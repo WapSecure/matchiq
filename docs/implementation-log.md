@@ -22,6 +22,13 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 
+## 2026-10-21 — Fix: blank optional env values
+
+| Area                                                                                                                                                                            | Status | Evidence              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------- |
+| `cp .env.example .env` made the API exit: blank `OTEL_SERVICE_NAME` and `APPLICATIONINSIGHTS_CONNECTION_STRING` failed `min(1)`. Blank optional values are now treated as unset | Done   | `load-env.spec.ts`    |
+| Regression guard: the committed `.env.example` (with only secrets filled) must parse for the api, worker and web schemas                                                        | Done   | `env-example.spec.ts` |
+
 ## 2026-10-21 — Refactor: single canonical JSON and hashing utility
 
 | Area                                                                                                                                                                    | Status | Evidence                                                          |
