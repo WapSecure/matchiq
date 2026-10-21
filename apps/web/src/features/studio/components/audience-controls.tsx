@@ -32,3 +32,16 @@ export function LocaleSwitcher() {
     />
   );
 }
+
+/** Persona and language for narratives; facts and figures stay identical. */
+export function AudienceBar() {
+  return (
+    <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+      <PersonaToggle />
+      <LocaleSwitcher />
+      <p className="text-micro text-ink-subtle sm:ml-auto sm:max-w-xs sm:text-right">
+        {STUDIO_COPY.controls.invariant}
+      </p>
+    </div>
+  );
+}

@@ -21,3 +21,7 @@ export { TimelineIcon } from './timeline-icon';
 export { SparkIcon } from './spark-icon';
 export { RefreshIcon } from './refresh-icon';
 export { ChartIcon } from './chart-icon';
+export { DownloadIcon } from './download-icon';
+export { AgentsIcon } from './agents-icon';
+export { ShieldIcon } from './shield-icon';
+export { TrophyIcon } from './trophy-icon';

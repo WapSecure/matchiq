@@ -1,9 +1,12 @@
-import { fixture, shot, snapshot } from '@/test/factories';
+import { shot, snapshot } from '@/test/factories';
+import { template, trace } from '@/test/session-factories';
 import { ApiError } from './api-error';
 import {
+  createSession,
+  fetchAgentRuns,
   fetchFixtureEvents,
-  fetchFixtures,
   fetchMatchState,
+  fetchTemplates,
   sendReplayCommand,
 } from './endpoints';
 
@@ -20,16 +23,16 @@ describe('REST client', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('returns contract-validated data', async () => {
-    vi.stubGlobal('fetch', respond({ items: [fixture()] }));
-    await expect(fetchFixtures()).resolves.toHaveLength(1);
+    vi.stubGlobal('fetch', respond({ items: [template()] }));
+    await expect(fetchTemplates()).resolves.toHaveLength(1);
   });
 
   it('rejects responses that violate the contract', async () => {
     vi.stubGlobal(
       'fetch',
-      respond({ items: [{ ...fixture(), status: 'POSTPONED' }] }),
+      respond({ items: [{ ...template(), eventCount: -1 }] }),
     );
-    const error = await fetchFixtures().catch((e: unknown) => e);
+    const error = await fetchTemplates().catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect((error as ApiError).kind).toBe('invalidResponse');
     expect((error as ApiError).retryable).toBe(false);
@@ -69,7 +72,7 @@ describe('REST client', () => {
         throw new TypeError('Failed to fetch');
       }),
     );
-    const error = (await fetchFixtures().catch((e: unknown) => e)) as ApiError;
+    const error = (await fetchTemplates().catch((e: unknown) => e)) as ApiError;
     expect(error.kind).toBe('network');
   });
 
@@ -110,5 +113,24 @@ describe('REST client', () => {
     await expect(fetchMatchState('fx_test')).resolves.toMatchObject({
       throughSequence: 10,
     });
+  });
+
+  it('creates a session with the chosen speed and an idempotency key', async () => {
+    const fetchMock = respond({ fixture: {}, session: {} }, { status: 201 });
+    vi.stubGlobal('fetch', fetchMock);
+    await createSession('fx_comeback_42', 30).catch(() => undefined);
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(String(url)).toMatch(/\/fixtures\/fx_comeback_42\/sessions$/);
+    expect(init?.body).toBe('{"speed":30}');
+    expect(
+      (init?.headers as Record<string, string>)['Idempotency-Key'],
+    ).toBeTruthy();
+  });
+
+  it('validates agent-run traces', async () => {
+    vi.stubGlobal('fetch', respond({ items: [trace()] }));
+    await expect(fetchAgentRuns('fx_x')).resolves.toMatchObject([
+      { publication: 'TEMPLATE', runs: [{ provider: 'template' }] },
+    ]);
   });
 });

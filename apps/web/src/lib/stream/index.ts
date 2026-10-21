@@ -12,6 +12,7 @@ export {
   MatchStreamClient,
   type MatchStreamClientOptions,
   type StreamGap,
+  type StreamOpen,
 } from './match-stream-client';
 export { SseParser, type SseFrame } from './sse-parser';
 export {

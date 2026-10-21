@@ -16,6 +16,8 @@ export {
   reduceMessages,
 } from './reduce-message';
 export { narrativeKey } from './reduce-insights';
+export type { Hydration } from './reduce-hydration';
+export type { StatusSource } from './reduce-message';
 export {
   selectActiveCues,
   selectEventsById,

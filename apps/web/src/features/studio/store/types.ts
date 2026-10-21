@@ -18,10 +18,12 @@ export type OverlayEntry = {
   retracted: { revision: number; reason: string } | null;
 };
 
+/** An ended cue: `EXPIRED` ran its match-clock window, `RETRACTED` was pulled. */
 export type Retraction = {
   overlayId: string;
   headline: string | null;
   reason: string;
+  ending: 'EXPIRED' | 'RETRACTED';
 };
 
 export type MomentumPoint = {
@@ -48,6 +50,8 @@ export type MatchData = {
   retractions: Retraction[];
   momentum: MomentumPoint[];
   connection: ConnectionStatus;
-  /** Incremented when local state can no longer be trusted (seek, gap). */
-  resyncToken: number;
+  /** Incremented when REST read models must be (re)loaded: join or gap. */
+  hydrationToken: number;
+  /** True once the first hydration settled, even if a read model was empty. */
+  hydrated: boolean;
 };

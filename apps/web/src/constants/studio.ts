@@ -49,8 +49,6 @@ export const STUDIO_COPY = {
     description: '16:9 graphics-safe frame at the current match clock',
     empty: 'No approved cue on air',
     safeArea: 'Safe area',
-    cueLog: 'Retractions',
-    retracted: 'Retracted',
     frameLabel: (count: number) =>
       count === 0
         ? 'Overlay preview, no cue on air'
@@ -59,6 +57,8 @@ export const STUDIO_COPY = {
   controls: {
     persona: 'Audience',
     locale: 'Language',
+    invariant:
+      'Audience and language change the wording only. Every number comes from the deterministic engine and stays the same.',
   },
   connectionPrefix: 'Stream ',
   notFound: 'Fixture not found',
@@ -98,3 +98,6 @@ export const STAT_ROWS = [
 ] as const;
 
 export const ANNOUNCE_THROTTLE_MS = 5_000;
+
+/** A keyboard seek is sent once the slider has been still this long. */
+export const SEEK_COMMIT_IDLE_MS = 600;

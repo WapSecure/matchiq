@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { API_PATHS, STREAM_TIMING } from '@/constants/api';
 import { apiUrl } from '@/lib/env';
 import { MatchStreamClient, type SseTransport } from '@/lib/stream';
-import { useMatchStoreApi } from '../store';
-import { resyncSnapshot } from './resync';
+import { useMatchStoreApi, useStudioUi } from '../store';
+import { hydrateStudio } from './hydrate';
 
 type MatchStreamOptions = {
   enabled?: boolean;
@@ -18,8 +18,10 @@ type MatchStreamOptions = {
 const STREAM_WARNING = '[matchiq] dropped invalid stream message:';
 
 /**
- * Connects the fixture stream to the match store. Messages are coalesced and
+ * Connects the session stream to the match store. Messages are coalesced and
  * flushed on a short interval so a 30x replay costs one store update per tick.
+ * Without a resume point the stream starts at the live head, so read models
+ * are hydrated once it is accepted; a gap re-hydrates before held messages.
  */
 export const useMatchStream = (
   fixtureId: string,
@@ -39,11 +41,6 @@ export const useMatchStream = (
       store.getState().applyMessages(queue.splice(0));
     };
 
-    const resync = () => {
-      flush();
-      return resyncSnapshot(queryClient, store, fixtureId);
-    };
-
     const client = new MatchStreamClient({
       url: apiUrl(API_PATHS.stream(fixtureId)),
       fixtureId,
@@ -52,8 +49,18 @@ export const useMatchStream = (
         queue.push(message);
         timer ??= setTimeout(flush, STREAM_TIMING.flushIntervalMs);
       },
+      onOpen: ({ resumed }) => {
+        if (!resumed) store.getState().requestHydration();
+      },
       onStatus: (status) => store.getState().setConnection(status),
-      onGap: resync,
+      onGap: () => {
+        flush();
+        const { persona, locale } = useStudioUi.getState();
+        return hydrateStudio(
+          { queryClient, store, fixtureId },
+          { persona, locale },
+        );
+      },
       onInvalidMessage: (reason) => console.warn(STREAM_WARNING, reason),
     });
     client.start();

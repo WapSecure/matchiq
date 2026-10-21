@@ -1,18 +1,68 @@
 'use client';
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { ChevronLeftIcon, LogoMark } from '@/components/icons';
-import { ConnectionStatus } from '@/components/match/connection-status';
 import { Badge } from '@/components/ui';
-import { ROUTES } from '@/constants/navigation';
-import { CONNECTION_COPY, STUDIO_COPY, WATERMARK } from '@/constants/studio';
+import {
+  ROUTES,
+  STUDIO_TABS,
+  STUDIO_TABS_LABEL,
+  type StudioView,
+} from '@/constants/navigation';
+import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { cn } from '@/lib/cn';
-import { useMatchStore } from '../store';
 
-type StudioHeaderProps = { title: string | null; competition: string | null };
+type StudioHeaderProps = {
+  fixtureId: string;
+  view: StudioView;
+  title: string | null;
+  competition: string | null;
+  /** Live connection indicator; only the live view has a stream. */
+  status?: ReactNode;
+};
 
-export function StudioHeader({ title, competition }: StudioHeaderProps) {
-  const connection = useMatchStore((s) => s.connection.state);
+function StudioTabs({
+  fixtureId,
+  view,
+}: {
+  fixtureId: string;
+  view: StudioView;
+}) {
+  return (
+    <nav
+      aria-label={STUDIO_TABS_LABEL}
+      className="-mb-px flex gap-1 overflow-x-auto"
+    >
+      {STUDIO_TABS.map((tab) => {
+        const current = tab.view === view;
+        return (
+          <Link
+            key={tab.view}
+            href={tab.href(fixtureId)}
+            aria-current={current ? 'page' : undefined}
+            className={cn(
+              'whitespace-nowrap border-b-2 px-3 py-2 text-xs font-medium transition-colors',
+              current
+                ? 'border-accent text-ink'
+                : 'border-transparent text-ink-muted hover:text-ink',
+            )}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function StudioHeader({
+  fixtureId,
+  view,
+  title,
+  competition,
+  status,
+}: StudioHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur">
       <div className="mx-auto flex h-12 max-w-[1920px] items-center gap-3 px-4 lg:px-6">
@@ -38,27 +88,11 @@ export function StudioHeader({ title, competition }: StudioHeaderProps) {
         <Badge tone="synthetic" dot data-watermark="">
           {WATERMARK}
         </Badge>
-        <ConnectionStatus state={connection} />
+        {status}
+      </div>
+      <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
+        <StudioTabs fixtureId={fixtureId} view={view} />
       </div>
     </header>
-  );
-}
-
-export function ConnectionBanner() {
-  const state = useMatchStore((s) => s.connection.state);
-  const banner = CONNECTION_COPY[state].banner;
-  if (!banner) return null;
-  return (
-    <div
-      role="status"
-      className={cn(
-        'border-b px-4 py-2 text-xs text-ink lg:px-6',
-        state === 'offline'
-          ? 'border-critical/30 bg-critical/5'
-          : 'border-warning/30 bg-warning/5',
-      )}
-    >
-      {banner}
-    </div>
   );
 }

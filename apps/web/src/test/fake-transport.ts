@@ -3,6 +3,8 @@ import type { SseFrame, SseRequest, SseTransport } from '@/lib/stream';
 
 type Connection = {
   request: SseRequest;
+  /** Signals that the server accepted the stream (headers received). */
+  open: () => void;
   push: (frame: SseFrame) => void;
   /** Ends the stream cleanly, as a server close would. */
   end: () => void;
@@ -16,8 +18,11 @@ export const frameOf = (message: StreamMessage): SseFrame => ({
   retryMs: null,
 });
 
-/** In-memory SSE transport; each connect() call is recorded and controllable. */
-export const createFakeTransport = () => {
+/**
+ * In-memory SSE transport; each connect() call is recorded and controllable.
+ * With `autoOpen` the connection is accepted on the next microtask.
+ */
+export const createFakeTransport = ({ autoOpen = false } = {}) => {
   const connections: Connection[] = [];
 
   const transport: SseTransport = (request) => {
@@ -29,8 +34,16 @@ export const createFakeTransport = () => {
       wake?.();
       wake = null;
     };
+    let opened = false;
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      request.onOpen?.();
+    };
+    if (autoOpen) queueMicrotask(open);
     connections.push({
       request,
+      open,
       push: (frame) => {
         queue.push(frame);
         notify();

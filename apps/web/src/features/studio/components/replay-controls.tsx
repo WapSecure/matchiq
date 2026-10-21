@@ -1,62 +1,80 @@
 'use client';
 
 import { REPLAY_SPEEDS, type ReplaySpeed } from '@matchiq/contracts';
-import { useState } from 'react';
 import { PauseIcon, PlayIcon, RestartIcon } from '@/components/icons';
 import { Button, SegmentedControl } from '@/components/ui';
 import { REPLAY_COPY } from '@/constants/replay';
+import { useStartSession } from '@/features/lobby/use-start-session';
+import { describeReplayProblem } from '@/lib/api/describe-problem';
 import { useReplayTransport } from '../hooks/use-replay-transport';
+import { useSessionTemplate } from '../hooks/use-session-template';
 import { useMatchStore } from '../store';
+import { SeekBar } from './seek-bar';
+
+type Transport = ReturnType<typeof useReplayTransport>;
 
 const SPEED_OPTIONS = REPLAY_SPEEDS.map((value) => ({
   value,
   label: REPLAY_COPY.speedOption(value),
 }));
 
-function SeekBar({
-  max,
-  value,
-  onCommit,
-  disabled,
-}: {
-  max: number;
-  value: number;
-  onCommit: (v: number) => void;
-  disabled: boolean;
-}) {
-  const [draft, setDraft] = useState<number | null>(null);
-  const shown = draft ?? value;
-  const commit = () => {
-    if (draft !== null) onCommit(draft);
-    setDraft(null);
-  };
+function statusText(t: Transport): string {
+  if (t.pending) return REPLAY_COPY.pending;
+  if (t.awaiting) return REPLAY_COPY.awaiting;
+  const state = t.replay
+    ? REPLAY_COPY.state[t.replay.state]
+    : REPLAY_COPY.unknownState;
+  return `${state} · ${REPLAY_COPY.speedOption(t.speed)}`;
+}
+
+function PrimaryButton({ t, disabled }: { t: Transport; disabled: boolean }) {
+  if (!t.primary) return null;
+  const Icon = t.primary === 'pause' ? PauseIcon : PlayIcon;
   return (
-    <label className="flex min-w-0 flex-1 items-center gap-3">
-      <span className="sr-only">{REPLAY_COPY.seek}</span>
-      <input
-        type="range"
-        min={0}
-        max={Math.max(max, 0)}
-        value={Math.min(shown, Math.max(max, 0))}
-        disabled={disabled || max <= 0}
-        aria-valuetext={REPLAY_COPY.seekValue(shown, max)}
-        onChange={(e) => setDraft(Number(e.target.value))}
-        onPointerUp={commit}
-        onKeyUp={commit}
-        onBlur={commit}
-        className="h-1 min-w-0 flex-1 cursor-pointer accent-[var(--color-accent)] disabled:cursor-not-allowed"
-      />
-    </label>
+    <Button
+      variant="primary"
+      onClick={t.runPrimary}
+      disabled={disabled}
+      leadingIcon={<Icon size={14} />}
+    >
+      {REPLAY_COPY[t.primary]}
+    </Button>
   );
 }
 
-export function ReplayControls({ fixtureId }: { fixtureId: string }) {
-  const t = useReplayTransport(fixtureId);
-  const applied = useMatchStore((s) => s.lastEventSequence);
-  const stateLabel = t.replay
-    ? REPLAY_COPY.state[t.replay.state]
-    : REPLAY_COPY.unknownState;
-  const PrimaryIcon = t.primary === 'pause' ? PauseIcon : PlayIcon;
+function ProblemLine({
+  t,
+  restartError,
+}: {
+  t: Transport;
+  restartError: unknown;
+}) {
+  if (t.error) {
+    return (
+      <p role="alert" className="text-xs text-critical">
+        {describeReplayProblem(t.error)}
+      </p>
+    );
+  }
+  if (!restartError) return null;
+  return (
+    <p role="alert" className="text-xs text-critical">
+      {REPLAY_COPY.restartFailed}. {describeReplayProblem(restartError)}
+    </p>
+  );
+}
+
+/** Transport for one session; every state shown comes from the server. */
+export function ReplayControls({ sessionId }: { sessionId: string }) {
+  const t = useReplayTransport(sessionId);
+  const template = useSessionTemplate(sessionId);
+  const restart = useStartSession();
+  const applied = useMatchStore((s) =>
+    Math.max(s.lastEventSequence, s.replay?.appliedSequence ?? -1),
+  );
+  const busy = t.pending || restart.pending;
+  const completed = t.replay?.state === 'COMPLETED';
+  const locked = busy || !t.replay || completed;
   return (
     <div
       role="group"
@@ -64,46 +82,37 @@ export function ReplayControls({ fixtureId }: { fixtureId: string }) {
       className="flex flex-col gap-3"
     >
       <div className="flex flex-wrap items-center gap-3">
+        <PrimaryButton t={t} disabled={busy} />
         <Button
-          variant="primary"
-          onClick={t.runPrimary}
-          disabled={t.pending}
-          leadingIcon={<PrimaryIcon size={14} />}
-        >
-          {REPLAY_COPY[t.primary]}
-        </Button>
-        <Button
-          iconOnly
-          aria-label={REPLAY_COPY.restart}
-          onClick={() => t.seek(0)}
-          disabled={t.pending || !t.replay}
+          variant={completed ? 'primary' : 'secondary'}
+          title={REPLAY_COPY.restartHint}
+          onClick={() =>
+            template && restart.start(template.templateId, t.speed)
+          }
+          disabled={busy || !template}
           leadingIcon={<RestartIcon size={14} />}
-        />
+        >
+          {restart.pending ? REPLAY_COPY.restarting : REPLAY_COPY.restart}
+        </Button>
         <SegmentedControl<ReplaySpeed>
           legend={REPLAY_COPY.speed}
           hideLegend
           options={SPEED_OPTIONS}
           value={t.speed}
           onChange={t.changeSpeed}
-          disabled={t.pending}
+          disabled={locked}
         />
         <p role="status" className="tabular ml-auto text-xs text-ink-muted">
-          {t.pending
-            ? REPLAY_COPY.pending
-            : `${stateLabel} · ${REPLAY_COPY.speedOption(t.speed)}`}
+          {statusText(t)}
         </p>
       </div>
       <SeekBar
-        max={Math.max(applied, t.replay?.appliedSequence ?? -1)}
-        value={Math.max(applied, 0)}
+        total={template?.eventCount ?? applied + 1}
+        applied={applied}
         onCommit={t.seek}
-        disabled={t.pending || !t.replay}
+        disabled={locked || !template}
       />
-      {t.error ? (
-        <p role="alert" className="text-xs text-critical">
-          {REPLAY_COPY.failed}: {t.error.message}
-        </p>
-      ) : null}
+      <ProblemLine t={t} restartError={restart.error} />
     </div>
   );
 }
