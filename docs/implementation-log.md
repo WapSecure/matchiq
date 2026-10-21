@@ -22,6 +22,34 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 
+## 2026-10-21 — M2: Evidence-grounded multi-agent pipeline (MQ-009)
+
+| Area                                                                                                                                   | Status            | Evidence                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Orchestration on Agent Framework graph workflows (`WorkflowBuilder`, `Executor`), typed FSM `DETECTED → ANALYZED → DRAFTED → VERIFIED` | Done              | ADR-0011; `tests/test_pipeline.py`                                                                                    |
+| Roster: Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer, with versioned prompts (all `1.0.0`)          | Done              | `apps/agents/src/matchiq_agents/roster/`                                                                              |
+| Deterministic Fact Checker (cited values, evidence ids, entity allowlist, forbidden lexicon, lengths), then an optional AI critique    | Done              | `tests/test_guard.py`                                                                                                 |
+| REVISE regenerates once; REJECT falls back to verified templates or is suppressed; timeouts, 2 retries with backoff, circuit breaker   | Done              | `tests/test_resilience.py`, `tests/test_pipeline.py`                                                                  |
+| Prompt-injection defence: untrusted fields as escaped JSON data blocks; unsafe entity names dropped from the allowlist                 | Done              | Adversarial cases in `tests/eval/`                                                                                    |
+| `POST /api/v1/pipeline/runs` with service-token auth (constant-time) and RFC 9457 401/422                                              | Done              | `tests/test_api.py`                                                                                                   |
+| Model port: `mock`, `ollama` (`OpenAIChatClient`), `foundry` (`FoundryChatClient`); `/health/ready` probes Ollama                      | Done              | `tests/test_providers.py` (fake agent, no network)                                                                    |
+| Evaluation: 33 golden and 6 adversarial-input cases, plus 10 compromised-model attacks, with an independent oracle                     | Done              | CI (mock and templates): 0 unsupported numbers, 0 unknown entities, 0 leaks; fallback verified with the model failing |
+| Live Ollama evaluation                                                                                                                 | **Not run**       | Pending local model download; `OLLAMA_LIVE=1 uv run pytest -m ollama`, `scripts/run_eval.py --provider ollama`        |
+| Live Foundry call                                                                                                                      | **Not exercised** | No Azure subscription (ADR-0012). Adapter covered by contract tests only                                              |
+
+### Known limitations
+
+- Entity detection relies on capitalisation and exempts the first word of each sentence, so a sentence that opens with an unknown name is not flagged.
+- Number words are recognised for 2 to 20 only. "one", "un" and "uno" are skipped because they double as articles.
+- The contract has no issue code for AI-critique concerns, so they are reported as `UNCITED_EVIDENCE`. After a fallback, `verification` describes the served template drafts, and the rejected drafts' issue codes appear in `fallbackReason`.
+- Metric labels for unknown metric families fall back to split camelCase in English, in every locale.
+
+### Proposed contract changes
+
+- `VerificationIssueCode`: add `UNGROUNDED_CLAIM` for critique concerns.
+- `EntityAllowlist.teams[]`: add `side: home | away`, so narratives can name the team behind `*.home.*` and `*.away.*` metrics.
+- `PipelineResult`: add an optional `rejectedVerification`, to keep the rejected agent drafts' issues alongside the served verification.
+
 ## 2026-10-21 — Fix: secret-scan scope blocking every PR
 
 | Area                                                                                                                                                                                                    | Status | Evidence                                                                                                                                           |
