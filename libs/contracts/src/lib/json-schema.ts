@@ -11,6 +11,7 @@ import { HealthStatus, ProblemDetails } from './http.js';
 import { EvidenceEnvelope, Insight } from './insight.js';
 import { Narrative } from './narrative.js';
 import { OverlayCue } from './overlay.js';
+import { PipelineRequest, PipelineResult } from './pipeline.js';
 import { MatchSnapshot } from './snapshot.js';
 
 /** Contracts exported for non-TypeScript consumers (the Python agents service). */
@@ -26,6 +27,8 @@ export const CROSS_LANGUAGE_CONTRACTS = {
   AgentRun,
   Narrative,
   OverlayCue,
+  PipelineRequest,
+  PipelineResult,
   ProblemDetails,
   HealthStatus,
 } as const;
@@ -38,7 +41,8 @@ export const toContractJsonSchema = (name: CrossLanguageContractName) =>
     io: 'input',
     unrepresentable: 'throw',
     override: ({ jsonSchema }) => {
-      // `format` already enforces RFC 3339; Zod's extra regex is unenforceable on parsed datetimes.
-      if (jsonSchema.format === 'date-time') delete jsonSchema.pattern;
+      // `format` (date-time, uuid, …) is authoritative; Zod's duplicate regex cannot be applied
+      // by generators that parse these strings into native types.
+      if (jsonSchema.format) delete jsonSchema.pattern;
     },
   });

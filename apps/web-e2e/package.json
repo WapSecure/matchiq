@@ -1,0 +1,25 @@
+{
+  "name": "web-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "web"
+    ],
+    "targets": {
+      "e2e": {
+        "dependsOn": [
+          {
+            "projects": [
+              "web"
+            ],
+            "target": "build"
+          }
+        ]
+      }
+    }
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0"
+  }
+}
