@@ -1,0 +1,54 @@
+{
+  "title": "VerificationResult",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "REVISE",
+        "REJECT"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "UNSUPPORTED_NUMBER",
+              "UNKNOWN_ENTITY",
+              "UNCITED_EVIDENCE",
+              "FORBIDDEN_CLAIM",
+              "SCHEMA_VIOLATION",
+              "LENGTH_EXCEEDED"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "claimIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "code",
+          "detail"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "verdict",
+    "issues"
+  ],
+  "additionalProperties": false
+}

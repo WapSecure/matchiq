@@ -1,0 +1,109 @@
+{
+  "title": "EvidenceEnvelope",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "insightId": {
+      "type": "string",
+      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "windowStartMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "windowEndMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "eventIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      }
+    },
+    "computedMetrics": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "methodVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "dataCoverage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "confidenceLabel": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "counterEvidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          }
+        },
+        "required": [
+          "description",
+          "eventIds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "insightId",
+    "fixtureId",
+    "windowStartMs",
+    "windowEndMs",
+    "eventIds",
+    "computedMetrics",
+    "methodVersion",
+    "dataCoverage",
+    "confidenceLabel",
+    "rationale",
+    "counterEvidence",
+    "generatedAt"
+  ],
+  "additionalProperties": false
+}

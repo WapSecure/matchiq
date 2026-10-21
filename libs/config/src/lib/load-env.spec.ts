@@ -1,0 +1,73 @@
+import { ApiEnv, ConfigError, WorkerEnv, loadEnv } from '../index.js';
+
+const OPERATOR_KEY = 'k'.repeat(32);
+const validApi = {
+  DATABASE_URL: 'postgresql://matchiq:matchiq@localhost:5432/matchiq',
+  REDIS_URL: 'redis://localhost:6379',
+  OPERATOR_API_KEY: OPERATOR_KEY,
+};
+
+describe('loadEnv', () => {
+  it('applies defaults and coerces types', () => {
+    const env = loadEnv(ApiEnv, {
+      ...validApi,
+      API_PORT: '4100',
+      CORS_ALLOWED_ORIGINS: 'a.com, b.com',
+    });
+    expect(env.API_PORT).toBe(4100);
+    expect(env.APP_ENV).toBe('local');
+    expect(env.CORS_ALLOWED_ORIGINS).toEqual(['a.com', 'b.com']);
+  });
+
+  it('reports every missing variable by name', () => {
+    expect.assertions(2);
+    try {
+      loadEnv(ApiEnv, {});
+    } catch (error) {
+      expect(error).toBeInstanceOf(ConfigError);
+      expect((error as ConfigError).issues).toEqual(
+        expect.arrayContaining([
+          'DATABASE_URL: is required',
+          'REDIS_URL: is required',
+          'OPERATOR_API_KEY: is required',
+        ]),
+      );
+    }
+  });
+
+  it('never echoes received values in error messages', () => {
+    const secret = 'short-secret-value';
+    expect(() =>
+      loadEnv(ApiEnv, { ...validApi, OPERATOR_API_KEY: secret }),
+    ).toThrow(ConfigError);
+    try {
+      loadEnv(ApiEnv, { ...validApi, OPERATOR_API_KEY: secret });
+    } catch (error) {
+      expect((error as Error).message).not.toContain(secret);
+    }
+  });
+
+  it('rejects non-postgres database URLs', () => {
+    expect(() =>
+      loadEnv(ApiEnv, { ...validApi, DATABASE_URL: 'mysql://x@y/z' }),
+    ).toThrow(ConfigError);
+  });
+
+  it('caps agent retries at the specification limit of two', () => {
+    const base = { ...validApi, AGENTS_SERVICE_TOKEN: OPERATOR_KEY };
+    expect(loadEnv(WorkerEnv, base).AGENT_MAX_RETRIES).toBe(2);
+    expect(() =>
+      loadEnv(WorkerEnv, { ...base, AGENT_MAX_RETRIES: '3' }),
+    ).toThrow(ConfigError);
+  });
+
+  it('parses boolean flags strictly', () => {
+    const base = { ...validApi, AGENTS_SERVICE_TOKEN: OPERATOR_KEY };
+    expect(loadEnv(WorkerEnv, { ...base, AI_ENABLED: 'true' }).AI_ENABLED).toBe(
+      true,
+    );
+    expect(() => loadEnv(WorkerEnv, { ...base, AI_ENABLED: 'yes' })).toThrow(
+      ConfigError,
+    );
+  });
+});
