@@ -58,4 +58,4 @@ Write a comment only when it carries information the code cannot express: an inv
 - Flow: feature → `dev` → `stage` → `main` (production). Only `dev` may be promoted to `stage`, and only `stage` to `main`. **[ci]** promotion job
 - PR titles follow Conventional Commits. **[ci]** PR-title job
 - Commits and PRs are authored by the repository owner. No tool attribution trailers.
-- Squash-merge feature PRs into `dev`. Use merge commits for promotions, to keep the history traceable.
+- Merge PRs with a merge commit once every CI check passes. Each PR is one cohesive, well-described commit series, so `dev` history reads stage by stage.
