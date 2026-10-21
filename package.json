@@ -12,6 +12,8 @@
     "codegen": "nx run agents:codegen",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "generate:fixture": "nx run synthetic-data:build --output-style=static 1>&2 && node libs/synthetic-data/dist/cli/generate-fixture.js",
+    "validate:fixture": "nx run synthetic-data:build --output-style=static 1>&2 && node libs/synthetic-data/dist/cli/validate-fixture.js",
     "verify": "nx sync:check && pnpm format:check && nx run-many -t lint typecheck test build",
     "infra:up": "docker compose up -d --wait",
     "infra:down": "docker compose down"
@@ -58,6 +60,7 @@
     "eslint-plugin-playwright": "1.8.3",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.0.0",
+    "fast-check": "4.10.2",
     "jest": "30.3.0",
     "jest-environment-node": "30.3.0",
     "jest-util": "30.3.0",
