@@ -33,7 +33,8 @@ class AppEnvironment(StrEnum):
 class Settings(BaseSettings):
     """Validated service configuration. Variable names follow Agent Framework conventions."""
 
-    model_config = SettingsConfigDict(extra="ignore", frozen=True)
+    # Blank values copied from `.env.example` (for example `FOUNDRY_MODEL=`) mean "unset".
+    model_config = SettingsConfigDict(extra="ignore", frozen=True, env_ignore_empty=True)
 
     app_env: AppEnvironment = AppEnvironment.LOCAL
     app_version: str = DEFAULT_APP_VERSION
