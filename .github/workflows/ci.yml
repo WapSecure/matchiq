@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, stage, main]
+  push:
+    branches: [dev, stage, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NX_NO_CLOUD: 'true'
+  NX_DAEMON: 'false'
+  UV_FROZEN: '1'
+
+jobs:
+  pr-title:
+    name: PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce Conventional Commits title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|perf|refactor|test|docs|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: [a-z].{4,}$'
+          if ! printf '%s' "$TITLE" | grep -Eq "$pattern"; then
+            echo "::error::PR title must follow Conventional Commits, e.g. 'feat(contracts): add overlay cue schema'"
+            exit 1
+          fi
+
+  promotion:
+    name: Promotion path
+    if: github.event_name == 'pull_request' && (github.base_ref == 'stage' || github.base_ref == 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce dev -> stage -> main
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          if [ "$BASE" = "stage" ] && [ "$HEAD" != "dev" ]; then
+            echo "::error::Only dev may be promoted to stage"; exit 1
+          fi
+          if [ "$BASE" = "main" ] && [ "$HEAD" != "stage" ]; then
+            echo "::error::Only stage may be promoted to main"; exit 1
+          fi
+
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        if: hashFiles('apps/agents/uv.lock') != ''
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/agents/uv.lock
+      - run: pnpm install --frozen-lockfile
+      - if: hashFiles('apps/agents/uv.lock') != ''
+        run: uv sync
+        working-directory: apps/agents
+      - name: Workspace configuration in sync
+        run: pnpm nx sync:check
+      - name: Formatting
+        run: pnpm format:check
+      - name: Lint, typecheck, test, build
+        run: pnpm nx run-many -t lint typecheck test build --parallel=3
+      - name: Generated contracts are up to date
+        run: |
+          pnpm nx run-many -t export-json-schema codegen --skip-nx-cache
+          git diff --exit-code
+          test -z "$(git status --porcelain)" || { git status --porcelain; exit 1; }
+
+  e2e:
+    name: End-to-end and accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: verify
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm nx run-many -t e2e
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: apps/web-e2e/test-output
+          retention-days: 7
+
+  security:
+    name: Secrets and dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Scan history for secrets
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks git --redact --no-banner --exit-code 1 .
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: npm dependency audit
+        run: pnpm audit --prod --audit-level=high
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        if: hashFiles('apps/agents/uv.lock') != ''
+      - name: Python dependency audit
+        if: hashFiles('apps/agents/uv.lock') != ''
+        working-directory: apps/agents
+        run: uv export --no-dev --no-hashes --no-emit-project --output-file "$RUNNER_TEMP/requirements.txt" && uvx pip-audit==2.10.1 -r "$RUNNER_TEMP/requirements.txt" --strict --disable-pip --no-deps

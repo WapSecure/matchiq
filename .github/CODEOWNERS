@@ -1,0 +1,12 @@
+# Default owner for everything not matched below.
+*                         @WapSecure
+
+# Shared contracts, configuration and quality gates require platform-lead review.
+/libs/contracts/          @WapSecure
+/libs/config/             @WapSecure
+/libs/server-kit/         @WapSecure
+/.github/                 @WapSecure
+/tools/                   @WapSecure
+/docs/adr/                @WapSecure
+/docs/engineering/        @WapSecure
+/apps/agents/src/matchiq_agents/contracts/generated/  @WapSecure
