@@ -230,6 +230,54 @@ describe('MatchStreamClient', () => {
     client.stop();
   });
 
+  it('goes live when the server accepts, before the first heartbeat', async () => {
+    const onOpen = vi.fn();
+    const { client, fake } = setup({ onOpen });
+    client.start();
+    expect(client.connection.state).toBe('connecting');
+    fake.connections[0]?.open();
+    await flush();
+    expect(client.connection.state).toBe('live');
+    expect(onOpen).toHaveBeenCalledWith({ resumed: false });
+    client.stop();
+  });
+
+  it('recovers within the capped backoff after an API restart', async () => {
+    const onOpen = vi.fn();
+    const { client, fake } = setup({ onOpen });
+    client.start();
+    fake.connections[0]?.open();
+    fake.connections[0]?.push(frameOf(event(3)));
+    await flush();
+    // The API goes away: every attempt fails until it is back.
+    for (let i = 0; i < 6; i += 1) {
+      fake.connections.at(-1)?.fail(new Error('ECONNREFUSED'));
+      await flush();
+      expect(client.connection.retryInMs).toBeLessThanOrEqual(5_000);
+      await vi.advanceTimersByTimeAsync(client.connection.retryInMs ?? 0);
+    }
+    const restarted = fake.connections.at(-1);
+    expect(restarted?.request.lastEventId).toBe('3');
+    restarted?.open();
+    await flush();
+    expect(client.connection).toMatchObject({ state: 'live', attempt: 0 });
+    expect(onOpen).toHaveBeenLastCalledWith({ resumed: true });
+    // No frame arrives for longer than the old 15 s stale threshold.
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(client.connection.state).toBe('live');
+    client.stop();
+  });
+
+  it('ignores an accept from a connection it already replaced', async () => {
+    const { client, fake, network } = setup();
+    client.start();
+    network.set(false);
+    await flush();
+    fake.connections[0]?.open();
+    expect(client.connection.state).toBe('offline');
+    client.stop();
+  });
+
   it('stops cleanly without reconnecting', async () => {
     const { client, fake } = setup();
     client.start();

@@ -79,6 +79,7 @@ export const initialStreamMessages = (): StreamMessage[] => {
     envelope('insight.detected', mockInsight()),
     envelope('narrative.ready', NARRATIVES.broadcastEn),
     envelope('narrative.ready', NARRATIVES.broadcastFr),
+    envelope('narrative.ready', NARRATIVES.broadcastPcm),
     envelope('narrative.ready', NARRATIVES.casualEn),
     envelope('narrative.ready', NARRATIVES.analystEn),
     envelope('overlay.publish', mockCue()),

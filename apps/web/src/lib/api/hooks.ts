@@ -1,23 +1,48 @@
 'use client';
 
-import type { ReplayCommand } from '@matchiq/contracts';
+import type {
+  Locale,
+  Persona,
+  ReplayCommand,
+  ReplaySpeed,
+} from '@matchiq/contracts';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { HTTP_STATUS, POLL_MS } from '@/constants/api';
+import { isApiError } from './api-error';
 import {
-  type EventsQuery,
+  createSession,
+  fetchAgentRuns,
   fetchFixture,
-  fetchFixtureEvents,
-  fetchFixtures,
-  fetchMatchState,
+  fetchNarratives,
+  fetchRecap,
+  fetchSessions,
+  fetchTemplates,
   sendReplayCommand,
 } from './endpoints';
 import { queryKeys } from './query-keys';
 
-type QueryToggle = { enabled?: boolean };
-
-export const useFixtures = () =>
+export const useTemplates = () =>
   useQuery({
-    queryKey: queryKeys.fixtures(),
-    queryFn: ({ signal }) => fetchFixtures(signal),
+    queryKey: queryKeys.templates(),
+    queryFn: ({ signal }) => fetchTemplates(signal),
+  });
+
+export const useSessions = () =>
+  useQuery({
+    queryKey: queryKeys.sessions(),
+    queryFn: ({ signal }) => fetchSessions(undefined, signal),
+    refetchInterval: POLL_MS.sessions,
+  });
+
+export const useCreateSession = () =>
+  useMutation({
+    mutationFn: ({
+      templateId,
+      speed,
+    }: {
+      templateId: string;
+      speed: ReplaySpeed;
+    }) => createSession(templateId, speed),
   });
 
 export const useFixture = (fixtureId: string) =>
@@ -26,29 +51,41 @@ export const useFixture = (fixtureId: string) =>
     queryFn: ({ signal }) => fetchFixture(fixtureId, signal),
   });
 
-export const useFixtureEvents = (
-  fixtureId: string,
-  query: EventsQuery,
-  { enabled = true }: QueryToggle = {},
-) =>
-  useQuery({
-    queryKey: queryKeys.events(fixtureId, query),
-    queryFn: ({ signal }) => fetchFixtureEvents(fixtureId, query, signal),
-    enabled,
-  });
-
-/** Snapshots are pushed over the stream; this query seeds and reconciles. */
-export const useMatchState = (fixtureId: string) =>
-  useQuery({
-    queryKey: queryKeys.state(fixtureId),
-    queryFn: ({ signal }) => fetchMatchState(fixtureId, signal),
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-    retryOnMount: false,
-  });
-
-export const useReplayCommand = (fixtureId: string) =>
+export const useReplayCommand = (sessionId: string) =>
   useMutation({
     mutationFn: (command: ReplayCommand) =>
-      sendReplayCommand(fixtureId, command),
+      sendReplayCommand(sessionId, command),
+  });
+
+const notReady = (error: unknown): boolean =>
+  isApiError(error) && error.status === HTTP_STATUS.notFound;
+
+/** 404 `recap-not-ready` until full time; polled until it exists. */
+export const useRecap = (fixtureId: string) =>
+  useQuery({
+    queryKey: queryKeys.recap(fixtureId),
+    queryFn: ({ signal }) => fetchRecap(fixtureId, signal),
+    retry: (count, error) => !notReady(error) && count < 2,
+    refetchInterval: (query) =>
+      query.state.data ? false : notReady(query.state.error) && POLL_MS.recap,
+  });
+
+export const useAgentRuns = (fixtureId: string) =>
+  useQuery({
+    queryKey: queryKeys.agentRuns(fixtureId),
+    queryFn: ({ signal }) => fetchAgentRuns(fixtureId, signal),
+    refetchInterval: POLL_MS.agentRuns,
+  });
+
+export const useNarratives = (
+  fixtureId: string,
+  persona: Persona,
+  locale: Locale,
+  { enabled = true }: { enabled?: boolean } = {},
+) =>
+  useQuery({
+    queryKey: queryKeys.narratives(fixtureId, { persona, locale }),
+    queryFn: ({ signal }) =>
+      fetchNarratives(fixtureId, { persona, locale }, signal),
+    enabled,
   });

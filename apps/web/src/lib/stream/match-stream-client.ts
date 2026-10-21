@@ -19,6 +19,7 @@ const SILENT_KEYS = new Set<keyof ConnectionStatus>([
 ]);
 
 export type StreamGap = { expected: number; received: number };
+export type StreamOpen = { resumed: boolean };
 
 export type MatchStreamClientOptions = {
   url: string;
@@ -27,6 +28,8 @@ export type MatchStreamClientOptions = {
   onStatus?: (status: ConnectionStatus) => void;
   /** Refetch the snapshot; messages received meanwhile are held, then replayed. */
   onGap?: (gap: StreamGap) => Promise<void>;
+  /** The server accepted the connection; `resumed` when Last-Event-ID was sent. */
+  onOpen?: (open: StreamOpen) => void;
   onInvalidMessage?: (reason: string) => void;
   transport?: SseTransport;
   network?: NetworkMonitor;
@@ -93,10 +96,14 @@ export class MatchStreamClient {
     this.clearRetry();
     const controller = new AbortController();
     this.controller = controller;
+    const resumed = this.resumeId !== null;
     const frames = this.transport({
       url: this.options.url,
       lastEventId: this.resumeId,
       signal: controller.signal,
+      onOpen: () => {
+        if (this.controller === controller) this.handleOpen(resumed);
+      },
     });
     try {
       for await (const frame of frames) this.handleFrame(frame);
@@ -107,6 +114,25 @@ export class MatchStreamClient {
       this.scheduleReconnect();
   }
 
+  /**
+   * The API flushes headers on accept but, without Last-Event-ID, sends nothing
+   * until the next message or its 15 s heartbeat. Going live on accept keeps a
+   * fresh or restarted connection from sitting in Connecting until then.
+   */
+  private handleOpen(resumed: boolean): void {
+    this.markHealthy();
+    this.options.onOpen?.({ resumed });
+  }
+
+  private markHealthy(): void {
+    this.setStatus({
+      state: 'live',
+      attempt: 0,
+      retryInMs: null,
+      lastMessageAt: Date.now(),
+    });
+  }
+
   private handleFrame(frame: SseFrame): void {
     const decoded = decodeFrame(frame, this.options.fixtureId);
     if (!decoded.ok) {
@@ -114,12 +140,7 @@ export class MatchStreamClient {
       return;
     }
     const { message } = decoded;
-    this.setStatus({
-      state: 'live',
-      attempt: 0,
-      retryInMs: null,
-      lastMessageAt: Date.now(),
-    });
+    this.markHealthy();
     if (
       this.lastSequence !== null &&
       message.streamSequence <= this.lastSequence

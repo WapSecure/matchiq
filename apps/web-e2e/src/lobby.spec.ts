@@ -9,7 +9,7 @@ import { FIXTURE_ID } from './support/mock-fixture';
 const SINGLE_LINE_MAX_PX = 24;
 
 test.describe('fixture lobby', () => {
-  test('lists synthetic fixtures with status and provenance', async ({
+  test('lists templates with the quick-start scenario first, and recent sessions', async ({
     page,
   }) => {
     await mockApi(page);
@@ -18,43 +18,62 @@ test.describe('fixture lobby', () => {
       .getByRole('list', { name: 'Synthetic fixtures' })
       .getByRole('article');
     await expect(cards).toHaveCount(2);
+    await expect(cards.first()).toContainText('Late comeback');
+    await expect(cards.first()).toContainText('Judge quick-start');
     await expect(cards.first()).toContainText('Northbridge Athletic');
     await expect(cards.first()).toContainText('Synthetic match demo');
-    await expect(cards.first()).toContainText('late-comeback');
-    await expect(cards.nth(1)).toContainText('Scheduled');
+    await expect(cards.first()).toContainText('4207');
+    await expect(cards.nth(1)).toContainText('High press');
+    const sessions = page.getByRole('list', { name: 'Recent replay sessions' });
+    await expect(sessions).toContainText('Session 1');
+    await expect(sessions).toContainText('Playing');
   });
 
-  test('starts a replay at the chosen speed and opens the studio', async ({
+  test('starts a session at the chosen speed and opens its studio', async ({
     page,
   }) => {
     const api = await mockApi(page);
     await page.goto('/fixtures');
     const card = page.getByRole('article').first();
-    await card.getByLabel('Replay speed').selectOption('30');
-    await card.getByRole('button', { name: 'Start replay' }).click();
+    await card.getByLabel(/Replay speed/).selectOption('30');
+    await card.getByRole('button', { name: /Start replay/ }).click();
     await expect(page).toHaveURL(new RegExp(`/studio/${FIXTURE_ID}$`));
-    expect(api.replayCommands).toEqual([{ action: 'start', speed: 30 }]);
+    expect(api.sessionStarts).toEqual([{ speed: 30 }]);
+    expect(api.replayCommands).toEqual([]);
     await expect(
       page.getByRole('region', { name: 'Scoreboard' }),
     ).toContainText('Northbridge');
   });
 
-  test('explains an empty fixture list', async ({ page }) => {
-    await mockApi(page, { fixtures: 'empty' });
+  test('explains a rate-limited start', async ({ page }) => {
+    await mockApi(page, { start: 'rateLimited' });
+    await page.goto('/fixtures');
+    await page
+      .getByRole('article')
+      .first()
+      .getByRole('button', { name: /Start replay/ })
+      .click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Too many replay starts' }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/fixtures$/);
+  });
+
+  test('explains an empty template list', async ({ page }) => {
+    await mockApi(page, { templates: 'empty' });
     await page.goto('/fixtures');
     await expect(page.getByText('No fixtures available')).toBeVisible();
   });
 
   test('shows problem details when the API fails', async ({ page }) => {
-    await mockApi(page, { fixtures: 'error' });
+    await mockApi(page, { templates: 'error' });
     await page.goto('/fixtures');
     const alert = page
       .getByRole('alert')
       .filter({ hasText: 'Fixtures could not be loaded' });
-    await expect(alert).toContainText('Fixtures could not be loaded', {
+    await expect(alert).toContainText('Template service unavailable', {
       timeout: 15_000,
     });
-    await expect(alert).toContainText('Fixture service unavailable');
     await expect(
       alert.getByRole('button', { name: 'Try again' }),
     ).toBeVisible();
@@ -66,6 +85,7 @@ test.describe('fixture lobby', () => {
     await mockApi(page);
     await page.goto('/fixtures');
     await expect(page.getByRole('article').first()).toBeVisible();
+    await expect(page.getByText('Session 1')).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });
 

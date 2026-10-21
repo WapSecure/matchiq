@@ -1,23 +1,49 @@
 import {
   Fixture,
+  type Locale,
   MatchSnapshot,
+  type Persona,
   ReplayCommand,
   type ReplayCommand as ReplayCommandType,
+  type ReplaySpeed,
+  ReplayStatus,
 } from '@matchiq/contracts';
-import { z } from 'zod';
 import { API_LIMITS, API_PATHS, HTTP_HEADERS } from '@/constants/api';
 import { requestJson } from './http-client';
 import { MatchEventPage, ReplayCommandAck } from './schemas';
-
-/** `GET /fixtures` wraps the list: `{ items: Fixture[] }`. */
-const FixtureList = z
-  .object({ items: z.array(Fixture) })
-  .transform((page) => page.items);
+import {
+  CreatedSession,
+  InsightList,
+  NarrativeList,
+  OverlayList,
+  RecapDocument,
+  SessionList,
+  TemplateList,
+} from './session-schemas';
+import { TraceList } from './trace-schemas';
 
 export type EventsQuery = { afterSequence?: number; limit?: number };
+export type NarrativeQuery = { persona: Persona; locale: Locale };
 
-export const fetchFixtures = (signal?: AbortSignal) =>
-  requestJson(API_PATHS.fixtures, FixtureList, { signal });
+const idempotent = () => ({
+  [HTTP_HEADERS.idempotencyKey]: crypto.randomUUID(),
+});
+
+export const fetchTemplates = (signal?: AbortSignal) =>
+  requestJson(API_PATHS.templates, TemplateList, { signal });
+
+export const fetchSessions = (
+  limit: number = API_LIMITS.sessionListLimit,
+  signal?: AbortSignal,
+) => requestJson(API_PATHS.sessions, SessionList, { signal, query: { limit } });
+
+/** Creates a fresh session of a template; the worker starts it at `speed`. */
+export const createSession = (templateId: string, speed: ReplaySpeed) =>
+  requestJson(API_PATHS.createSession(templateId), CreatedSession, {
+    method: 'POST',
+    body: { speed },
+    headers: idempotent(),
+  });
 
 export const fetchFixture = (fixtureId: string, signal?: AbortSignal) =>
   requestJson(API_PATHS.fixture(fixtureId), Fixture, { signal });
@@ -38,12 +64,37 @@ export const fetchFixtureEvents = (
 export const fetchMatchState = (fixtureId: string, signal?: AbortSignal) =>
   requestJson(API_PATHS.state(fixtureId), MatchSnapshot, { signal });
 
+export const fetchReplayStatus = (sessionId: string, signal?: AbortSignal) =>
+  requestJson(API_PATHS.replay(sessionId), ReplayStatus, { signal });
+
 export const sendReplayCommand = (
-  fixtureId: string,
+  sessionId: string,
   command: ReplayCommandType,
 ) =>
-  requestJson(API_PATHS.replay(fixtureId), ReplayCommandAck, {
+  requestJson(API_PATHS.replay(sessionId), ReplayCommandAck, {
     method: 'POST',
     body: ReplayCommand.parse(command),
-    headers: { [HTTP_HEADERS.idempotencyKey]: crypto.randomUUID() },
+    headers: idempotent(),
   });
+
+export const fetchInsights = (fixtureId: string, signal?: AbortSignal) =>
+  requestJson(API_PATHS.insights(fixtureId), InsightList, { signal });
+
+export const fetchNarratives = (
+  fixtureId: string,
+  query: NarrativeQuery,
+  signal?: AbortSignal,
+) =>
+  requestJson(API_PATHS.narratives(fixtureId), NarrativeList, {
+    signal,
+    query,
+  });
+
+export const fetchOverlays = (fixtureId: string, signal?: AbortSignal) =>
+  requestJson(API_PATHS.overlays(fixtureId), OverlayList, { signal });
+
+export const fetchRecap = (fixtureId: string, signal?: AbortSignal) =>
+  requestJson(API_PATHS.recap(fixtureId), RecapDocument, { signal });
+
+export const fetchAgentRuns = (fixtureId: string, signal?: AbortSignal) =>
+  requestJson(API_PATHS.agentRuns(fixtureId), TraceList, { signal });

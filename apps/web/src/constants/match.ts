@@ -98,6 +98,7 @@ export const LOCALE_OPTIONS: readonly {
   { value: 'en-GB', label: 'English', short: 'EN' },
   { value: 'fr-FR', label: 'Français', short: 'FR' },
   { value: 'es-ES', label: 'Español', short: 'ES' },
+  { value: 'pcm-NG', label: 'Naijá (Pidgin)', short: 'PCM' },
 ];
 
 export const UNAVAILABLE_REASONS: Record<MetricUnavailableReason, string> = {

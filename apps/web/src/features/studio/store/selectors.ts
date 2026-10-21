@@ -43,9 +43,19 @@ const isOnAir = (cue: OverlayCue, clockMs: number): boolean =>
   cue.clockStartMs <= clockMs &&
   clockMs < cue.clockEndMs;
 
+const preferred = <T>(
+  items: readonly T[],
+  matches: (item: T) => boolean,
+  fallback: (item: T) => boolean,
+): T[] => {
+  const exact = items.filter(matches);
+  return exact.length > 0 ? exact : items.filter(fallback);
+};
+
 /**
- * Cues visible on the preview at the current match clock for this audience.
- * Falls back to broadcast cues when none target the selected persona.
+ * Cues on the preview at the current match clock for this audience. The
+ * worker renders broadcast graphics in en-GB, so other personas and locales
+ * fall back to those rather than showing an empty frame.
  */
 export const selectActiveCues = (
   state: MatchData,
@@ -54,16 +64,19 @@ export const selectActiveCues = (
 ): OverlayCue[] => {
   const live: OverlayCue[] = [];
   for (const entry of Object.values(state.overlays)) {
-    if (entry.cue && !entry.retracted && entry.cue.locale === locale) {
-      if (isOnAir(entry.cue, state.clock.ms)) live.push(entry.cue);
-    }
+    if (entry.cue && !entry.retracted && isOnAir(entry.cue, state.clock.ms))
+      live.push(entry.cue);
   }
-  const forPersona = live.filter((cue) => cue.persona === persona);
-  const chosen =
-    forPersona.length > 0
-      ? forPersona
-      : live.filter((cue) => cue.persona === BROADCAST);
-  return chosen
+  const byLocale = preferred(
+    live,
+    (cue) => cue.locale === locale,
+    (cue) => cue.locale === DEFAULT_LOCALE,
+  );
+  return preferred(
+    byLocale,
+    (cue) => cue.persona === persona,
+    (cue) => cue.persona === BROADCAST,
+  )
     .sort((a, b) => b.priority - a.priority)
     .slice(0, STORE_LIMITS.activeCuesMax);
 };

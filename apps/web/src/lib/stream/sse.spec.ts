@@ -48,6 +48,27 @@ describe('backoffDelay', () => {
 });
 
 describe('fetchSseTransport', () => {
+  it('reports the accept before any frame is read', async () => {
+    const onOpen = vi.fn();
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(streamOf(['retry: 2000\n\n']), {
+          headers: { 'content-type': 'text/event-stream' },
+        }),
+    );
+    const frames = [];
+    for await (const frame of fetchSseTransport(fetchImpl)({
+      url: 'http://api.test/s',
+      lastEventId: null,
+      signal: new AbortController().signal,
+      onOpen,
+    })) {
+      frames.push(frame);
+    }
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(frames).toHaveLength(0);
+  });
+
   it('sends Last-Event-ID on resume and yields parsed frames', async () => {
     const fetchImpl = vi.fn(
       async () =>

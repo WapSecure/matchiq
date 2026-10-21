@@ -5,6 +5,8 @@ export type SseRequest = {
   url: string;
   lastEventId: string | null;
   signal: AbortSignal;
+  /** Called once the server accepts the stream, before any frame arrives. */
+  onOpen?: () => void;
 };
 
 /** Yields frames until the server closes the stream or the signal aborts. */
@@ -27,7 +29,7 @@ export class SseHttpError extends Error {
 export const fetchSseTransport = (
   fetchImpl: typeof fetch = fetch,
 ): SseTransport =>
-  async function* stream({ url, lastEventId, signal }) {
+  async function* stream({ url, lastEventId, signal, onOpen }) {
     const headers: Record<string, string> = {
       [HTTP_HEADERS.accept]: MEDIA_TYPES.eventStream,
     };
@@ -38,6 +40,7 @@ export const fetchSseTransport = (
       cache: 'no-store',
     });
     if (!response.ok || !response.body) throw new SseHttpError(response.status);
+    onOpen?.();
     const reader = response.body
       .pipeThrough(new TextDecoderStream())
       .getReader();

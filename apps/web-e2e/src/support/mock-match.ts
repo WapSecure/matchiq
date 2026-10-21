@@ -156,6 +156,12 @@ export const NARRATIVES = {
     'Northbridge prend le contrôle',
     'Cinq récupérations en six minutes ont mené à trois tirs et à l’égalisation.',
   ),
+  broadcastPcm: narrative(
+    'BROADCAST',
+    'pcm-NG',
+    'Northbridge don take control',
+    'Dem collect ball five times for six minutes, shoot three times, and equalise.',
+  ),
   casualEn: narrative(
     'CASUAL',
     'en-GB',

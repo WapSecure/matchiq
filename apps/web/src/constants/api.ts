@@ -1,5 +1,14 @@
+const fx = (fixtureId: string) => `/fixtures/${encodeURIComponent(fixtureId)}`;
+
 export const API_PATHS = {
-  fixtures: '/fixtures',
+  templates: '/fixture-templates',
+  sessions: '/replay-sessions',
+  createSession: (templateId: string) => `${fx(templateId)}/sessions`,
+  insights: (fixtureId: string) => `${fx(fixtureId)}/insights`,
+  narratives: (fixtureId: string) => `${fx(fixtureId)}/narratives`,
+  overlays: (fixtureId: string) => `${fx(fixtureId)}/overlays`,
+  recap: (fixtureId: string) => `${fx(fixtureId)}/recap`,
+  agentRuns: (fixtureId: string) => `${fx(fixtureId)}/agent-runs`,
   fixture: (fixtureId: string) => `/fixtures/${encodeURIComponent(fixtureId)}`,
   events: (fixtureId: string) =>
     `/fixtures/${encodeURIComponent(fixtureId)}/events`,
@@ -27,18 +36,25 @@ export const MEDIA_TYPES = {
 export const API_LIMITS = {
   requestTimeoutMs: 10_000,
   eventsPageSize: 200,
+  /** The API caps an events page at 500. */
+  eventsPageMax: 500,
+  /** Pages walked when resolving evidence ids outside the loaded timeline. */
+  evidencePagesMax: 8,
+  sessionListLimit: 8,
   queryStaleMs: 15_000,
   queryRetries: 2,
 } as const;
 
 export const STREAM_TIMING = {
   backoffBaseMs: 1_000,
-  backoffMaxMs: 30_000,
+  /** Kept short: a judge restarting the API should see Live within seconds. */
+  backoffMaxMs: 5_000,
   backoffJitterRatio: 0.2,
   /** No message (heartbeat included) for this long marks the stream stale. */
-  staleAfterMs: 15_000,
+  /** Above the API's 15 s heartbeat so an idle but healthy stream stays Live. */
+  staleAfterMs: 25_000,
   /** A stale stream is torn down and reconnected after this long. */
-  reconnectAfterStaleMs: 30_000,
+  reconnectAfterStaleMs: 40_000,
   watchdogIntervalMs: 1_000,
   flushIntervalMs: 100,
 } as const;
@@ -49,6 +65,29 @@ export const STORE_LIMITS = {
   momentumPointsMax: 180,
   retractionsMax: 8,
   activeCuesMax: 2,
+  cueLogMax: 8,
+} as const;
+
+export const POLL_MS = {
+  sessions: 10_000,
+  recap: 5_000,
+  agentRuns: 4_000,
+  /** How long a 202 prediction waits for the worker's `replay.status`. */
+  replayConfirm: 4_000,
+} as const;
+
+export const HTTP_STATUS = {
+  notFound: 404,
+  conflict: 409,
+  tooManyRequests: 429,
+  unavailable: 503,
+} as const;
+
+/** RFC 9457 `type` suffixes the API uses for states the UI explains. */
+export const PROBLEM_SLUGS = {
+  recapNotReady: 'recap-not-ready',
+  stateNotFound: 'state-not-found',
+  replayConflict: 'replay-state-conflict',
 } as const;
 
 export const PROBLEM_FALLBACK = {

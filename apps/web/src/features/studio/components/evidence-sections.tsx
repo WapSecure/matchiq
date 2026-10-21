@@ -6,8 +6,6 @@ import { formatFraction, formatMinute, formatWindow } from '@/lib/format';
 import { describeEvent } from '../lib/describe-event';
 import type { Roster } from '../lib/roster';
 
-const METRIC_DECIMALS = 2;
-
 export function EvidenceSection({
   title,
   children,
@@ -54,48 +52,19 @@ export function EvidenceSummary({
   );
 }
 
-export function EvidenceMetrics({ evidence }: { evidence: EvidenceEnvelope }) {
-  const entries = Object.entries(evidence.computedMetrics);
-  if (entries.length === 0)
-    return <p className="text-xs text-ink-subtle">{EVIDENCE_COPY.noMetrics}</p>;
-  return (
-    <table className="w-full text-left text-sm">
-      <thead className="text-xs text-ink-subtle">
-        <tr>
-          <th scope="col" className="pb-1 font-normal">
-            {EVIDENCE_COPY.metricsTable.metric}
-          </th>
-          <th scope="col" className="pb-1 text-right font-normal">
-            {EVIDENCE_COPY.metricsTable.value}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map(([ref, value]) => (
-          <tr key={ref} className="border-t border-line/60">
-            <th
-              scope="row"
-              className="py-1.5 font-mono text-xs font-normal text-ink-muted"
-            >
-              {ref}
-            </th>
-            <td className="tabular py-1.5 text-right font-semibold text-ink">
-              {Number.isInteger(value) ? value : value.toFixed(METRIC_DECIMALS)}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
 type EvidenceEventsProps = {
   ids: readonly string[];
   events: readonly MatchEvent[];
   roster: Roster;
+  resolving?: boolean;
 };
 
-export function EvidenceEvents({ ids, events, roster }: EvidenceEventsProps) {
+export function EvidenceEvents({
+  ids,
+  events,
+  roster,
+  resolving = false,
+}: EvidenceEventsProps) {
   const byId = new Map(events.map((e) => [e.eventId, e]));
   return (
     <ol className="flex flex-col gap-1.5">
@@ -109,7 +78,10 @@ export function EvidenceEvents({ ids, events, roster }: EvidenceEventsProps) {
             </span>
             <div className="min-w-0">
               <p className="text-ink">
-                {described?.label ?? EVIDENCE_COPY.eventOutsideWindow}
+                {described?.label ??
+                  (resolving
+                    ? EVIDENCE_COPY.resolving
+                    : EVIDENCE_COPY.eventOutsideWindow)}
               </p>
               <p className="truncate font-mono text-micro text-ink-subtle">
                 {[described?.detail, id].filter(Boolean).join(' · ')}
@@ -148,3 +120,5 @@ export function CounterEvidenceList({
     </ul>
   );
 }
+
+export { EvidenceMetrics } from './evidence-metrics';

@@ -20,42 +20,39 @@ export const initialMatchData = (fixtureId: string): MatchData => ({
   retractions: [],
   momentum: [],
   connection: INITIAL_CONNECTION,
-  resyncToken: 0,
+  hydrationToken: 0,
+  hydrated: false,
 });
 
-/**
- * Status frames may trail the events already delivered by a few sequences;
- * only a larger regression is treated as a seek.
- */
-const SEEK_TOLERANCE = 10;
+export type StatusSource = 'stream' | 'rest';
 
 /**
- * A replay that moved well behind what we have applied is a seek: derived state
- * is discarded and a resync is requested so stale graphics never linger (§26).
+ * The worker is the authority on replay status. Stream frames arrive in order
+ * and always apply; a REST read (hydration or a refetch) may be older than
+ * what the stream already delivered, so it applies only when not behind.
+ * Seeks only move forward (ADR-0013), so a status never rewinds derived state;
+ * the clock moves only when the status is at or ahead of the applied events.
  */
 export const reduceReplay = (
   state: MatchData,
   status: ReplayStatus,
-  seek = false,
+  source: StatusSource = 'stream',
 ): Partial<MatchData> => {
-  const clock = { period: status.period, ms: status.matchClockMs };
-  if (status.appliedSequence >= state.lastEventSequence) {
-    return { replay: status, clock };
-  }
+  const current = state.replay;
   if (
-    !seek &&
-    state.lastEventSequence - status.appliedSequence <= SEEK_TOLERANCE
+    source === 'rest' &&
+    current !== null &&
+    status.appliedSequence < current.appliedSequence
   ) {
-    return { replay: status };
+    return {};
   }
-  return {
-    ...initialMatchData(state.fixtureId),
-    connection: state.connection,
-    replay: status,
-    clock,
-    lastEventSequence: status.appliedSequence,
-    resyncToken: state.resyncToken + 1,
-  };
+  if (status.appliedSequence >= state.lastEventSequence) {
+    return {
+      replay: status,
+      clock: { period: status.period, ms: status.matchClockMs },
+    };
+  }
+  return { replay: status };
 };
 
 export const reduceMessage = (

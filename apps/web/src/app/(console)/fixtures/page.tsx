@@ -3,7 +3,8 @@ import { SiteFooter, SiteHeader, SyntheticNotice } from '@/components/layout';
 import { Container } from '@/components/ui';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { MAIN_CONTENT_ID } from '@/constants/site';
-import { FixtureLobby } from '@/features/lobby/fixture-lobby';
+import { RecentSessions } from '@/features/lobby/recent-sessions';
+import { TemplateLobby } from '@/features/lobby/template-lobby';
 
 export const metadata: Metadata = { title: LOBBY_COPY.metaTitle };
 
@@ -24,7 +25,10 @@ export default function FixturesPage() {
             </p>
           </header>
           <div className="mt-8">
-            <FixtureLobby />
+            <TemplateLobby />
+          </div>
+          <div className="mt-10">
+            <RecentSessions />
           </div>
         </Container>
       </main>

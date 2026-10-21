@@ -18,10 +18,11 @@ export const EVIDENCE_COPY = {
     generated: 'Generated',
     status: 'Pipeline status',
   },
-  metricsTable: { metric: 'Metric', value: 'Value' },
+  metricsTable: { metric: 'Metric and definition', value: 'Value' },
   noCounter: 'No counter-evidence recorded for this window.',
   noMetrics: 'No metrics were attached to this insight.',
-  eventOutsideWindow: 'Outside the loaded timeline window',
+  eventOutsideWindow: 'Not found in the session ledger',
+  resolving: 'Looking up in the session ledger…',
   caveat:
     'Confidence is a heuristic label, not a guarantee. Figures come from the deterministic engine; agents only cite them.',
 } as const;

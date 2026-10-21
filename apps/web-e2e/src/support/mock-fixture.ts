@@ -1,7 +1,8 @@
 import type { Fixture, Player, Team } from '@matchiq/contracts';
 
-export const FIXTURE_ID = 'fx_late_comeback';
-export const SECOND_FIXTURE_ID = 'fx_high_press';
+export const TEMPLATE_ID = 'fx_late_comeback';
+/** A replay session of the template; the studio, stream and reads use it. */
+export const FIXTURE_ID = `${TEMPLATE_ID}_s1`;
 export const HOME_ID = 'tm_northbridge';
 export const AWAY_ID = 'tm_harbourside';
 
@@ -98,17 +99,5 @@ export const mockFixture = (overrides: Partial<Fixture> = {}): Fixture => ({
   provenance: PROVENANCE,
   ...overrides,
 });
-
-export const mockFixtures = (): Fixture[] => [
-  mockFixture(),
-  mockFixture({
-    fixtureId: SECOND_FIXTURE_ID,
-    title: 'Northbridge Athletic v Harbourside Rovers (reverse)',
-    competitionLabel: 'Synthetic League · Matchday 14',
-    kickoffUtc: '2026-11-07T19:45:00Z',
-    status: 'SCHEDULED',
-    provenance: { ...PROVENANCE, seed: 9113, scenario: 'high-press' },
-  }),
-];
 
 export const SYNTHETIC_PROVENANCE = PROVENANCE;

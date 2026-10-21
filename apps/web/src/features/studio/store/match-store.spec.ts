@@ -217,7 +217,7 @@ describe('match store', () => {
     ]);
   });
 
-  it('resets derived state and requests a resync when the replay seeks back', () => {
+  it('never rewinds derived state for a status behind the applied events', () => {
     const store = createMatchStore(FX);
     store.getState().applyEvents(Array.from({ length: 30 }, (_, i) => shot(i)));
     store.getState().applyMessages([message('overlay.publish', cue(), 1)]);
@@ -225,20 +225,116 @@ describe('match store', () => {
       .getState()
       .applyMessages([message('replay.status', replayStatus(2, 3_000), 2)]);
     const state = store.getState();
-    expect(state.timeline).toHaveLength(0);
-    expect(state.overlays).toEqual({});
-    expect(state.resyncToken).toBe(1);
-    expect(state.lastEventSequence).toBe(2);
+    expect(state.timeline).toHaveLength(30);
+    expect(state.overlays['ov_1']).toBeDefined();
+    expect(state.replay?.appliedSequence).toBe(2);
+    expect(state.clock.ms).toBe(29_000);
   });
 
-  it('tolerates a status frame trailing the delivered events', () => {
+  it('applies stream statuses in order but ignores an older REST read', () => {
     const store = createMatchStore(FX);
-    store.getState().applyEvents([shot(1), shot(2), shot(3)]);
+    const s = store.getState();
+    s.applyMessages([message('replay.status', replayStatus(40), 1)]);
+    s.applyReplayStatus({ ...replayStatus(20), state: 'PAUSED' }, 'rest');
+    expect(store.getState().replay).toMatchObject({
+      appliedSequence: 40,
+      state: 'PLAYING',
+    });
+    s.applyReplayStatus({ ...replayStatus(45), state: 'PAUSED' }, 'rest');
+    expect(store.getState().replay?.state).toBe('PAUSED');
+    s.applyMessages([
+      message('replay.status', { ...replayStatus(45), state: 'COMPLETED' }, 2),
+    ]);
+    expect(store.getState().replay?.state).toBe('COMPLETED');
+  });
+
+  it('merges hydration with stream state without duplicates', () => {
+    const store = createMatchStore(FX);
+    const s = store.getState();
+    s.applyMessages([
+      message('insight.detected', insight({ status: 'PUBLISHED' }), 1),
+      message('overlay.publish', cue({ revision: 2, headline: 'agent' }), 2),
+      message('narrative.ready', narrative(), 3),
+    ]);
+    s.applyHydration({
+      insights: [
+        insight({ status: 'DETECTED' }),
+        insight({ insightId: 'in_old', matchClockMs: 100 }),
+      ],
+      overlays: [
+        cue({ revision: 1, headline: 'template' }),
+        cue({ overlayId: 'ov_old', status: 'EXPIRED' }),
+      ],
+      narratives: [
+        narrative(),
+        narrative({ narrativeId: 'nr_fr', locale: 'fr-FR' }),
+      ],
+    });
+    const state = store.getState();
+    expect(state.insights.map((i) => [i.insightId, i.status])).toEqual([
+      ['in_1', 'PUBLISHED'],
+      ['in_old', 'PUBLISHED'],
+    ]);
+    expect(state.overlays['ov_1']?.cue?.headline).toBe('agent');
+    expect(state.overlays['ov_old']?.retracted).not.toBeNull();
+    expect(Object.keys(state.narratives['in_1'] ?? {})).toEqual([
+      'BROADCAST:en-GB',
+      'BROADCAST:fr-FR',
+    ]);
+  });
+
+  it('takes a terminal status from the read model over the detection status', () => {
+    const store = createMatchStore(FX);
     store
       .getState()
-      .applyMessages([message('replay.status', replayStatus(1), 1)]);
-    expect(store.getState().timeline).toHaveLength(3);
-    expect(store.getState().resyncToken).toBe(0);
+      .applyMessages([
+        message('insight.detected', insight({ status: 'DETECTED' }), 1),
+      ]);
+    store
+      .getState()
+      .applyHydration({ insights: [insight({ status: 'FALLBACK' })] });
+    expect(store.getState().insights.map((i) => i.status)).toEqual([
+      'FALLBACK',
+    ]);
+  });
+
+  it('logs expiries separately from real retractions', () => {
+    const store = createMatchStore(FX);
+    store
+      .getState()
+      .applyMessages([
+        message('overlay.publish', cue(), 1),
+        message(
+          'overlay.retract',
+          { overlayId: 'ov_1', revision: 1, reason: 'expired' },
+          2,
+        ),
+        message('overlay.publish', cue({ overlayId: 'ov_2' }), 3),
+        message(
+          'overlay.retract',
+          { overlayId: 'ov_2', revision: 1, reason: 'Goal disallowed' },
+          4,
+        ),
+      ]);
+    expect(store.getState().retractions.map((r) => r.ending)).toEqual([
+      'RETRACTED',
+      'EXPIRED',
+    ]);
+  });
+
+  it('falls back to en-GB broadcast cues for other personas and locales', () => {
+    const store = createMatchStore(FX);
+    store
+      .getState()
+      .applyMessages([
+        message('replay.status', replayStatus(0, 600_000), 1),
+        message('overlay.publish', cue(), 2),
+      ]);
+    expect(
+      selectActiveCues(store.getState(), 'CASUAL', 'fr-FR').map(
+        (c) => c.overlayId,
+      ),
+    ).toEqual(['ov_1']);
   });
 
   it('marks voided events from corrections', () => {

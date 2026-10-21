@@ -3,9 +3,9 @@
 import { Drawer } from '@/components/ui/drawer';
 import { EVIDENCE_COPY } from '@/constants/evidence';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
+import { useEvidenceEvents } from '../hooks/use-evidence-events';
 import type { Roster } from '../lib/roster';
 import {
-  selectEventsById,
   selectInsight,
   selectNarrative,
   useMatchStore,
@@ -33,7 +33,8 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
     selectedId ? selectNarrative(s, selectedId, persona, locale) : null,
   );
   const ids = insight?.evidence.eventIds ?? NO_IDS;
-  const events = useMatchStoreShallow((s) => selectEventsById(s, ids));
+  const fixtureId = useMatchStore((s) => s.fixtureId);
+  const { events, resolving } = useEvidenceEvents(fixtureId, ids);
   const period = useMatchStore((s) => s.clock.period);
   const title =
     view?.narrative.headline ??
@@ -64,7 +65,12 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
             <EvidenceMetrics evidence={insight.evidence} />
           </EvidenceSection>
           <EvidenceSection title={EVIDENCE_COPY.sections.events}>
-            <EvidenceEvents ids={ids} events={events} roster={roster} />
+            <EvidenceEvents
+              ids={ids}
+              events={events}
+              roster={roster}
+              resolving={resolving}
+            />
           </EvidenceSection>
           <EvidenceSection title={EVIDENCE_COPY.sections.counter}>
             <CounterEvidenceList evidence={insight.evidence} />
