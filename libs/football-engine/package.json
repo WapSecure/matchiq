@@ -23,6 +23,7 @@
     ]
   },
   "dependencies": {
+    "@matchiq/canonical-json": "workspace:*",
     "@matchiq/contracts": "workspace:*",
     "tslib": "2.8.1"
   },

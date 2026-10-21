@@ -48,6 +48,7 @@
     }
   },
   "dependencies": {
+    "@matchiq/canonical-json": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
     "drizzle-orm": "0.45.3",

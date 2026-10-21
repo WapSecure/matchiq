@@ -1,5 +1,5 @@
 import type { MatchEvent } from '@matchiq/contracts';
-import { canonicalJson } from '../hash.js';
+import { canonicalJson } from '@matchiq/canonical-json';
 import type { ValidationContext } from './context.js';
 import { ISSUE_MESSAGES as M } from './issues.js';
 
