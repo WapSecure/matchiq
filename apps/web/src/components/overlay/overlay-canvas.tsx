@@ -3,6 +3,7 @@ import type {
   SafeArea,
 } from '@matchiq/contracts';
 import { OverlayCue } from './overlay-cue';
+import { OverlayStandby } from './overlay-standby';
 
 export type Scorebug = {
   home: string;
@@ -15,7 +16,9 @@ type OverlayCanvasProps = {
   cues: readonly OverlayCueData[];
   scorebug: Scorebug | null;
   watermark: string;
-  emptyLabel: string;
+  standbyLabel: string;
+  /** Headline of the most recent cue that left air, shown while standing by. */
+  lastAired?: string | null;
   safeAreaLabel: string;
   frameLabel: string;
 };
@@ -64,7 +67,8 @@ export function OverlayCanvas({
   cues,
   scorebug,
   watermark,
-  emptyLabel,
+  standbyLabel,
+  lastAired = null,
   safeAreaLabel,
   frameLabel,
 }: OverlayCanvasProps) {
@@ -95,15 +99,17 @@ export function OverlayCanvas({
             {watermark}
           </span>
           <div className="absolute bottom-[1cqw] left-[1cqw] right-[1cqw] flex flex-col items-start gap-[0.8cqw]">
-            {cues.map((cue) => (
-              <OverlayCue key={`${cue.overlayId}:${cue.revision}`} cue={cue} />
-            ))}
+            {cues.length === 0 ? (
+              <OverlayStandby label={standbyLabel} lastAired={lastAired} />
+            ) : (
+              cues.map((cue) => (
+                <OverlayCue
+                  key={`${cue.overlayId}:${cue.revision}`}
+                  cue={cue}
+                />
+              ))
+            )}
           </div>
-          {cues.length === 0 ? (
-            <p className="absolute inset-0 flex items-center justify-center text-[max(11px,1.6cqw)] text-ink-subtle">
-              {emptyLabel}
-            </p>
-          ) : null}
         </div>
       </div>
     </div>

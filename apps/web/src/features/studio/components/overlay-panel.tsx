@@ -6,7 +6,8 @@ import {
   OverlayCanvas,
   type Scorebug,
 } from '@/components/overlay/overlay-canvas';
-import { Panel } from '@/components/ui';
+import { Panel, SegmentedControl } from '@/components/ui';
+import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { formatClock } from '@/lib/format';
 import { useOnAirCue } from '../hooks/use-on-air-cue';
@@ -29,6 +30,9 @@ export function OverlayPanel({
 }: OverlayPanelProps) {
   const persona = useStudioUi((s) => s.persona);
   const locale = useStudioUi((s) => s.locale);
+  const cueHold = useStudioUi((s) => s.cueHold);
+  const setCueHold = useStudioUi((s) => s.setCueHold);
+  const lastHeadline = useMatchStore((s) => s.retractions[0]?.headline ?? null);
   const onAir = useOnAirCue(persona, locale);
   const cues = onAir.cue ? [onAir.cue] : [];
   const score = useMatchStore((s) => s.snapshot?.score ?? null);
@@ -50,12 +54,22 @@ export function OverlayPanel({
       Icon={BroadcastIcon}
       className={className}
     >
-      <OnAirMeta onAir={onAir} locale={locale} />
+      <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+        <OnAirMeta onAir={onAir} locale={locale} />
+        <SegmentedControl
+          className="ml-auto"
+          legend={OVERLAY_COPY.holdLegend}
+          options={OVERLAY_COPY.holdOptions}
+          value={cueHold}
+          onChange={setCueHold}
+        />
+      </div>
       <OverlayCanvas
         cues={cues}
         scorebug={scorebug}
         watermark={WATERMARK}
-        emptyLabel={copy.empty}
+        standbyLabel={OVERLAY_COPY.standby}
+        lastAired={lastHeadline ? OVERLAY_COPY.lastAired(lastHeadline) : null}
         safeAreaLabel={copy.safeArea}
         frameLabel={copy.frameLabel(cues.length)}
       />

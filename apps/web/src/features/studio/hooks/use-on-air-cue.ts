@@ -2,14 +2,14 @@
 
 import type { Locale, Persona } from '@matchiq/contracts';
 import { useEffect, useRef, useState } from 'react';
-import { NATURAL_CUE_ENDS } from '@/constants/overlay';
+import { CUE_HOLD_MS, NATURAL_CUE_ENDS } from '@/constants/overlay';
 import {
   dwellRemaining,
   nextOnAir,
   OFF_AIR,
   type OnAir,
 } from '../lib/cue-dwell';
-import { selectActiveCues, useMatchStore } from '../store';
+import { selectActiveCues, useMatchStore, useStudioUi } from '../store';
 import type { OverlayEntry } from '../store';
 
 const isPulled = (entry: OverlayEntry | undefined): boolean =>
@@ -21,6 +21,7 @@ export const useOnAirCue = (persona: Persona, locale: Locale): OnAir => {
     (s) => selectActiveCues(s, persona, locale)[0] ?? null,
   );
   const overlays = useMatchStore((s) => s.overlays);
+  const dwellMs = CUE_HOLD_MS[useStudioUi((s) => s.cueHold)];
   const [onAir, setOnAir] = useState<OnAir>(OFF_AIR);
   const [tick, setTick] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -31,18 +32,21 @@ export const useOnAirCue = (persona: Persona, locale: Locale): OnAir => {
         candidate,
         pulled: (id) => isPulled(overlays[id]),
         now: Date.now(),
+        dwellMs,
       }),
     );
-  }, [candidate, overlays, tick]);
+  }, [candidate, overlays, tick, dwellMs]);
 
   useEffect(() => {
-    const remaining = onAir.held ? dwellRemaining(onAir, Date.now()) : null;
+    const remaining = onAir.held
+      ? dwellRemaining(onAir, Date.now(), dwellMs)
+      : null;
     if (remaining === null) return undefined;
     timer.current = setTimeout(() => setTick((t) => t + 1), remaining);
     return () => {
       if (timer.current !== null) clearTimeout(timer.current);
     };
-  }, [onAir]);
+  }, [onAir, dwellMs]);
 
   return onAir;
 };

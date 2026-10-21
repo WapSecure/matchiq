@@ -1,14 +1,16 @@
 import type { Locale } from '@matchiq/contracts';
 import { Badge } from '@/components/ui';
-import { CUE_MIN_DWELL_MS, OVERLAY_COPY } from '@/constants/overlay';
+import { CUE_HOLD_MS, OVERLAY_COPY } from '@/constants/overlay';
 import { OVERLAY_KIND_LABELS } from '@/constants/match';
 import type { OnAir } from '../lib/cue-dwell';
+import { useStudioUi } from '../store';
 
 const MS_PER_SECOND = 1_000;
 const FIRST_REVISION = 1;
 
 /** Kind, priority, copy source and hold state of the cue on air. */
 export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
+  const dwellMs = CUE_HOLD_MS[useStudioUi((s) => s.cueHold)];
   const { cue } = onAir;
   if (!cue) return null;
   const source = cue.revision > FIRST_REVISION ? 'AGENT' : 'TEMPLATE';
@@ -30,7 +32,7 @@ export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
       {onAir.held ? (
         <Badge
           className="ml-auto"
-          title={OVERLAY_COPY.heldHint(CUE_MIN_DWELL_MS / MS_PER_SECOND)}
+          title={OVERLAY_COPY.heldHint(dwellMs / MS_PER_SECOND)}
         >
           {OVERLAY_COPY.held}
         </Badge>

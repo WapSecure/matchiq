@@ -1,5 +1,6 @@
 import type { Locale, Persona, ReplaySpeed } from '@matchiq/contracts';
 import { create } from 'zustand';
+import type { CueHold } from '@/constants/overlay';
 
 /** Ephemeral presentation state; never holds server data. */
 export type StudioUiState = {
@@ -7,11 +8,13 @@ export type StudioUiState = {
   locale: Locale;
   selectedInsightId: string | null;
   speed: ReplaySpeed;
+  cueHold: CueHold;
   setPersona: (persona: Persona) => void;
   setLocale: (locale: Locale) => void;
   openEvidence: (insightId: string) => void;
   closeEvidence: () => void;
   setSpeed: (speed: ReplaySpeed) => void;
+  setCueHold: (cueHold: CueHold) => void;
 };
 
 export const STUDIO_UI_DEFAULTS = {
@@ -19,6 +22,7 @@ export const STUDIO_UI_DEFAULTS = {
   locale: 'en-GB',
   selectedInsightId: null,
   speed: 20,
+  cueHold: 'standard',
 } as const satisfies Partial<StudioUiState>;
 
 export const useStudioUi = create<StudioUiState>()((set) => ({
@@ -28,4 +32,5 @@ export const useStudioUi = create<StudioUiState>()((set) => ({
   openEvidence: (selectedInsightId) => set({ selectedInsightId }),
   closeEvidence: () => set({ selectedInsightId: null }),
   setSpeed: (speed) => set({ speed }),
+  setCueHold: (cueHold) => set({ cueHold }),
 }));

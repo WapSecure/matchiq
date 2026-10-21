@@ -278,7 +278,7 @@ describe('LiveStudio', () => {
       ),
     );
     expect(
-      screen.getByRole('group', { name: /no cue on air/ }),
+      screen.getByRole('group', { name: /standing by/ }),
     ).toBeInTheDocument();
     expect(screen.getByText('Goal disallowed')).toBeInTheDocument();
   });

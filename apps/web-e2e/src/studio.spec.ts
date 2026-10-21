@@ -108,7 +108,7 @@ test.describe('live studio', () => {
       page.getByText('Pressure building on the left').first(),
     ).toBeVisible();
     await expect(
-      page.getByRole('group', { name: /no cue on air/ }),
+      page.getByRole('group', { name: /standing by/ }),
     ).toBeVisible();
     await expect(page.getByText('Superseded by goal review')).toBeVisible();
   });
