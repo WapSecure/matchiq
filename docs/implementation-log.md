@@ -25,6 +25,41 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 Football engine projections over these fixtures (MQ-005), ingest/replay API on top of `ReplayController` (MQ-004/006), and correction and out-of-order fixtures for the ingest tests.
 
+## 2026-10-21 — M1: Football engine (MQ-005, MQ-007)
+
+### Delivered
+
+| Area                                                                                                                                                                                | Status | Evidence                                                                |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| `libs/football-engine` (`scope:shared`, `type:domain`): pure `createInitialState`, `applyEvent`, `project`, `toSnapshot` producing contract `MatchSnapshot` with sha256 `stateHash` | Done   | `projection.spec.ts`, Zod-parsed in every snapshot test                 |
+| Idempotent application (duplicate sequence or eventId is a no-op), out-of-order re-fold, `provisional` while a sequence gap or a pending correction exists                          | Done   | Property: any arrival order plus duplicates equals in-order projection  |
+| CORRECTION (VOID) by re-folding the ledger without voided events                                                                                                                    | Done   | `corrections.spec.ts`                                                   |
+| Metrics with a versioned `MetricDefinition` registry: counts, pass completion (ZERO_DENOMINATOR), time-weighted possession with contested time excluded, event-share proxy fallback | Done   | `counting.spec.ts`, `possession.spec.ts`, `verify-and-registry.spec.ts` |
+| Rolling 5-minute and previous-window metrics, momentum index (spec §9 weights, bounded z against a fixed reference scale, `heuristic: true`)                                        | Done   | `momentum.spec.ts` asserts hand-computed values                         |
+| Key moments with full evidence envelopes: GOAL and RED_CARD (P0), SHOT_BURST, HIGH_REGAINS, PRESSURE_SWING, MOMENTUM_SHIFT (P1); debounce; deterministic ids; resumable cursor      | Done   | `moments.spec.ts`, `golden.spec.ts`; every insight Zod-parsed           |
+| `verifyCitedValues` and `verifyEvidenceIds` for the publish gate                                                                                                                    | Done   | `verify-and-registry.spec.ts`                                           |
+| Golden fixtures with pinned state hashes (zero-event match, late comeback with void, own goal and second yellow)                                                                    | Done   | `golden.spec.ts`                                                        |
+| Property tests (fast-check 4.10.2): determinism, order independence, score oracle, non-negative counts, bounded percentages and momentum, contract-valid insights                   | Done   | 60 Vitest tests in 9 files                                              |
+
+### Known limitations
+
+- Momentum reference means and deviations are product calibration constants for synthetic fixtures, not league statistics. Recalibrate once the synthetic generator's distributions are fixed.
+- Re-folding is O(ledger) per late event or correction (about 3 ms for 3,000 events locally). The in-order path is incremental.
+- `stepMoments` serves the in-order path. After a correction or a late event the worker re-runs `detectKeyMoments` and diffs by `insightId` to retract or add insights.
+- PLAYER_MILESTONE (P2) is not implemented.
+
+### Next
+
+Wire the engine into the worker projection and the deterministic publish gate, and add golden replay tests against the synthetic generator's seeded fixtures.
+
+## 2026-10-21 — M2 groundwork: pipeline contracts (MQ-009)
+
+| Area                                                                                                                                                      | Status | Evidence                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------- |
+| `PipelineRequest`, `PipelineResult`, `NarrativeDraft`, `OverlayProposal` contracts for the worker ↔ agents boundary, exported to JSON Schema and Pydantic | Done   | Vitest `pipeline.spec.ts`; pytest sample parity |
+| JSON Schema export drops Zod's duplicate regex for every `format` (date-time, uuid) so generated models validate                                          | Done   | `json-schema.spec.ts`                           |
+| `agents` lint, typecheck and test depend on `codegen` (removes a race with regeneration)                                                                  | Done   | `project.json`                                  |
+
 ## 2026-10-21 — M0: Foundation (MQ-001, MQ-002)
 
 ### Delivered
@@ -41,11 +76,14 @@ Football engine projections over these fixtures (MQ-005), ingest/replay API on t
 | `apps/api`, `apps/worker`: Nest bootstrap with live/ready health under `/api/v1`                                                                                                                          | Done    | 3 + 2 Jest tests; built server smoke-tested                                                                  |
 | Cross-language contracts: JSON Schema export, Pydantic codegen, shared samples validated in both languages                                                                                                | Done    | Vitest `samples.spec.ts`, pytest `test_contract_samples.py`                                                  |
 | `apps/agents`: FastAPI, Agent Framework 1.22 + Foundry 1.15 client factory, settings, health, Foundry probe script                                                                                        | Partial | 20 pytest tests; Ruff and Pyright strict clean. **Live Foundry call not yet exercised** (needs Azure access) |
+| `apps/web`: Tailwind v4 design tokens, icon components, UI primitives, landing shell                                                                                                                      | Done    | 9 Vitest + 10 Playwright/axe tests (desktop and mobile)                                                      |
 
 ### Findings fixed during M0
 
 - Duplicate `@nestjs/common` copies came from mismatched `rxjs` peer versions. Fixed with pnpm overrides.
 - Zod emitted a regex `pattern` alongside `format: date-time`, which Pydantic cannot apply to parsed datetimes. The exporter now drops it, and a test covers this.
+- The generated Next.js 16.1.7 had 2 critical and 18 high advisories. Upgraded to 16.4.2; `pnpm audit --prod` is now clean.
+- axe found a WCAG contrast failure on `ink-subtle`. The token was raised to `#788494` (≥ 4.6:1 on all surfaces).
 
 ### Azure and Foundry access spike
 
@@ -59,4 +97,4 @@ Football engine projections over these fixtures (MQ-005), ingest/replay API on t
 
 ### Next
 
-Remaining M0 pull requests, then M1.
+M1: MQ-003 seeded generator, MQ-004 ledger and idempotent ingest, MQ-005 deterministic metrics, MQ-006 SSE and snapshot reconciliation.

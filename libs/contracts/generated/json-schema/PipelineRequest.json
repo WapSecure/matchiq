@@ -1,0 +1,358 @@
+{
+  "title": "PipelineRequest",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/PipelineRequest",
+  "$defs": {
+    "PipelineRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "packet": {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "type": "number",
+              "const": 1
+            },
+            "runId": {
+              "type": "string",
+              "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "correlationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "orgId": {
+              "type": "string",
+              "pattern": "^org_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "fixtureId": {
+              "type": "string",
+              "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "insight": {
+              "type": "object",
+              "properties": {
+                "schemaVersion": {
+                  "type": "number",
+                  "const": 1
+                },
+                "insightId": {
+                  "type": "string",
+                  "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                },
+                "fixtureId": {
+                  "type": "string",
+                  "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "GOAL",
+                    "RED_CARD",
+                    "SHOT_BURST",
+                    "HIGH_REGAINS",
+                    "PRESSURE_SWING",
+                    "MOMENTUM_SHIFT",
+                    "PLAYER_MILESTONE"
+                  ]
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "P0",
+                    "P1",
+                    "P2"
+                  ]
+                },
+                "matchClockMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "teamId": {
+                  "type": "string",
+                  "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                },
+                "playerId": {
+                  "type": "string",
+                  "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                },
+                "reasonCode": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+                },
+                "evidence": {
+                  "type": "object",
+                  "properties": {
+                    "insightId": {
+                      "type": "string",
+                      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "fixtureId": {
+                      "type": "string",
+                      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "windowStartMs": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "windowEndMs": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "eventIds": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                      }
+                    },
+                    "computedMetrics": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "methodVersion": {
+                      "type": "string",
+                      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+                    },
+                    "dataCoverage": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "confidenceLabel": {
+                      "type": "string",
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ]
+                    },
+                    "rationale": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 400
+                    },
+                    "counterEvidence": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "description": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "eventIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                            }
+                          }
+                        },
+                        "required": [
+                          "description",
+                          "eventIds"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "insightId",
+                    "fixtureId",
+                    "windowStartMs",
+                    "windowEndMs",
+                    "eventIds",
+                    "computedMetrics",
+                    "methodVersion",
+                    "dataCoverage",
+                    "confidenceLabel",
+                    "rationale",
+                    "counterEvidence",
+                    "generatedAt"
+                  ],
+                  "additionalProperties": false
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "DETECTED",
+                    "ANALYZED",
+                    "DRAFTED",
+                    "VERIFIED",
+                    "SCHEDULED",
+                    "PUBLISHED",
+                    "REJECTED",
+                    "EXPIRED",
+                    "FALLBACK"
+                  ]
+                },
+                "synthetic": {
+                  "type": "boolean",
+                  "const": true
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "insightId",
+                "fixtureId",
+                "kind",
+                "priority",
+                "matchClockMs",
+                "reasonCode",
+                "evidence",
+                "status",
+                "synthetic"
+              ],
+              "additionalProperties": false
+            },
+            "entities": {
+              "type": "object",
+              "properties": {
+                "teams": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "teamId": {
+                        "type": "string",
+                        "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "teamId",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "players": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "playerId": {
+                        "type": "string",
+                        "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                      },
+                      "teamId": {
+                        "type": "string",
+                        "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                      },
+                      "displayName": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "playerId",
+                      "teamId",
+                      "displayName"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "teams",
+                "players"
+              ],
+              "additionalProperties": false
+            },
+            "persona": {
+              "type": "string",
+              "enum": [
+                "CASUAL",
+                "ANALYST",
+                "BROADCAST"
+              ]
+            },
+            "locale": {
+              "type": "string",
+              "enum": [
+                "en-GB",
+                "fr-FR",
+                "es-ES"
+              ]
+            },
+            "deadlineMs": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 30000
+            },
+            "policyVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "runId",
+            "correlationId",
+            "orgId",
+            "fixtureId",
+            "insight",
+            "entities",
+            "persona",
+            "locale",
+            "deadlineMs",
+            "policyVersion"
+          ],
+          "additionalProperties": false
+        },
+        "personas": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "CASUAL",
+              "ANALYST",
+              "BROADCAST"
+            ]
+          }
+        },
+        "locales": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "en-GB",
+              "fr-FR",
+              "es-ES"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "packet",
+        "personas",
+        "locales"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

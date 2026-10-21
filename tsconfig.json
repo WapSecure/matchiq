@@ -23,6 +23,15 @@
     },
     {
       "path": "./libs/replay"
+    },
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./libs/football-engine"
     }
   ],
   "compilerOptions": {}
