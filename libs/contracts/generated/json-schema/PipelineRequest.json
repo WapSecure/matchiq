@@ -293,7 +293,8 @@
               "enum": [
                 "en-GB",
                 "fr-FR",
-                "es-ES"
+                "es-ES",
+                "pcm-NG"
               ]
             },
             "deadlineMs": {
@@ -341,7 +342,8 @@
             "enum": [
               "en-GB",
               "fr-FR",
-              "es-ES"
+              "es-ES",
+              "pcm-NG"
             ]
           }
         }

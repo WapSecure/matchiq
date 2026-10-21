@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  Locale,
   NarrativeDraft,
   PipelineRequest,
   PipelineResult,
@@ -62,6 +63,20 @@ describe('model provider', () => {
         ...sample('PipelineResult'),
         runs: [{ ...run, provider: 'ollama' }],
       }).success,
+    ).toBe(true);
+  });
+});
+
+describe('locale', () => {
+  it('lists the audience locales in display order, Nigerian Pidgin last', () => {
+    expect(Locale.options).toEqual(['en-GB', 'fr-FR', 'es-ES', 'pcm-NG']);
+    expect(Locale.safeParse('en-NG').success).toBe(false);
+  });
+
+  it('accepts a Pidgin narrative draft', () => {
+    const [draft] = sample('PipelineResult')['narratives'] as object[];
+    expect(
+      NarrativeDraft.safeParse({ ...draft, locale: 'pcm-NG' }).success,
     ).toBe(true);
   });
 });

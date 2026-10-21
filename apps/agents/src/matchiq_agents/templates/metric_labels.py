@@ -7,36 +7,95 @@ from matchiq_agents.contracts.types import InsightKind, Locale
 
 _L = Locale
 METRIC_LABELS: Final[dict[str, dict[Locale, str]]] = {
-    "goals": {_L.en_GB: "goals", _L.fr_FR: "buts", _L.es_ES: "goles"},
-    "shots": {_L.en_GB: "shots", _L.fr_FR: "tirs", _L.es_ES: "tiros"},
+    "goals": {
+        _L.en_GB: "goals",
+        _L.fr_FR: "buts",
+        _L.es_ES: "goles",
+        _L.pcm_NG: "goals",
+    },
+    "shots": {
+        _L.en_GB: "shots",
+        _L.fr_FR: "tirs",
+        _L.es_ES: "tiros",
+        _L.pcm_NG: "shots",
+    },
     "shotsOnTarget": {
         _L.en_GB: "shots on target",
         _L.fr_FR: "tirs cadrés",
         _L.es_ES: "tiros a puerta",
+        _L.pcm_NG: "shots on target",
     },
     "highRecoveries": {
         _L.en_GB: "high recoveries",
         _L.fr_FR: "récupérations hautes",
         _L.es_ES: "recuperaciones altas",
+        _L.pcm_NG: "ball win for up",
     },
-    "recoveries": {_L.en_GB: "recoveries", _L.fr_FR: "récupérations", _L.es_ES: "recuperaciones"},
-    "pressures": {_L.en_GB: "pressures", _L.fr_FR: "pressings", _L.es_ES: "presiones"},
-    "possession": {_L.en_GB: "possession", _L.fr_FR: "possession", _L.es_ES: "posesión"},
-    "passes": {_L.en_GB: "passes", _L.fr_FR: "passes", _L.es_ES: "pases"},
-    "xg": {_L.en_GB: "expected goals", _L.fr_FR: "buts attendus", _L.es_ES: "goles esperados"},
-    "corners": {_L.en_GB: "corners", _L.fr_FR: "corners", _L.es_ES: "córneres"},
-    "fouls": {_L.en_GB: "fouls", _L.fr_FR: "fautes", _L.es_ES: "faltas"},
-    "redCards": {_L.en_GB: "red cards", _L.fr_FR: "cartons rouges", _L.es_ES: "tarjetas rojas"},
+    "recoveries": {
+        _L.en_GB: "recoveries",
+        _L.fr_FR: "récupérations",
+        _L.es_ES: "recuperaciones",
+        _L.pcm_NG: "ball recoveries",
+    },
+    "pressures": {
+        _L.en_GB: "pressures",
+        _L.fr_FR: "pressings",
+        _L.es_ES: "presiones",
+        _L.pcm_NG: "pressures",
+    },
+    "possession": {
+        _L.en_GB: "possession",
+        _L.fr_FR: "possession",
+        _L.es_ES: "posesión",
+        _L.pcm_NG: "possession",
+    },
+    "passes": {
+        _L.en_GB: "passes",
+        _L.fr_FR: "passes",
+        _L.es_ES: "pases",
+        _L.pcm_NG: "passes",
+    },
+    "xg": {
+        _L.en_GB: "expected goals",
+        _L.fr_FR: "buts attendus",
+        _L.es_ES: "goles esperados",
+        _L.pcm_NG: "expected goals",
+    },
+    "corners": {
+        _L.en_GB: "corners",
+        _L.fr_FR: "corners",
+        _L.es_ES: "córneres",
+        _L.pcm_NG: "corners",
+    },
+    "fouls": {
+        _L.en_GB: "fouls",
+        _L.fr_FR: "fautes",
+        _L.es_ES: "faltas",
+        _L.pcm_NG: "fouls",
+    },
+    "redCards": {
+        _L.en_GB: "red cards",
+        _L.fr_FR: "cartons rouges",
+        _L.es_ES: "tarjetas rojas",
+        _L.pcm_NG: "red cards",
+    },
     "yellowCards": {
         _L.en_GB: "yellow cards",
         _L.fr_FR: "cartons jaunes",
         _L.es_ES: "tarjetas amarillas",
+        _L.pcm_NG: "yellow cards",
     },
-    "touches": {_L.en_GB: "touches", _L.fr_FR: "touches", _L.es_ES: "toques"},
+    "touches": {
+        _L.en_GB: "touches",
+        _L.fr_FR: "touches",
+        _L.es_ES: "toques",
+        _L.pcm_NG: "touches",
+    },
     "momentum": {
         _L.en_GB: "momentum index",
         _L.fr_FR: "indice de dynamique",
         _L.es_ES: "índice de impulso",
+        _L.pcm_NG: "momentum index",
     },
 }
 

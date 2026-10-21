@@ -60,6 +60,15 @@ def _localiser_number(answer: BaseModel, _count: int) -> BaseModel:
     return answer.model_copy(update={"drafts": drafts})
 
 
+def _localiser_pidgin(suffix: str) -> Override:
+    def override(answer: BaseModel, _count: int) -> BaseModel:
+        assert isinstance(answer, LocalizationOutput)
+        drafts = [d.model_copy(update={"body": d.body + suffix}) for d in answer.drafts]
+        return answer.model_copy(update={"drafts": drafts})
+
+    return override
+
+
 def _bad_events(answer: BaseModel, _count: int) -> BaseModel:
     assert isinstance(answer, WriterOutput)
     drafts = [d.model_copy(update={"evidence_event_ids": ["ev_99999"]}) for d in answer.drafts]
@@ -87,4 +96,13 @@ ATTACKS: dict[str, dict[AgentName, Override]] = {
     "analyst_unsupported_number": {AgentName.MATCH_ANALYST: _analyst_number},
     "producer_unsupported_number": {AgentName.BROADCAST_PRODUCER: _producer_number},
     "localiser_changes_number": {AgentName.LOCALIZATION: _localiser_number},
+    "localiser_pidgin_number_word": {
+        AgentName.LOCALIZATION: _localiser_pidgin(" Dem don score nain goals.")
+    },
+    "localiser_pidgin_betting": {
+        AgentName.LOCALIZATION: _localiser_pidgin(" Stake money for dem, dem go win am.")
+    },
+    "localiser_pidgin_injury": {
+        AgentName.LOCALIZATION: _localiser_pidgin(" Northgate keeper don wound.")
+    },
 }

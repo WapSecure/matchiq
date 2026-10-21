@@ -45,7 +45,7 @@ export const PitchPoint = z
   })
   .meta({ id: 'PitchPoint' });
 
-export const Locale = z.enum(['en-GB', 'fr-FR', 'es-ES']);
+export const Locale = z.enum(['en-GB', 'fr-FR', 'es-ES', 'pcm-NG']);
 export const Persona = z.enum(['CASUAL', 'ANALYST', 'BROADCAST']);
 export const ConfidenceLabel = z.enum(['low', 'medium', 'high']);
 export const MetricRef = z

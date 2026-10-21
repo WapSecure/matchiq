@@ -45,7 +45,7 @@ async def test_happy_path_walks_every_stage_of_the_roster() -> None:
         agents
     )
     assert all(run.correlationId == result.correlationId for run in result.runs)
-    assert len(result.narratives) == 9
+    assert len(result.narratives) == 12
     assert result.overlay is not None
     assert 6_000 <= result.overlay.durationMs <= 10_000
 

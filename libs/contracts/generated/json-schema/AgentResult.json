@@ -89,7 +89,8 @@
       "enum": [
         "en-GB",
         "fr-FR",
-        "es-ES"
+        "es-ES",
+        "pcm-NG"
       ]
     },
     "confidenceLabel": {
