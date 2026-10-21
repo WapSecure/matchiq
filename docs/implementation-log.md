@@ -2,6 +2,12 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — Fix: replay speed lost when the worker restarts
+
+| Area                                                                                                                                                                                                                               | Status | Evidence                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| A worker restart resumed PLAYING sessions at 1× (the rebuilt controller's default) instead of their persisted speed. Paused sessions also lost it for their next resume. Resume now re-applies the persisted speed before resuming | Done   | `replay.integration.spec.ts` "resumes a session after a worker restart at its persisted speed" (failed before the fix: speed 1 vs 20) |
+
 ## 2026-10-21 — E2: Judge flow on replay sessions, recap and Agent Observatory (web)
 
 ### Delivered
