@@ -19,14 +19,30 @@
     "src/**/*.test.ts",
     "eslint.config.js",
     "eslint.config.cjs",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "src/test/**"
   ],
   "references": [
     {
       "path": "../../libs/server-kit/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/replay/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/football-engine/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/db/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/contracts/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/config/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/synthetic-data/tsconfig.lib.json"
     }
   ]
 }

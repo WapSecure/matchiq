@@ -44,6 +44,16 @@
           "cwd": "{projectRoot}"
         },
         "cache": false
+      },
+      "seed-fixtures": {
+        "dependsOn": [
+          "build"
+        ],
+        "command": "node --env-file-if-exists=../../.env dist/cli/seed-fixtures.js ../../fixtures",
+        "options": {
+          "cwd": "{projectRoot}"
+        },
+        "cache": false
       }
     }
   },
@@ -51,10 +61,13 @@
     "@matchiq/canonical-json": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
+    "@matchiq/synthetic-data": "workspace:*",
+    "bullmq": "5.81.5",
     "drizzle-orm": "0.45.3",
     "ioredis": "5.11.1",
     "pg": "8.23.1",
-    "tslib": "2.8.1"
+    "tslib": "2.8.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/pg": "8.23.1",

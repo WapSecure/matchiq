@@ -118,12 +118,19 @@ export const ApiEnv = CommonEnv.extend({
     .default(ENV_LIMITS.rateLimitPerMinute),
   /** Bearer secret for operator-only endpoints until Entra ID is wired. */
   OPERATOR_API_KEY: secret,
+  /** Per-client cap on anonymous replay controls (ADR-0010), stricter than reads. */
+  REPLAY_RATE_LIMIT_PER_MINUTE: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(ENV_LIMITS.replayRateLimitPerMinute),
 });
 
 export const WorkerEnv = CommonEnv.extend({
+  ...DatabaseEnv.shape,
+  ...RedisEnv.shape,
+  ...OutboxRelayEnv.shape,
   WORKER_PORT: port(DEFAULT_PORTS.worker),
-  DATABASE_URL: postgresUrl,
-  REDIS_URL: redisUrl,
   AGENTS_SERVICE_URL: z.url().default(DEFAULT_URLS.agentsService),
   AGENTS_SERVICE_TOKEN: secret,
   AGENT_TIMEOUT_MS: z.coerce
@@ -144,6 +151,29 @@ export const WorkerEnv = CommonEnv.extend({
     .min(1)
     .default(ENV_LIMITS.agentCircuitFailureThreshold),
   AI_ENABLED: booleanFlag,
+  /** Concurrent agents-pipeline jobs; bounds load on the model provider. */
+  AGENT_JOB_CONCURRENCY: boundedInt(
+    1,
+    ENV_LIMITS.agentJobConcurrencyMax,
+    ENV_LIMITS.agentJobConcurrencyDefault,
+  ),
+  /** First retry delay; BullMQ doubles it on each further attempt. */
+  AGENT_RETRY_BACKOFF_MS: boundedInt(
+    ENV_LIMITS.agentRetryBackoffMinMs,
+    ENV_LIMITS.agentRetryBackoffMaxMs,
+    ENV_LIMITS.agentRetryBackoffDefaultMs,
+  ),
+  AGENT_CIRCUIT_COOLDOWN_MS: boundedInt(
+    ENV_LIMITS.agentCircuitCooldownMinMs,
+    ENV_LIMITS.agentCircuitCooldownMaxMs,
+    ENV_LIMITS.agentCircuitCooldownDefaultMs,
+  ),
+  /** Replay sessions the worker drives at once; further starts wait in the queue. */
+  REPLAY_MAX_ACTIVE_SESSIONS: boundedInt(
+    1,
+    ENV_LIMITS.replayActiveSessionsMax,
+    ENV_LIMITS.replayActiveSessionsDefault,
+  ),
 });
 
 export const WebPublicEnv = z.object({

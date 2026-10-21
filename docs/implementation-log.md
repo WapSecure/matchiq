@@ -2,6 +2,34 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — M2/M3: Replay sessions, intelligence pipeline, publish gate, overlays and recap (MQ-010, MQ-013)
+
+### Delivered
+
+| Area                                                                                                                                                                                                                                                        | Status                          | Evidence                                                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ADR-0013: templates vs sessions, forward-only seek, worker-owned playback, deterministic gate, overlay revisions                                                                                                                                            | Done                            | `docs/adr/0013-replay-sessions-and-intelligence-pipeline.md`                                                                                                                               |
+| Migration `0001_replay_intelligence`: `fixture_templates`, `replay_sessions`, `insights`, `narratives`, `overlay_cues`, `agent_runs`, `match_snapshots`, `match_recaps` (all with `org_id`)                                                                 | Done                            | Applied by every integration test and the local smoke                                                                                                                                      |
+| `pnpm seed:fixtures`: validates the 5 golden files with `validateFixtureFile` and upserts them idempotently                                                                                                                                                 | Done                            | Second run reports `unchanged` for all 5; integration test                                                                                                                                 |
+| Replay API: `POST /fixtures/:templateId/sessions`, `POST/GET /fixtures/:sessionId/replay` (409 `replay-state-conflict`, own `REPLAY_RATE_LIMIT_PER_MINUTE` throttler), `GET /fixture-templates`, `GET /replay-sessions`; BullMQ `replay-commands` transport | Done                            | `replay.integration.spec.ts` (api), 409 and 429 cases                                                                                                                                      |
+| Worker: one serial `SessionRunner` per session, batched transactions (ledger, stream messages and read models), snapshot cadence, moments, overlay scheduler, template fallback, recap, resume after restart                                                | Done                            | `replay.integration.spec.ts` (worker): ledger hash equals the manifest, score 3-2, 5 goals, overlays published and retracted, identical stream hash on a second run and across speeds      |
+| Deterministic publish gate (cited values, numerals in text, evidence ids, entity allowlist, persona lengths, requested variants)                                                                                                                            | Done                            | `publish-gate.spec.ts`; every template variant for every golden insight passes                                                                                                             |
+| Agents client (`/api/v1/pipeline/runs`, bearer token, `deadlineMs + 1.5 s` timeout, retriable classification, circuit breaker), BullMQ `insight-pipeline` jobs with idempotent publication                                                                  | Done against a fake HTTP server | `agents.integration.spec.ts`: 3×3 agent narratives, an unsupported number rejected and replaced by a template, timeout retry then fallback, duplicate and concurrent delivery publish once |
+| Read APIs: `state`, `insights`, `narratives?persona=&locale=`, `overlays`, `recap`, `agent-runs`                                                                                                                                                            | Done                            | `intelligence.integration.spec.ts` and the local smoke                                                                                                                                     |
+| Performance smoke (`pnpm perf:replay`)                                                                                                                                                                                                                      | Done                            | Max speed: 1,470 events in 1.6 s (≈ 900 events/s). At 30× in real time: event-to-ledger p95 74 ms, event-to-snapshot p95 536 ms (synthetic local load, not an SLA)                         |
+
+### Local smoke (built API on :3100, built worker on :3101, own database and Redis prefix, AI disabled)
+
+A `comeback` session at 30×, streamed with `curl -N` from `Last-Event-ID: 0` for 130 s, delivered 1,470 `match.event`, 288 `match.snapshot`, 19 `insight.detected`, 171 `narrative.ready` (19 × 9), 18 `overlay.publish`, 18 `overlay.retract` and 3 `replay.status` messages. Afterwards `/state` reported COMPLETED 3-2, `/recap` listed 19 key moments including 5 goals, and pausing the finished session answered 409.
+
+### Not done or limits
+
+- The live agents service was not exercised end to end in this PR. The client is tested against a fake server that follows the PR #11 contract.
+- Sessions run in a single worker replica. Insights left `PENDING` by a crash between commit and job enqueue are not re-enqueued on boot.
+- Corrections are projected, but moments are not re-detected after a correction. There is no producer approval yet: cues are `AUTO_APPROVED`.
+- The compose `migrate` job does not seed templates. Run `pnpm seed:fixtures` against the database.
+- `ReplaySessionView`, `FixtureTemplateSummary`, `RecapDocument`, `InsightTrace`, `GateReport` and the `{ items }` lists are local types in `libs/db` until they are added to `libs/contracts`.
+
 ## 2026-10-21 — MQ-011: Fixture lobby, live studio and resumable match stream (web)
 
 ### Delivered

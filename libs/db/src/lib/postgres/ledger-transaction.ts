@@ -31,8 +31,9 @@ const eventsOf = (key: FixtureKey) =>
     eq(matchEvents.fixtureId, key.fixtureId),
   );
 
-class PostgresLedgerTransaction implements LedgerTransaction {
-  constructor(private readonly tx: Transaction) {}
+/** Extended by the worker's pipeline transaction (see pipeline-transaction.ts). */
+export class PostgresLedgerTransaction implements LedgerTransaction {
+  constructor(protected readonly tx: Transaction) {}
 
   async insertFixture(
     orgId: string,

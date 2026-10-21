@@ -16,7 +16,7 @@ describe('Worker AppModule', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule.forRoot(env)],
+      imports: [AppModule.forRoot(env, { consumeQueues: false })],
     }).compile();
     app = moduleRef.createNestApplication({ logger: false });
     configureHttpApp(app, { corsOrigins: [] });
