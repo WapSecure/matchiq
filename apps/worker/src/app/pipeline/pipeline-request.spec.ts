@@ -18,7 +18,7 @@ describe('buildPipelineRequest', () => {
 
     expect(PipelineRequest.parse(request)).toEqual(request);
     expect(request.personas).toEqual(['CASUAL', 'ANALYST', 'BROADCAST']);
-    expect(request.locales).toEqual(['en-GB', 'fr-FR', 'es-ES']);
+    expect(request.locales).toEqual(['en-GB', 'fr-FR', 'es-ES', 'pcm-NG']);
     expect(request.packet).toMatchObject({
       orgId: 'org_demo',
       fixtureId: fixture.fixtureId,

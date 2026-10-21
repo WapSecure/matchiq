@@ -1,4 +1,4 @@
-"""Localization Specialist (spec §27, §28): approved en-GB drafts → fr-FR / es-ES.
+"""Localization Specialist (spec §27, §28): approved en-GB drafts → fr-FR / es-ES / pcm-NG.
 
 Evidence ids and cited values are copied from the source draft, never from the model. When a
 translation changes a number or drops a proper noun, the en-GB text is served with

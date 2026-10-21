@@ -11,7 +11,7 @@ export interface RecapInput {
 }
 
 const PERSONA_ORDER = ['CASUAL', 'ANALYST', 'BROADCAST'];
-const LOCALE_ORDER = ['en-GB', 'fr-FR', 'es-ES'];
+const LOCALE_ORDER = ['en-GB', 'fr-FR', 'es-ES', 'pcm-NG'];
 
 const byVariant = (a: Narrative, b: Narrative): number =>
   PERSONA_ORDER.indexOf(a.persona) - PERSONA_ORDER.indexOf(b.persona) ||

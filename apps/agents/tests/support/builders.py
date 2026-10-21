@@ -23,7 +23,7 @@ class CaseSpec:
         default_factory=lambda: {"highRecoveries.home.rolling5m": 5, "shots.home.rolling5m": 3}
     )
     personas: tuple[str, ...] = ("CASUAL", "ANALYST", "BROADCAST")
-    locales: tuple[str, ...] = ("en-GB", "fr-FR", "es-ES")
+    locales: tuple[str, ...] = ("en-GB", "fr-FR", "es-ES", "pcm-NG")
     team_id: str | None = HOME
     player_id: str | None = None
     team_name: str = "Harbour City"

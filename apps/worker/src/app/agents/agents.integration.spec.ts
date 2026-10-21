@@ -63,7 +63,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
     expect(fixture.fixtureId).toBe(key.fixtureId);
   });
 
-  it('publishes agent narratives in three personas and three locales', async () => {
+  it('publishes agent narratives in three personas and four locales', async () => {
     const [first] = await t.reader.insights(key);
     if (!first) throw new Error('no insight');
     expect(await t.pipeline.process(job(first.insightId), attempt(0))).toBe(
@@ -72,13 +72,13 @@ describe('agents pipeline with AI enabled (integration)', () => {
     const narratives = (await t.reader.narratives(key, {})).filter(
       (n) => n.insightId === first.insightId,
     );
-    expect(narratives).toHaveLength(9);
+    expect(narratives).toHaveLength(12);
     expect(new Set(narratives.map((n) => n.source))).toEqual(
       new Set(['AGENT']),
     );
     expect(
       new Set(narratives.map((n) => `${n.persona}/${n.locale}`)).size,
-    ).toBe(9);
+    ).toBe(12);
     const trace = (await t.reader.traces(key)).find(
       (x) => x.insightId === first.insightId,
     );
@@ -100,7 +100,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
     const narratives = await t.reader.narratives(key, {});
     expect(
       narratives.filter((n) => n.insightId === first.insightId),
-    ).toHaveLength(9);
+    ).toHaveLength(12);
   });
 
   it('races two deliveries of one job into a single publication', async () => {
@@ -117,7 +117,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
         m.type === 'narrative.ready' &&
         m.payload.insightId === insight.insightId,
     );
-    expect(ready).toHaveLength(9);
+    expect(ready).toHaveLength(12);
   });
 
   it('rejects a draft that cites an unsupported number and serves the template for that variant', async () => {
@@ -149,7 +149,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
       (n) => n.insightId === insight.insightId,
     );
     expect(narratives.filter((n) => n.source === 'TEMPLATE')).toHaveLength(1);
-    expect(narratives).toHaveLength(9);
+    expect(narratives).toHaveLength(12);
   });
 
   it('retries a timeout while attempts remain, then falls back to templates', async () => {

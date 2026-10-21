@@ -2,6 +2,24 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — MQ-012: Nigerian Pidgin (pcm-NG) audience locale
+
+### Delivered
+
+| Area                                                                                                                                                        | Status  | Evidence                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------- |
+| ADR-0014: `pcm-NG` locale code rationale, spelling and register, number words, quality caveat                                                               | Done    | `docs/adr/0014-nigerian-pidgin-locale.md`                                          |
+| Contract `Locale` gains `pcm-NG` (en-GB, fr-FR, es-ES, pcm-NG); JSON Schema and Pydantic regenerated; shared `PipelineRequest` sample requests `pcm-NG`     | Done    | `pipeline.spec.ts` locale tests; `test_api.py` and contract sample tests           |
+| Worker: `copy-pcm.ts` for every insight kind × persona, Pidgin gate number words, recap order, 12 narratives per insight, policy and template version 1.1.0 | Done    | `copy-pcm.spec.ts`: every Pidgin variant passes the gate for all 5 golden fixtures |
+| Agents: `phrases_pcm.py`, Pidgin metric labels, Fact Checker number words, Pidgin forbidden-claim phrasings, Localization prompt 1.1.0                      | Done    | `test_guard.py`, eval cases and attacks for `pcm-NG`, `test_golden.py`             |
+| Football glossary for review                                                                                                                                | Partial | `docs/localization/PIDGIN_GLOSSARY.md`, **pending native-speaker review**          |
+
+### Not done or limits
+
+- The web locale switcher option belongs to the web stream: `{ value: 'pcm-NG', label: 'Naijá (Pidgin)', short: 'PCM' }`.
+- Pidgin model output was exercised only with the mock provider and templates, not with Ollama or Foundry.
+- The deterministic checks protect facts, names and forbidden claims, not style. Copy quality depends on the owner's review.
+
 ## 2026-10-21 — M2/M3: Replay sessions, intelligence pipeline, publish gate, overlays and recap (MQ-010, MQ-013)
 
 ### Delivered

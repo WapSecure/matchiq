@@ -38,7 +38,7 @@ describe('HttpAgentsClient', () => {
 
   it('posts the PipelineRequest with the service bearer token and parses the result', async () => {
     const result = await client().run(request);
-    expect(result.narratives).toHaveLength(9);
+    expect(result.narratives).toHaveLength(12);
     expect(server.requests.at(-1)).toEqual(request);
     expect(server.authorizations.at(-1)).toBe(`Bearer ${TOKEN}`);
     expect(await client().reachable()).toBe(true);

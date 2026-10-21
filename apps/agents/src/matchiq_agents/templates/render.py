@@ -11,11 +11,13 @@ from matchiq_agents.templates.phrasebook import Phrasebook
 from matchiq_agents.templates.phrases_en import EN_GB
 from matchiq_agents.templates.phrases_es import ES_ES
 from matchiq_agents.templates.phrases_fr import FR_FR
+from matchiq_agents.templates.phrases_pcm import PCM_NG
 
 PHRASEBOOKS: Final[dict[Locale, Phrasebook]] = {
     Locale.en_GB: EN_GB,
     Locale.fr_FR: FR_FR,
     Locale.es_ES: ES_ES,
+    Locale.pcm_NG: PCM_NG,
 }
 MAX_DECIMALS: Final = 2
 METRIC_SEPARATOR: Final = "; "

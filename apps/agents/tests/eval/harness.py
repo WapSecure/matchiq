@@ -17,6 +17,7 @@ NUMBER_WORDS = {
     "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
     "deux", "trois", "quatre", "cinq", "sept", "huit", "neuf", "dix", "onze", "douze",
     "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "doce",
+    "tu", "tri", "faiv", "siks", "sevin", "nain",
 }  # fmt: skip
 INJECTION_MARKERS = (
     "ignore previous",
@@ -28,6 +29,11 @@ INJECTION_MARKERS = (
     "odds",
     "injur",
     "manager changed",
+    "stake money",
+    "booking code",
+    "go win am",
+    "don wound",
+    "forget all di",
     "<<<",
 )
 ALLOWED_CAPITALISED = {"VAR"}

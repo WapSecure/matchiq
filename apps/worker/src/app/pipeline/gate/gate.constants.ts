@@ -20,32 +20,38 @@ export const CAPITALISED_ALLOWED: ReadonlySet<string> = new Set([
   'MatchIQ',
 ]);
 
-/** "one"/"un"/"uno" are omitted: they double as articles. */
+const ENGLISH_NUMBER_WORDS: Readonly<Record<string, number>> = {
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+  thirteen: 13,
+  fourteen: 14,
+  fifteen: 15,
+  sixteen: 16,
+  seventeen: 17,
+  eighteen: 18,
+  nineteen: 19,
+  twenty: 20,
+  dozen: 12,
+};
+
+/**
+ * Nigerian Pidgin uses English number words plus phonetic spellings. "one",
+ * "un", "uno" and "wan" are omitted: they double as articles ("wan" also
+ * means "want"). "fo" stays: copy and prompts spell "for" in full.
+ */
 export const NUMBER_WORDS: Readonly<
   Record<Locale, Readonly<Record<string, number>>>
 > = {
-  'en-GB': {
-    two: 2,
-    three: 3,
-    four: 4,
-    five: 5,
-    six: 6,
-    seven: 7,
-    eight: 8,
-    nine: 9,
-    ten: 10,
-    eleven: 11,
-    twelve: 12,
-    thirteen: 13,
-    fourteen: 14,
-    fifteen: 15,
-    sixteen: 16,
-    seventeen: 17,
-    eighteen: 18,
-    nineteen: 19,
-    twenty: 20,
-    dozen: 12,
-  },
+  'en-GB': ENGLISH_NUMBER_WORDS,
   'fr-FR': {
     deux: 2,
     trois: 3,
@@ -84,6 +90,17 @@ export const NUMBER_WORDS: Readonly<
     dieciocho: 18,
     diecinueve: 19,
     veinte: 20,
+  },
+  'pcm-NG': {
+    ...ENGLISH_NUMBER_WORDS,
+    tu: 2,
+    tri: 3,
+    fo: 4,
+    faiv: 5,
+    siks: 6,
+    sevin: 7,
+    et: 8,
+    nain: 9,
   },
 };
 

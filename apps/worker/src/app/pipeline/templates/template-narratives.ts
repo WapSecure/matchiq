@@ -15,6 +15,7 @@ import {
 import { COPY_EN } from './copy-en';
 import { COPY_ES } from './copy-es';
 import { COPY_FR } from './copy-fr';
+import { COPY_PCM } from './copy-pcm';
 import type { LocaleCopy } from './copy-types';
 import { buildFacts, type TemplateFacts } from './template-facts';
 
@@ -22,6 +23,7 @@ const COPY: Readonly<Record<Locale, LocaleCopy>> = {
   'en-GB': COPY_EN,
   'fr-FR': COPY_FR,
   'es-ES': COPY_ES,
+  'pcm-NG': COPY_PCM,
 };
 
 interface Copy {
