@@ -1,0 +1,60 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "agents",
+  "projectType": "application",
+  "sourceRoot": "apps/agents/src",
+  "tags": ["scope:agents", "type:app"],
+  "implicitDependencies": ["contracts"],
+  "targets": {
+    "install": {
+      "command": "uv sync --frozen",
+      "options": { "cwd": "{projectRoot}" },
+      "inputs": ["{projectRoot}/pyproject.toml", "{projectRoot}/uv.lock"],
+      "cache": false
+    },
+    "codegen": {
+      "dependsOn": [
+        { "projects": ["contracts"], "target": "export-json-schema" }
+      ],
+      "command": "rm -rf src/matchiq_agents/contracts/generated && uv run --frozen datamodel-codegen",
+      "options": { "cwd": "{projectRoot}" },
+      "inputs": [
+        "{workspaceRoot}/libs/contracts/generated/json-schema/**/*",
+        "{projectRoot}/pyproject.toml"
+      ],
+      "outputs": ["{projectRoot}/src/matchiq_agents/contracts/generated"],
+      "cache": true
+    },
+    "lint": {
+      "command": "uv run --frozen ruff check . && uv run --frozen ruff format --check .",
+      "options": { "cwd": "{projectRoot}" },
+      "inputs": ["{projectRoot}/**/*.py", "{projectRoot}/pyproject.toml"],
+      "cache": true
+    },
+    "typecheck": {
+      "command": "uv run --frozen pyright",
+      "options": { "cwd": "{projectRoot}" },
+      "inputs": [
+        "{projectRoot}/**/*.py",
+        "{projectRoot}/pyproject.toml",
+        "{projectRoot}/uv.lock"
+      ],
+      "cache": true
+    },
+    "test": {
+      "command": "uv run --frozen pytest",
+      "options": { "cwd": "{projectRoot}" },
+      "inputs": [
+        "{projectRoot}/**/*.py",
+        "{projectRoot}/pyproject.toml",
+        "{workspaceRoot}/libs/contracts/samples/**/*"
+      ],
+      "cache": true
+    },
+    "serve": {
+      "command": "uv run --frozen python -m matchiq_agents",
+      "options": { "cwd": "{projectRoot}" },
+      "continuous": true
+    }
+  }
+}
