@@ -2,6 +2,39 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — M1: Event ledger, idempotent ingest and resumable SSE (MQ-004, MQ-006)
+
+### Delivered
+
+| Area                                                                                                                                                                                                     | Status  | Evidence                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------ |
+| `libs/db`: Drizzle schema, migration `0000_event_ledger` (`fixtures`, `match_events`, `stream_messages`, `audit_events`, `idempotency_keys`, all with `org_id`), ports and Postgres/Redis adapters       | Done    | `pnpm nx run db:migrate` applied to local Postgres; 15 Vitest tests (8 integration on real Postgres + Redis) |
+| ADR-0006 accepted: Drizzle, Postgres ledger, transactional outbox to Redis pub/sub                                                                                                                       | Done    | `docs/adr/0006-persistence-and-messaging.md`                                                                 |
+| Fixtures API: `POST /fixtures` (operator, 201/409), `GET /fixtures`, `GET /fixtures/:id`, `GET /fixtures/:id/events` (cursor `afterSequence`, limit ≤ 500)                                               | Done    | `fixtures.integration.spec.ts`, `ingest.integration.spec.ts`                                                 |
+| Ingest `POST /fixtures/:id/events:batch`: one transaction for events, duplicate counting, 409 on changed body or taken sequence, 422 on fixture mismatch, 404 on unknown fixture, outbox rows, audit row | Done    | `ingest.integration.spec.ts` (10 tests), `classify-batch.spec.ts`, `ingest.service.spec.ts`                  |
+| Optional `Idempotency-Key` on both POSTs: replay of the stored response, 422 when reused with a different body                                                                                           | Done    | Integration tests for both endpoints                                                                         |
+| Operator bearer guard (SHA-256 + `timingSafeEqual`), 401 problems with `WWW-Authenticate`; reads anonymous; `@nestjs/throttler` at `RATE_LIMIT_PER_MINUTE`                                               | Done    | `operator-auth.guard.spec.ts`, `operator-access.integration.spec.ts`                                         |
+| Outbox relay in the API process: `FOR UPDATE SKIP LOCKED`, at-least-once, kicked after commit plus polling                                                                                               | Done    | `outbox-relay.spec.ts`, `ledger.integration.spec.ts`                                                         |
+| SSE `GET /fixtures/:id/stream`: `Last-Event-ID` or `?lastEventId=` replay from Postgres, then live Redis messages, gap fill and de-duplication by `streamSequence`, heartbeats, cleanup on disconnect    | Done    | `stream.integration.spec.ts`, `stream-session.spec.ts`; curl smoke test against the built API                |
+| Postgres and Redis readiness indicators (503 when either is down)                                                                                                                                        | Done    | `health.indicators.spec.ts`, `app.module.spec.ts`                                                            |
+| CI `verify` job gets Postgres 17.6 and Redis 8.2 service containers for the integration tests                                                                                                            | Partial | Workflow updated; proven by the PR run                                                                       |
+
+### Findings fixed during M1
+
+- The relay first drained in `created_at` order. Concurrent transactions share no commit order with `now()`, so the integration test caught out-of-order publication. It now drains in `(org_id, fixture_id, stream_sequence)` order with a matching partial index.
+- A real ioredis client left a connect timer alive after `disconnect()` against a refused port, which held Jest workers open. The readiness test uses a rejecting PING instead.
+
+### Known limitations
+
+- Out-of-order or gapped event sequences are accepted as long as they are unique; the §24 reorder window and dead-letter queue are not implemented.
+- Rate limiting uses in-memory storage per API instance and keys by socket address (no `trust proxy` yet).
+- SSE does not apply per-connection backpressure, and a fresh connection without `Last-Event-ID` starts at the live head (clients load the snapshot first, ADR-0005).
+- `GET /fixtures` returns at most 100 fixtures without a cursor.
+
+### Next
+
+Snapshot projection wired to the outbox (`match.snapshot`), replay controls, worker consumers on the same outbox.
+
 ## 2026-10-21 — M0: Foundation (MQ-001, MQ-002)
 
 ### Delivered
