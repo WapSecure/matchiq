@@ -19,6 +19,12 @@
       "path": "./apps/api"
     },
     {
+      "path": "./libs/synthetic-data"
+    },
+    {
+      "path": "./libs/replay"
+    },
+    {
       "path": "./apps/web-e2e"
     },
     {
