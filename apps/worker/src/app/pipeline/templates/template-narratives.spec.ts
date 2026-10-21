@@ -11,7 +11,7 @@ describe('template fallback narratives', () => {
       personas: PERSONAS,
       locales: LOCALES,
     });
-    expect(drafts).toHaveLength(9);
+    expect(drafts).toHaveLength(12);
     for (const draft of drafts) {
       expect(NarrativeDraft.parse(draft)).toEqual(draft);
       expect(draft.source).toBe('TEMPLATE');
@@ -31,16 +31,17 @@ describe('template fallback narratives', () => {
     const cited = drafts.map((d) => d.citedValues);
     expect(cited[1]).toEqual(cited[0]);
     expect(cited[2]).toEqual(cited[0]);
+    expect(cited[3]).toEqual(cited[0]);
     const shots = cited[0]?.find((c) => c.metricRef.startsWith('shots.'));
     for (const draft of drafts) {
       expect(draft.body).toContain(String(shots?.value));
     }
   });
 
-  it('localises decimal separators for French and Spanish', async () => {
+  it('localises decimal separators for French and Spanish, not Pidgin', async () => {
     const { fixture, insights } = await goldenMoments('comeback');
     const shift = firstOfKind(insights, 'MOMENTUM_SHIFT');
-    const [en, fr, es] = templateDrafts(shift, fixture, {
+    const [en, fr, es, pcm] = templateDrafts(shift, fixture, {
       personas: ['ANALYST'],
       locales: LOCALES,
     });
@@ -50,6 +51,7 @@ describe('template fallback narratives', () => {
     expect(en?.body).toContain(text);
     expect(fr?.body).toContain(text.replace('.', ','));
     expect(es?.body).toContain(text.replace('.', ','));
+    expect(pcm?.body).toContain(text);
   });
 
   it('derives a deterministic broadcast overlay from the insight', async () => {

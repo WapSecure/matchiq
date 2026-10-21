@@ -17,6 +17,7 @@ class Locale(StrEnum):
     en_GB = "en-GB"
     fr_FR = "fr-FR"
     es_ES = "es-ES"
+    pcm_NG = "pcm-NG"
 
 
 class Citation(RootModel[str]):

@@ -11,12 +11,12 @@ import type {
 export const SERVICE_NAME = 'matchiq-worker';
 
 /** Bump when gate rules, templates or overlay policy change (sent as `policyVersion`). */
-export const PUBLISH_POLICY_VERSION = '1.0.0';
-export const TEMPLATE_PROMPT_VERSION = '1.0.0';
+export const PUBLISH_POLICY_VERSION = '1.1.0';
+export const TEMPLATE_PROMPT_VERSION = '1.1.0';
 export const INSIGHT_REVISION = 1;
 
 export const PERSONAS: readonly Persona[] = ['CASUAL', 'ANALYST', 'BROADCAST'];
-export const LOCALES: readonly Locale[] = ['en-GB', 'fr-FR', 'es-ES'];
+export const LOCALES: readonly Locale[] = ['en-GB', 'fr-FR', 'es-ES', 'pcm-NG'];
 export const PRIMARY_LOCALE: Locale = 'en-GB';
 export const OVERLAY_PERSONA: Persona = 'BROADCAST';
 

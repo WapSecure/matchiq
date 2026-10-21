@@ -66,7 +66,7 @@ describe('replay sessions with AI disabled (integration)', () => {
     expect(insights.every((i) => i.status === 'FALLBACK')).toBe(true);
 
     const narratives = await t.reader.narratives(key, {});
-    expect(narratives).toHaveLength(insights.length * 9);
+    expect(narratives).toHaveLength(insights.length * 12);
     expect(narratives.every((n) => n.source === 'TEMPLATE')).toBe(true);
     const french = await t.reader.narratives(key, {
       persona: 'CASUAL',
@@ -94,7 +94,7 @@ describe('replay sessions with AI disabled (integration)', () => {
     const recap = await t.reader.recap(key);
     expect(recap?.finalSnapshot.score).toEqual({ home: 3, away: 2 });
     expect(recap?.keyMoments.filter((m) => m.kind === 'GOAL')).toHaveLength(5);
-    expect(recap?.keyMoments[0]?.narratives).toHaveLength(9);
+    expect(recap?.keyMoments[0]?.narratives).toHaveLength(12);
 
     const traces = await t.reader.traces(key);
     expect(traces[0]).toMatchObject({

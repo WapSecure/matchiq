@@ -11,7 +11,7 @@ from matchiq_agents.wiring import build_orchestrator
 from tests.conftest import TOKEN
 from tests.eval.attacks import ATTACKS
 from tests.eval.cases import ADVERSARIAL_INPUTS, GOLDEN, EvalCase
-from tests.eval.harness import CaseReport, evaluate
+from tests.eval.harness import DIGITS, CaseReport, evaluate
 from tests.support.builders import build_request
 from tests.support.models import FailingModel, FakeClock, ScriptedModel
 
@@ -84,3 +84,20 @@ async def test_attack_runs_are_recorded_as_failed_then_fallback() -> None:
     writer_runs = [run for run in result.runs if run.agent.value == "NARRATIVE_WRITER"]
     assert len(writer_runs) == 2
     assert all(run.outcome is RunOutcome.SUCCEEDED for run in writer_runs)
+
+
+async def test_pidgin_persona_variants_differ_but_numbers_match_english() -> None:
+    request = build_request(GOLDEN[0].spec)
+    result = await build_orchestrator(SETTINGS, FakeClock(), MockModel()).run(request)
+    by_locale = {
+        locale: {d.persona.value: d for d in result.narratives if d.locale.value == locale}
+        for locale in ("en-GB", "pcm-NG")
+    }
+    pidgin = by_locale["pcm-NG"]
+    assert len({d.body for d in pidgin.values()}) == len(pidgin) == 3
+    assert not any(d.localeFallback for d in pidgin.values())
+    for persona, draft in pidgin.items():
+        english = by_locale["en-GB"][persona]
+        assert draft.body != english.body
+        assert sorted(DIGITS.findall(draft.body)) == sorted(DIGITS.findall(english.body))
+        assert draft.citedValues == english.citedValues

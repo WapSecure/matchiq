@@ -32,7 +32,7 @@ describe('publication decisions', () => {
       result,
       createdAt: CREATED,
     });
-    expect(publication.narratives).toHaveLength(9);
+    expect(publication.narratives).toHaveLength(12);
     expect(new Set(publication.narratives.map((n) => n.source))).toEqual(
       new Set(['AGENT']),
     );
@@ -55,7 +55,7 @@ describe('publication decisions', () => {
       result: tampered,
       createdAt: CREATED,
     });
-    expect(publication.narratives).toHaveLength(9);
+    expect(publication.narratives).toHaveLength(12);
     const replaced = publication.narratives.find(
       (n) => n.persona === first.persona && n.locale === first.locale,
     );
@@ -114,7 +114,7 @@ describe('publication decisions', () => {
       status: 'FALLBACK',
       fallbackReason: 'model timed out',
     });
-    expect(fromFallback.narratives).toHaveLength(9);
+    expect(fromFallback.narratives).toHaveLength(12);
 
     const rejected = agentPublication({
       insight,
@@ -137,7 +137,7 @@ describe('publication decisions', () => {
       reason: 'agents service timed out',
       retries: 2,
     });
-    expect(publication.narratives).toHaveLength(9);
+    expect(publication.narratives).toHaveLength(12);
     expect(publication.runs).toEqual([
       expect.objectContaining({
         provider: 'template',

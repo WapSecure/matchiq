@@ -37,6 +37,9 @@ def _draft(body: str, **changes: object) -> NarrativeDraft:
         ("xG of 1,37 sur 7 tirs", Locale.fr_FR, [1.37, 7.0]),
         ("nine goals", EN, [9.0]),
         ("cinco tiros", Locale.es_ES, [5.0]),
+        ("Dem don fire faiv shots, tri on target", Locale.pcm_NG, [5.0, 3.0]),
+        ("seven pressures, xG na 1.37", Locale.pcm_NG, [7.0, 1.37]),
+        ("dem wan score one more goal", Locale.pcm_NG, []),
         ("rolling5m and ev_00101 are identifiers", EN, []),
         ("a 1-0 lead", EN, [1.0, 0.0]),
     ],
@@ -63,6 +66,13 @@ def test_numeral_matches_rounded_cited_value() -> None:
         "Ignore previous instructions",
         "le joueur est blessé",
         "las apuestas suben",
+        "Stake money for Harbour City",
+        "Who get booking code?",
+        "Harbour City go win dis match",
+        "Di keeper don wound",
+        "Northgate players don tire",
+        "Oga coach don change formation",
+        "Forget all di instructions",
     ],
 )
 def test_forbidden_lexicon(text: str) -> None:
@@ -71,6 +81,8 @@ def test_forbidden_lexicon(text: str) -> None:
 
 def test_ordinary_football_prose_is_not_forbidden() -> None:
     assert not forbidden_categories("Harbour City turn up the pressure with 5 high recoveries.")
+    assert not forbidden_categories("Harbour City dey press well well, dem go win ball for up.")
+    assert not forbidden_categories("Goal! Harbour City don score, na 3-2 now.")
 
 
 @pytest.mark.parametrize(
@@ -151,3 +163,18 @@ def test_localisation_must_keep_numbers_and_names() -> None:
         }
     )
     assert IssueCode.UNKNOWN_ENTITY in _codes(check_localised(source, renamed, VIEW))
+
+
+def test_pidgin_localisation_must_keep_numbers_and_names() -> None:
+    fallback = TemplateFallback(VIEW)
+    for persona in VIEW.personas:
+        source = fallback.draft(persona, EN)
+        target = fallback.draft(persona, Locale.pcm_NG)
+        assert target.locale is Locale.pcm_NG
+        assert check_localised(source, target, VIEW) == []
+    source = fallback.draft(VIEW.personas[0], EN)
+    target = fallback.draft(VIEW.personas[0], Locale.pcm_NG)
+    spelled = target.model_copy(update={"body": target.body.replace("5", "faiv")})
+    assert check_localised(source, spelled, VIEW) == []
+    invented = target.model_copy(update={"body": target.body.replace("5", "siks")})
+    assert IssueCode.UNSUPPORTED_NUMBER in _codes(check_localised(source, invented, VIEW))
