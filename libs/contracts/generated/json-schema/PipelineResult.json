@@ -259,6 +259,7 @@
                 "type": "string",
                 "enum": [
                   "foundry",
+                  "ollama",
                   "mock",
                   "template"
                 ]
