@@ -37,6 +37,128 @@ services:
       timeout: 3s
       retries: 10
 
+  # --- Opt-in application stack: docker compose --profile app up --build ---
+  # Values come from .env via interpolation; defaults are local-only placeholders.
+  # Explicit blocks (not env_file) keep compose-DNS URLs authoritative over the localhost URLs in .env.
+  # One-shot schema migration from the api image (Nx prune ships libs/db with its migrations).
+  migrate:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: matchiq-api:local
+    command: ['node', 'workspace_modules/@matchiq/db/dist/cli/migrate.js']
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matchiq}:${POSTGRES_PASSWORD:-matchiq_local_only}@postgres:5432/${POSTGRES_DB:-matchiq}
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: 'no'
+
+  api:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: matchiq-api:local
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_VERSION: ${APP_VERSION:-0.0.0-dev}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DEMO_ORG_ID: ${DEMO_ORG_ID:-org_demo}
+      API_PORT: '3000'
+      API_PUBLIC_URL: http://localhost:${API_PORT:-3000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-300}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matchiq}:${POSTGRES_PASSWORD:-matchiq_local_only}@postgres:5432/${POSTGRES_DB:-matchiq}
+      DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-10}
+      REDIS_URL: redis://redis:6379
+      REDIS_KEY_PREFIX: ${REDIS_KEY_PREFIX:-matchiq}
+      OUTBOX_RELAY_ENABLED: ${OUTBOX_RELAY_ENABLED:-true}
+      OUTBOX_POLL_INTERVAL_MS: ${OUTBOX_POLL_INTERVAL_MS:-250}
+      OUTBOX_BATCH_SIZE: ${OUTBOX_BATCH_SIZE:-200}
+      SSE_HEARTBEAT_MS: ${SSE_HEARTBEAT_MS:-15000}
+      OPERATOR_API_KEY: ${OPERATOR_API_KEY:-local_only_operator_api_key_change_me}
+      OTEL_SERVICE_NAME: matchiq-api
+    ports:
+      - '127.0.0.1:${API_PORT:-3000}:3000'
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+
+  worker:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    image: matchiq-worker:local
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_VERSION: ${APP_VERSION:-0.0.0-dev}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DEMO_ORG_ID: ${DEMO_ORG_ID:-org_demo}
+      WORKER_PORT: '3001'
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matchiq}:${POSTGRES_PASSWORD:-matchiq_local_only}@postgres:5432/${POSTGRES_DB:-matchiq}
+      REDIS_URL: redis://redis:6379
+      AGENTS_SERVICE_URL: http://agents:8000
+      AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
+      AGENT_TIMEOUT_MS: ${AGENT_TIMEOUT_MS:-8000}
+      AGENT_MAX_RETRIES: ${AGENT_MAX_RETRIES:-2}
+      AGENT_CIRCUIT_FAILURE_THRESHOLD: ${AGENT_CIRCUIT_FAILURE_THRESHOLD:-5}
+      AI_ENABLED: ${AI_ENABLED:-false}
+      OTEL_SERVICE_NAME: matchiq-worker
+    ports:
+      - '127.0.0.1:${WORKER_PORT:-3001}:3001'
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      agents: { condition: service_healthy }
+
+  # Runs the mock provider. Foundry needs Azure credentials, so run it natively (`pnpm nx serve agents`).
+  agents:
+    profiles: [app]
+    build:
+      context: apps/agents
+    image: matchiq-agents:local
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_VERSION: ${APP_VERSION:-0.0.0-dev}
+      AGENTS_PORT: '8000'
+      AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
+      MODEL_PROVIDER: mock
+    ports:
+      - '127.0.0.1:${AGENTS_PORT:-8000}:8000'
+
+  web:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # Resolved by the browser, so it must be the host-published API address.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000/api/v1}
+        NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-true}
+    image: matchiq-web:local
+    ports:
+      - '127.0.0.1:${WEB_PORT:-4200}:4200'
+    depends_on:
+      api: { condition: service_healthy }
+
+  # --- Opt-in local model runtime (CPU): docker compose --profile ai up -d ollama ---
+  # On macOS prefer native Ollama: Docker on macOS cannot use the Apple GPU.
+  ollama:
+    profiles: [ai]
+    image: ollama/ollama:0.40.7@sha256:2e6cc92ffa43b4b1a2e70e315407e00ac97ec125afc71277d73c7efe01c4f31b
+    ports:
+      - '127.0.0.1:${OLLAMA_PORT:-11434}:11434'
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ['CMD', 'ollama', 'list']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
 volumes:
   postgres-data:
   redis-data:
+  ollama-data:
