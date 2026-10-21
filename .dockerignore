@@ -1,0 +1,25 @@
+# Build context for the api, worker and web images (context = repository root).
+# The agents image uses apps/agents as its own context.
+**/node_modules
+**/dist
+**/.next
+**/out-tsc
+**/coverage
+**/test-output
+**/test-results
+**/playwright-report
+**/.DS_Store
+**/*.log
+.nx
+.git
+.github
+.claude
+.vscode
+.idea
+.env
+.env.*
+apps/agents
+infra
+docs
+docker-compose.yml
+**/Dockerfile
