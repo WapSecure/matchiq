@@ -21,6 +21,49 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 
+## 2026-10-21 — Local-first AI providers (ADR-0012)
+
+| Area                                                               | Status                                                          | Evidence                                               |
+| ------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
+| Azure subscription                                                 | **Blocked (owner)**: account has no subscription and no credits | `az login` reports "No subscriptions found"            |
+| Decision: local-first, cloud-ready (`mock` / `ollama` / `foundry`) | Done                                                            | ADR-0012                                               |
+| `ModelProvider` contract includes `ollama`                         | Done                                                            | Vitest `pipeline.spec.ts`; regenerated Pydantic models |
+
+## 2026-10-21 — M1: Football engine (MQ-005, MQ-007)
+
+### Delivered
+
+| Area                                                                                                                                                                                | Status | Evidence                                                                |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| `libs/football-engine` (`scope:shared`, `type:domain`): pure `createInitialState`, `applyEvent`, `project`, `toSnapshot` producing contract `MatchSnapshot` with sha256 `stateHash` | Done   | `projection.spec.ts`, Zod-parsed in every snapshot test                 |
+| Idempotent application (duplicate sequence or eventId is a no-op), out-of-order re-fold, `provisional` while a sequence gap or a pending correction exists                          | Done   | Property: any arrival order plus duplicates equals in-order projection  |
+| CORRECTION (VOID) by re-folding the ledger without voided events                                                                                                                    | Done   | `corrections.spec.ts`                                                   |
+| Metrics with a versioned `MetricDefinition` registry: counts, pass completion (ZERO_DENOMINATOR), time-weighted possession with contested time excluded, event-share proxy fallback | Done   | `counting.spec.ts`, `possession.spec.ts`, `verify-and-registry.spec.ts` |
+| Rolling 5-minute and previous-window metrics, momentum index (spec §9 weights, bounded z against a fixed reference scale, `heuristic: true`)                                        | Done   | `momentum.spec.ts` asserts hand-computed values                         |
+| Key moments with full evidence envelopes: GOAL and RED_CARD (P0), SHOT_BURST, HIGH_REGAINS, PRESSURE_SWING, MOMENTUM_SHIFT (P1); debounce; deterministic ids; resumable cursor      | Done   | `moments.spec.ts`, `golden.spec.ts`; every insight Zod-parsed           |
+| `verifyCitedValues` and `verifyEvidenceIds` for the publish gate                                                                                                                    | Done   | `verify-and-registry.spec.ts`                                           |
+| Golden fixtures with pinned state hashes (zero-event match, late comeback with void, own goal and second yellow)                                                                    | Done   | `golden.spec.ts`                                                        |
+| Property tests (fast-check 4.10.2): determinism, order independence, score oracle, non-negative counts, bounded percentages and momentum, contract-valid insights                   | Done   | 60 Vitest tests in 9 files                                              |
+
+### Known limitations
+
+- Momentum reference means and deviations are product calibration constants for synthetic fixtures, not league statistics. Recalibrate once the synthetic generator's distributions are fixed.
+- Re-folding is O(ledger) per late event or correction (about 3 ms for 3,000 events locally). The in-order path is incremental.
+- `stepMoments` serves the in-order path. After a correction or a late event the worker re-runs `detectKeyMoments` and diffs by `insightId` to retract or add insights.
+- PLAYER_MILESTONE (P2) is not implemented.
+
+### Next
+
+Wire the engine into the worker projection and the deterministic publish gate, and add golden replay tests against the synthetic generator's seeded fixtures.
+
+## 2026-10-21 — M2 groundwork: pipeline contracts (MQ-009)
+
+| Area                                                                                                                                                      | Status | Evidence                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------- |
+| `PipelineRequest`, `PipelineResult`, `NarrativeDraft`, `OverlayProposal` contracts for the worker ↔ agents boundary, exported to JSON Schema and Pydantic | Done   | Vitest `pipeline.spec.ts`; pytest sample parity |
+| JSON Schema export drops Zod's duplicate regex for every `format` (date-time, uuid) so generated models validate                                          | Done   | `json-schema.spec.ts`                           |
+| `agents` lint, typecheck and test depend on `codegen` (removes a race with regeneration)                                                                  | Done   | `project.json`                                  |
+
 ## 2026-10-21 — M0: Foundation (MQ-001, MQ-002)
 
 ### Delivered

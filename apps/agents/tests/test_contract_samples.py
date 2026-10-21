@@ -7,12 +7,16 @@ from pydantic import BaseModel, ValidationError
 from matchiq_agents.contracts.generated.AgentResult import AgentResult
 from matchiq_agents.contracts.generated.MatchEvent import MatchEvent
 from matchiq_agents.contracts.generated.OverlayCue import OverlayCue
+from matchiq_agents.contracts.generated.PipelineRequest import PipelineRequest
+from matchiq_agents.contracts.generated.PipelineResult import PipelineResult
 
 SAMPLES_DIR = Path(__file__).resolve().parents[3] / "libs" / "contracts" / "samples"
 MODELS: dict[str, type[BaseModel]] = {
     "AgentResult": AgentResult,
     "MatchEvent": MatchEvent,
     "OverlayCue": OverlayCue,
+    "PipelineRequest": PipelineRequest,
+    "PipelineResult": PipelineResult,
 }
 SAMPLE_FILES = sorted(SAMPLES_DIR.glob("*.json"))
 

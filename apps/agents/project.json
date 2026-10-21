@@ -8,16 +8,23 @@
   "targets": {
     "install": {
       "command": "uv sync --frozen",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "inputs": ["{projectRoot}/pyproject.toml", "{projectRoot}/uv.lock"],
       "cache": false
     },
     "codegen": {
       "dependsOn": [
-        { "projects": ["contracts"], "target": "export-json-schema" }
+        {
+          "projects": ["contracts"],
+          "target": "export-json-schema"
+        }
       ],
       "command": "rm -rf src/matchiq_agents/contracts/generated && uv run --frozen datamodel-codegen",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "inputs": [
         "{workspaceRoot}/libs/contracts/generated/json-schema/**/*",
         "{projectRoot}/pyproject.toml"
@@ -27,33 +34,44 @@
     },
     "lint": {
       "command": "uv run --frozen ruff check . && uv run --frozen ruff format --check .",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "inputs": ["{projectRoot}/**/*.py", "{projectRoot}/pyproject.toml"],
-      "cache": true
+      "cache": true,
+      "dependsOn": ["codegen"]
     },
     "typecheck": {
       "command": "uv run --frozen pyright",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "inputs": [
         "{projectRoot}/**/*.py",
         "{projectRoot}/pyproject.toml",
         "{projectRoot}/uv.lock"
       ],
-      "cache": true
+      "cache": true,
+      "dependsOn": ["codegen"]
     },
     "test": {
       "command": "uv run --frozen pytest",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "inputs": [
         "{projectRoot}/**/*.py",
         "{projectRoot}/pyproject.toml",
         "{workspaceRoot}/libs/contracts/samples/**/*"
       ],
-      "cache": true
+      "cache": true,
+      "dependsOn": ["codegen"]
     },
     "serve": {
       "command": "uv run --frozen python -m matchiq_agents",
-      "options": { "cwd": "{projectRoot}" },
+      "options": {
+        "cwd": "{projectRoot}"
+      },
       "continuous": true
     }
   }

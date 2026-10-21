@@ -18,6 +18,7 @@ class Agent(StrEnum):
 
 class Provider(StrEnum):
     foundry = "foundry"
+    ollama = "ollama"
     mock = "mock"
     template = "template"
 
@@ -34,12 +35,7 @@ class AgentRun(BaseModel):
         extra="forbid",
     )
     runId: Annotated[str, Field(pattern="^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
-    correlationId: Annotated[
-        UUID,
-        Field(
-            pattern="^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-        ),
-    ]
+    correlationId: UUID
     agent: Agent
     provider: Provider
     modelDeployment: Annotated[str | None, Field(max_length=128, min_length=1)] = None

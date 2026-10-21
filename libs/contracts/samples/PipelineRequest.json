@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "packet": {
+    "schemaVersion": 1,
+    "runId": "run_fx42_0012",
+    "correlationId": "5b0f3d4e-8c6a-4a51-9a3e-2f1d7c9b6e10",
+    "orgId": "org_demo",
+    "fixtureId": "fx_comeback_42",
+    "insight": {
+      "schemaVersion": 1,
+      "insightId": "in_fx42_0012",
+      "fixtureId": "fx_comeback_42",
+      "kind": "HIGH_REGAINS",
+      "priority": "P1",
+      "matchClockMs": 3742000,
+      "teamId": "tm_harbour",
+      "reasonCode": "HIGH_REGAINS_5M",
+      "evidence": {
+        "insightId": "in_fx42_0012",
+        "fixtureId": "fx_comeback_42",
+        "windowStartMs": 3442000,
+        "windowEndMs": 3742000,
+        "eventIds": ["ev_00101", "ev_00112", "ev_00127"],
+        "computedMetrics": {
+          "highRecoveries.home.rolling5m": 5,
+          "shots.home.rolling5m": 3
+        },
+        "methodVersion": "1.0.0",
+        "dataCoverage": 1,
+        "confidenceLabel": "medium",
+        "rationale": "Five high recoveries in five minutes, three of them followed by shots.",
+        "counterEvidence": [
+          {
+            "description": "Northgate also registered two shots in the window.",
+            "eventIds": ["ev_00119"]
+          }
+        ],
+        "generatedAt": "2026-10-20T20:02:22Z"
+      },
+      "status": "DETECTED",
+      "synthetic": true
+    },
+    "entities": {
+      "teams": [
+        { "teamId": "tm_harbour", "name": "Harbour City" },
+        { "teamId": "tm_northgate", "name": "Northgate Rovers" }
+      ],
+      "players": [
+        {
+          "playerId": "pl_harbour_9",
+          "teamId": "tm_harbour",
+          "displayName": "Tomas Varell"
+        }
+      ]
+    },
+    "persona": "ANALYST",
+    "locale": "en-GB",
+    "deadlineMs": 8000,
+    "policyVersion": "1.0.0"
+  },
+  "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+  "locales": ["en-GB", "fr-FR"]
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "runId": "run_fx42_0012",
+  "correlationId": "5b0f3d4e-8c6a-4a51-9a3e-2f1d7c9b6e10",
+  "status": "VERIFIED",
+  "analysis": {
+    "schemaVersion": 1,
+    "runId": "run_fx42_0012",
+    "agent": "MATCH_ANALYST",
+    "claims": [
+      {
+        "claimType": "OBSERVATION",
+        "text": "Harbour City won the ball back high up the pitch five times in five minutes.",
+        "evidenceEventIds": ["ev_00101", "ev_00112", "ev_00127"],
+        "citedValues": [
+          { "metricRef": "highRecoveries.home.rolling5m", "value": 5 }
+        ]
+      }
+    ],
+    "limitations": ["Synthetic event feed; no tracking data."],
+    "locale": "en-GB",
+    "confidenceLabel": "medium",
+    "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+  },
+  "verification": { "verdict": "PASS", "issues": [] },
+  "narratives": [
+    {
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "headline": "Harbour City turn up the pressure",
+      "body": "Harbour City won the ball back high up the pitch five times in five minutes.",
+      "evidenceEventIds": ["ev_00101", "ev_00112", "ev_00127"],
+      "citedValues": [
+        { "metricRef": "highRecoveries.home.rolling5m", "value": 5 }
+      ],
+      "source": "AGENT",
+      "localeFallback": false
+    }
+  ],
+  "overlay": {
+    "kind": "TACTICAL_INSIGHT",
+    "priority": 70,
+    "durationMs": 7000,
+    "headline": "Pressure building",
+    "body": "Five high recoveries in five minutes.",
+    "evidenceEventIds": ["ev_00101", "ev_00112", "ev_00127"],
+    "metricRefs": ["highRecoveries.home.rolling5m"]
+  },
+  "runs": [
+    {
+      "runId": "run_fx42_0012",
+      "correlationId": "5b0f3d4e-8c6a-4a51-9a3e-2f1d7c9b6e10",
+      "agent": "MATCH_ANALYST",
+      "provider": "mock",
+      "promptVersion": "1.0.0",
+      "startedAt": "2026-10-20T20:02:23Z",
+      "latencyMs": 4,
+      "retries": 0,
+      "outcome": "SUCCEEDED"
+    }
+  ]
+}
