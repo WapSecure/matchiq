@@ -22,14 +22,14 @@ export function SiteHeader() {
           className="flex items-center gap-1"
         >
           {NAV_ITEMS.map((item) => (
-            <ButtonLink
+            <span
               key={item.href}
-              href={item.href}
-              variant="ghost"
-              size="sm"
+              className={item.compact ? 'contents' : 'hidden sm:contents'}
             >
-              {item.label}
-            </ButtonLink>
+              <ButtonLink href={item.href} variant="ghost" size="sm">
+                {item.label}
+              </ButtonLink>
+            </span>
           ))}
           <ButtonLink
             href={SITE.repositoryUrl}

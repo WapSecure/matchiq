@@ -14,7 +14,8 @@ export const HERO = {
   title: 'One trusted event stream. Every audience, every language.',
   description:
     'MatchIQ turns match events into verified insight in seconds — a deterministic football engine detects what changed, coordinated AI agents explain why it matters, and producers receive timed, evidence-linked overlays.',
-  primaryCta: { label: 'How it works', href: '#pipeline' },
+  primaryCta: { label: 'Open fixture lobby', href: '/fixtures' },
+  howItWorks: { label: 'How it works', href: '#pipeline' },
   secondaryCta: { label: 'View source' },
 } as const;
 
