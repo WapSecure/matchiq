@@ -2,6 +2,79 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — M2: Evidence-grounded multi-agent pipeline (MQ-009)
+
+| Area                                                                                                                                   | Status            | Evidence                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Orchestration on Agent Framework graph workflows (`WorkflowBuilder`, `Executor`), typed FSM `DETECTED → ANALYZED → DRAFTED → VERIFIED` | Done              | ADR-0011; `tests/test_pipeline.py`                                                                                    |
+| Roster: Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer, with versioned prompts (all `1.0.0`)          | Done              | `apps/agents/src/matchiq_agents/roster/`                                                                              |
+| Deterministic Fact Checker (cited values, evidence ids, entity allowlist, forbidden lexicon, lengths), then an optional AI critique    | Done              | `tests/test_guard.py`                                                                                                 |
+| REVISE regenerates once; REJECT falls back to verified templates or is suppressed; timeouts, 2 retries with backoff, circuit breaker   | Done              | `tests/test_resilience.py`, `tests/test_pipeline.py`                                                                  |
+| Prompt-injection defence: untrusted fields as escaped JSON data blocks; unsafe entity names dropped from the allowlist                 | Done              | Adversarial cases in `tests/eval/`                                                                                    |
+| `POST /api/v1/pipeline/runs` with service-token auth (constant-time) and RFC 9457 401/422                                              | Done              | `tests/test_api.py`                                                                                                   |
+| Model port: `mock`, `ollama` (`OpenAIChatClient`), `foundry` (`FoundryChatClient`); `/health/ready` probes Ollama                      | Done              | `tests/test_providers.py` (fake agent, no network)                                                                    |
+| Evaluation: 33 golden and 6 adversarial-input cases, plus 10 compromised-model attacks, with an independent oracle                     | Done              | CI (mock and templates): 0 unsupported numbers, 0 unknown entities, 0 leaks; fallback verified with the model failing |
+| Live Ollama evaluation                                                                                                                 | **Not run**       | Pending local model download; `OLLAMA_LIVE=1 uv run pytest -m ollama`, `scripts/run_eval.py --provider ollama`        |
+| Live Foundry call                                                                                                                      | **Not exercised** | No Azure subscription (ADR-0012). Adapter covered by contract tests only                                              |
+
+### Known limitations
+
+- Entity detection relies on capitalisation and exempts the first word of each sentence, so a sentence that opens with an unknown name is not flagged.
+- Number words are recognised for 2 to 20 only. "one", "un" and "uno" are skipped because they double as articles.
+- The contract has no issue code for AI-critique concerns, so they are reported as `UNCITED_EVIDENCE`. After a fallback, `verification` describes the served template drafts, and the rejected drafts' issue codes appear in `fallbackReason`.
+- Metric labels for unknown metric families fall back to split camelCase in English, in every locale.
+
+### Proposed contract changes
+
+- `VerificationIssueCode`: add `UNGROUNDED_CLAIM` for critique concerns.
+- `EntityAllowlist.teams[]`: add `side: home | away`, so narratives can name the team behind `*.home.*` and `*.away.*` metrics.
+- `PipelineResult`: add an optional `rejectedVerification`, to keep the rejected agent drafts' issues alongside the served verification.
+
+## 2026-10-21 — Fix: secret-scan scope blocking every PR
+
+| Area                                                                                                                                                                                                    | Status | Evidence                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI's `fetch-depth: 0` fetched every remote branch, so gitleaks flagged an Azure built-in role ID in an unmerged infra branch and failed every PR and `dev`. The scan is now scoped to `--log-opts=HEAD` | Done   | `ci.yml`                                                                                                                                           |
+| `.gitleaks.toml`: default rules plus one allowlist (role-ID GUID variables in `infra/**/*.bicep`, condition AND)                                                                                        | Done   | Local check: without config the line is flagged as `generic-api-key`; with config it is allowed, and a GitHub PAT in the same file is still caught |
+
+## 2026-10-21 — Infrastructure, packaging and deployment strategy (MQ-014)
+
+### Delivered
+
+| Area                                                                                                                                                                                                                                                                                                                                                                                             | Status  | Evidence                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production Dockerfiles for api, worker, web and agents. Each is multi-stage, uses a base image pinned by digest (`node:22.22.3-bookworm-slim`, `python:3.12.15-slim-bookworm`, `uv:0.13.4`), runs as a non-root user, has a `HEALTHCHECK` and bakes in no secrets. Nest apps use `nx run <app>:prune` plus `pnpm install --frozen-lockfile --prod`.                                              | Done    | All four images built locally. Sizes: api 279 MB, worker 266 MB, web 284 MB, agents 277 MB.                                                                           |
+| Compose `app` profile (one-shot migrate job, then api, worker, agents and web) on the existing Postgres and Redis. Compose `ai` profile with CPU Ollama. `docker compose up` with no profile still starts only Postgres and Redis.                                                                                                                                                               | Done    | Every service reported `(healthy)`. Liveness returned 200 on `:3000`, `:3001` and `:8000`. api readiness reported Postgres and Redis ok. web `/` returned 200.        |
+| `infra/vps`: Caddy (auto-TLS, SSE flush) overlay for hosting on a single server                                                                                                                                                                                                                                                                                                                  | Done    | `docker compose -f docker-compose.yml -f infra/vps/compose.vps.yml --profile app config` is valid. It refuses to start without real secrets.                          |
+| `infra/azure`: Bicep for Log Analytics, App Insights, Container Apps environment, 4 apps plus a migrate job, ACR, PostgreSQL 17 Flexible Server, Azure Managed Redis, Key Vault, user-assigned identity with AcrPull / Key Vault Secrets User / Foundry User, Foundry account + project + model deployment, and a budget. Parameters for dev, stage and prod use `readEnvironmentVariable` only. | Partial | `az bicep build`, `az bicep lint` and `build-params` (Bicep 0.48.1) pass with zero diagnostics. **Not deployed; `what-if` not run** because there is no subscription. |
+| `.github/workflows/deploy-azure.yml`: `workflow_dispatch` only, OIDC (`azure/login` pinned to its SHA), a what-if job, then an approval-gated deploy (platform, then image push, then apps, then migrations, then smoke test)                                                                                                                                                                    | Partial | Never run. It needs the owner to set up federated credentials and environments.                                                                                       |
+| CI: `container` job (matrix build of all four images) and `infra` job (Bicep build and lint)                                                                                                                                                                                                                                                                                                     | Done    | They first run on this PR.                                                                                                                                            |
+| `docs/deployment/HOSTING_OPTIONS.md` (seven options with sourced prices, 2026-10-21) and `LOCAL_STACK.md`                                                                                                                                                                                                                                                                                        | Done    | Primary recommendation is a single VPS with compose and Caddy; fallback is Railway. **Pending owner approval.**                                                       |
+
+### Findings
+
+- Compose uses explicit `environment:` blocks with `.env` interpolation instead of `env_file: .env`. This keeps compose-DNS URLs authoritative over the host `localhost` URLs in `.env`. `libs/config` now treats blank optional values as unset (MQ-001 fix), but `apps/agents` settings still reject an empty `FOUNDRY_PROJECT_ENDPOINT`.
+- GitHub Models was retired on 2026-07-30, so there is no free hosted LLM option. Oracle Always Free has been cut to 2 OCPU / 12 GB. Hetzner CX plans are shown as unavailable.
+- The agents service accepts only `mock` and `foundry` today. The compose `ollama` service is staged for the ADR-0012 provider, which has not been implemented yet.
+
+### Next
+
+Owner decision on demo hosting (VPS or Railway) and on an Azure subscription. Then run a first `what-if`, load the golden fixtures into the hosted stack, and add an external uptime check.
+
+## 2026-10-21 — Fix: blank optional env values
+
+| Area                                                                                                                                                                            | Status | Evidence              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------- |
+| `cp .env.example .env` made the API exit: blank `OTEL_SERVICE_NAME` and `APPLICATIONINSIGHTS_CONNECTION_STRING` failed `min(1)`. Blank optional values are now treated as unset | Done   | `load-env.spec.ts`    |
+| Regression guard: the committed `.env.example` (with only secrets filled) must parse for the api, worker and web schemas                                                        | Done   | `env-example.spec.ts` |
+
+## 2026-10-21 — Refactor: single canonical JSON and hashing utility
+
+| Area                                                                                                                                                                    | Status | Evidence                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------- |
+| Three copies of canonical JSON + SHA-256 (`libs/db`, `libs/football-engine`, `libs/synthetic-data`) replaced by `@matchiq/canonical-json` (`scope:shared`, `type:util`) | Done   | Engine golden state hashes and committed fixture hashes unchanged |
+| `@matchiq/db` keeps its public `sha256Hex(value)` API, now backed by the shared library                                                                                 | Done   | db 15 tests, api 53 tests                                         |
+
 ## 2026-10-21 — M1: Synthetic generator and replay engine (MQ-003, replay part of MQ-004)
 
 ### Delivered

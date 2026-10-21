@@ -18,6 +18,12 @@ const flag = (fallback: 'true' | 'false') =>
 
 const booleanFlag = flag('false');
 
+/** Blank values (e.g. `KEY=` copied from .env.example) mean "not set". */
+const optionalString = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.string().min(1).optional(),
+);
+
 const boundedInt = (min: number, max: number, fallback: number) =>
   z.coerce.number().int().min(min).max(max).default(fallback);
 
@@ -56,8 +62,8 @@ export const CommonEnv = z.object({
     .string()
     .regex(ENV_PATTERNS.orgId)
     .default(DEFAULT_DEMO_ORG_ID),
-  OTEL_SERVICE_NAME: z.string().min(1).optional(),
-  APPLICATIONINSIGHTS_CONNECTION_STRING: z.string().min(1).optional(),
+  OTEL_SERVICE_NAME: optionalString,
+  APPLICATIONINSIGHTS_CONNECTION_STRING: optionalString,
 });
 
 /** Connection settings shared by every process that talks to Postgres. */

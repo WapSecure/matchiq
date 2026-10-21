@@ -132,6 +132,54 @@ jobs:
           path: apps/web-e2e/test-output
           retention-days: 7
 
+  container:
+    name: Container image (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: api
+            args: -f apps/api/Dockerfile .
+          - app: worker
+            args: -f apps/worker/Dockerfile .
+          - app: web
+            args: -f apps/web/Dockerfile .
+          - app: agents
+            args: apps/agents
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build image
+        env:
+          APP: ${{ matrix.app }}
+          ARGS: ${{ matrix.args }}
+        run: |
+          # shellcheck disable=SC2086
+          DOCKER_BUILDKIT=1 docker build -t "matchiq-$APP:ci" $ARGS
+          docker image ls "matchiq-$APP:ci" --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+
+  infra:
+    name: Bicep build and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build and lint
+        env:
+          POSTGRES_ADMIN_PASSWORD: x
+          OPERATOR_API_KEY: x
+          AGENTS_SERVICE_TOKEN: x
+          FOUNDRY_MODEL_NAME: x
+          FOUNDRY_MODEL_VERSION: x
+        run: |
+          az bicep install --version v0.48.1
+          az bicep build --file infra/azure/main.bicep --stdout > /dev/null
+          az bicep lint --file infra/azure/main.bicep
+          for env in dev stage prod; do
+            az bicep build-params --file "infra/azure/env/$env.bicepparam" --stdout > /dev/null
+          done
+
   security:
     name: Secrets and dependency audit
     runs-on: ubuntu-latest
@@ -145,7 +193,8 @@ jobs:
       - name: Scan history for secrets
         run: |
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
-          ./gitleaks git --redact --no-banner --exit-code 1 .
+          # Scan only history reachable from the commit under test; fetch-depth 0 also fetches unrelated branches.
+          ./gitleaks git --redact --no-banner --exit-code 1 --config .gitleaks.toml --log-opts=HEAD .
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:

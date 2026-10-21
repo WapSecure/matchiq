@@ -58,6 +58,7 @@
     }
   },
   "dependencies": {
+    "@matchiq/canonical-json": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
     "@matchiq/synthetic-data": "workspace:*",

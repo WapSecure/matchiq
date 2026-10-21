@@ -1,0 +1,15 @@
+# Single-host demo: one origin, automatic HTTPS. MATCHIQ_DOMAIN must resolve to this host.
+{$MATCHIQ_DOMAIN} {
+	encode zstd gzip
+
+	handle /api/* {
+		# Flush immediately so SSE frames are not buffered.
+		reverse_proxy api:3000 {
+			flush_interval -1
+		}
+	}
+
+	handle {
+		reverse_proxy web:4200
+	}
+}

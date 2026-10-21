@@ -37,4 +37,3 @@ export {
   type CitedValueIssue,
   type CitedValueIssueReason,
 } from './lib/evidence/verify.js';
-export { canonicalJson, sha256Hex } from './lib/util/canonical-json.js';

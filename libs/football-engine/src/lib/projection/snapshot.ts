@@ -2,7 +2,7 @@ import { SCHEMA_VERSION, type MatchSnapshot } from '@matchiq/contracts';
 import { ALGORITHM_VERSION } from '../constants.js';
 import { teamMetrics } from '../metrics/team-metrics.js';
 import type { ProjectionState } from '../types.js';
-import { canonicalJson, sha256Hex, type Json } from '../util/canonical-json.js';
+import { hashCanonical } from '@matchiq/canonical-json';
 import { possessionTotals } from './possession.js';
 import {
   hasPendingCorrection,
@@ -22,11 +22,10 @@ export const hashState = (
   state: ProjectionState,
 ): string => {
   const { period, clockMs, possession } = state.derived;
-  const hashed = {
+  return hashCanonical({
     body,
     possessionMs: possessionTotals(possession, period, clockMs),
-  } satisfies Json;
-  return sha256Hex(canonicalJson(hashed));
+  });
 };
 
 export const toSnapshot = (state: ProjectionState): MatchSnapshot => {

@@ -16,7 +16,7 @@ export {
   type GeneratedMatch,
   generateMatch,
 } from './lib/engine/generate-match.js';
-export { canonicalJson, hashEvents, sha256Hex } from './lib/hash.js';
+export { hashEvents } from './lib/hash.js';
 export {
   FIXTURE_ISSUE_CODES,
   type FixtureIssue,
