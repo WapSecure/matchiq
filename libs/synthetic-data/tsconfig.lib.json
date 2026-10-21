@@ -12,6 +12,9 @@
   "references": [
     {
       "path": "../contracts/tsconfig.lib.json"
+    },
+    {
+      "path": "../canonical-json/tsconfig.lib.json"
     }
   ],
   "exclude": [
