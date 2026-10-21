@@ -11,7 +11,7 @@ import {
   type ReplaySignal,
   type Scheduler,
 } from '@matchiq/replay';
-import { REPLAY_RUNTIME } from '../constants';
+import { LOG_MESSAGES, REPLAY_RUNTIME } from '../constants';
 import type { MatchPipeline } from '../pipeline/match-pipeline';
 import {
   emptyBatch,
@@ -109,6 +109,21 @@ export class SessionRunner {
   }
 
   command(command: ReplayCommand): ReplayResult {
+    // The ledger is append-only: a backward seek would re-emit applied events.
+    if (command.action === 'seek' && command.sequence < this.nextSequence) {
+      return {
+        ok: false,
+        error: {
+          code: 'INVALID_COMMAND',
+          message: LOG_MESSAGES.seekBackwards(
+            command.sequence,
+            this.nextSequence,
+          ),
+          state: this.status.state,
+          action: 'seek',
+        },
+      };
+    }
     const result = this.controller.execute(command);
     if (result.ok) this.push({ kind: 'status', status: result.status });
     return result;

@@ -22,7 +22,7 @@ import {
 } from '@matchiq/db';
 import { createSystemScheduler, type Scheduler } from '@matchiq/replay';
 import { type AgentsClient, HttpAgentsClient } from '../agents/agents-client';
-import { SERVICE_NAME } from '../constants';
+import { AGENTS_HTTP, SERVICE_NAME } from '../constants';
 import { BUNDLE_PROVIDERS } from './bundles';
 import { createWorkerRedis, type WorkerRedis } from './redis-connections';
 import {
@@ -153,7 +153,7 @@ export class InfrastructureModule {
           new HttpAgentsClient({
             baseUrl: env.AGENTS_SERVICE_URL,
             token: env.AGENTS_SERVICE_TOKEN,
-            timeoutMs: env.AGENT_TIMEOUT_MS,
+            timeoutMs: env.AGENT_TIMEOUT_MS + AGENTS_HTTP.deadlineGraceMs,
           }),
       },
       {

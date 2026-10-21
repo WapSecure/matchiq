@@ -94,6 +94,41 @@ describe('publication decisions', () => {
     expect(publication.overlay).toBeNull();
   });
 
+  it('treats a FALLBACK result as template output and a REJECTED result as suppressed', () => {
+    const serviceFallback = {
+      ...result,
+      status: 'FALLBACK' as const,
+      fallbackReason: 'model timed out',
+      narratives: result.narratives.map((d) => ({
+        ...d,
+        source: 'TEMPLATE' as const,
+      })),
+    };
+    const fromFallback = agentPublication({
+      insight,
+      fixture,
+      result: serviceFallback,
+      createdAt: CREATED,
+    });
+    expect(fromFallback.completion).toMatchObject({
+      status: 'FALLBACK',
+      fallbackReason: 'model timed out',
+    });
+    expect(fromFallback.narratives).toHaveLength(9);
+
+    const rejected = agentPublication({
+      insight,
+      fixture,
+      result: { ...result, status: 'REJECTED', narratives: [], overlay: null },
+      createdAt: CREATED,
+    });
+    expect(rejected.completion.status).toBe('FALLBACK');
+    expect(rejected.completion.fallbackReason).toMatch(/rejected/);
+    expect(rejected.narratives.every((n) => n.source === 'TEMPLATE')).toBe(
+      true,
+    );
+  });
+
   it('records a template AgentRun when the pipeline is not used', () => {
     const publication = templatePublication({
       insight,

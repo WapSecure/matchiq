@@ -8,7 +8,6 @@ import type {
 import { and, eq, max, sql } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
 import type { Database } from '../client.js';
-import { sha256Hex } from '../hash.js';
 import type {
   InsightCompletion,
   InsightPublication,
@@ -17,19 +16,18 @@ import type {
   PipelineTransaction,
   PipelineUnitOfWork,
   RecapDocument,
+  SessionProgress,
 } from '../intelligence-types.js';
 import type { FixtureKey } from '../ports.js';
 import {
   agentRuns,
   insights,
-  matchRecaps,
-  matchSnapshots,
   narratives,
   overlayCues,
-  replaySessions,
 } from '../schema/intelligence-tables.js';
 import { matchEvents } from '../schema/tables.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
+import * as writes from './read-model-writes.js';
 
 const scoped = (
   table: { orgId: PgColumn; fixtureId: PgColumn },
@@ -203,53 +201,23 @@ class PostgresPipelineTransaction
     );
   }
 
-  async saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
-    await this.tx
-      .insert(matchSnapshots)
-      .values({
-        orgId: key.orgId,
-        fixtureId: key.fixtureId,
-        throughSequence: snapshot.throughSequence,
-        payload: snapshot,
-      })
-      .onConflictDoUpdate({
-        target: [matchSnapshots.orgId, matchSnapshots.fixtureId],
-        set: {
-          throughSequence: snapshot.throughSequence,
-          payload: snapshot,
-          updatedAt: sql`now()`,
-        },
-      });
+  saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
+    return writes.saveSnapshot(this.tx, key, snapshot);
   }
 
-  async updateSession(key: FixtureKey, status: ReplayStatus): Promise<void> {
-    await this.tx
-      .update(replaySessions)
-      .set({
-        state: status.state,
-        speed: status.speed,
-        appliedSequence: status.appliedSequence,
-        period: status.period,
-        matchClockMs: status.matchClockMs,
-        updatedAt: sql`now()`,
-      })
-      .where(scoped(replaySessions, key));
+  updateSession(key: FixtureKey, status: ReplayStatus): Promise<void> {
+    return writes.updateSession(this.tx, key, status);
   }
 
-  async saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
-    const payloadHash = sha256Hex(recap);
-    await this.tx
-      .insert(matchRecaps)
-      .values({
-        orgId: key.orgId,
-        fixtureId: key.fixtureId,
-        payload: recap,
-        payloadHash,
-      })
-      .onConflictDoUpdate({
-        target: [matchRecaps.orgId, matchRecaps.fixtureId],
-        set: { payload: recap, payloadHash, updatedAt: sql`now()` },
-      });
+  updateSessionProgress(
+    key: FixtureKey,
+    progress: SessionProgress,
+  ): Promise<void> {
+    return writes.updateSessionProgress(this.tx, key, progress);
+  }
+
+  saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
+    return writes.saveRecap(this.tx, key, recap);
   }
 }
 

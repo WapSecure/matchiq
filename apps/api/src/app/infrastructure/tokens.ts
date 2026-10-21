@@ -9,6 +9,10 @@ export const STREAM_PUBLISHER = Symbol('STREAM_PUBLISHER');
 export const STREAM_SUBSCRIBER = Symbol('STREAM_SUBSCRIBER');
 export const OUTBOX_NOTIFIER = Symbol('OUTBOX_NOTIFIER');
 export const CLOCK = Symbol('CLOCK');
+export const TEMPLATE_STORE = Symbol('TEMPLATE_STORE');
+export const SESSION_STORE = Symbol('SESSION_STORE');
+export const INTELLIGENCE_READER = Symbol('INTELLIGENCE_READER');
+export const REPLAY_COMMAND_BUS = Symbol('REPLAY_COMMAND_BUS');
 
 export interface Clock {
   now(): Date;

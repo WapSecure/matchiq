@@ -93,20 +93,6 @@ export const OVERLAY_END_REASONS = {
   queueFull: 'dropped: overlay queue full',
 } as const;
 
-export const GATE_LIMITS = {
-  /** Casual copy is one plain sentence (spec §27). */
-  casualBodyMax: 280,
-  broadcastBodyMax: 200,
-} as const;
-
-export const GATE_PATTERNS = {
-  /** Unsigned decimal numbers; a comma decimal separator is accepted for fr/es. */
-  number: /\d+(?:[.,]\d+)?/g,
-  /** Runs of two or more capitalised words: candidate proper nouns. */
-  properNounRun: /\p{Lu}[\p{L}'’-]*(?:\s+\p{Lu}[\p{L}'’-]*)+/gu,
-  whitespace: /\s+/,
-} as const;
-
 export const GATE_DETAILS = {
   schema: (path: string, message: string) => `${path}: ${message}`,
   citedValue: (ref: string, reason: string) => `${ref}: ${reason}`,
@@ -132,7 +118,7 @@ export const FALLBACK_REASONS = {
   httpStatus: (status: number) => `agents service answered HTTP ${status}`,
   enqueueFailed: 'could not enqueue the agents pipeline job',
   gateRejectedAll: 'every agent draft failed the publish gate',
-  agentFallback: (reason: string) => `agents pipeline fell back: ${reason}`,
+  agentsRejected: 'agents pipeline rejected the insight; templates published',
 } as const;
 
 export const ID_PREFIXES = {
@@ -149,6 +135,8 @@ export const AGENTS_HTTP = {
   bearerPrefix: 'Bearer ',
   contentType: 'application/json',
   probeTimeoutMs: 1_500,
+  /** The service works within `deadlineMs` and adds 1 s grace before answering FALLBACK. */
+  deadlineGraceMs: 1_500,
 } as const;
 
 export const REPLAY_RUNTIME = {
@@ -181,6 +169,8 @@ export const LOG_MESSAGES = {
     `Replay command for unknown session ${fixtureId}`,
   jobFailed: (id: string, reason: string) =>
     `Pipeline job ${id} failed: ${reason}`,
+  seekBackwards: (sequence: number, next: number) =>
+    `seek to ${sequence} is behind the next sequence ${next}`,
   resumeFailed: (reason: string) =>
     `Could not resume replay sessions: ${reason}`,
   hookFailed: (fixtureId: string, reason: string) =>

@@ -13,6 +13,12 @@ const STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   idempotencyMismatch: HttpStatus.UNPROCESSABLE_ENTITY,
   invalidHeader: HttpStatus.BAD_REQUEST,
   streamUnavailable: HttpStatus.SERVICE_UNAVAILABLE,
+  templateNotFound: HttpStatus.NOT_FOUND,
+  sessionNotFound: HttpStatus.NOT_FOUND,
+  replayConflict: HttpStatus.CONFLICT,
+  replayUnavailable: HttpStatus.SERVICE_UNAVAILABLE,
+  stateNotFound: HttpStatus.NOT_FOUND,
+  recapNotReady: HttpStatus.NOT_FOUND,
 };
 
 export const problem = (

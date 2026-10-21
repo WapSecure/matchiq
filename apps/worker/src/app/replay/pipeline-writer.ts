@@ -63,6 +63,15 @@ const writeArtifacts = async (
   }
   if (batch.snapshot !== null) await tx.saveSnapshot(key, batch.snapshot);
   if (batch.status !== null) await tx.updateSession(key, batch.status);
+  // After the status: a batch may start with a command and continue with events.
+  const last = batch.events.at(-1);
+  if (last !== undefined) {
+    await tx.updateSessionProgress(key, {
+      appliedSequence: last.sequence,
+      period: last.period,
+      matchClockMs: last.matchClockMs,
+    });
+  }
 };
 
 /**

@@ -157,6 +157,11 @@ export interface InsightCompletion {
   readonly fallbackReason?: string;
 }
 
+export type SessionProgress = Pick<
+  ReplayStatus,
+  'appliedSequence' | 'period' | 'matchClockMs'
+>;
+
 export interface NarrativeFilter {
   readonly persona?: Persona;
   readonly locale?: Locale;
@@ -198,6 +203,11 @@ export interface PipelineTransaction extends LedgerTransaction {
   ): Promise<void>;
   saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void>;
   updateSession(key: FixtureKey, status: ReplayStatus): Promise<void>;
+  /** Moves the session's applied position without touching state or speed. */
+  updateSessionProgress(
+    key: FixtureKey,
+    progress: SessionProgress,
+  ): Promise<void>;
   saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void>;
 }
 

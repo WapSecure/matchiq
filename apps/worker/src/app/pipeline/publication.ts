@@ -127,6 +127,12 @@ const fillMissing = (
     .accepted;
 };
 
+/** REJECTED means the agents suppressed every draft; deterministic templates still apply (ADR-0002). */
+const fallbackFor = (status: PipelineResult['status']): string =>
+  status === 'REJECTED'
+    ? FALLBACK_REASONS.agentsRejected
+    : FALLBACK_REASONS.gateRejectedAll;
+
 export interface AgentInput {
   readonly insight: Insight;
   readonly fixture: Fixture;
@@ -151,10 +157,11 @@ export const agentPublication = (input: AgentInput): Publication => {
     rejected.push(rejection('OVERLAY', 'AGENT', overlayVerdict.issues));
   }
   const overlay = overlayVerdict?.ok === true ? overlayVerdict.value : null;
-  const usedAgent = agent.accepted.length > 0;
+  // A FALLBACK result carries the service's own TEMPLATE drafts: gated, but not model output.
+  const usedAgent = agent.accepted.some((d) => d.source === 'AGENT');
   const fallbackReason =
     result.fallbackReason ??
-    (usedAgent ? undefined : FALLBACK_REASONS.gateRejectedAll);
+    (usedAgent ? undefined : fallbackFor(result.status));
   const gateReport: GateReport = {
     source: usedAgent ? 'AGENT' : 'TEMPLATE',
     publishedNarratives: agent.accepted.length + templates.length,

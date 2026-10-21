@@ -7,7 +7,21 @@ export const ROUTES = {
   eventsBatch: ':fixtureId/events\\:batch',
   events: ':fixtureId/events',
   stream: ':fixtureId/stream',
+  sessions: ':fixtureId/sessions',
+  replay: ':fixtureId/replay',
+  state: ':fixtureId/state',
+  insights: ':fixtureId/insights',
+  narratives: ':fixtureId/narratives',
+  overlays: ':fixtureId/overlays',
+  recap: ':fixtureId/recap',
+  agentRuns: ':fixtureId/agent-runs',
+  fixtureTemplates: 'fixture-templates',
+  replaySessions: 'replay-sessions',
 } as const;
+
+/** Named throttlers: `default` covers every route, `replay` only replay controls (ADR-0010). */
+export const THROTTLERS = { default: 'default', replay: 'replay' } as const;
+export const REPLAY_THROTTLE_KEY = 'matchiq:replay-throttle';
 
 export const ROUTE_PARAMS = { fixtureId: 'fixtureId' } as const;
 
@@ -40,6 +54,8 @@ export const API_LIMITS = {
   streamReplayPage: 500,
   rateLimitWindowMs: 60_000,
   shutdownGraceMs: 5_000,
+  sessionListDefault: 20,
+  sessionListMax: 100,
 } as const;
 
 export const PATTERNS = {
@@ -90,6 +106,39 @@ export const PROBLEMS = {
     title: 'Live stream is temporarily unavailable',
     slug: 'stream-unavailable',
   },
+  templateNotFound: {
+    title: 'Fixture template not found',
+    slug: 'fixture-template-not-found',
+  },
+  sessionNotFound: {
+    title: 'Replay session not found',
+    slug: 'replay-session-not-found',
+  },
+  replayConflict: {
+    title: 'Replay command not allowed in the current state',
+    slug: 'replay-state-conflict',
+  },
+  replayUnavailable: {
+    title: 'Replay control is temporarily unavailable',
+    slug: 'replay-unavailable',
+  },
+  stateNotFound: {
+    title: 'No match state has been projected yet',
+    slug: 'state-not-found',
+  },
+  recapNotReady: {
+    title: 'The recap is available once the match has ended',
+    slug: 'recap-not-ready',
+  },
+} as const;
+
+export const REPLAY_CONFLICTS = {
+  transition: (action: string, state: string) =>
+    `cannot ${action} while ${state}`,
+  seekBackwards: (sequence: number, applied: number) =>
+    `seek to ${sequence} is not after the applied sequence ${applied}; scrub back over received events on the client`,
+  seekOutOfRange: (sequence: number, last: number) =>
+    `sequence ${sequence} is outside 0..${last}`,
 } as const;
 
 export const HEADER_ERRORS = {
@@ -108,4 +157,6 @@ export const CONFLICT_REASONS = {
 } as const;
 
 export const HEALTH_CHECKS = { postgres: 'postgres', redis: 'redis' } as const;
+
+export const QUEUE_CONNECTION_NAME = 'matchiq-api-queues';
 export const HEALTH_DETAILS = { unreachable: 'unreachable' } as const;

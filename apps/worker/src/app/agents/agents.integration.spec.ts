@@ -158,7 +158,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
     agents.behave((r) => ({
       status: 200,
       body: fakePipelineResult(r, fixture),
-      delayMs: 1_500,
+      delayMs: 2_500,
     }));
     await expect(
       t.pipeline.process(job(insight.insightId), attempt(0)),

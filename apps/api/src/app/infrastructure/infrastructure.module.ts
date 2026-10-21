@@ -19,6 +19,7 @@ import {
   PostgresUnitOfWork,
 } from '@matchiq/db';
 import { SERVICE_NAME } from '../constants';
+import { replayProviders } from './replay-providers';
 import {
   createRedisConnections,
   type RedisConnections,
@@ -96,6 +97,7 @@ export class InfrastructureModule {
       fromRedis(STREAM_PUBLISHER),
       fromRedis(STREAM_SUBSCRIBER),
       { provide: CLOCK, useValue: systemClock },
+      ...replayProviders(env),
       ConnectionLifecycle,
     ];
     return {
