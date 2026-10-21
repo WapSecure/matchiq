@@ -4,15 +4,22 @@ import {
   DEFAULT_APP_VERSION,
   DEFAULT_DEMO_ORG_ID,
   DEFAULT_PORTS,
+  DEFAULT_REDIS_KEY_PREFIX,
   DEFAULT_URLS,
   ENV_LIMITS,
   ENV_PATTERNS,
 } from './constants.js';
 
-const booleanFlag = z
-  .enum(['true', 'false'])
-  .default('false')
-  .transform((v) => v === 'true');
+const flag = (fallback: 'true' | 'false') =>
+  z
+    .enum(['true', 'false'])
+    .default(fallback)
+    .transform((v) => v === 'true');
+
+const booleanFlag = flag('false');
+
+const boundedInt = (min: number, max: number, fallback: number) =>
+  z.coerce.number().int().min(min).max(max).default(fallback);
 
 const port = (fallback: number) =>
   z.coerce.number().int().min(1).max(ENV_LIMITS.portMax).default(fallback);
@@ -53,7 +60,48 @@ export const CommonEnv = z.object({
   APPLICATIONINSIGHTS_CONNECTION_STRING: z.string().min(1).optional(),
 });
 
+/** Connection settings shared by every process that talks to Postgres. */
+export const DatabaseEnv = z.object({
+  DATABASE_URL: postgresUrl,
+  DATABASE_POOL_MAX: boundedInt(
+    1,
+    ENV_LIMITS.databasePoolMax,
+    ENV_LIMITS.databasePoolMaxDefault,
+  ),
+});
+
+const RedisEnv = z.object({
+  REDIS_URL: redisUrl,
+  /** Namespaces channels and keys so environments can share one Redis. */
+  REDIS_KEY_PREFIX: z
+    .string()
+    .regex(ENV_PATTERNS.redisKeyPrefix)
+    .default(DEFAULT_REDIS_KEY_PREFIX),
+});
+
+const OutboxRelayEnv = z.object({
+  OUTBOX_RELAY_ENABLED: flag('true'),
+  OUTBOX_POLL_INTERVAL_MS: boundedInt(
+    ENV_LIMITS.outboxPollMinMs,
+    ENV_LIMITS.outboxPollMaxMs,
+    ENV_LIMITS.outboxPollDefaultMs,
+  ),
+  OUTBOX_BATCH_SIZE: boundedInt(
+    1,
+    ENV_LIMITS.outboxBatchMax,
+    ENV_LIMITS.outboxBatchDefault,
+  ),
+});
+
 export const ApiEnv = CommonEnv.extend({
+  ...DatabaseEnv.shape,
+  ...RedisEnv.shape,
+  ...OutboxRelayEnv.shape,
+  SSE_HEARTBEAT_MS: boundedInt(
+    ENV_LIMITS.sseHeartbeatMinMs,
+    ENV_LIMITS.sseHeartbeatMaxMs,
+    ENV_LIMITS.sseHeartbeatDefaultMs,
+  ),
   API_PORT: port(DEFAULT_PORTS.api),
   API_PUBLIC_URL: z.url().default(DEFAULT_URLS.apiPublic),
   CORS_ALLOWED_ORIGINS: csv,
@@ -62,8 +110,6 @@ export const ApiEnv = CommonEnv.extend({
     .int()
     .positive()
     .default(ENV_LIMITS.rateLimitPerMinute),
-  DATABASE_URL: postgresUrl,
-  REDIS_URL: redisUrl,
   /** Bearer secret for operator-only endpoints until Entra ID is wired. */
   OPERATOR_API_KEY: secret,
 });
@@ -102,6 +148,7 @@ export const WebPublicEnv = z.object({
 export type AppEnvironment = z.infer<typeof AppEnvironment>;
 export type LogLevel = z.infer<typeof LogLevel>;
 export type CommonEnv = z.infer<typeof CommonEnv>;
+export type DatabaseEnv = z.infer<typeof DatabaseEnv>;
 export type ApiEnv = z.infer<typeof ApiEnv>;
 export type WorkerEnv = z.infer<typeof WorkerEnv>;
 export type WebPublicEnv = z.infer<typeof WebPublicEnv>;

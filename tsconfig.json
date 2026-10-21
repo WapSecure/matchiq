@@ -25,6 +25,9 @@
       "path": "./apps/web"
     },
     {
+      "path": "./libs/db"
+    },
+    {
       "path": "./libs/football-engine"
     }
   ],
