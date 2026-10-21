@@ -1,0 +1,49 @@
+{
+  "name": "@matchiq/web",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "web",
+    "sourceRoot": "apps/web/src",
+    "tags": [
+      "scope:web",
+      "type:app"
+    ],
+    "targets": {
+      "typecheck": {
+        "command": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.spec.json",
+        "options": {
+          "cwd": "{projectRoot}"
+        },
+        "cache": true,
+        "inputs": [
+          "production",
+          "^production",
+          "{projectRoot}/**/*.spec.tsx"
+        ]
+      },
+      "dev": {
+        "options": {
+          "port": 4200
+        }
+      },
+      "start": {
+        "options": {
+          "port": 4200
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "geist": "1.8.1",
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/jest-dom": "7.0.1",
+    "postcss": "8.5.31",
+    "tailwindcss": "4.3.3"
+  }
+}

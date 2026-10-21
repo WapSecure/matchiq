@@ -17,6 +17,12 @@
     },
     {
       "path": "./apps/api"
+    },
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
     }
   ],
   "compilerOptions": {}

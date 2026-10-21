@@ -18,11 +18,14 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 | `apps/api`, `apps/worker`: Nest bootstrap with live/ready health under `/api/v1`                                                                                                                          | Done    | 3 + 2 Jest tests; built server smoke-tested                                                                  |
 | Cross-language contracts: JSON Schema export, Pydantic codegen, shared samples validated in both languages                                                                                                | Done    | Vitest `samples.spec.ts`, pytest `test_contract_samples.py`                                                  |
 | `apps/agents`: FastAPI, Agent Framework 1.22 + Foundry 1.15 client factory, settings, health, Foundry probe script                                                                                        | Partial | 20 pytest tests; Ruff and Pyright strict clean. **Live Foundry call not yet exercised** (needs Azure access) |
+| `apps/web`: Tailwind v4 design tokens, icon components, UI primitives, landing shell                                                                                                                      | Done    | 9 Vitest + 10 Playwright/axe tests (desktop and mobile)                                                      |
 
 ### Findings fixed during M0
 
 - Duplicate `@nestjs/common` copies came from mismatched `rxjs` peer versions. Fixed with pnpm overrides.
 - Zod emitted a regex `pattern` alongside `format: date-time`, which Pydantic cannot apply to parsed datetimes. The exporter now drops it, and a test covers this.
+- The generated Next.js 16.1.7 had 2 critical and 18 high advisories. Upgraded to 16.4.2; `pnpm audit --prod` is now clean.
+- axe found a WCAG contrast failure on `ink-subtle`. The token was raised to `#788494` (≥ 4.6:1 on all surfaces).
 
 ### Azure and Foundry access spike
 
@@ -36,4 +39,4 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 ### Next
 
-Remaining M0 pull requests, then M1.
+M1: MQ-003 seeded generator, MQ-004 ledger and idempotent ingest, MQ-005 deterministic metrics, MQ-006 SSE and snapshot reconciliation.
