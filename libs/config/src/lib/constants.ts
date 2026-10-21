@@ -15,15 +15,27 @@ export const ENV_LIMITS = {
   agentTimeoutDefaultMs: 8_000,
   agentMaxRetries: 2,
   agentCircuitFailureThreshold: 5,
+  databasePoolMaxDefault: 10,
+  databasePoolMax: 100,
+  outboxPollMinMs: 10,
+  outboxPollMaxMs: 60_000,
+  outboxPollDefaultMs: 250,
+  outboxBatchMax: 1_000,
+  outboxBatchDefault: 200,
+  sseHeartbeatMinMs: 50,
+  sseHeartbeatMaxMs: 60_000,
+  sseHeartbeatDefaultMs: 15_000,
 } as const;
 
 export const ENV_PATTERNS = {
   orgId: /^org_[A-Za-z0-9_-]+$/,
   postgresProtocol: /^postgres(ql)?$/,
   redisProtocol: /^rediss?$/,
+  redisKeyPrefix: /^[a-z][a-z0-9_-]{0,31}$/,
 } as const;
 
 export const DEFAULT_DEMO_ORG_ID = 'org_demo';
 export const DEFAULT_APP_VERSION = '0.0.0-dev';
 export const REQUIRED_MESSAGE = 'is required';
 export const CSV_SEPARATOR = ',';
+export const DEFAULT_REDIS_KEY_PREFIX = 'matchiq';

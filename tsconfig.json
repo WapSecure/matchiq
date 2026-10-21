@@ -19,10 +19,19 @@
       "path": "./apps/api"
     },
     {
+      "path": "./libs/synthetic-data"
+    },
+    {
+      "path": "./libs/replay"
+    },
+    {
       "path": "./apps/web-e2e"
     },
     {
       "path": "./apps/web"
+    },
+    {
+      "path": "./libs/db"
     },
     {
       "path": "./libs/football-engine"

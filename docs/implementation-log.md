@@ -21,6 +21,62 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 
+## 2026-10-21 — M1: Synthetic generator and replay engine (MQ-003, replay part of MQ-004)
+
+### Delivered
+
+| Area                                                                                                                                                                                                                                                              | Status | Evidence                                                                                                |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------- |
+| `libs/synthetic-data`: seeded mulberry32 PRNG, fictional clubs and 18-player squads, rule-based possession state machine (passes, carries, pressure, tackles, fouls, cards, shots, saves, goals, substitutions, restarts) over two halves plus stoppage           | Done   | 55 Vitest tests, including fast-check properties across random seeds and all five scenarios             |
+| Five scenario presets (`comeback`, `possession-dominance`, `red-card-swing`, `high-press`, `low-event`), shaped by team parameters and scripted beats. Results for the scripted scenarios hold for every seed                                                     | Done   | Property tests assert each scenario's outcome for random seeds                                          |
+| `validateFixtureEvents` / `validateFixtureFile`: contract parsing, sequences, IDs, clocks, period structure, player/team/on-pitch checks (substitutions and dismissals respected), reference integrity, GOAL-only scoring, manifest check. Returns typed issues   | Done   | Mutation tests for every issue code                                                                     |
+| Canonical JSON + SHA-256 event hash; `pnpm generate:fixture` and `pnpm validate:fixture` (build, then run the compiled ESM CLI)                                                                                                                                   | Done   | CLI run end-to-end from the root scripts; CLI unit tests with injected IO                               |
+| Golden fixtures for all five scenarios (seed 42) in `fixtures/`, with a manifest table                                                                                                                                                                            | Done   | `golden.spec.ts` regenerates each file and compares it with the committed JSON and a pinned hash        |
+| `libs/replay`: `Scheduler` port (system + `ManualScheduler`), `ReplayController` implementing `ReplayCommand`/`ReplayStatus` with pacing by clock gaps ÷ speed (gaps capped at 5 s, 3 s period break), pause/resume/setSpeed/seek with reset signal, typed errors | Done   | 17 Vitest tests, including a fast-check property over random command interleavings and 1× vs 30× parity |
+
+### Notes
+
+- Event density is about 1,000 (low-event) to 1,470 (comeback) events per match at seed 42. `matchClockMs` restarts at 0 in each period.
+- Not in this PR: replay checkpoints, the proposed `pnpm replay` CLI, HTTP/SSE wiring and correction handling. These belong to the backend stream (MQ-004/006); `ReplayController` is ready to be wrapped.
+- Own goals are never generated. The validator credits an own goal to the opponent of `GOAL.teamId`, which is an assumption the contract does not yet state.
+
+### Next
+
+Football engine projections over these fixtures (MQ-005), ingest/replay API on top of `ReplayController` (MQ-004/006), and correction and out-of-order fixtures for the ingest tests.
+
+## 2026-10-21 — M1: Event ledger, idempotent ingest and resumable SSE (MQ-004, MQ-006)
+
+### Delivered
+
+| Area                                                                                                                                                                                                     | Status  | Evidence                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------ |
+| `libs/db`: Drizzle schema, migration `0000_event_ledger` (`fixtures`, `match_events`, `stream_messages`, `audit_events`, `idempotency_keys`, all with `org_id`), ports and Postgres/Redis adapters       | Done    | `pnpm nx run db:migrate` applied to local Postgres; 15 Vitest tests (8 integration on real Postgres + Redis) |
+| ADR-0006 accepted: Drizzle, Postgres ledger, transactional outbox to Redis pub/sub                                                                                                                       | Done    | `docs/adr/0006-persistence-and-messaging.md`                                                                 |
+| Fixtures API: `POST /fixtures` (operator, 201/409), `GET /fixtures`, `GET /fixtures/:id`, `GET /fixtures/:id/events` (cursor `afterSequence`, limit ≤ 500)                                               | Done    | `fixtures.integration.spec.ts`, `ingest.integration.spec.ts`                                                 |
+| Ingest `POST /fixtures/:id/events:batch`: one transaction for events, duplicate counting, 409 on changed body or taken sequence, 422 on fixture mismatch, 404 on unknown fixture, outbox rows, audit row | Done    | `ingest.integration.spec.ts` (10 tests), `classify-batch.spec.ts`, `ingest.service.spec.ts`                  |
+| Optional `Idempotency-Key` on both POSTs: replay of the stored response, 422 when reused with a different body                                                                                           | Done    | Integration tests for both endpoints                                                                         |
+| Operator bearer guard (SHA-256 + `timingSafeEqual`), 401 problems with `WWW-Authenticate`; reads anonymous; `@nestjs/throttler` at `RATE_LIMIT_PER_MINUTE`                                               | Done    | `operator-auth.guard.spec.ts`, `operator-access.integration.spec.ts`                                         |
+| Outbox relay in the API process: `FOR UPDATE SKIP LOCKED`, at-least-once, kicked after commit plus polling                                                                                               | Done    | `outbox-relay.spec.ts`, `ledger.integration.spec.ts`                                                         |
+| SSE `GET /fixtures/:id/stream`: `Last-Event-ID` or `?lastEventId=` replay from Postgres, then live Redis messages, gap fill and de-duplication by `streamSequence`, heartbeats, cleanup on disconnect    | Done    | `stream.integration.spec.ts`, `stream-session.spec.ts`; curl smoke test against the built API                |
+| Postgres and Redis readiness indicators (503 when either is down)                                                                                                                                        | Done    | `health.indicators.spec.ts`, `app.module.spec.ts`                                                            |
+| CI `verify` job gets Postgres 17.6 and Redis 8.2 service containers for the integration tests                                                                                                            | Partial | Workflow updated; proven by the PR run                                                                       |
+
+### Findings fixed during M1
+
+- The relay first drained in `created_at` order. Concurrent transactions share no commit order with `now()`, so the integration test caught out-of-order publication. It now drains in `(org_id, fixture_id, stream_sequence)` order with a matching partial index.
+- A real ioredis client left a connect timer alive after `disconnect()` against a refused port, which held Jest workers open. The readiness test uses a rejecting PING instead.
+
+### Known limitations
+
+- Out-of-order or gapped event sequences are accepted as long as they are unique; the §24 reorder window and dead-letter queue are not implemented.
+- Rate limiting uses in-memory storage per API instance and keys by socket address (no `trust proxy` yet).
+- SSE does not apply per-connection backpressure, and a fresh connection without `Last-Event-ID` starts at the live head (clients load the snapshot first, ADR-0005).
+- `GET /fixtures` returns at most 100 fixtures without a cursor.
+
+### Next
+
+Snapshot projection wired to the outbox (`match.snapshot`), replay controls, worker consumers on the same outbox.
+
 ## 2026-10-21 — Local-first AI providers (ADR-0012)
 
 | Area                                                               | Status                                                          | Evidence                                               |
