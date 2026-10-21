@@ -135,12 +135,7 @@ class FactPacket(BaseModel):
     )
     schemaVersion: Literal[1]
     runId: Annotated[str, Field(pattern="^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
-    correlationId: Annotated[
-        UUID,
-        Field(
-            pattern="^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-        ),
-    ]
+    correlationId: UUID
     orgId: Annotated[str, Field(pattern="^org_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
     fixtureId: Annotated[str, Field(pattern="^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
     insight: Insight

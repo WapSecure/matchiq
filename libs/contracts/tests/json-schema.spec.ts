@@ -25,10 +25,13 @@ describe('cross-language JSON Schema export', () => {
   });
 });
 
-describe('timestamp export', () => {
-  it('relies on the date-time format instead of a regex pattern', () => {
-    const text = JSON.stringify(toContractJsonSchema('MatchEvent'));
-    expect(text).toContain('"format":"date-time"');
-    expect(text).not.toMatch(/"format":"date-time","pattern"/);
-  });
+describe('formatted string export', () => {
+  it.each(['MatchEvent', 'PipelineRequest'] as const)(
+    'relies on format instead of a duplicate regex in %s',
+    (name) => {
+      const text = JSON.stringify(toContractJsonSchema(name));
+      expect(text).toMatch(/"format":"(date-time|uuid)"/);
+      expect(text).not.toMatch(/"format":"[a-z-]+","pattern"/);
+    },
+  );
 });
