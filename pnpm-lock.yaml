@@ -371,6 +371,19 @@ importers:
         specifier: 0.31.11
         version: 0.31.11
 
+  libs/football-engine:
+    dependencies:
+      '@matchiq/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      tslib:
+        specifier: 2.8.1
+        version: 2.8.1
+    devDependencies:
+      fast-check:
+        specifier: 4.10.2
+        version: 4.10.2
+
   libs/server-kit:
     dependencies:
       '@matchiq/contracts':
@@ -5273,6 +5286,10 @@ packages:
     resolution: {integrity: sha512-yblEwXAbGv1VQDmow7s38W77hzAgJAO50ztBLMcUyUBfxv1HC+LGwtiEN+Co6LtlqT/5uwVOxsD4TNIilWhwdQ==}
     engines: {node: '>=4'}
 
+  fast-check@4.10.2:
+    resolution: {integrity: sha512-iK2f+YrcmoeGqk6fA0ea2bptcu/itMIm4NfEozq6N25+aG6h7s5HZbB/k1aV7b5w5sFLMCbbtRUsTVR+BgC3xw==}
+    engines: {node: '>=12.17.0'}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -7505,6 +7522,9 @@ packages:
 
   pure-rand@7.0.1:
     resolution: {integrity: sha512-oTUZM/NAZS8p7ANR3SHh30kXB+zK2r2BPcEn/awJIbOvq82WoMN4p62AWWp3Hhw50G0xMsw1mhIBLqHw64EcNQ==}
+
+  pure-rand@8.4.2:
+    resolution: {integrity: sha512-vvuOGgcuPJAirlHvuQw1TrOiw7ptaIXXmIbNuiNOY6lNGJJH49PQ1Kj4nd783nPdQhQdicgOjVI2yI/9BD6/Ng==}
 
   pvtsutils@1.3.6:
     resolution: {integrity: sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg==}
@@ -12519,7 +12539,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.4.2)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0))
+      vitest: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0))
 
   '@vitest/expect@4.1.12':
     dependencies:
@@ -12545,7 +12565,6 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0)
-    optional: true
 
   '@vitest/pretty-format@4.1.12':
     dependencies:
@@ -12574,7 +12593,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.4.2)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0))
+      vitest: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0))
 
   '@vitest/utils@4.1.12':
     dependencies:
@@ -14447,6 +14466,10 @@ snapshots:
     dependencies:
       ext-list: 2.2.2
       sort-keys-length: 1.0.1
+
+  fast-check@4.10.2:
+    dependencies:
+      pure-rand: 8.4.2
 
   fast-deep-equal@3.1.3: {}
 
@@ -17097,6 +17120,8 @@ snapshots:
 
   pure-rand@7.0.1: {}
 
+  pure-rand@8.4.2: {}
+
   pvtsutils@1.3.6:
     dependencies:
       tslib: 2.8.1
@@ -18390,7 +18415,6 @@ snapshots:
       terser: 5.51.2
       tsx: 4.23.15
       yaml: 2.9.0
-    optional: true
 
   vitest@4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(@vitest/ui@4.1.12)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.4.2)(less@4.8.1)(sass-embedded@1.106.0)(sass@1.106.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0)):
     dependencies:
@@ -18451,7 +18475,6 @@ snapshots:
       jsdom: 27.4.0(@noble/hashes@1.8.0)
     transitivePeerDependencies:
       - msw
-    optional: true
 
   w3c-xmlserializer@5.0.0:
     dependencies:
