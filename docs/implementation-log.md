@@ -2,6 +2,13 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — Fix: blank optional env values
+
+| Area                                                                                                                                                                            | Status | Evidence              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------- |
+| `cp .env.example .env` made the API exit: blank `OTEL_SERVICE_NAME` and `APPLICATIONINSIGHTS_CONNECTION_STRING` failed `min(1)`. Blank optional values are now treated as unset | Done   | `load-env.spec.ts`    |
+| Regression guard: the committed `.env.example` (with only secrets filled) must parse for the api, worker and web schemas                                                        | Done   | `env-example.spec.ts` |
+
 ## 2026-10-21 — M1: Event ledger, idempotent ingest and resumable SSE (MQ-004, MQ-006)
 
 ### Delivered
