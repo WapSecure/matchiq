@@ -4,17 +4,18 @@ The source of truth for product behaviour is `docs/product/MatchIQ_Enterprise_Ma
 
 ## Projects
 
-| Project    | Path              | Tags                              | Responsibility                                                                       |
-| ---------- | ----------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
-| web        | `apps/web`        | `scope:web` `type:app`            | Next.js UI. Talks only to the API (REST + SSE).                                      |
-| api        | `apps/api`        | `scope:api` `type:app`            | Authoritative writes, ingest, replay control, SSE gateway. Never calls models.       |
-| worker     | `apps/worker`     | `scope:worker` `type:app`         | Projection, moment detection, deterministic quality gate, overlay scheduling.        |
-| agents     | `apps/agents`     | `scope:agents` `type:app`         | Stateless Python service: Agent Framework + Foundry. Returns proposals only.         |
-| web-e2e    | `apps/web-e2e`    | —                                 | Playwright + axe.                                                                    |
-| contracts  | `libs/contracts`  | `scope:shared` `type:contract`    | Zod schemas, the only hand-written contract source.                                  |
-| config     | `libs/config`     | `scope:shared` `type:util`        | Validated environment loading.                                                       |
-| server-kit | `libs/server-kit` | `scope:server` `type:util`        | Nest HTTP baseline: health, problem details, request IDs, env module.                |
-| db         | `libs/db`         | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters. |
+| Project        | Path                  | Tags                              | Responsibility                                                                                            |
+| -------------- | --------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| web            | `apps/web`            | `scope:web` `type:app`            | Next.js UI. Talks only to the API (REST + SSE).                                                           |
+| api            | `apps/api`            | `scope:api` `type:app`            | Authoritative writes, ingest, replay control, SSE gateway. Never calls models.                            |
+| worker         | `apps/worker`         | `scope:worker` `type:app`         | Projection, moment detection, deterministic quality gate, overlay scheduling.                             |
+| agents         | `apps/agents`         | `scope:agents` `type:app`         | Stateless Python service: Agent Framework + Foundry. Returns proposals only.                              |
+| web-e2e        | `apps/web-e2e`        | —                                 | Playwright + axe.                                                                                         |
+| contracts      | `libs/contracts`      | `scope:shared` `type:contract`    | Zod schemas, the only hand-written contract source.                                                       |
+| canonical-json | `libs/canonical-json` | `scope:shared` `type:util`        | The only canonical JSON and SHA-256 implementation (ledger payload hashes, state hashes, fixture hashes). |
+| config         | `libs/config`         | `scope:shared` `type:util`        | Validated environment loading.                                                                            |
+| server-kit     | `libs/server-kit`     | `scope:server` `type:util`        | Nest HTTP baseline: health, problem details, request IDs, env module.                                     |
+| db             | `libs/db`             | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters.                      |
 
 Planned for M1 (created by their owning stream with these tags):
 

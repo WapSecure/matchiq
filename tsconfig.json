@@ -35,6 +35,9 @@
     },
     {
       "path": "./libs/football-engine"
+    },
+    {
+      "path": "./libs/canonical-json"
     }
   ],
   "compilerOptions": {}

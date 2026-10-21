@@ -22,6 +22,13 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 
+## 2026-10-21 — Refactor: single canonical JSON and hashing utility
+
+| Area                                                                                                                                                                    | Status | Evidence                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------- |
+| Three copies of canonical JSON + SHA-256 (`libs/db`, `libs/football-engine`, `libs/synthetic-data`) replaced by `@matchiq/canonical-json` (`scope:shared`, `type:util`) | Done   | Engine golden state hashes and committed fixture hashes unchanged |
+| `@matchiq/db` keeps its public `sha256Hex(value)` API, now backed by the shared library                                                                                 | Done   | db 15 tests, api 53 tests                                         |
+
 ## 2026-10-21 — M1: Synthetic generator and replay engine (MQ-003, replay part of MQ-004)
 
 ### Delivered
