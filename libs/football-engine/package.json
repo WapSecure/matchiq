@@ -1,0 +1,32 @@
+{
+  "name": "@matchiq/football-engine",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@matchiq/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "name": "football-engine",
+    "tags": [
+      "scope:shared",
+      "type:domain"
+    ]
+  },
+  "dependencies": {
+    "@matchiq/contracts": "workspace:*",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "fast-check": "4.10.2"
+  }
+}
