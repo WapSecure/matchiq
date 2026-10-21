@@ -12,7 +12,7 @@ import {
   ROUNDING,
 } from '../constants.js';
 import { windowStartMs } from '../metrics/windows.js';
-import { sha256Hex } from '../util/canonical-json.js';
+import { hashText } from '@matchiq/canonical-json';
 import { roundTo } from '../util/numbers.js';
 import type { Candidate, RecentEvent, RuleInput } from './types.js';
 
@@ -22,7 +22,7 @@ export const insightIdFor = (
   candidate: Pick<Candidate, 'kind' | 'side'>,
   anchorEventId: string,
 ): string =>
-  `${INSIGHT_ID_PREFIX}${sha256Hex(
+  `${INSIGHT_ID_PREFIX}${hashText(
     [fixtureId, candidate.kind, candidate.side, anchorEventId].join('|'),
   ).slice(0, INSIGHT_ID_HASH_LENGTH)}`;
 
