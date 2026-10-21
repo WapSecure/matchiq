@@ -26,7 +26,7 @@ export const AgentName = z.enum([
   'LOCALIZATION',
 ]);
 
-export const ModelProvider = z.enum(['foundry', 'mock', 'template']);
+export const ModelProvider = z.enum(['foundry', 'ollama', 'mock', 'template']);
 
 /** Names an agent is allowed to mention; anything else is rejected. */
 export const EntityAllowlist = z.strictObject({

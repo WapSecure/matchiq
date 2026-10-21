@@ -47,3 +47,21 @@ describe('pipeline contracts', () => {
     ).toBe(false);
   });
 });
+
+describe('model provider', () => {
+  it('records local Ollama inference distinctly from Foundry and mocks', () => {
+    const [run] = sample('PipelineResult')['runs'] as Record<string, unknown>[];
+    expect(PipelineResult.shape.runs.element.shape.provider.options).toEqual([
+      'foundry',
+      'ollama',
+      'mock',
+      'template',
+    ]);
+    expect(
+      PipelineResult.safeParse({
+        ...sample('PipelineResult'),
+        runs: [{ ...run, provider: 'ollama' }],
+      }).success,
+    ).toBe(true);
+  });
+});

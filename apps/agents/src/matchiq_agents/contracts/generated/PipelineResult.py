@@ -119,6 +119,7 @@ class Verification(BaseModel):
 
 class Provider(StrEnum):
     foundry = "foundry"
+    ollama = "ollama"
     mock = "mock"
     template = "template"
 

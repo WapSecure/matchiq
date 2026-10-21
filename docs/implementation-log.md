@@ -35,6 +35,14 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 Snapshot projection wired to the outbox (`match.snapshot`), replay controls, worker consumers on the same outbox.
 
+## 2026-10-21 — Local-first AI providers (ADR-0012)
+
+| Area                                                               | Status                                                          | Evidence                                               |
+| ------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
+| Azure subscription                                                 | **Blocked (owner)**: account has no subscription and no credits | `az login` reports "No subscriptions found"            |
+| Decision: local-first, cloud-ready (`mock` / `ollama` / `foundry`) | Done                                                            | ADR-0012                                               |
+| `ModelProvider` contract includes `ollama`                         | Done                                                            | Vitest `pipeline.spec.ts`; regenerated Pydantic models |
+
 ## 2026-10-21 — M1: Football engine (MQ-005, MQ-007)
 
 ### Delivered
