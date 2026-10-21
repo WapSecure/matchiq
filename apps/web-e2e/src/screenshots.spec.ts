@@ -32,6 +32,28 @@ test.describe('review screenshots', () => {
     });
   });
 
+  test('recap', async ({ page }, info) => {
+    await mockApi(page);
+    await page.goto(`/studio/${FIXTURE_ID}/recap`);
+    await expect(page.getByRole('list', { name: 'Key moments' })).toBeVisible();
+    await page.screenshot({
+      path: `${OUT_DIR}/recap-${info.project.name}.png`,
+      fullPage: true,
+    });
+  });
+
+  test('observatory', async ({ page }, info) => {
+    await mockApi(page);
+    await page.goto(`/studio/${FIXTURE_ID}/observatory`);
+    await expect(
+      page.getByRole('list', { name: 'Insight traces' }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `${OUT_DIR}/observatory-${info.project.name}.png`,
+      fullPage: true,
+    });
+  });
+
   test('evidence drawer', async ({ page }, info) => {
     await mockApi(page);
     await page.goto(`/studio/${FIXTURE_ID}`);
