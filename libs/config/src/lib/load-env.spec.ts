@@ -96,3 +96,15 @@ describe('loadEnv', () => {
     );
   });
 });
+
+describe('.env.example compatibility', () => {
+  it('treats blank optional variables as unset', () => {
+    const env = loadEnv(ApiEnv, {
+      ...validApi,
+      OTEL_SERVICE_NAME: '',
+      APPLICATIONINSIGHTS_CONNECTION_STRING: '',
+    });
+    expect(env.OTEL_SERVICE_NAME).toBeUndefined();
+    expect(env.APPLICATIONINSIGHTS_CONNECTION_STRING).toBeUndefined();
+  });
+});
