@@ -2,6 +2,13 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — Broadcast preview standby state and cue hold
+
+| Area                                                                                                                                                                                                                                    | Status | Evidence                    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------- |
+| The empty overlay preview showed "No approved cue on air" centred on the pitch markings, which read like an error. It now shows a muted "Standing by" chip in the cue slot, with the last aired cue, like a clean feed between graphics | Done   | `match-components.spec.tsx` |
+| Cue hold control: Standard (4 s) or Extended (10 s) real-time dwell, for walk-throughs at 20–30×                                                                                                                                        | Done   | web 97 tests; e2e 60 passed |
+
 ## 2026-10-21 — E2: Judge flow on replay sessions, recap and Agent Observatory (web)
 
 ### Delivered
