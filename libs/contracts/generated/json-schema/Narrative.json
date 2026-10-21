@@ -1,0 +1,86 @@
+{
+  "title": "Narrative",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "narrativeId": {
+      "type": "string",
+      "pattern": "^nr_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "insightId": {
+      "type": "string",
+      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "persona": {
+      "type": "string",
+      "enum": [
+        "CASUAL",
+        "ANALYST",
+        "BROADCAST"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "en-GB",
+        "fr-FR",
+        "es-ES"
+      ]
+    },
+    "headline": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "citations": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      }
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "AGENT",
+        "TEMPLATE"
+      ]
+    },
+    "localeFallback": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "narrativeId",
+    "fixtureId",
+    "insightId",
+    "persona",
+    "locale",
+    "headline",
+    "body",
+    "citations",
+    "source",
+    "localeFallback",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

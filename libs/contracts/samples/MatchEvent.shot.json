@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "eventId": "ev_00043",
+  "fixtureId": "fx_comeback_42",
+  "sequence": 43,
+  "period": 1,
+  "matchClockMs": 1860000,
+  "wallClockUtc": "2026-10-20T19:31:00Z",
+  "provenance": {
+    "kind": "synthetic",
+    "generatorVersion": "0.1.0",
+    "seed": 42,
+    "scenario": "comeback"
+  },
+  "type": "SHOT",
+  "teamId": "tm_harbour",
+  "playerId": "pl_harbour_9",
+  "location": { "x": 88, "y": 52 },
+  "outcome": "ON_TARGET",
+  "bodyPart": "RIGHT_FOOT"
+}

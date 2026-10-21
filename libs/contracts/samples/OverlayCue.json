@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "overlayId": "ov_fx42_000134",
+  "fixtureId": "fx_comeback_42",
+  "insightId": "in_fx42_0012",
+  "revision": 1,
+  "kind": "TACTICAL_INSIGHT",
+  "priority": 70,
+  "persona": "BROADCAST",
+  "locale": "en-GB",
+  "clockStartMs": 3742000,
+  "clockEndMs": 3749000,
+  "maxDisplayMs": 8000,
+  "headline": "Pressure building on the left",
+  "body": "Five recoveries in the last six minutes led to three shots.",
+  "evidenceEventIds": ["ev_00101", "ev_00112", "ev_00127"],
+  "metricRefs": ["recoveries.home.rolling6m", "shots.home.rolling6m"],
+  "safeArea": { "topPct": 8, "rightPct": 6, "bottomPct": 10, "leftPct": 6 },
+  "status": "APPROVED",
+  "synthetic": true
+}

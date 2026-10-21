@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "runId": "run_fx42_0012_a",
+  "agent": "MATCH_ANALYST",
+  "claims": [
+    {
+      "claimType": "OBSERVATION",
+      "text": "Harbour City recorded five recoveries in the previous six minutes.",
+      "evidenceEventIds": ["ev_00101", "ev_00112"],
+      "citedValues": [{ "metricRef": "recoveries.home.rolling6m", "value": 5 }]
+    },
+    {
+      "claimType": "INFERENCE",
+      "text": "Territorial pressure may be increasing.",
+      "evidenceEventIds": ["ev_00101"],
+      "citedValues": []
+    }
+  ],
+  "limitations": ["Synthetic event feed; no tracking data."],
+  "locale": "en-GB",
+  "confidenceLabel": "medium",
+  "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+}

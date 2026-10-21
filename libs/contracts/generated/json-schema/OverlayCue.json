@@ -1,0 +1,170 @@
+{
+  "title": "OverlayCue",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "overlayId": {
+      "type": "string",
+      "pattern": "^ov_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "insightId": {
+      "type": "string",
+      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "revision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "SCORE_UPDATE",
+        "KEY_MOMENT",
+        "TACTICAL_INSIGHT",
+        "STAT_COMPARISON",
+        "DISCIPLINE",
+        "SUBSTITUTION"
+      ]
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "persona": {
+      "type": "string",
+      "enum": [
+        "CASUAL",
+        "ANALYST",
+        "BROADCAST"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "en-GB",
+        "fr-FR",
+        "es-ES"
+      ]
+    },
+    "clockStartMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "clockEndMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "maxDisplayMs": {
+      "type": "integer",
+      "minimum": 2000,
+      "maximum": 15000
+    },
+    "headline": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "body": {
+      "type": "string",
+      "maxLength": 140
+    },
+    "evidenceEventIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      }
+    },
+    "metricRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+      }
+    },
+    "safeArea": {
+      "type": "object",
+      "properties": {
+        "topPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25
+        },
+        "rightPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25
+        },
+        "bottomPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25
+        },
+        "leftPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25
+        }
+      },
+      "required": [
+        "topPct",
+        "rightPct",
+        "bottomPct",
+        "leftPct"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "VERIFIED",
+        "APPROVED",
+        "AUTO_APPROVED",
+        "SCHEDULED",
+        "LIVE",
+        "EXPIRED",
+        "RETRACTED",
+        "FAILED"
+      ]
+    },
+    "synthetic": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "overlayId",
+    "fixtureId",
+    "revision",
+    "kind",
+    "priority",
+    "persona",
+    "locale",
+    "clockStartMs",
+    "clockEndMs",
+    "maxDisplayMs",
+    "headline",
+    "body",
+    "evidenceEventIds",
+    "metricRefs",
+    "safeArea",
+    "status",
+    "synthetic"
+  ],
+  "additionalProperties": false
+}

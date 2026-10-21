@@ -1,0 +1,1637 @@
+{
+  "title": "MatchEvent",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "MATCH_STARTED"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type"
+      ],
+      "additionalProperties": false,
+      "title": "MatchStartedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PERIOD_STARTED"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type"
+      ],
+      "additionalProperties": false,
+      "title": "PeriodStartedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PERIOD_ENDED"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type"
+      ],
+      "additionalProperties": false,
+      "title": "PeriodEndedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "MATCH_ENDED"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type"
+      ],
+      "additionalProperties": false,
+      "title": "MatchEndedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PASS_ATTEMPTED"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "targetLocation": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "intendedReceiverId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "underPressure": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location",
+        "targetLocation",
+        "underPressure"
+      ],
+      "additionalProperties": false,
+      "title": "PassAttemptedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PASS_COMPLETED"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "attemptEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "attemptEventId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "PassCompletedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PASS_INTERCEPTED"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "attemptEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "attemptEventId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "PassInterceptedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "CARRY"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "endLocation": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location",
+        "endLocation"
+      ],
+      "additionalProperties": false,
+      "title": "CarryEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "FINAL_THIRD_ENTRY"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "FinalThirdEntryEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "TACKLE"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "opponentPlayerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "won": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "opponentPlayerId",
+        "location",
+        "won"
+      ],
+      "additionalProperties": false,
+      "title": "TackleEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PRESSURE_APPLIED"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "targetPlayerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "targetPlayerId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "PressureAppliedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "RECOVERY"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "RecoveryEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "POSSESSION_CHANGED"
+        },
+        "teamId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId"
+      ],
+      "additionalProperties": false,
+      "title": "PossessionChangedEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "SHOT"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "ON_TARGET",
+            "OFF_TARGET",
+            "BLOCKED",
+            "WOODWORK"
+          ]
+        },
+        "bodyPart": {
+          "type": "string",
+          "enum": [
+            "RIGHT_FOOT",
+            "LEFT_FOOT",
+            "HEAD",
+            "OTHER"
+          ]
+        },
+        "speedKph": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location",
+        "outcome",
+        "bodyPart"
+      ],
+      "additionalProperties": false,
+      "title": "ShotEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "GOAL"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "shotEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "assistPlayerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "ownGoal": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "shotEventId",
+        "ownGoal"
+      ],
+      "additionalProperties": false,
+      "title": "GoalEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "SAVE"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "shotEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "shotEventId"
+      ],
+      "additionalProperties": false,
+      "title": "SaveEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "FOUL"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "victimPlayerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "FoulEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "CARD"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "card": {
+          "type": "string",
+          "enum": [
+            "YELLOW",
+            "SECOND_YELLOW",
+            "RED"
+          ]
+        },
+        "foulEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "card"
+      ],
+      "additionalProperties": false,
+      "title": "CardEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "SUBSTITUTION"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerOutId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerInId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerOutId",
+        "playerInId"
+      ],
+      "additionalProperties": false,
+      "title": "SubstitutionEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "PLAYER_POSITION"
+        },
+        "teamId": {
+          "type": "string",
+          "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "playerId": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        },
+        "speedMps": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 13
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "teamId",
+        "playerId",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "PlayerPositionEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "BALL_POSITION"
+        },
+        "location": {
+          "$ref": "#/$defs/PitchPoint"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "location"
+      ],
+      "additionalProperties": false,
+      "title": "BallPositionEvent"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "eventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "matchClockMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wallClockUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "type": {
+          "type": "string",
+          "const": "CORRECTION"
+        },
+        "correctedEventId": {
+          "type": "string",
+          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "action": {
+          "type": "string",
+          "const": "VOID"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "fixtureId",
+        "sequence",
+        "period",
+        "matchClockMs",
+        "wallClockUtc",
+        "provenance",
+        "type",
+        "correctedEventId",
+        "action",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "title": "CorrectionEvent"
+    }
+  ],
+  "$defs": {
+    "Provenance": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SyntheticProvenance"
+        }
+      ]
+    },
+    "SyntheticProvenance": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "synthetic"
+        },
+        "generatorVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "scenario": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "kind",
+        "generatorVersion",
+        "seed",
+        "scenario"
+      ],
+      "additionalProperties": false
+    },
+    "PitchPoint": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

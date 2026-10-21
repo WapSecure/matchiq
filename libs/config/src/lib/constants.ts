@@ -1,0 +1,29 @@
+export const DEFAULT_PORTS = { api: 3000, worker: 3001, agents: 8000 } as const;
+
+export const DEFAULT_URLS = {
+  apiPublic: `http://localhost:${DEFAULT_PORTS.api}`,
+  apiBase: `http://localhost:${DEFAULT_PORTS.api}/api/v1`,
+  agentsService: `http://localhost:${DEFAULT_PORTS.agents}`,
+} as const;
+
+export const ENV_LIMITS = {
+  portMax: 65_535,
+  secretMinLength: 32,
+  rateLimitPerMinute: 300,
+  agentTimeoutMinMs: 500,
+  agentTimeoutMaxMs: 30_000,
+  agentTimeoutDefaultMs: 8_000,
+  agentMaxRetries: 2,
+  agentCircuitFailureThreshold: 5,
+} as const;
+
+export const ENV_PATTERNS = {
+  orgId: /^org_[A-Za-z0-9_-]+$/,
+  postgresProtocol: /^postgres(ql)?$/,
+  redisProtocol: /^rediss?$/,
+} as const;
+
+export const DEFAULT_DEMO_ORG_ID = 'org_demo';
+export const DEFAULT_APP_VERSION = '0.0.0-dev';
+export const REQUIRED_MESSAGE = 'is required';
+export const CSV_SEPARATOR = ',';

@@ -1,0 +1,120 @@
+{
+  "title": "AgentResult",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "runId": {
+      "type": "string",
+      "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "agent": {
+      "type": "string",
+      "enum": [
+        "MATCH_ANALYST",
+        "NARRATIVE_WRITER",
+        "FACT_CHECKER",
+        "BROADCAST_PRODUCER",
+        "LOCALIZATION"
+      ]
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "OBSERVATION",
+              "INFERENCE"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          },
+          "evidenceEventIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "citedValues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metricRef": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "metricRef",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "claimType",
+          "text",
+          "evidenceEventIds",
+          "citedValues"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "en-GB",
+        "fr-FR",
+        "es-ES"
+      ]
+    },
+    "confidenceLabel": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "traceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "runId",
+    "agent",
+    "claims",
+    "limitations",
+    "locale",
+    "confidenceLabel",
+    "traceId"
+  ],
+  "additionalProperties": false
+}

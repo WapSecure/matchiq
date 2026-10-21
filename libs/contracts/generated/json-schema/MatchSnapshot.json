@@ -1,0 +1,262 @@
+{
+  "title": "MatchSnapshot",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "throughSequence": {
+      "type": "integer",
+      "minimum": -1,
+      "maximum": 9007199254740991
+    },
+    "algorithmVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "NOT_STARTED",
+        "IN_PLAY",
+        "BREAK",
+        "COMPLETED"
+      ]
+    },
+    "period": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "matchClockMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "score": {
+      "type": "object",
+      "properties": {
+        "home": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "away": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "home",
+        "away"
+      ],
+      "additionalProperties": false
+    },
+    "home": {
+      "$ref": "#/$defs/TeamMatchMetrics"
+    },
+    "away": {
+      "$ref": "#/$defs/TeamMatchMetrics"
+    },
+    "provisional": {
+      "type": "boolean"
+    },
+    "stateHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "fixtureId",
+    "throughSequence",
+    "algorithmVersion",
+    "phase",
+    "period",
+    "matchClockMs",
+    "score",
+    "home",
+    "away",
+    "provisional",
+    "stateHash"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "TeamMatchMetrics": {
+      "type": "object",
+      "properties": {
+        "goals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "shots": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "shotsOnTarget": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "passesAttempted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "passesCompleted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "passCompletionPct": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "possessionPct": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "possessionBasis": {
+          "type": "string",
+          "enum": [
+            "TIME_WEIGHTED",
+            "EVENT_SHARE_PROXY"
+          ]
+        },
+        "pressures": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "recoveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "finalThirdEntries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "fouls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "yellowCards": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "redCards": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "momentum": {
+          "$ref": "#/$defs/MetricValue"
+        }
+      },
+      "required": [
+        "goals",
+        "shots",
+        "shotsOnTarget",
+        "passesAttempted",
+        "passesCompleted",
+        "passCompletionPct",
+        "possessionPct",
+        "possessionBasis",
+        "pressures",
+        "recoveries",
+        "finalThirdEntries",
+        "fouls",
+        "yellowCards",
+        "redCards",
+        "momentum"
+      ],
+      "additionalProperties": false
+    },
+    "MetricValue": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MetricAvailable"
+        },
+        {
+          "$ref": "#/$defs/MetricUnavailable"
+        }
+      ]
+    },
+    "MetricAvailable": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "available"
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "count",
+            "percent",
+            "index",
+            "metres",
+            "kph",
+            "mps"
+          ]
+        },
+        "numerator": {
+          "type": "number"
+        },
+        "denominator": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "status",
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "MetricUnavailable": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "unavailable"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "ZERO_DENOMINATOR",
+            "NO_TRACKING_DATA",
+            "NOT_GENERATED",
+            "INSUFFICIENT_SAMPLE"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
