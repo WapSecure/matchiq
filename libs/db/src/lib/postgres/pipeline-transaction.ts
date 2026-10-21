@@ -1,0 +1,264 @@
+import type {
+  AgentRun,
+  MatchSnapshot,
+  Narrative,
+  OverlayCue,
+  ReplayStatus,
+} from '@matchiq/contracts';
+import { and, eq, max, sql } from 'drizzle-orm';
+import type { PgColumn } from 'drizzle-orm/pg-core';
+import type { Database } from '../client.js';
+import { sha256Hex } from '../hash.js';
+import type {
+  InsightCompletion,
+  InsightPublication,
+  InsightRecord,
+  OverlayRecord,
+  PipelineTransaction,
+  PipelineUnitOfWork,
+  RecapDocument,
+} from '../intelligence-types.js';
+import type { FixtureKey } from '../ports.js';
+import {
+  agentRuns,
+  insights,
+  matchRecaps,
+  matchSnapshots,
+  narratives,
+  overlayCues,
+  replaySessions,
+} from '../schema/intelligence-tables.js';
+import { matchEvents } from '../schema/tables.js';
+import { PostgresLedgerTransaction } from './ledger-transaction.js';
+
+const scoped = (
+  table: { orgId: PgColumn; fixtureId: PgColumn },
+  key: FixtureKey,
+) => and(eq(table.orgId, key.orgId), eq(table.fixtureId, key.fixtureId));
+
+class PostgresPipelineTransaction
+  extends PostgresLedgerTransaction
+  implements PipelineTransaction
+{
+  async ledgerHead(key: FixtureKey): Promise<number> {
+    const [row] = await this.tx
+      .select({ head: max(matchEvents.sequence) })
+      .from(matchEvents)
+      .where(
+        and(
+          eq(matchEvents.orgId, key.orgId),
+          eq(matchEvents.fixtureId, key.fixtureId),
+        ),
+      );
+    return row?.head ?? -1;
+  }
+
+  async insertInsights(
+    key: FixtureKey,
+    rows: readonly InsightRecord[],
+  ): Promise<void> {
+    if (rows.length === 0) return;
+    await this.tx
+      .insert(insights)
+      .values(
+        rows.map((r) => ({
+          orgId: key.orgId,
+          fixtureId: key.fixtureId,
+          insightId: r.insight.insightId,
+          revision: r.revision,
+          kind: r.insight.kind,
+          priority: r.insight.priority,
+          period: r.period,
+          matchClockMs: r.insight.matchClockMs,
+          status: r.insight.status,
+          publication: r.publication,
+          payload: r.insight,
+          detectedSequence: r.detectedSequence,
+        })),
+      )
+      .onConflictDoNothing();
+  }
+
+  async claimPublication(
+    key: FixtureKey,
+    insightId: string,
+    publication: Exclude<InsightPublication, 'PENDING'>,
+  ): Promise<boolean> {
+    const rows = await this.tx
+      .update(insights)
+      .set({ publication, updatedAt: sql`now()` })
+      .where(
+        and(
+          scoped(insights, key),
+          eq(insights.insightId, insightId),
+          eq(insights.publication, 'PENDING'),
+        ),
+      )
+      .returning({ insightId: insights.insightId });
+    return rows.length > 0;
+  }
+
+  async completeInsight(
+    key: FixtureKey,
+    insightId: string,
+    completion: InsightCompletion,
+  ): Promise<void> {
+    await this.tx
+      .update(insights)
+      .set({
+        status: completion.status,
+        gateReport: completion.gateReport,
+        fallbackReason: completion.fallbackReason ?? null,
+        updatedAt: sql`now()`,
+      })
+      .where(and(scoped(insights, key), eq(insights.insightId, insightId)));
+  }
+
+  async insertNarratives(
+    key: FixtureKey,
+    items: readonly Narrative[],
+  ): Promise<void> {
+    if (items.length === 0) return;
+    await this.tx
+      .insert(narratives)
+      .values(
+        items.map((n) => ({
+          orgId: key.orgId,
+          fixtureId: key.fixtureId,
+          narrativeId: n.narrativeId,
+          insightId: n.insightId,
+          persona: n.persona,
+          locale: n.locale,
+          source: n.source,
+          revision: 1,
+          payload: n,
+        })),
+      )
+      .onConflictDoNothing();
+  }
+
+  async upsertOverlay(key: FixtureKey, record: OverlayRecord): Promise<void> {
+    const { cue } = record;
+    const values = {
+      revision: cue.revision,
+      status: record.status,
+      priority: cue.priority,
+      period: record.period,
+      clockStartMs: cue.clockStartMs,
+      clockEndMs: cue.clockEndMs,
+      payload: cue,
+      publishedSequence: record.publishedSequence,
+    };
+    await this.tx
+      .insert(overlayCues)
+      .values({
+        orgId: key.orgId,
+        fixtureId: key.fixtureId,
+        overlayId: cue.overlayId,
+        insightId: cue.insightId ?? null,
+        ...values,
+      })
+      .onConflictDoUpdate({
+        target: [
+          overlayCues.orgId,
+          overlayCues.fixtureId,
+          overlayCues.overlayId,
+        ],
+        set: { ...values, updatedAt: sql`now()` },
+      });
+  }
+
+  async endOverlay(
+    key: FixtureKey,
+    overlayId: string,
+    end: { status: OverlayCue['status']; reason: string },
+  ): Promise<void> {
+    await this.tx
+      .update(overlayCues)
+      .set({ status: end.status, endReason: end.reason, updatedAt: sql`now()` })
+      .where(
+        and(scoped(overlayCues, key), eq(overlayCues.overlayId, overlayId)),
+      );
+  }
+
+  async insertAgentRuns(
+    key: FixtureKey,
+    insightId: string,
+    runs: readonly AgentRun[],
+  ): Promise<void> {
+    if (runs.length === 0) return;
+    await this.tx.insert(agentRuns).values(
+      runs.map((run) => ({
+        orgId: key.orgId,
+        fixtureId: key.fixtureId,
+        insightId,
+        runId: run.runId,
+        correlationId: run.correlationId,
+        agent: run.agent,
+        provider: run.provider,
+        outcome: run.outcome,
+        latencyMs: run.latencyMs,
+        payload: run,
+      })),
+    );
+  }
+
+  async saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
+    await this.tx
+      .insert(matchSnapshots)
+      .values({
+        orgId: key.orgId,
+        fixtureId: key.fixtureId,
+        throughSequence: snapshot.throughSequence,
+        payload: snapshot,
+      })
+      .onConflictDoUpdate({
+        target: [matchSnapshots.orgId, matchSnapshots.fixtureId],
+        set: {
+          throughSequence: snapshot.throughSequence,
+          payload: snapshot,
+          updatedAt: sql`now()`,
+        },
+      });
+  }
+
+  async updateSession(key: FixtureKey, status: ReplayStatus): Promise<void> {
+    await this.tx
+      .update(replaySessions)
+      .set({
+        state: status.state,
+        speed: status.speed,
+        appliedSequence: status.appliedSequence,
+        period: status.period,
+        matchClockMs: status.matchClockMs,
+        updatedAt: sql`now()`,
+      })
+      .where(scoped(replaySessions, key));
+  }
+
+  async saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
+    const payloadHash = sha256Hex(recap);
+    await this.tx
+      .insert(matchRecaps)
+      .values({
+        orgId: key.orgId,
+        fixtureId: key.fixtureId,
+        payload: recap,
+        payloadHash,
+      })
+      .onConflictDoUpdate({
+        target: [matchRecaps.orgId, matchRecaps.fixtureId],
+        set: { payload: recap, payloadHash, updatedAt: sql`now()` },
+      });
+  }
+}
+
+export class PostgresPipelineUnitOfWork implements PipelineUnitOfWork {
+  constructor(private readonly db: Database) {}
+
+  transaction<T>(work: (tx: PipelineTransaction) => Promise<T>): Promise<T> {
+    return this.db.transaction((tx) =>
+      work(new PostgresPipelineTransaction(tx)),
+    );
+  }
+}

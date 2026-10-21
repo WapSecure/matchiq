@@ -16,7 +16,9 @@
     "validate:fixture": "nx run synthetic-data:build --output-style=static 1>&2 && node libs/synthetic-data/dist/cli/validate-fixture.js",
     "verify": "nx sync:check && pnpm format:check && nx run-many -t lint typecheck test build",
     "infra:up": "docker compose up -d --wait",
-    "infra:down": "docker compose down"
+    "infra:down": "docker compose down",
+    "seed:fixtures": "nx run db:seed-fixtures --output-style=static",
+    "perf:replay": "PERF_REPORT=1 nx test worker --output-style=static -- -t \"replay performance\""
   },
   "private": true,
   "devDependencies": {

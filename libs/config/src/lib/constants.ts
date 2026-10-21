@@ -25,6 +25,17 @@ export const ENV_LIMITS = {
   sseHeartbeatMinMs: 50,
   sseHeartbeatMaxMs: 60_000,
   sseHeartbeatDefaultMs: 15_000,
+  replayRateLimitPerMinute: 30,
+  agentJobConcurrencyMax: 16,
+  agentJobConcurrencyDefault: 2,
+  agentRetryBackoffMinMs: 50,
+  agentRetryBackoffMaxMs: 60_000,
+  agentRetryBackoffDefaultMs: 500,
+  agentCircuitCooldownMinMs: 1_000,
+  agentCircuitCooldownMaxMs: 600_000,
+  agentCircuitCooldownDefaultMs: 30_000,
+  replayActiveSessionsMax: 50,
+  replayActiveSessionsDefault: 10,
 } as const;
 
 export const ENV_PATTERNS = {

@@ -2,7 +2,10 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: './src/lib/schema/tables.ts',
+  schema: [
+    './src/lib/schema/tables.ts',
+    './src/lib/schema/intelligence-tables.ts',
+  ],
   out: './migrations',
   strict: true,
   verbose: true,
