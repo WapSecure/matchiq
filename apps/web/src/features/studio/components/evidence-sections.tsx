@@ -1,0 +1,150 @@
+import type { EvidenceEnvelope, Insight, MatchEvent } from '@matchiq/contracts';
+import type { ReactNode } from 'react';
+import { EVIDENCE_COPY } from '@/constants/evidence';
+import { CONFIDENCE_LABELS } from '@/constants/match';
+import { formatFraction, formatMinute, formatWindow } from '@/lib/format';
+import { describeEvent } from '../lib/describe-event';
+import type { Roster } from '../lib/roster';
+
+const METRIC_DECIMALS = 2;
+
+export function EvidenceSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-b border-line py-4 first:pt-0 last:border-0">
+      <h3 className="eyebrow mb-2">{title}</h3>
+      {children}
+    </section>
+  );
+}
+
+export function EvidenceSummary({
+  insight,
+  period,
+}: {
+  insight: Insight;
+  period: number | null;
+}) {
+  const e = insight.evidence;
+  const rows: [string, string][] = [
+    [
+      EVIDENCE_COPY.fields.window,
+      formatWindow(period, e.windowStartMs, e.windowEndMs),
+    ],
+    [EVIDENCE_COPY.fields.confidence, CONFIDENCE_LABELS[e.confidenceLabel]],
+    [EVIDENCE_COPY.fields.coverage, formatFraction(e.dataCoverage)],
+    [EVIDENCE_COPY.fields.method, e.methodVersion],
+    [EVIDENCE_COPY.fields.reason, insight.reasonCode],
+    [EVIDENCE_COPY.fields.status, insight.status],
+  ];
+  return (
+    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+      {rows.map(([label, value]) => (
+        <div key={label} className="min-w-0">
+          <dt className="text-xs text-ink-subtle">{label}</dt>
+          <dd className="tabular truncate text-[13px] text-ink">{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function EvidenceMetrics({ evidence }: { evidence: EvidenceEnvelope }) {
+  const entries = Object.entries(evidence.computedMetrics);
+  if (entries.length === 0)
+    return <p className="text-xs text-ink-subtle">{EVIDENCE_COPY.noMetrics}</p>;
+  return (
+    <table className="w-full text-left text-sm">
+      <thead className="text-xs text-ink-subtle">
+        <tr>
+          <th scope="col" className="pb-1 font-normal">
+            {EVIDENCE_COPY.metricsTable.metric}
+          </th>
+          <th scope="col" className="pb-1 text-right font-normal">
+            {EVIDENCE_COPY.metricsTable.value}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {entries.map(([ref, value]) => (
+          <tr key={ref} className="border-t border-line/60">
+            <th
+              scope="row"
+              className="py-1.5 font-mono text-xs font-normal text-ink-muted"
+            >
+              {ref}
+            </th>
+            <td className="tabular py-1.5 text-right font-semibold text-ink">
+              {Number.isInteger(value) ? value : value.toFixed(METRIC_DECIMALS)}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+type EvidenceEventsProps = {
+  ids: readonly string[];
+  events: readonly MatchEvent[];
+  roster: Roster;
+};
+
+export function EvidenceEvents({ ids, events, roster }: EvidenceEventsProps) {
+  const byId = new Map(events.map((e) => [e.eventId, e]));
+  return (
+    <ol className="flex flex-col gap-1.5">
+      {ids.map((id) => {
+        const event = byId.get(id);
+        const described = event ? describeEvent(event, roster) : null;
+        return (
+          <li key={id} className="grid grid-cols-[3rem_1fr] gap-2 text-sm">
+            <span className="tabular font-mono text-xs text-ink-subtle">
+              {event ? formatMinute(event.period, event.matchClockMs) : '—'}
+            </span>
+            <div className="min-w-0">
+              <p className="text-ink">
+                {described?.label ?? EVIDENCE_COPY.eventOutsideWindow}
+              </p>
+              <p className="truncate font-mono text-micro text-ink-subtle">
+                {[described?.detail, id].filter(Boolean).join(' · ')}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function CounterEvidenceList({
+  evidence,
+}: {
+  evidence: EvidenceEnvelope;
+}) {
+  if (evidence.counterEvidence.length === 0) {
+    return <p className="text-xs text-ink-subtle">{EVIDENCE_COPY.noCounter}</p>;
+  }
+  return (
+    <ul className="flex flex-col gap-2 text-sm">
+      {evidence.counterEvidence.map((item) => (
+        <li
+          key={item.description}
+          className="rounded-md border border-line bg-surface-sunken p-2"
+        >
+          <p className="text-ink">{item.description}</p>
+          {item.eventIds.length > 0 ? (
+            <p className="mt-0.5 font-mono text-micro text-ink-subtle">
+              {item.eventIds.join(', ')}
+            </p>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  );
+}

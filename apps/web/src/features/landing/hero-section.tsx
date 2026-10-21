@@ -31,6 +31,9 @@ export function HeroSection() {
           >
             {HERO.primaryCta.label}
           </ButtonLink>
+          <ButtonLink href={HERO.howItWorks.href} variant="secondary">
+            {HERO.howItWorks.label}
+          </ButtonLink>
           <ButtonLink
             href={SITE.repositoryUrl}
             variant="secondary"
