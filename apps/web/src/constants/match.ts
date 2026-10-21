@@ -1,0 +1,146 @@
+import type {
+  ConfidenceLabel,
+  FixtureStatus,
+  InsightKind,
+  InsightPriority,
+  Locale,
+  MatchEventType,
+  MatchPhase,
+  MetricUnavailableReason,
+  OverlayKind,
+  Persona,
+  PossessionBasis,
+} from '@matchiq/contracts';
+
+export const EVENT_LABELS: Record<MatchEventType, string> = {
+  MATCH_STARTED: 'Kick-off',
+  PERIOD_STARTED: 'Period started',
+  PERIOD_ENDED: 'Period ended',
+  MATCH_ENDED: 'Full time',
+  PASS_ATTEMPTED: 'Pass attempted',
+  PASS_COMPLETED: 'Pass completed',
+  PASS_INTERCEPTED: 'Pass intercepted',
+  CARRY: 'Carry',
+  FINAL_THIRD_ENTRY: 'Final-third entry',
+  TACKLE: 'Tackle',
+  PRESSURE_APPLIED: 'Pressure',
+  RECOVERY: 'Ball recovery',
+  POSSESSION_CHANGED: 'Possession change',
+  SHOT: 'Shot',
+  GOAL: 'Goal',
+  SAVE: 'Save',
+  FOUL: 'Foul',
+  CARD: 'Card',
+  SUBSTITUTION: 'Substitution',
+  PLAYER_POSITION: 'Player position',
+  BALL_POSITION: 'Ball position',
+  CORRECTION: 'Correction',
+};
+
+/** Shown in the ticker; the rest stay in the evidence trail only. */
+export const KEY_EVENT_TYPES: ReadonlySet<MatchEventType> = new Set([
+  'MATCH_STARTED',
+  'PERIOD_STARTED',
+  'PERIOD_ENDED',
+  'MATCH_ENDED',
+  'SHOT',
+  'GOAL',
+  'SAVE',
+  'FOUL',
+  'CARD',
+  'SUBSTITUTION',
+  'TACKLE',
+  'RECOVERY',
+  'FINAL_THIRD_ENTRY',
+  'PASS_INTERCEPTED',
+  'CORRECTION',
+]);
+
+export const HIGHLIGHT_EVENT_TYPES: ReadonlySet<MatchEventType> = new Set([
+  'GOAL',
+  'CARD',
+  'CORRECTION',
+]);
+
+export const INSIGHT_KIND_LABELS: Record<InsightKind, string> = {
+  GOAL: 'Goal',
+  RED_CARD: 'Red card',
+  SHOT_BURST: 'Shot burst',
+  HIGH_REGAINS: 'High regains',
+  PRESSURE_SWING: 'Pressure swing',
+  MOMENTUM_SHIFT: 'Momentum shift',
+  PLAYER_MILESTONE: 'Player milestone',
+};
+
+export const PRIORITY_LABELS: Record<InsightPriority, string> = {
+  P0: 'Critical',
+  P1: 'High',
+  P2: 'Context',
+};
+
+export const CONFIDENCE_LABELS: Record<ConfidenceLabel, string> = {
+  low: 'Low confidence',
+  medium: 'Medium confidence',
+  high: 'High confidence',
+};
+
+export const PERSONA_OPTIONS: readonly { value: Persona; label: string }[] = [
+  { value: 'CASUAL', label: 'Casual' },
+  { value: 'ANALYST', label: 'Analyst' },
+  { value: 'BROADCAST', label: 'Broadcast' },
+];
+
+export const LOCALE_OPTIONS: readonly {
+  value: Locale;
+  label: string;
+  short: string;
+}[] = [
+  { value: 'en-GB', label: 'English', short: 'EN' },
+  { value: 'fr-FR', label: 'Français', short: 'FR' },
+  { value: 'es-ES', label: 'Español', short: 'ES' },
+];
+
+export const UNAVAILABLE_REASONS: Record<MetricUnavailableReason, string> = {
+  ZERO_DENOMINATOR: 'No attempts yet',
+  NO_TRACKING_DATA: 'No tracking data',
+  NOT_GENERATED: 'Not in this dataset',
+  INSUFFICIENT_SAMPLE: 'Sample too small',
+};
+
+export const POSSESSION_BASIS_LABELS: Record<PossessionBasis, string> = {
+  TIME_WEIGHTED: 'Time-weighted',
+  EVENT_SHARE_PROXY: 'Event-share proxy',
+};
+
+export const FIXTURE_STATUS_LABELS: Record<FixtureStatus, string> = {
+  SCHEDULED: 'Scheduled',
+  LIVE: 'Live',
+  COMPLETED: 'Completed',
+  ABANDONED: 'Abandoned',
+};
+
+export const PHASE_LABELS: Record<MatchPhase, string> = {
+  NOT_STARTED: 'Pre-match',
+  IN_PLAY: 'In play',
+  BREAK: 'Break',
+  COMPLETED: 'Full time',
+};
+
+export const PERIOD_LABELS: Record<number, string> = {
+  1: '1st half',
+  2: '2nd half',
+  3: 'Extra time 1',
+  4: 'Extra time 2',
+  5: 'Penalties',
+};
+
+export const OVERLAY_KIND_LABELS: Record<OverlayKind, string> = {
+  SCORE_UPDATE: 'Score update',
+  KEY_MOMENT: 'Key moment',
+  TACTICAL_INSIGHT: 'Tactical insight',
+  STAT_COMPARISON: 'Stat comparison',
+  DISCIPLINE: 'Discipline',
+  SUBSTITUTION: 'Substitution',
+};
+
+export const NOT_AVAILABLE = 'Not available';

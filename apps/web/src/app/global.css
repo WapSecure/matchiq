@@ -74,6 +74,17 @@
   }
 }
 
+@keyframes cue-in {
+  from {
+    opacity: 0;
+    transform: translateY(8%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }

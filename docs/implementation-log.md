@@ -2,6 +2,25 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — MQ-011: Fixture lobby, live studio and resumable match stream (web)
+
+### Delivered
+
+| Area                                                                                                                                                                                                                       | Status  | Evidence                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------- |
+| Typed REST client: Zod-validated responses, RFC 9457 problem errors, idempotency key on replay commands, TanStack Query hooks                                                                                              | Done    | `http-client.spec.ts` (8 tests)                                                               |
+| `MatchStreamClient`: streaming-fetch SSE, `StreamMessage` validation, dedupe by `streamSequence`, `Last-Event-ID` resume, capped jittered backoff, gap → snapshot refetch, staleness, offline                              | Done    | `match-stream-client.spec.ts`, `sse.spec.ts` (15 tests)                                       |
+| Zustand match store: batched apply, bounded timeline, monotonic snapshots, momentum series, narratives by persona/locale, overlay revisions and retraction tombstones, seek reset                                          | Done    | `match-store.spec.ts` (14 tests)                                                              |
+| `/fixtures` lobby and `/studio/[fixtureId]` live studio: scoreboard, timeline, insight feed, evidence drawer, live metrics, momentum chart with table, 16:9 overlay preview, replay transport, persona and language switch | Done    | `live-studio.spec.tsx`, component specs; Playwright lobby and studio specs, desktop + mobile  |
+| Accessibility: axe WCAG 2.2 AA (no serious/critical) on lobby, studio and open drawer; keyboard drawer with focus return; throttled live announcements; reduced motion                                                     | Done    | Playwright (46 tests per run, both projects)                                                  |
+| End-to-end against the real API and worker                                                                                                                                                                                 | Partial | **UI wired to the contract; not yet exercised against a live backend.** All network is mocked |
+
+### Notes
+
+- The events page envelope, momentum history and replay length are not in `libs/contracts`; the web app tolerates a bare array or `{ items, nextAfterSequence }` and builds momentum from streamed snapshots. Proposals are in the PR.
+- The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
+- Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
+
 ## 2026-10-21 — M0: Foundation (MQ-001, MQ-002)
 
 ### Delivered

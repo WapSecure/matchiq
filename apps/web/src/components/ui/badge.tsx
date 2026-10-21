@@ -25,7 +25,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'eyebrow inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5',
+        'eyebrow inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-2 py-0.5',
         TONES[tone],
         className,
       )}
