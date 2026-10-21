@@ -1,0 +1,152 @@
+# Manual Azure deployment. Never runs on push or pull_request.
+# Prerequisites (owner approval required; see infra/azure/README.md):
+#   - an Entra app registration with federated credentials for the environments
+#     "<env>-plan" and "<env>", scoped to one resource group
+#   - environment "<env>" configured with required reviewers
+name: Deploy (Azure)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, stage, prod]
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-azure-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  TARGET_ENV: ${{ inputs.environment }}
+  IMAGE_TAG: ${{ github.sha }}
+  APP_VERSION: ${{ github.sha }}
+  AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+  AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+  BUDGET_CONTACT_EMAILS: ${{ vars.BUDGET_CONTACT_EMAILS }}
+  BUDGET_START_DATE: ${{ vars.BUDGET_START_DATE }}
+  FOUNDRY_MODEL_NAME: ${{ vars.FOUNDRY_MODEL_NAME }}
+  FOUNDRY_MODEL_VERSION: ${{ vars.FOUNDRY_MODEL_VERSION }}
+
+jobs:
+  plan:
+    name: What-if
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.environment }}-plan
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+      OPERATOR_API_KEY: ${{ secrets.OPERATOR_API_KEY }}
+      AGENTS_SERVICE_TOKEN: ${{ secrets.AGENTS_SERVICE_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: What-if (full deployment)
+        env:
+          DEPLOY_APPS: 'true'
+        run: |
+          az deployment group what-if \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "matchiq-$TARGET_ENV-whatif" \
+            --parameters "infra/azure/env/$TARGET_ENV.bicepparam"
+
+  deploy:
+    name: Deploy
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Required reviewers on this environment gate everything below.
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+      OPERATOR_API_KEY: ${{ secrets.OPERATOR_API_KEY }}
+      AGENTS_SERVICE_TOKEN: ${{ secrets.AGENTS_SERVICE_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy platform (registry, data, secrets, monitoring)
+        id: platform
+        env:
+          DEPLOY_APPS: 'false'
+        run: |
+          outputs=$(az deployment group create \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "matchiq-$TARGET_ENV-platform" \
+            --parameters "infra/azure/env/$TARGET_ENV.bicepparam" \
+            --query properties.outputs --output json)
+          echo "registry=$(jq -r .registryName.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+          echo "login_server=$(jq -r .registryLoginServer.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+          echo "api_base_url=$(jq -r .apiBaseUrl.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push images
+        env:
+          REGISTRY: ${{ steps.platform.outputs.registry }}
+          LOGIN_SERVER: ${{ steps.platform.outputs.login_server }}
+          API_BASE_URL: ${{ steps.platform.outputs.api_base_url }}
+        run: |
+          az acr login --name "$REGISTRY"
+          docker build -f apps/api/Dockerfile -t "$LOGIN_SERVER/matchiq-api:$IMAGE_TAG" .
+          docker build -f apps/worker/Dockerfile -t "$LOGIN_SERVER/matchiq-worker:$IMAGE_TAG" .
+          docker build -f apps/web/Dockerfile -t "$LOGIN_SERVER/matchiq-web:$IMAGE_TAG" \
+            --build-arg "NEXT_PUBLIC_API_BASE_URL=$API_BASE_URL" .
+          docker build -t "$LOGIN_SERVER/matchiq-agents:$IMAGE_TAG" apps/agents
+          for app in api worker web agents; do
+            docker push "$LOGIN_SERVER/matchiq-$app:$IMAGE_TAG"
+          done
+
+      - name: Deploy apps
+        id: apps
+        env:
+          DEPLOY_APPS: 'true'
+        run: |
+          outputs=$(az deployment group create \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "matchiq-$TARGET_ENV-apps" \
+            --parameters "infra/azure/env/$TARGET_ENV.bicepparam" \
+            --query properties.outputs --output json)
+          echo "web_url=$(jq -r .webUrl.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+          echo "api_base_url=$(jq -r .apiBaseUrl.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+          echo "migrate_job=$(jq -r .migrateJobName.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+
+      - name: Run database migrations
+        env:
+          JOB: ${{ steps.apps.outputs.migrate_job }}
+        run: |
+          execution=$(az containerapp job start --resource-group "$AZURE_RESOURCE_GROUP" --name "$JOB" --query name --output tsv)
+          for _ in $(seq 1 60); do
+            status=$(az containerapp job execution show --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$JOB" --job-execution-name "$execution" --query properties.status --output tsv)
+            case "$status" in
+              Succeeded) exit 0 ;;
+              Failed|Stopped|Degraded) echo "::error::Migration $execution: $status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::Migration $execution timed out"; exit 1
+
+      - name: Smoke test
+        env:
+          WEB_URL: ${{ steps.apps.outputs.web_url }}
+          API_BASE_URL: ${{ steps.apps.outputs.api_base_url }}
+        run: |
+          curl -fsS --retry 10 --retry-delay 10 --retry-all-errors "$API_BASE_URL/health/live"
+          curl -fsS --retry 10 --retry-delay 10 --retry-all-errors -o /dev/null "$WEB_URL/"
