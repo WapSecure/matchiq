@@ -9,7 +9,10 @@ import { API_LIMITS, API_PATHS, HTTP_HEADERS } from '@/constants/api';
 import { requestJson } from './http-client';
 import { MatchEventPage, ReplayCommandAck } from './schemas';
 
-const FixtureList = z.array(Fixture);
+/** `GET /fixtures` wraps the list: `{ items: Fixture[] }`. */
+const FixtureList = z
+  .object({ items: z.array(Fixture) })
+  .transform((page) => page.items);
 
 export type EventsQuery = { afterSequence?: number; limit?: number };
 

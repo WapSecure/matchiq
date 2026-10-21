@@ -138,6 +138,24 @@ test.describe('live studio', () => {
     await expectNoBlockingA11yViolations(page);
   });
 
+  test('stays usable while /state and /replay are not deployed', async ({
+    page,
+  }) => {
+    await mockApi(page, { backend: 'partial', stream: [] });
+    await page.goto(`/studio/${FIXTURE_ID}`);
+    await expect(page.getByText('Awaiting first match snapshot')).toBeVisible();
+    await expect(
+      page.getByText(/appear once the engine publishes/),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Start replay' }).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Replay command failed' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Scoreboard' }),
+    ).toContainText('Northbridge');
+  });
+
   test('does not scroll horizontally', async ({ page }) => {
     await openStudio(page);
     await expectNoHorizontalOverflow(page);

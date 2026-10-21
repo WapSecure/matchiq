@@ -209,6 +209,27 @@ describe('MatchStreamClient', () => {
     client.stop();
   });
 
+  it('treats id-less heartbeats at the last sequence as liveness only', async () => {
+    const { client, fake, received } = setup({
+      staleAfterMs: 5_000,
+      reconnectAfterStaleMs: 10_000,
+    });
+    client.start();
+    fake.connections[0]?.push(frameOf(event(4)));
+    await flush();
+    await vi.advanceTimersByTimeAsync(4_000);
+    fake.connections[0]?.push({ ...frameOf(heartbeat(4)), id: null });
+    await flush();
+    await vi.advanceTimersByTimeAsync(4_000);
+    expect(client.connection.state).toBe('live');
+    expect(received.map((m) => m.type)).toEqual(['match.event']);
+    fake.connections[0]?.fail(new Error('drop'));
+    await flush();
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(fake.connections[1]?.request.lastEventId).toBe('4');
+    client.stop();
+  });
+
   it('stops cleanly without reconnecting', async () => {
     const { client, fake } = setup();
     client.start();

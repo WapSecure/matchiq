@@ -11,9 +11,15 @@ import {
 } from '@/components/match/stat-comparison';
 import { Panel, Skeleton } from '@/components/ui';
 import { STAT_ROWS, STUDIO_COPY } from '@/constants/studio';
+import { useMatchState } from '@/lib/api/hooks';
 import { useMatchStore } from '../store';
 
-type Teams = { homeName: string; awayName: string };
+type LiveMetricsProps = {
+  fixtureId: string;
+  homeName: string;
+  awayName: string;
+  className?: string;
+};
 
 const statRows = (snapshot: MatchSnapshot): StatRow[] => [
   ...STAT_ROWS.map((r) => ({
@@ -43,11 +49,13 @@ function MetricsSkeleton() {
 }
 
 export function LiveMetrics({
+  fixtureId,
   homeName,
   awayName,
   className,
-}: Teams & { className?: string }) {
+}: LiveMetricsProps) {
   const snapshot = useMatchStore((s) => s.snapshot);
+  const statePending = useMatchState(fixtureId).isPending;
   const momentum = useMatchStore((s) => s.momentum);
   const m = STUDIO_COPY.metrics;
   return (
@@ -89,8 +97,10 @@ export function LiveMetrics({
             />
           )}
         </div>
-      ) : (
+      ) : statePending ? (
         <MetricsSkeleton />
+      ) : (
+        <EmptyState compact title={m.awaiting} />
       )}
     </Panel>
   );

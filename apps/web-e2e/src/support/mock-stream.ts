@@ -36,8 +36,20 @@ export const envelope = <T extends StreamMessage['type']>(
     payload,
   }) as StreamMessage;
 
+/** Like the API, heartbeats carry no `id`, so they never move Last-Event-ID. */
 export const toFrame = (message: StreamMessage): string =>
-  `id: ${message.streamSequence}\nevent: ${message.type}\ndata: ${JSON.stringify(message)}\n\n`;
+  `${message.type === 'heartbeat' ? '' : `id: ${message.streamSequence}\n`}event: ${message.type}\ndata: ${JSON.stringify(message)}\n\n`;
+
+/** Heartbeats repeat the last delivered `streamSequence`. */
+export const heartbeat = (): StreamMessage =>
+  ({
+    schemaVersion: 1,
+    streamSequence: sequence,
+    fixtureId: FIXTURE_ID,
+    emittedAt: '2026-10-24T15:07:13Z',
+    type: 'heartbeat',
+    payload: {},
+  }) as StreamMessage;
 
 /** The opening burst of a live studio session, in stream order. */
 export const initialStreamMessages = (): StreamMessage[] => {
@@ -70,6 +82,6 @@ export const initialStreamMessages = (): StreamMessage[] => {
     envelope('narrative.ready', NARRATIVES.casualEn),
     envelope('narrative.ready', NARRATIVES.analystEn),
     envelope('overlay.publish', mockCue()),
-    envelope('heartbeat', {}),
+    heartbeat(),
   ];
 };

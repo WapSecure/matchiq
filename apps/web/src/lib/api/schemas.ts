@@ -2,9 +2,8 @@ import { MatchEvent, ReplayStatus } from '@matchiq/contracts';
 import { z } from 'zod';
 
 /**
- * Local until `libs/contracts` defines a page envelope for
- * `GET /fixtures/:id/events`. Accepts a bare array or `{ items, nextAfterSequence }`
- * and normalises both, so the UI survives whichever shape the API lands on.
+ * `GET /fixtures/:id/events` returns `{ items, nextAfterSequence }`. Local until
+ * `libs/contracts` exports the envelope; a bare array is still tolerated.
  */
 export const MatchEventPage = z
   .union([

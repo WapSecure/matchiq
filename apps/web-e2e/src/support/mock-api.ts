@@ -43,6 +43,8 @@ const problem = (route: Route, status: number, title: string) =>
 
 export type MockApiOptions = {
   fixtures?: 'ok' | 'empty' | 'error';
+  /** `partial` mirrors the API before `/state` and `/replay` exist (404). */
+  backend?: 'full' | 'partial';
   stream?: StreamMessage[];
 };
 
@@ -94,6 +96,52 @@ const installStreamMock = ({ frames }: { frames: string[] }) => {
   };
 };
 
+const handleFixtures = (route: Route, options: MockApiOptions) =>
+  options.fixtures === 'error'
+    ? problem(route, 503, 'Fixture service unavailable')
+    : json(route, {
+        items: options.fixtures === 'empty' ? [] : mockFixtures(),
+      });
+
+const handleReplay = (route: Route, replayCommands: unknown[]) => {
+  const command = route.request().postDataJSON() as {
+    action?: string;
+    speed?: number;
+  };
+  replayCommands.push(command);
+  return json(route, replayAck(command), 202);
+};
+
+const initialState = () =>
+  mockSnapshot(
+    NOW_MS - (MOMENTUM_SERIES.length - 1) * 60_000,
+    [null, null],
+    600,
+  );
+
+const handleFixtureResource = (
+  route: Route,
+  path: string,
+  options: MockApiOptions,
+  replayCommands: unknown[],
+) => {
+  const partial = options.backend === 'partial';
+  if (partial && (path.endsWith('/replay') || path.endsWith('/state'))) {
+    return problem(route, 404, 'Not Found');
+  }
+  if (path.endsWith('/replay')) return handleReplay(route, replayCommands);
+  if (path.endsWith('/state')) return json(route, initialState());
+  if (path.endsWith('/events')) {
+    return json(route, { items: mockEvents(), nextAfterSequence: null });
+  }
+  return json(
+    route,
+    mockFixture({
+      fixtureId: decodeURIComponent(path.split('/')[2] ?? FIXTURE_ID),
+    }),
+  );
+};
+
 const handleRoute = async (
   route: Route,
   options: MockApiOptions,
@@ -101,38 +149,13 @@ const handleRoute = async (
 ) => {
   const request = route.request();
   const path = new URL(request.url()).pathname.replace('/api/v1', '');
-  if (request.method() === 'OPTIONS')
+  if (request.method() === 'OPTIONS') {
     return route.fulfill({ status: 204, headers: CORS });
-  if (path === '/fixtures') {
-    if (options.fixtures === 'error')
-      return problem(route, 503, 'Fixture service unavailable');
-    return json(route, options.fixtures === 'empty' ? [] : mockFixtures());
   }
-  if (path.endsWith('/replay')) {
-    const command = request.postDataJSON() as {
-      action?: string;
-      speed?: number;
-    };
-    replayCommands.push(command);
-    return json(route, replayAck(command), 202);
+  if (path === '/fixtures') return handleFixtures(route, options);
+  if (path.startsWith('/fixtures/')) {
+    return handleFixtureResource(route, path, options, replayCommands);
   }
-  if (path.endsWith('/state'))
-    return json(
-      route,
-      mockSnapshot(
-        NOW_MS - (MOMENTUM_SERIES.length - 1) * 60_000,
-        [null, null],
-        600,
-      ),
-    );
-  if (path.endsWith('/events')) return json(route, mockEvents());
-  if (path.startsWith('/fixtures/'))
-    return json(
-      route,
-      mockFixture({
-        fixtureId: decodeURIComponent(path.split('/')[2] ?? FIXTURE_ID),
-      }),
-    );
   return problem(route, 404, 'Not found');
 };
 

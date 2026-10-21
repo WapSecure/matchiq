@@ -17,7 +17,8 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 ### Notes
 
-- The events page envelope, momentum history and replay length are not in `libs/contracts`; the web app tolerates a bare array or `{ items, nextAfterSequence }` and builds momentum from streamed snapshots. Proposals are in the PR.
+- Aligned with the merged API (PR #9): `{ items }` fixture list, `{ items, nextAfterSequence }` event pages, id-less heartbeats, stream connects after state is loaded. Smoke-checked from Node against the local API: fixtures, fixture, events and `?lastEventId` stream frames all validate. `/state` and `/replay` are not built yet; the studio degrades to an awaiting state and shows replay command errors inline.
+- Momentum history and replay length are not in `libs/contracts`; momentum is built from streamed snapshots. Proposals are in the PR.
 - The stream uses streaming `fetch`, because `EventSource` cannot set `Last-Event-ID` on a client-managed reconnect. The API must allow the `Last-Event-ID` request header in CORS.
 - Review screenshots: `docs/screenshots/` (`CAPTURE_SCREENSHOTS=1 pnpm e2e`).
 

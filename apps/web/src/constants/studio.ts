@@ -37,6 +37,8 @@ export const STUDIO_COPY = {
     passCompletion: 'Pass completion',
     momentum: 'Momentum',
     momentumDescription: 'Engine momentum index per team over match time',
+    awaiting:
+      'Live metrics appear once the engine publishes the first match snapshot.',
     momentumEmpty: 'Momentum appears once the engine publishes snapshots.',
     tableToggle: 'View as table',
     lineStyle: { home: 'solid', away: 'dashed' },

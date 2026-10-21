@@ -18,14 +18,23 @@ import { createMatchStore, STUDIO_UI_DEFAULTS, useStudioUi } from './store';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
-const stubApi = () =>
+const NOT_BUILT = {
+  type: 'urn:matchiq:problem:not-found',
+  title: 'Not Found',
+  status: 404,
+};
+
+const stubApi = ({ stateBuilt = true } = {}) =>
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
+      if (!stateBuilt && url.includes('/state')) {
+        return new Response(JSON.stringify(NOT_BUILT), { status: 404 });
+      }
       const body = url.includes('/state')
         ? snapshot({ throughSequence: 2 })
         : url.includes('/events')
-          ? [shot(1), shot(2)]
+          ? { items: [shot(1), shot(2)], nextAfterSequence: null }
           : fixture();
       return new Response(JSON.stringify(body), { status: 200 });
     }),
@@ -40,6 +49,7 @@ const renderStudio = async () => {
     </QueryClientProvider>,
   );
   await screen.findByRole('heading', { level: 1 });
+  await waitFor(() => expect(fake.connections).toHaveLength(1));
   const push = async (...messages: Parameters<typeof frameOf>[0][]) => {
     messages.forEach((m) => fake.connections[0]?.push(frameOf(m)));
     await act(async () => {
@@ -156,6 +166,19 @@ describe('LiveStudio', () => {
     await waitFor(() =>
       expect(useStudioUi.getState().selectedInsightId).toBeNull(),
     );
+  });
+
+  it('degrades gracefully while the state endpoint is not available', async () => {
+    stubApi({ stateBuilt: false });
+    const { push } = await renderStudio();
+    expect(
+      await screen.findByText(/appear once the engine publishes/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Awaiting first match snapshot'),
+    ).toBeInTheDocument();
+    await push(message('match.snapshot', snapshot(), 1));
+    expect(metricsText()).toContain('Shots');
   });
 
   it('removes a retracted cue from the preview and logs the reason', async () => {

@@ -20,12 +20,15 @@ describe('REST client', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('returns contract-validated data', async () => {
-    vi.stubGlobal('fetch', respond([fixture()]));
+    vi.stubGlobal('fetch', respond({ items: [fixture()] }));
     await expect(fetchFixtures()).resolves.toHaveLength(1);
   });
 
   it('rejects responses that violate the contract', async () => {
-    vi.stubGlobal('fetch', respond([{ ...fixture(), status: 'POSTPONED' }]));
+    vi.stubGlobal(
+      'fetch',
+      respond({ items: [{ ...fixture(), status: 'POSTPONED' }] }),
+    );
     const error = await fetchFixtures().catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect((error as ApiError).kind).toBe('invalidResponse');

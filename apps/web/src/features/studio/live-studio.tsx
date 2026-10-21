@@ -6,6 +6,7 @@ import { ErrorState } from '@/components/feedback';
 import { Skeleton } from '@/components/ui';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import { STUDIO_COPY } from '@/constants/studio';
+import { isApiError } from '@/lib/api/api-error';
 import { useFixture } from '@/lib/api/hooks';
 import type { SseTransport } from '@/lib/stream';
 import { LocaleSwitcher, PersonaToggle } from './components/audience-controls';
@@ -29,6 +30,7 @@ type LiveStudioProps = {
   transport?: SseTransport;
 };
 
+const NOT_FOUND = 404;
 const SIDE_PANEL = 'max-h-[32rem] xl:h-0 xl:max-h-none xl:min-h-full';
 
 function StudioGrid({ fixture }: { fixture: Fixture }) {
@@ -65,6 +67,7 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
           />
         </div>
         <LiveMetrics
+          fixtureId={fixture.fixtureId}
           homeName={fixture.home.name}
           awayName={fixture.away.name}
         />
@@ -81,8 +84,9 @@ function StudioScreen({
 }: Omit<LiveStudioProps, 'store'>) {
   const fixture = useFixture(fixtureId);
   const closeEvidence = useStudioUi((s) => s.closeEvidence);
-  useStudioBootstrap(fixtureId);
-  useMatchStream(fixtureId, { transport });
+  const { state } = useStudioBootstrap(fixtureId);
+  // With no Last-Event-ID the stream starts at the live head, so seed state first.
+  useMatchStream(fixtureId, { transport, enabled: state.isFetched });
   useEffect(() => closeEvidence, [closeEvidence]);
 
   return (
@@ -107,7 +111,11 @@ function StudioScreen({
       {fixture.isError ? (
         <main id={MAIN_CONTENT_ID} className="mx-auto max-w-3xl p-6">
           <ErrorState
-            title={STUDIO_COPY.loadError}
+            title={
+              isApiError(fixture.error) && fixture.error.status === NOT_FOUND
+                ? STUDIO_COPY.notFound
+                : STUDIO_COPY.loadError
+            }
             error={fixture.error}
             onRetry={() => void fixture.refetch()}
           />

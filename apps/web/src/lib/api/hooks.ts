@@ -44,6 +44,7 @@ export const useMatchState = (fixtureId: string) =>
     queryFn: ({ signal }) => fetchMatchState(fixtureId, signal),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
+    retryOnMount: false,
   });
 
 export const useReplayCommand = (fixtureId: string) =>
