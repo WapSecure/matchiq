@@ -1,0 +1,13 @@
+title = "MatchIQ secret scanning"
+
+[extend]
+useDefault = true
+
+# Azure built-in role definition IDs are published GUIDs, not credentials.
+# Scoped to Bicep and to variables named like role IDs so real secrets still fail.
+[[allowlists]]
+description = "Azure built-in role definition IDs in Bicep"
+condition = "AND"
+paths = ['''^infra/.+\.bicep$''']
+regexTarget = "line"
+regexes = ['''(?i)^\s*var\s+\w*role\w*id\s*=\s*'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'\s*$''']
