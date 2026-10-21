@@ -20,7 +20,7 @@ Covers both the product's runtime agents and the coding agents that build the re
 6. Each run records `AgentRun`: provider, model deployment, prompt version, latency, tokens, retries and outcome.
 7. Replay determinism covers events, metrics, snapshots and deterministic overlay decisions. AI text is recorded per `(fixtureId, insightId, persona, locale, promptVersion)` and replayed from that record when exact replay is required (ADR-0008).
 
-**Honesty.** The `mock` provider exists for development, deterministic tests and documented fallback only. Never describe mock output as a Foundry integration. `/health/ready` reports `degraded` while the provider is mock.
+**Providers (ADR-0012).** `mock` (tests), `ollama` (real local inference through Agent Framework's OpenAI-compatible client) and `foundry` (target Azure integration). `AgentRun.provider` always records the real source. **Honesty:** mock or template output is never described as model output, and Ollama output is never described as Foundry. `/health/ready` reports `degraded` for `mock`, or when the configured model endpoint is unreachable.
 
 **Evaluation (M2).** 30 golden insight cases plus adversarial inputs. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled.
 
