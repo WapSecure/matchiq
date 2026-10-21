@@ -19,6 +19,31 @@ describe('loadEnv', () => {
     expect(env.CORS_ALLOWED_ORIGINS).toEqual(['a.com', 'b.com']);
   });
 
+  it('defaults the ledger, relay and stream settings', () => {
+    const env = loadEnv(ApiEnv, validApi);
+    expect(env).toMatchObject({
+      DATABASE_POOL_MAX: 10,
+      REDIS_KEY_PREFIX: 'matchiq',
+      OUTBOX_RELAY_ENABLED: true,
+      OUTBOX_POLL_INTERVAL_MS: 250,
+      OUTBOX_BATCH_SIZE: 200,
+      SSE_HEARTBEAT_MS: 15_000,
+    });
+    expect(
+      loadEnv(ApiEnv, { ...validApi, OUTBOX_RELAY_ENABLED: 'false' })
+        .OUTBOX_RELAY_ENABLED,
+    ).toBe(false);
+  });
+
+  it('rejects unsafe Redis key prefixes and unbounded relay batches', () => {
+    expect(() =>
+      loadEnv(ApiEnv, { ...validApi, REDIS_KEY_PREFIX: 'Bad Prefix*' }),
+    ).toThrow(ConfigError);
+    expect(() =>
+      loadEnv(ApiEnv, { ...validApi, OUTBOX_BATCH_SIZE: '100000' }),
+    ).toThrow(ConfigError);
+  });
+
   it('reports every missing variable by name', () => {
     expect.assertions(2);
     try {

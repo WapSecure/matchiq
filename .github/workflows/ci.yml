@@ -55,6 +55,31 @@ jobs:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # Integration tests (libs/db, apps/api) need real Postgres and Redis. Ports and
+    # credentials match docker-compose.yml and .env.example; tests create and drop
+    # their own databases on this server.
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_USER: matchiq
+          POSTGRES_PASSWORD: matchiq_local_only
+          POSTGRES_DB: matchiq
+        ports:
+          - 54320:5432
+        options: >-
+          --health-cmd "pg_isready -U matchiq -d matchiq"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:8.2-alpine
+        ports:
+          - 63790:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://matchiq:matchiq_local_only@localhost:54320/matchiq
+      TEST_REDIS_URL: redis://localhost:63790
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
