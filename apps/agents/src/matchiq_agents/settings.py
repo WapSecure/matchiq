@@ -4,11 +4,21 @@ from typing import Self
 from pydantic import Field, HttpUrl, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from matchiq_agents.constants import DEFAULT_APP_VERSION, DEFAULT_PORT, SECRET_MIN_LENGTH
+from matchiq_agents.constants import (
+    DEFAULT_APP_VERSION,
+    DEFAULT_CIRCUIT_FAILURE_THRESHOLD,
+    DEFAULT_CIRCUIT_RESET_MS,
+    DEFAULT_OLLAMA_ENDPOINT,
+    DEFAULT_OLLAMA_MODEL,
+    DEFAULT_PORT,
+    SECRET_MIN_LENGTH,
+)
+from matchiq_agents.limits import MAX_AGENT_RETRIES
 
 
 class ModelProvider(StrEnum):
     MOCK = "mock"
+    OLLAMA = "ollama"
     FOUNDRY = "foundry"
 
 
@@ -33,9 +43,15 @@ class Settings(BaseSettings):
     foundry_project_endpoint: HttpUrl | None = None
     foundry_model: str | None = Field(default=None, min_length=1)
     azure_client_id: str | None = None
+    ollama_endpoint: HttpUrl | None = HttpUrl(DEFAULT_OLLAMA_ENDPOINT)
+    ollama_model: str | None = Field(default=DEFAULT_OLLAMA_MODEL, min_length=1)
+    agent_max_retries: int = Field(default=MAX_AGENT_RETRIES, ge=0, le=MAX_AGENT_RETRIES)
+    agent_circuit_failure_threshold: int = Field(default=DEFAULT_CIRCUIT_FAILURE_THRESHOLD, ge=1)
+    agent_circuit_reset_ms: int = Field(default=DEFAULT_CIRCUIT_RESET_MS, ge=1)
+    agent_critique_enabled: bool = True
 
     @model_validator(mode="after")
-    def _require_foundry_config(self) -> Self:
+    def _require_provider_config(self) -> Self:
         if self.model_provider is ModelProvider.FOUNDRY and not (
             self.foundry_project_endpoint and self.foundry_model
         ):
@@ -43,6 +59,11 @@ class Settings(BaseSettings):
                 "FOUNDRY_PROJECT_ENDPOINT and FOUNDRY_MODEL are required "
                 "when MODEL_PROVIDER=foundry"
             )
+            raise ValueError(msg)
+        if self.model_provider is ModelProvider.OLLAMA and not (
+            self.ollama_endpoint and self.ollama_model
+        ):
+            msg = "OLLAMA_ENDPOINT and OLLAMA_MODEL are required when MODEL_PROVIDER=ollama"
             raise ValueError(msg)
         if self.model_provider is ModelProvider.MOCK and self.app_env is AppEnvironment.PROD:
             msg = "MODEL_PROVIDER=mock is not permitted in prod"
