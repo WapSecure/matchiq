@@ -2,6 +2,13 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-21 — Fix: secret-scan scope blocking every PR
+
+| Area                                                                                                                                                                                                    | Status | Evidence                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI's `fetch-depth: 0` fetched every remote branch, so gitleaks flagged an Azure built-in role ID in an unmerged infra branch and failed every PR and `dev`. The scan is now scoped to `--log-opts=HEAD` | Done   | `ci.yml`                                                                                                                                           |
+| `.gitleaks.toml`: default rules plus one allowlist (role-ID GUID variables in `infra/**/*.bicep`, condition AND)                                                                                        | Done   | Local check: without config the line is flagged as `generic-api-key`; with config it is allowed, and a GitHub PAT in the same file is still caught |
+
 ## 2026-10-21 — Fix: blank optional env values
 
 | Area                                                                                                                                                                            | Status | Evidence              |

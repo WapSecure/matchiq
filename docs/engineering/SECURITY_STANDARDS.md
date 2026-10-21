@@ -24,7 +24,7 @@ Authorization is deny-by-default and enforced server-side. Tenant identity comes
 
 ## Secrets
 
-- Secrets are never committed. `.env*` is ignored, except `.env.example`, which holds placeholders only. **[ci]** gitleaks scans the full history.
+- Secrets are never committed. `.env*` is ignored, except `.env.example`, which holds placeholders only. **[ci]** gitleaks scans all history reachable from the commit under test, using `.gitleaks.toml`. Allowlist entries must be narrowly scoped (path, variable pattern) and justified, and real-looking secrets must still be caught.
 - Azure uses managed identity and Key Vault, with no model API keys. Locally, `az login` provides credentials.
 - Logs must not contain secrets, tokens, connection strings or raw licensed payloads.
 
