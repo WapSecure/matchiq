@@ -1,0 +1,11 @@
+**/dist
+**/coverage
+**/test-output
+**/.next
+**/.venv
+.nx/
+pnpm-lock.yaml
+apps/agents/uv.lock
+libs/contracts/generated/
+apps/agents/src/matchiq_agents/contracts/generated/
+docs/product/
