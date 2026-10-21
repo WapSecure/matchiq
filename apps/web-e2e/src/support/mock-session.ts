@@ -125,8 +125,8 @@ export const mockTraces = () => [
     fallbackReason: 'AI_ENABLED=false: deterministic templates only',
     gate: {
       source: 'TEMPLATE',
-      publishedNarratives: 9,
-      templateNarratives: 9,
+      publishedNarratives: 12,
+      templateNarratives: 12,
       overlayRevision: null,
       rejected: [],
     },
@@ -141,7 +141,7 @@ export const mockTraces = () => [
     fallbackReason: null,
     gate: {
       source: 'AGENT',
-      publishedNarratives: 8,
+      publishedNarratives: 12,
       templateNarratives: 1,
       overlayRevision: 2,
       rejected: [

@@ -84,8 +84,8 @@ export const trace = (overrides: Partial<InsightTrace> = {}): InsightTrace => ({
   fallbackReason: 'AI_ENABLED=false: deterministic templates only',
   gate: {
     source: 'TEMPLATE',
-    publishedNarratives: 9,
-    templateNarratives: 9,
+    publishedNarratives: 12,
+    templateNarratives: 12,
     overlayRevision: null,
     rejected: [],
   },

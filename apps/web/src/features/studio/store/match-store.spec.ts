@@ -283,6 +283,21 @@ describe('match store', () => {
     ]);
   });
 
+  it('takes a terminal status from the read model over the detection status', () => {
+    const store = createMatchStore(FX);
+    store
+      .getState()
+      .applyMessages([
+        message('insight.detected', insight({ status: 'DETECTED' }), 1),
+      ]);
+    store
+      .getState()
+      .applyHydration({ insights: [insight({ status: 'FALLBACK' })] });
+    expect(store.getState().insights.map((i) => i.status)).toEqual([
+      'FALLBACK',
+    ]);
+  });
+
   it('logs expiries separately from real retractions', () => {
     const store = createMatchStore(FX);
     store

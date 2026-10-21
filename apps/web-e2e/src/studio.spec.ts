@@ -155,6 +155,26 @@ test.describe('live studio', () => {
     ).toBeVisible();
   });
 
+  test('offers four languages, including Pidgin, by keyboard at 390 px', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openStudio(page);
+    const languages = page.getByRole('group', { name: 'Language' });
+    await expect(languages.getByRole('radio')).toHaveCount(4);
+    const scoreboard = page.getByRole('region', { name: 'Scoreboard' });
+    const before = (await scoreboard.textContent()) ?? '';
+    await languages.getByRole('radio', { name: /English/ }).focus();
+    for (let i = 0; i < 3; i += 1) await page.keyboard.press('ArrowRight');
+    await expect(
+      languages.getByRole('radio', { name: 'Naijá (Pidgin) (PCM)' }),
+    ).toBeChecked();
+    await expect(page.getByText('Northbridge don take control')).toBeVisible();
+    await expect(scoreboard).toHaveText(before);
+    await expectNoHorizontalOverflow(page);
+    await expectNoBlockingA11yViolations(page);
+  });
+
   test('has no serious or critical accessibility violations', async ({
     page,
   }) => {

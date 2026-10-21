@@ -21,11 +21,25 @@ const fold = <T>(
     state,
   );
 
-/** The stream is fresher than a read model, so a known insight is kept. */
-const hydrateInsight: Step<Insight> = (state, insight) =>
-  state.insights.some((i) => i.insightId === insight.insightId)
-    ? {}
-    : reduceInsight(state, insight);
+const TERMINAL = new Set<Insight['status']>([
+  'PUBLISHED',
+  'FALLBACK',
+  'REJECTED',
+  'EXPIRED',
+]);
+
+/**
+ * A known insight keeps its streamed version unless the read model has moved
+ * it to a terminal status the stream did not announce (`insight.detected`
+ * carries the detection-time status only).
+ */
+const hydrateInsight: Step<Insight> = (state, insight) => {
+  const known = state.insights.find((i) => i.insightId === insight.insightId);
+  if (!known) return reduceInsight(state, insight);
+  return TERMINAL.has(insight.status) && !TERMINAL.has(known.status)
+    ? reduceInsight(state, insight)
+    : {};
+};
 
 /**
  * Merges REST read models into stream state. Every step is idempotent and

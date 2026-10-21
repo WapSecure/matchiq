@@ -81,7 +81,7 @@ describe('agent observatory', () => {
               fallbackReason: null,
               gate: {
                 source: 'AGENT',
-                publishedNarratives: 8,
+                publishedNarratives: 12,
                 templateNarratives: 1,
                 overlayRevision: 2,
                 rejected: [

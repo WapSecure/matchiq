@@ -150,6 +150,37 @@ describe('LiveStudio', () => {
     expect(scoreText()).toBe(before.score);
   });
 
+  it('offers Nigerian Pidgin as a fourth language', async () => {
+    const user = userEvent.setup();
+    await renderStudio(
+      baseRoutes({
+        'GET /insights': items([insight()]),
+        'GET /narratives': (url) =>
+          items(
+            url.searchParams.get('locale') === 'pcm-NG'
+              ? [
+                  narrative({
+                    narrativeId: 'nr_pcm',
+                    locale: 'pcm-NG',
+                    headline: 'Home team dey press well well',
+                  }),
+                ]
+              : [narrative()],
+          ),
+      }),
+    );
+    const languages = screen.getByRole('group', { name: 'Language' });
+    expect(within(languages).getAllByRole('radio')).toHaveLength(4);
+    await user.click(
+      within(languages).getByRole('radio', { name: 'Naijá (Pidgin) (PCM)' }),
+    );
+    expect(
+      (await screen.findByText('Home team dey press well well')).closest(
+        '[lang]',
+      ),
+    ).toHaveAttribute('lang', 'pcm-NG');
+  });
+
   it('drives the transport from server status, not local guesses', async () => {
     const user = userEvent.setup();
     const routes = baseRoutes({
