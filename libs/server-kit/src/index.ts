@@ -2,6 +2,7 @@ export * from './lib/constants';
 export * from './lib/bootstrap/configure-http-app';
 export * from './lib/http/http-kit.module';
 export * from './lib/http/problem-details.filter';
+export * from './lib/http/problem.exception';
 export * from './lib/http/request-id.middleware';
 export * from './lib/http/request-validation.error';
 export * from './lib/http/zod-validation.pipe';

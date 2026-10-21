@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { configureHttpApp } from './bootstrap/configure-http-app';
 import { PROBLEM_CONTENT_TYPE, REQUEST_ID_HEADER } from './constants';
 import { HttpKitModule } from './http/http-kit.module';
+import { ProblemException } from './http/problem.exception';
 import { ZodValidationPipe } from './http/zod-validation.pipe';
 
 const Payload = z.strictObject({ name: z.string().min(1) });
@@ -22,6 +23,18 @@ class ProbeController {
   @Get('missing')
   missing(): never {
     throw new NotFoundException('Fixture not found');
+  }
+
+  @Get('conflict')
+  conflict(): never {
+    throw new ProblemException({
+      status: 409,
+      title: 'Event conflict',
+      detail: 'ev_1 was already stored with a different body',
+      slug: 'event-conflict',
+      errors: [{ path: '$.events.0', message: 'changed body' }],
+      headers: { 'x-probe': 'yes' },
+    });
   }
 
   @Get('boom')
@@ -61,6 +74,20 @@ describe('HTTP baseline', () => {
       title: 'Fixture not found',
       status: 404,
       instance: '/api/v1/probe/missing',
+    });
+  });
+
+  it('renders problem exceptions with detail, errors and headers', async () => {
+    const res = await request(app.getHttpServer()).get(
+      '/api/v1/probe/conflict',
+    );
+    expect(res.status).toBe(409);
+    expect(res.headers['x-probe']).toBe('yes');
+    expect(res.body).toMatchObject({
+      type: 'urn:matchiq:problem:event-conflict',
+      title: 'Event conflict',
+      detail: 'ev_1 was already stored with a different body',
+      errors: [{ path: '$.events.0', message: 'changed body' }],
     });
   });
 

@@ -18,6 +18,7 @@ class Agent(StrEnum):
 
 class Provider(StrEnum):
     foundry = "foundry"
+    ollama = "ollama"
     mock = "mock"
     template = "template"
 

@@ -14,11 +14,12 @@ import {
   PROBLEM_TITLES,
   PROBLEM_TYPE_PREFIX,
 } from '../constants';
+import { ProblemException } from './problem.exception';
 import { RequestValidationError } from './request-validation.error';
 import { requestIdOf } from './request-id.middleware';
 
-const problemType = (status: number): string =>
-  `${PROBLEM_TYPE_PREFIX}${PROBLEM_SLUGS[status] ?? `http-${status}`}`;
+const problemType = (status: number, slug?: string): string =>
+  `${PROBLEM_TYPE_PREFIX}${slug ?? PROBLEM_SLUGS[status] ?? `http-${status}`}`;
 
 const titleOf = (exception: HttpException): string => {
   const body = exception.getResponse();
@@ -40,6 +41,13 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     const req = http.getRequest<Request>();
     const res = http.getResponse<Response>();
     const problem = this.toProblem(exception, req);
+    if (exception instanceof ProblemException) {
+      for (const [name, value] of Object.entries(
+        exception.problem.headers ?? {},
+      )) {
+        res.setHeader(name, value);
+      }
+    }
 
     if (problem.status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
@@ -53,6 +61,17 @@ export class ProblemDetailsFilter implements ExceptionFilter {
   private toProblem(exception: unknown, req: Request): ProblemDetails {
     const base = { instance: req.originalUrl, requestId: requestIdOf(req) };
 
+    if (exception instanceof ProblemException) {
+      const { status, title, detail, slug, errors } = exception.problem;
+      return {
+        ...base,
+        type: problemType(status, slug),
+        title,
+        status,
+        ...(detail === undefined ? {} : { detail }),
+        ...(errors === undefined ? {} : { errors: [...errors] }),
+      };
+    }
     if (exception instanceof RequestValidationError) {
       const status = exception.getStatus();
       return {
