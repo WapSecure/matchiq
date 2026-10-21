@@ -9,6 +9,12 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 | The empty overlay preview showed "No approved cue on air" centred on the pitch markings, which read like an error. It now shows a muted "Standing by" chip in the cue slot, with the last aired cue, like a clean feed between graphics | Done   | `match-components.spec.tsx` |
 | Cue hold control: Standard (4 s) or Extended (10 s) real-time dwell, for walk-throughs at 20–30×                                                                                                                                        | Done   | web 97 tests; e2e 60 passed |
 
+## 2026-10-21 — Fix: replay speed lost when the worker restarts
+
+| Area                                                                                                                                                                                                                               | Status | Evidence                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| A worker restart resumed PLAYING sessions at 1× (the rebuilt controller's default) instead of their persisted speed. Paused sessions also lost it for their next resume. Resume now re-applies the persisted speed before resuming | Done   | `replay.integration.spec.ts` "resumes a session after a worker restart at its persisted speed" (failed before the fix: speed 1 vs 20) |
+
 ## 2026-10-21 — E2: Judge flow on replay sessions, recap and Agent Observatory (web)
 
 ### Delivered

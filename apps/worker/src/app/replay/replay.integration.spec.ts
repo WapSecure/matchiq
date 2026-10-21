@@ -175,6 +175,36 @@ describe('replay sessions with AI disabled (integration)', () => {
     expect((await t.store.get(key))?.status.state).toBe('COMPLETED');
   });
 
+  it('resumes a session after a worker restart at its persisted speed', async () => {
+    const created = await t.store.create({
+      orgId: ORG,
+      templateId: TEMPLATE,
+      speed: 20,
+    });
+    if (created === null) throw new Error('no session');
+    const key = { orgId: ORG, fixtureId: created.fixture.fixtureId };
+    await t.sessions.handle({
+      ...key,
+      command: { action: 'start', speed: 20 },
+    });
+    t.scheduler.advance(20_000);
+    await t.sessions.whenIdle(key.fixtureId);
+    const before = await t.store.get(key);
+    expect(before?.status).toMatchObject({ state: 'PLAYING', speed: 20 });
+
+    const restarted = await startTestWorker({ database: t.database });
+    try {
+      await restarted.sessions.whenIdle(key.fixtureId);
+      const after = await restarted.store.get(key);
+      expect(after?.status).toMatchObject({ state: 'PLAYING', speed: 20 });
+      expect(after?.status.appliedSequence).toBeGreaterThanOrEqual(
+        before?.status.appliedSequence ?? 0,
+      );
+    } finally {
+      await restarted.close({ keepDatabase: true });
+    }
+  });
+
   it('accepts commands through the BullMQ command queue', async () => {
     const consumer = await startTestWorker({ consumeQueues: true });
     const connection = new Redis(consumer.env.REDIS_URL, {
