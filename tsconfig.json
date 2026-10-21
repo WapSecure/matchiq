@@ -8,6 +8,15 @@
     },
     {
       "path": "./libs/config"
+    },
+    {
+      "path": "./libs/server-kit"
+    },
+    {
+      "path": "./apps/worker"
+    },
+    {
+      "path": "./apps/api"
     }
   ],
   "compilerOptions": {}
