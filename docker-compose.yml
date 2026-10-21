@@ -77,6 +77,7 @@ services:
       OUTBOX_POLL_INTERVAL_MS: ${OUTBOX_POLL_INTERVAL_MS:-250}
       OUTBOX_BATCH_SIZE: ${OUTBOX_BATCH_SIZE:-200}
       SSE_HEARTBEAT_MS: ${SSE_HEARTBEAT_MS:-15000}
+      REPLAY_RATE_LIMIT_PER_MINUTE: ${REPLAY_RATE_LIMIT_PER_MINUTE:-30}
       OPERATOR_API_KEY: ${OPERATOR_API_KEY:-local_only_operator_api_key_change_me}
       OTEL_SERVICE_NAME: matchiq-api
     ports:
@@ -99,12 +100,16 @@ services:
       WORKER_PORT: '3001'
       DATABASE_URL: postgresql://${POSTGRES_USER:-matchiq}:${POSTGRES_PASSWORD:-matchiq_local_only}@postgres:5432/${POSTGRES_DB:-matchiq}
       REDIS_URL: redis://redis:6379
+      # Must match the API: BullMQ queues and stream channels are namespaced by it.
+      REDIS_KEY_PREFIX: ${REDIS_KEY_PREFIX:-matchiq}
       AGENTS_SERVICE_URL: http://agents:8000
       AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
       AGENT_TIMEOUT_MS: ${AGENT_TIMEOUT_MS:-8000}
       AGENT_MAX_RETRIES: ${AGENT_MAX_RETRIES:-2}
       AGENT_CIRCUIT_FAILURE_THRESHOLD: ${AGENT_CIRCUIT_FAILURE_THRESHOLD:-5}
       AI_ENABLED: ${AI_ENABLED:-false}
+      AGENT_JOB_CONCURRENCY: ${AGENT_JOB_CONCURRENCY:-2}
+      REPLAY_MAX_ACTIVE_SESSIONS: ${REPLAY_MAX_ACTIVE_SESSIONS:-10}
       OTEL_SERVICE_NAME: matchiq-worker
     ports:
       - '127.0.0.1:${WORKER_PORT:-3001}:3001'
