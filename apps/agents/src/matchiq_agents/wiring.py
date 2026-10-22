@@ -4,6 +4,7 @@ from matchiq_agents.clock import Clock
 from matchiq_agents.constants import (
     DEADLINE_RESERVE_MS,
     LOCAL_PER_CALL_DEADLINE_SHARE,
+    LOCAL_WORKFLOW_GRACE_MS,
     MIN_MODEL_CALL_MS,
     PER_CALL_DEADLINE_SHARE,
     RETRY_BACKOFF_BASE_MS,
@@ -49,6 +50,7 @@ def build_model(settings: Settings) -> ModelPort:
 def pipeline_config(settings: Settings) -> PipelineConfig:
     retry = RetryPolicy(
         max_retries=settings.agent_max_retries,
+        output_retries=0 if settings.is_local else settings.agent_max_retries,
         backoff_base_ms=RETRY_BACKOFF_BASE_MS,
         per_call_share=(
             LOCAL_PER_CALL_DEADLINE_SHARE if settings.is_local else PER_CALL_DEADLINE_SHARE
@@ -57,7 +59,9 @@ def pipeline_config(settings: Settings) -> PipelineConfig:
         min_call_ms=MIN_MODEL_CALL_MS,
     )
     return PipelineConfig(
-        retry=retry, critique_enabled=settings.critique_enabled, grace_ms=WORKFLOW_GRACE_MS
+        retry=retry,
+        critique_enabled=settings.critique_enabled,
+        grace_ms=LOCAL_WORKFLOW_GRACE_MS if settings.is_local else WORKFLOW_GRACE_MS,
     )
 
 

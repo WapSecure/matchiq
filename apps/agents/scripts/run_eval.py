@@ -8,7 +8,8 @@ Usage (from apps/agents):
         --provider foundry
 
 `--deadline-ms` replaces the default request deadline (cases that set their own, such as
-`tight_deadline`, keep it). `--cases N` runs an evenly spaced, deterministic sample of N cases.
+`tight_deadline`, keep it). `--cases N` runs an evenly spaced, deterministic sample of N
+cases; `--case NAME` adds a named case.
 
 Never part of CI: ollama and foundry make real model calls. Exit code 1 if any case leaks an
 unsupported claim.
@@ -21,6 +22,7 @@ import statistics
 import sys
 import time
 from collections import Counter, defaultdict
+from collections.abc import Sequence
 from dataclasses import replace
 from pathlib import Path
 
@@ -60,11 +62,15 @@ def model_calls(result: PipelineResult) -> int:
     return sum(run.retries + 1 for run in result.runs if run.provider is not RunProvider.template)
 
 
-def select_cases(count: int | None, deadline_ms: int | None) -> list[EvalCase]:
-    cases = [*GOLDEN, *ADVERSARIAL_INPUTS]
-    if count is not None and 0 < count < len(cases):
-        stride = len(cases) / count
-        cases = [cases[int(index * stride)] for index in range(count)]
+def select_cases(
+    count: int | None, deadline_ms: int | None, extra: Sequence[str] = ()
+) -> list[EvalCase]:
+    every = [*GOLDEN, *ADVERSARIAL_INPUTS]
+    cases = every
+    if count is not None and 0 < count < len(every):
+        stride = len(every) / count
+        cases = [every[int(index * stride)] for index in range(count)]
+    cases += [case for case in every if case.name in extra and case not in cases]
     if deadline_ms is None:
         return cases
     return [
@@ -183,7 +189,8 @@ if __name__ == "__main__":
     parser.add_argument("--provider", choices=PROVIDERS, default="mock")
     parser.add_argument("--deadline-ms", type=int, default=None, help="request deadline override")
     parser.add_argument("--cases", type=int, default=None, help="evenly spaced sample size")
+    parser.add_argument("--case", action="append", default=[], help="also run this case by name")
     parser.add_argument("--verbose", action="store_true", help="print reasons and issues per case")
     args = parser.parse_args()
-    selected = select_cases(args.cases, args.deadline_ms)
+    selected = select_cases(args.cases, args.deadline_ms, args.case)
     sys.exit(asyncio.run(main(args.provider, selected, verbose=args.verbose)))

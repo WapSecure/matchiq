@@ -5,7 +5,7 @@ raises `ValueError` and counts as a failed attempt.
 """
 
 import re
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Sequence
 from typing import Final
 
 from pydantic import ValidationError
@@ -48,29 +48,41 @@ OVERLAY_KINDS: Final[dict[InsightKind, OverlayKind]] = {
 }
 
 
-def facts_payload(view: FactView, *, free_text: bool = True) -> FactsPayload:
-    """`free_text=False` drops the engine's rationale and counter-evidence prose.
+def facts_payload(
+    view: FactView, *, free_text: bool = True, metric_refs: Collection[str] | None = None
+) -> FactsPayload:
+    """The data block for one agent, trimmed to what that agent needs (ADR-0011 addendum).
 
-    Only the Analyst (and the critique) reason over that untrusted prose; the stages after it
-    work from the verified claims and limitations, and small models otherwise copy its wording
-    and numbers into drafts.
+    `free_text=False` drops the engine's rationale and counter-evidence prose: only the Analyst
+    (and the critique) reason over it, and small models otherwise copy its wording and numbers
+    into drafts. `metric_refs` keeps only the metrics already cited upstream (a real packet has
+    about 28). Output is checked against the full evidence either way.
     """
+    metrics = {
+        ref: value
+        for ref, value in view.metrics.items()
+        if metric_refs is None or ref in metric_refs
+    }
     return FactsPayload(
         insight_kind=view.kind,
         subject_team=view.team_name,
         subject_player=view.player_name,
-        computed_metrics=dict(view.metrics),
+        computed_metrics=metrics,
         event_ids=list(view.event_ids),
         confidence_label=view.confidence,
         data_coverage=view.data_coverage,
         rationale=view.rationale if free_text else "",
         counter_evidence=list(view.counter_evidence) if free_text else [],
-        entities=sorted(view.entity_names),
+        entities=view.prompt_entities,
     )
 
 
 def cited_out(values: Sequence[CitedValue]) -> list[CitedValueOut]:
     return [CitedValueOut(metric_ref=value.metricRef, value=value.value) for value in values]
+
+
+def cited_refs(drafts: Iterable[NarrativeDraft]) -> set[str]:
+    return {value.metricRef for draft in drafts for value in draft.citedValues}
 
 
 def text_pairs(drafts: Sequence[NarrativeDraft]) -> list[TextPair]:

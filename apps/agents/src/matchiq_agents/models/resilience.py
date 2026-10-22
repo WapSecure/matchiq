@@ -15,6 +15,8 @@ class BreakerState(StrEnum):
 @dataclass(frozen=True, slots=True)
 class RetryPolicy:
     max_retries: int
+    # Retries after output that parses but fails its checks; at most `max_retries`.
+    output_retries: int
     backoff_base_ms: float
     per_call_share: float
     reserve_ms: float

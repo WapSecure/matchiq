@@ -33,7 +33,6 @@ from matchiq_agents.roster.schemas import CritiqueInput, CritiqueOutput
 # by the cited evidence"). See the proposed contract change in the implementation log.
 CRITIQUE_CODE: Final = IssueCode.UNCITED_EVIDENCE
 ALWAYS_REJECT: Final = frozenset({IssueCode.FORBIDDEN_CLAIM})
-MISSING_DRAFT: Final = "no usable draft for persona {persona}"
 REVISION_NOTE: Final = "{persona}: {detail}"
 
 
@@ -105,7 +104,11 @@ def deterministic_issues(
 
 def _per_persona(ctx: AgentContext, drafts: Sequence[NarrativeDraft]) -> dict[Persona, list[Issue]]:
     by_persona: dict[Persona, list[Issue]] = {
-        persona: [issue(IssueCode.SCHEMA_VIOLATION, MISSING_DRAFT.format(persona=persona.value))]
+        persona: [
+            issue(
+                IssueCode.SCHEMA_VIOLATION, messages.MISSING_PERSONA.format(persona=persona.value)
+            )
+        ]
         for persona in ctx.canonical_personas
     }
     for index, draft in enumerate(drafts):

@@ -33,6 +33,7 @@ class ModelCall[T: BaseModel, R]:
 class _Attempts:
     started_ms: float
     count: int = 0
+    rejected: int = 0
     tokens_in: int | None = None
     tokens_out: int | None = None
     outcome: RunOutcome = RunOutcome.FAILED
@@ -111,6 +112,7 @@ class ModelRunner:
         except Exception:
             logger.info("model output rejected", extra={"agent": call.prompt.agent.value})
             state.outcome = RunOutcome.FAILED
+            state.rejected += 1
             return None
         state.outcome = RunOutcome.SUCCEEDED
         return value
@@ -128,6 +130,8 @@ class ModelRunner:
             state.count = attempt + 1
             value = await self._attempt(call, state)
             if value is not None or self._deadline.expired:
+                break
+            if state.rejected > self._policy.output_retries:
                 break
         return value, self._scope.record(self._record(call, state, started_at))
 

@@ -10,7 +10,7 @@ from matchiq_agents.limits import OVERLAY_LIMITS
 from matchiq_agents.pipeline import reasons
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import AgentContext
-from matchiq_agents.roster.convert import facts_payload, text_pairs, to_overlay
+from matchiq_agents.roster.convert import cited_refs, facts_payload, text_pairs, to_overlay
 from matchiq_agents.roster.prompts import BROADCAST_PRODUCER
 from matchiq_agents.roster.schemas import ProducerInput, ProducerOutput
 
@@ -31,7 +31,7 @@ async def produce(
     if use_template:
         return ctx.fallback.overlay(), (ctx.local_run(BROADCAST_PRODUCER.agent),), None
     payload = ProducerInput(
-        facts=facts_payload(ctx.view, free_text=False),
+        facts=facts_payload(ctx.view, free_text=False, metric_refs=cited_refs([broadcast])),
         broadcast_draft=text_pairs([broadcast])[0],
         headline_max=OVERLAY_LIMITS.headline_max,
         body_max=OVERLAY_LIMITS.body_max,

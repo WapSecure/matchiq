@@ -21,7 +21,11 @@ LOCAL_PER_CALL_DEADLINE_SHARE: Final = 0.75
 LOCAL_CIRCUIT_TIMEOUT_THRESHOLD: Final = 8
 DEADLINE_RESERVE_MS: Final = 50
 MIN_MODEL_CALL_MS: Final = 200
+# Model work ends this long before `deadlineMs`, leaving room to cancel in-flight calls and
+# render templates. Local inference gets more: cancelling a busy Ollama request was measured
+# at up to 3.5 s on a loaded machine.
 WORKFLOW_GRACE_MS: Final = 1_000
+LOCAL_WORKFLOW_GRACE_MS: Final = 5_000
 PROBLEM_CONTENT_TYPE: Final = "application/problem+json"
 PROBLEM_TYPE_PREFIX: Final = "urn:matchiq:problem:"
 BEARER_PREFIX: Final = "Bearer "

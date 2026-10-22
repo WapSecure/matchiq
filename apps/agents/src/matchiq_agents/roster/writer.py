@@ -25,7 +25,11 @@ def writer_input(
     ctx: AgentContext, analysis: AgentResult, notes: Sequence[str], personas: Sequence[Persona]
 ) -> WriterInput:
     return WriterInput(
-        facts=facts_payload(ctx.view, free_text=False),
+        facts=facts_payload(
+            ctx.view,
+            free_text=False,
+            metric_refs={v.metricRef for claim in analysis.claims for v in claim.citedValues},
+        ),
         claims=[
             ClaimOut.model_validate(claim.model_dump(mode="json")) for claim in analysis.claims
         ],

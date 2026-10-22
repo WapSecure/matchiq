@@ -23,7 +23,7 @@ from matchiq_agents.domain.facts import CANONICAL_LOCALE
 from matchiq_agents.guard.locale_checks import check_localised
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import AgentContext
-from matchiq_agents.roster.convert import facts_payload, text_pairs, tidy
+from matchiq_agents.roster.convert import cited_refs, facts_payload, text_pairs, tidy
 from matchiq_agents.roster.prompts import LOCALIZATION
 from matchiq_agents.roster.schemas import LocalizationInput, LocalizationOutput, LocalizedOut
 
@@ -88,11 +88,11 @@ async def _translate(
     ctx: AgentContext, sources: Sequence[NarrativeDraft], targets: Sequence[Locale]
 ) -> tuple[dict[ItemKey, NarrativeDraft], AgentRun]:
     payload = LocalizationInput(
-        facts=facts_payload(ctx.view, free_text=False),
+        facts=facts_payload(ctx.view, free_text=False, metric_refs=cited_refs(sources)),
         source_locale=CANONICAL_LOCALE,
         target_locales=list(targets),
         drafts=text_pairs(sources),
-        protected_terms=sorted(ctx.view.entity_names),
+        protected_terms=ctx.view.prompt_entities,
     )
     call = ModelCall(
         prompt=LOCALIZATION,

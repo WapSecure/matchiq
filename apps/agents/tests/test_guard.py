@@ -175,8 +175,11 @@ def test_pidgin_localisation_must_keep_numbers_and_names() -> None:
         assert check_localised(source, target, VIEW) == []
     source = fallback.draft(VIEW.personas[0], EN)
     target = fallback.draft(VIEW.personas[0], Locale.pcm_NG)
+    # Digits only: even a correct spelled number is rejected, matching the evaluation oracle.
     spelled = target.model_copy(update={"body": target.body.replace("5", "faiv")})
-    assert check_localised(source, spelled, VIEW) == []
+    assert [found.detail for found in check_localised(source, spelled, VIEW)] == [
+        "writes the number faiv as a word; use digits"
+    ]
     invented = target.model_copy(update={"body": target.body.replace("5", "siks")})
     assert IssueCode.UNSUPPORTED_NUMBER in _codes(check_localised(source, invented, VIEW))
 

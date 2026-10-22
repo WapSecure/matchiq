@@ -1,8 +1,10 @@
+import time
 from typing import Any
 
 import pytest
 from pydantic import BaseModel, SecretStr
 
+from matchiq_agents.clock import SystemClock
 from matchiq_agents.contracts.types import (
     AgentName,
     NarrativeSource,
@@ -12,9 +14,11 @@ from matchiq_agents.contracts.types import (
     RunProvider,
     Verdict,
 )
+from matchiq_agents.domain.facts import build_fact_view
 from matchiq_agents.models.mock import MockModel
 from matchiq_agents.models.port import ModelPort, ModelUsage
 from matchiq_agents.pipeline import orchestrator as orchestrator_module
+from matchiq_agents.roster.convert import facts_payload
 from matchiq_agents.roster.schemas import (
     CritiqueOutput,
     LocalizationOutput,
@@ -25,7 +29,7 @@ from matchiq_agents.settings import Settings
 from matchiq_agents.wiring import build_orchestrator
 from tests.conftest import TOKEN
 from tests.support.builders import AWAY, CaseSpec, build_payload, build_request
-from tests.support.models import FailingModel, FakeClock, ScriptedModel
+from tests.support.models import FailingModel, FakeClock, HangingModel, ScriptedModel
 
 SETTINGS = Settings(agents_service_token=SecretStr(TOKEN))
 
@@ -212,3 +216,21 @@ async def test_local_inference_makes_four_model_calls_per_clean_run() -> None:
     await build_orchestrator(local, FakeClock(), model).run(build_request())
     assert sum(model.calls.values()) == 4
     assert AgentName.FACT_CHECKER not in model.calls
+
+
+def test_data_blocks_carry_teams_and_subject_not_the_squad() -> None:
+    view = build_fact_view(build_request(CaseSpec(squad_players=36)))
+    assert len(view.entity_names) == 39
+    assert facts_payload(view).entities == ["Harbour City", "Northgate Rovers"]
+    trimmed = facts_payload(view, free_text=False, metric_refs={"shots.home.rolling5m"})
+    assert trimmed.computed_metrics == {"shots.home.rolling5m": 3}
+    assert (trimmed.rationale, trimmed.counter_evidence) == ("", [])
+
+
+async def test_a_hanging_model_still_answers_inside_the_deadline() -> None:
+    started = time.perf_counter()
+    orchestrator = build_orchestrator(SETTINGS, SystemClock(), HangingModel())
+    result = await orchestrator.run(build_request(CaseSpec(deadline_ms=1_500)))
+    assert (time.perf_counter() - started) * 1_000 < 1_500
+    assert result.status is PipelineStatus.FALLBACK
+    assert {d.source for d in result.narratives} == {NarrativeSource.TEMPLATE}
