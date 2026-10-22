@@ -9,7 +9,10 @@ import { meteredUnitOfWork } from './metered-unit-of-work';
 import { WORKER_METRICS } from './telemetry.constants';
 import { WorkerMetrics } from './worker-metrics';
 
-const run = (outcome: AgentRun['outcome'], provider: AgentRun['provider']): AgentRun => ({
+const run = (
+  outcome: AgentRun['outcome'],
+  provider: AgentRun['provider'],
+): AgentRun => ({
   runId: 'run_1',
   correlationId: 'corr_1',
   agent: 'NARRATIVE_WRITER',
@@ -83,11 +86,16 @@ describe('worker metrics', () => {
   it('counts agent runs, completions and gate rejections only after commit', async () => {
     const uow = meteredUnitOfWork(fakeUow(), metrics);
     await uow.transaction(async (tx) => {
-      await tx.completeInsight({ orgId: 'org_demo', fixtureId: 'fx_1' }, 'in_1', completion);
-      await tx.insertAgentRuns({ orgId: 'org_demo', fixtureId: 'fx_1' }, 'in_1', [
-        run('TIMED_OUT', 'ollama'),
-        run('FALLBACK', 'template'),
-      ]);
+      await tx.completeInsight(
+        { orgId: 'org_demo', fixtureId: 'fx_1' },
+        'in_1',
+        completion,
+      );
+      await tx.insertAgentRuns(
+        { orgId: 'org_demo', fixtureId: 'fx_1' },
+        'in_1',
+        [run('TIMED_OUT', 'ollama'), run('FALLBACK', 'template')],
+      );
     });
     const text = await registry.metrics();
     expect(text).toContain(
@@ -99,7 +107,9 @@ describe('worker metrics', () => {
     expect(text).toContain(
       'matchiq_agent_run_duration_seconds_sum{agent="NARRATIVE_WRITER",provider="ollama",outcome="TIMED_OUT"} 1.5',
     );
-    expect(text).toContain('matchiq_insight_completions_total{status="FALLBACK",source="TEMPLATE"} 1');
+    expect(text).toContain(
+      'matchiq_insight_completions_total{status="FALLBACK",source="TEMPLATE"} 1',
+    );
     expect(text).toContain(
       'matchiq_gate_rejections_total{item="NARRATIVE",source="AGENT",code="UNSUPPORTED_NUMBER"} 1',
     );
@@ -111,7 +121,11 @@ describe('worker metrics', () => {
     const uow = meteredUnitOfWork(fakeUow(true), metrics);
     await expect(
       uow.transaction(async (tx) => {
-        await tx.completeInsight({ orgId: 'org_demo', fixtureId: 'fx_1' }, 'in_1', completion);
+        await tx.completeInsight(
+          { orgId: 'org_demo', fixtureId: 'fx_1' },
+          'in_1',
+          completion,
+        );
       }),
     ).rejects.toThrow('rolled back');
     const text = await registry.metrics();
@@ -125,11 +139,21 @@ describe('worker metrics', () => {
     metrics.job('insight-pipeline', 'failed', 2);
     metrics.retained({ sessions: 2, events: 0, idempotencyKeys: 5 });
     const text = await registry.metrics();
-    expect(text).toContain('matchiq_agent_pipeline_call_duration_seconds_count{outcome="timeout"} 1');
-    expect(text).toContain('matchiq_agent_pipeline_call_duration_seconds_count{outcome="ai-disabled"} 1');
-    expect(text).toContain('matchiq_queue_job_duration_seconds_count{queue="insight-pipeline",outcome="failed"} 1');
-    expect(text).toContain('matchiq_retention_deleted_total{kind="sessions"} 2');
-    expect(text).toContain('matchiq_retention_deleted_total{kind="idempotencyKeys"} 5');
+    expect(text).toContain(
+      'matchiq_agent_pipeline_call_duration_seconds_count{outcome="timeout"} 1',
+    );
+    expect(text).toContain(
+      'matchiq_agent_pipeline_call_duration_seconds_count{outcome="ai-disabled"} 1',
+    );
+    expect(text).toContain(
+      'matchiq_queue_job_duration_seconds_count{queue="insight-pipeline",outcome="failed"} 1',
+    );
+    expect(text).toContain(
+      'matchiq_retention_deleted_total{kind="sessions"} 2',
+    );
+    expect(text).toContain(
+      'matchiq_retention_deleted_total{kind="idempotencyKeys"} 5',
+    );
     expect(text).not.toContain('kind="events"');
   });
 });

@@ -24,7 +24,9 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)],
 });
 
-const until = async (check: () => boolean | Promise<boolean>): Promise<void> => {
+const until = async (
+  check: () => boolean | Promise<boolean>,
+): Promise<void> => {
   for (let i = 0; i < 400; i += 1) {
     if (await check()) return;
     await new Promise((resolve) => setTimeout(resolve, 25));
@@ -52,11 +54,18 @@ describe('W3C trace context: api -> BullMQ -> worker -> agents (integration)', (
     const golden = await loadGolden('comeback');
     agents = await startFakeAgents((r) => ({
       status: 200,
-      body: fakePipelineResult(r, { ...golden.fixture, fixtureId: r.packet.fixtureId }),
+      body: fakePipelineResult(r, {
+        ...golden.fixture,
+        fixtureId: r.packet.fixtureId,
+      }),
     }));
     t = await startTestWorker({
       consumeQueues: true,
-      env: { AI_ENABLED: 'true', AGENTS_SERVICE_URL: agents.url, AGENT_TIMEOUT_MS: '2000' },
+      env: {
+        AI_ENABLED: 'true',
+        AGENTS_SERVICE_URL: agents.url,
+        AGENT_TIMEOUT_MS: '2000',
+      },
     });
     apiQueue = new Redis(testRedisUrl(), { maxRetriesPerRequest: null });
     bus = new BullMqReplayCommandBus({
@@ -76,9 +85,16 @@ describe('W3C trace context: api -> BullMQ -> worker -> agents (integration)', (
   });
 
   it('carries one trace from the replay request to the agents call', async () => {
-    const created = await t.store.create({ orgId: ORG, templateId: TEMPLATE, speed: 30 });
+    const created = await t.store.create({
+      orgId: ORG,
+      templateId: TEMPLATE,
+      speed: 30,
+    });
     if (created === null) throw new Error('template missing');
-    const key: FixtureKey = { orgId: ORG, fixtureId: created.fixture.fixtureId };
+    const key: FixtureKey = {
+      orgId: ORG,
+      fixtureId: created.fixture.fixtureId,
+    };
 
     const tracer = trace.getTracer('api-under-test');
     const traceId = await tracer.startActiveSpan(
@@ -100,13 +116,21 @@ describe('W3C trace context: api -> BullMQ -> worker -> agents (integration)', (
     const spans = exporter.getFinishedSpans();
     const inTrace = (name: string, kind: SpanKind) =>
       spans.some(
-        (s) => s.name === name && s.kind === kind && s.spanContext().traceId === traceId,
+        (s) =>
+          s.name === name &&
+          s.kind === kind &&
+          s.spanContext().traceId === traceId,
       );
-    expect(inTrace(`process ${QUEUES.replayCommands}`, SpanKind.CONSUMER)).toBe(true);
+    expect(inTrace(`process ${QUEUES.replayCommands}`, SpanKind.CONSUMER)).toBe(
+      true,
+    );
     await until(() =>
       exporter
         .getFinishedSpans()
-        .some((s) => s.name === 'agents.pipeline' && s.spanContext().traceId === traceId),
+        .some(
+          (s) =>
+            s.name === 'agents.pipeline' && s.spanContext().traceId === traceId,
+        ),
     );
     const finished = exporter.getFinishedSpans();
     expect(

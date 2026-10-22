@@ -56,7 +56,16 @@ export const PRETTY = {
     fatal: '\x1b[35m',
   } as Readonly<Record<string, string>>,
   reset: '\x1b[0m',
-  omit: ['level', 'time', 'msg', 'service', 'version', 'env', 'pid', 'hostname'],
+  omit: [
+    'level',
+    'time',
+    'msg',
+    'service',
+    'version',
+    'env',
+    'pid',
+    'hostname',
+  ],
 } as const;
 
 export const TRACING = {
@@ -74,7 +83,8 @@ export const TRACING = {
 export const TRACING_NOTICES = {
   azureViaCollector:
     'APPLICATIONINSIGHTS_CONNECTION_STRING is set but no in-process Azure exporter is bundled; set OTEL_EXPORTER_OTLP_ENDPOINT to an OpenTelemetry Collector with the azuremonitor exporter (docs/operations/OBSERVABILITY.md)',
-  enabled: (endpoint: string) => `Tracing enabled; exporting OTLP to ${endpoint}`,
+  enabled: (endpoint: string) =>
+    `Tracing enabled; exporting OTLP to ${endpoint}`,
 } as const;
 
 export const METRICS_LOG = {

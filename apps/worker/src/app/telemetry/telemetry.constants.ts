@@ -15,12 +15,17 @@ export const WORKER_METRICS = {
     outboxAge: 'matchiq_outbox_oldest_age_seconds',
   },
   help: {
-    agentRuns: 'Agent runs stored with a publication, by agent, provider and outcome (FALLBACK and TIMED_OUT included)',
-    agentRunSeconds: 'Agent run latency reported by each run, by agent, provider and outcome',
-    pipelineCalls: 'Worker-side agents pipeline calls by outcome (count is the _count series)',
+    agentRuns:
+      'Agent runs stored with a publication, by agent, provider and outcome (FALLBACK and TIMED_OUT included)',
+    agentRunSeconds:
+      'Agent run latency reported by each run, by agent, provider and outcome',
+    pipelineCalls:
+      'Worker-side agents pipeline calls by outcome (count is the _count series)',
     completions: 'Insights completed, by pipeline status and narrative source',
-    gateRejections: 'Items the deterministic publish gate rejected, by item, source and issue code',
-    transactions: 'Committed pipeline transactions (events, snapshot, insights, cues) latency',
+    gateRejections:
+      'Items the deterministic publish gate rejected, by item, source and issue code',
+    transactions:
+      'Committed pipeline transactions (events, snapshot, insights, cues) latency',
     jobs: 'BullMQ job processing time by queue and outcome',
     retention: 'Rows deleted by data retention, by kind',
     sessions: 'Replay sessions loaded in this worker by state',

@@ -7,12 +7,7 @@ import { LOG_FIELDS, LOG_LEVELS } from './telemetry.constants';
 import { activeTraceFields } from './trace-context';
 
 export type ServiceLogLevel =
-  | 'fatal'
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'debug'
-  | 'trace';
+  'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
 export interface ServiceLoggerOptions {
   readonly service: string;
@@ -92,7 +87,11 @@ export class PinoLoggerService implements LoggerService {
     if (lowest) this.logger.level = LOG_LEVELS[lowest];
   }
 
-  private write(level: NestLogLevel, message: unknown, params: unknown[]): void {
+  private write(
+    level: NestLogLevel,
+    message: unknown,
+    params: unknown[],
+  ): void {
     const rest = [...params];
     // Nest appends the context name as the last argument.
     const context =
@@ -110,7 +109,10 @@ export class PinoLoggerService implements LoggerService {
     const target = this.logger[LOG_LEVELS[level]].bind(this.logger);
     if (isRecord(message)) target({ ...fields, ...message });
     else if (message instanceof Error) {
-      target({ ...fields, err: message, stack: message.stack }, message.message);
+      target(
+        { ...fields, err: message, stack: message.stack },
+        message.message,
+      );
     } else target(fields, String(message));
   }
 }

@@ -2,10 +2,7 @@
   "uid": "matchiq-service-red",
   "title": "MatchIQ / Service RED",
   "description": "Rate, errors and duration per route template for the API and worker.",
-  "tags": [
-    "matchiq",
-    "synthetic-data"
-  ],
+  "tags": ["matchiq", "synthetic-data"],
   "timezone": "utc",
   "schemaVersion": 39,
   "version": 1,

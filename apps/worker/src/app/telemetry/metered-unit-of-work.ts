@@ -22,13 +22,17 @@ export const meteredUnitOfWork = (
     const result = await inner.transaction((tx) => {
       const observed: PipelineTransaction = Object.create(tx, {
         completeInsight: {
-          value: (...args: Parameters<PipelineTransaction['completeInsight']>) => {
+          value: (
+            ...args: Parameters<PipelineTransaction['completeInsight']>
+          ) => {
             completions.push(args[2]);
             return tx.completeInsight(...args);
           },
         },
         insertAgentRuns: {
-          value: (...args: Parameters<PipelineTransaction['insertAgentRuns']>) => {
+          value: (
+            ...args: Parameters<PipelineTransaction['insertAgentRuns']>
+          ) => {
             runs.push(...args[2]);
             return tx.insertAgentRuns(...args);
           },

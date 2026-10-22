@@ -68,7 +68,9 @@ describe('log redaction', () => {
   it('scrubs strings at any depth and reduces errors to name and message', () => {
     const error = new Error('login with Bearer t0k3n failed');
     expect(redact({ detail: { err: error } })).toEqual({
-      detail: { err: { name: 'Error', message: `login with Bearer ${REDACTED} failed` } },
+      detail: {
+        err: { name: 'Error', message: `login with Bearer ${REDACTED} failed` },
+      },
     });
   });
 

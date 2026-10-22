@@ -4,11 +4,7 @@ import {
   type OnApplicationShutdown,
   type OnModuleInit,
 } from '@nestjs/common';
-import {
-  type DatabaseHandle,
-  PostgresOutboxStore,
-  QUEUES,
-} from '@matchiq/db';
+import { type DatabaseHandle, PostgresOutboxStore, QUEUES } from '@matchiq/db';
 import { Gauge, METRICS_REGISTRY, type Registry } from '@matchiq/server-kit';
 import { Queue } from 'bullmq';
 import { DATABASE, REDIS } from '../infrastructure/tokens';

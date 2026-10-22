@@ -7,7 +7,10 @@ import {
 import type { Request } from 'express';
 import type { Observable } from 'rxjs';
 import { annotateLogContext } from './log-context';
-import { ACTOR_REQUEST_FIELD, FIXTURE_ROUTE_PARAM } from './telemetry.constants';
+import {
+  ACTOR_REQUEST_FIELD,
+  FIXTURE_ROUTE_PARAM,
+} from './telemetry.constants';
 
 /**
  * Runs after routing and guards, so it can add the fixture from the path and

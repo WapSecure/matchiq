@@ -1,10 +1,18 @@
 import { BullMQOtel } from 'bullmq-otel';
-import { injectTraceHeaders, queueTelemetry, withClientSpan } from './trace-context';
+import {
+  injectTraceHeaders,
+  queueTelemetry,
+  withClientSpan,
+} from './trace-context';
 import { TRACING_NOTICES } from './telemetry.constants';
 import { startTracing } from './tracing';
 import { isTracingActive, markTracingActive } from './tracing-state';
 
-const base = { serviceName: 'matchiq-test', version: '1.0.0', environment: 'test' };
+const base = {
+  serviceName: 'matchiq-test',
+  version: '1.0.0',
+  environment: 'test',
+};
 
 describe('tracing when not configured', () => {
   afterEach(() => markTracingActive(false));
@@ -29,7 +37,10 @@ describe('tracing when not configured', () => {
   it('honours OTEL_SDK_DISABLED even with an endpoint', async () => {
     process.env['OTEL_SDK_DISABLED'] = 'true';
     try {
-      const handle = await startTracing({ ...base, endpoint: 'http://127.0.0.1:4318' });
+      const handle = await startTracing({
+        ...base,
+        endpoint: 'http://127.0.0.1:4318',
+      });
       expect(handle.enabled).toBe(false);
     } finally {
       delete process.env['OTEL_SDK_DISABLED'];

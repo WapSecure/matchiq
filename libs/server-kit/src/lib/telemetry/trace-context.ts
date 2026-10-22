@@ -41,16 +41,20 @@ export const withClientSpan = <T>(
 ): Promise<T> =>
   trace
     .getTracer(TRACING.clientTracer)
-    .startActiveSpan(name, { kind: SpanKind.CLIENT, attributes }, async (span) => {
-      try {
-        return await fn(span);
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: error instanceof Error ? error.message : String(error),
-        });
-        throw error;
-      } finally {
-        span.end();
-      }
-    });
+    .startActiveSpan(
+      name,
+      { kind: SpanKind.CLIENT, attributes },
+      async (span) => {
+        try {
+          return await fn(span);
+        } catch (error) {
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error instanceof Error ? error.message : String(error),
+          });
+          throw error;
+        } finally {
+          span.end();
+        }
+      },
+    );

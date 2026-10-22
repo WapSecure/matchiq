@@ -2,10 +2,7 @@
   "uid": "matchiq-replay-outbox",
   "title": "MatchIQ / Replay and outbox health",
   "description": "Replay session states, pipeline commit latency, outbox lag and BullMQ depth.",
-  "tags": [
-    "matchiq",
-    "synthetic-data"
-  ],
+  "tags": ["matchiq", "synthetic-data"],
   "timezone": "utc",
   "schemaVersion": 39,
   "version": 1,

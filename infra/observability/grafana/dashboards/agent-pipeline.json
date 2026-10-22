@@ -2,10 +2,7 @@
   "uid": "matchiq-agent-pipeline",
   "title": "MatchIQ / Agent pipeline",
   "description": "Agents pipeline outcomes (success, timeout, fallback) and latency by provider.",
-  "tags": [
-    "matchiq",
-    "synthetic-data"
-  ],
+  "tags": ["matchiq", "synthetic-data"],
   "timezone": "utc",
   "schemaVersion": 39,
   "version": 1,

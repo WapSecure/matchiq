@@ -10,7 +10,12 @@ import request from 'supertest';
 import { configureHttpApp } from '../bootstrap/configure-http-app';
 import { HttpKitModule } from '../http/http-kit.module';
 import { currentLogContext } from './log-context';
-import { Counter, METRICS_REGISTRY, Registry, startMetricsServer } from './metrics';
+import {
+  Counter,
+  METRICS_REGISTRY,
+  Registry,
+  startMetricsServer,
+} from './metrics';
 import { TelemetryModule } from './telemetry.module';
 
 @Controller('fixtures')
@@ -22,7 +27,10 @@ class ProbeController {
 }
 
 @Module({
-  imports: [TelemetryModule.forRoot({ service: 'matchiq-probe' }), HttpKitModule],
+  imports: [
+    TelemetryModule.forRoot({ service: 'matchiq-probe' }),
+    HttpKitModule,
+  ],
   controllers: [ProbeController],
 })
 class ProbeModule {}
@@ -44,8 +52,12 @@ describe('telemetry module', () => {
   afterAll(() => app.close());
 
   it('records RED metrics under the route template, never the raw path', async () => {
-    await request(app.getHttpServer()).get('/api/v1/fixtures/fx_secret_1/state').expect(200);
-    await request(app.getHttpServer()).get('/api/v1/fixtures/fx_secret_2/state').expect(200);
+    await request(app.getHttpServer())
+      .get('/api/v1/fixtures/fx_secret_1/state')
+      .expect(200);
+    await request(app.getHttpServer())
+      .get('/api/v1/fixtures/fx_secret_2/state')
+      .expect(200);
     await request(app.getHttpServer()).get('/api/v1/nowhere/123').expect(404);
     const text = await registry.metrics();
     expect(text).toContain(
@@ -62,7 +74,9 @@ describe('telemetry module', () => {
 
   it('exposes process and Node runtime series with the service label', async () => {
     const text = await registry.metrics();
-    expect(text).toMatch(/process_cpu_seconds_total\{service="matchiq-probe"\}/);
+    expect(text).toMatch(
+      /process_cpu_seconds_total\{service="matchiq-probe"\}/,
+    );
     expect(text).toContain('nodejs_eventloop_lag_seconds');
   });
 
@@ -90,8 +104,15 @@ describe('telemetry module', () => {
 describe('metrics listener', () => {
   it('serves the registry as Prometheus text on GET /metrics only', async () => {
     const registry = new Registry();
-    new Counter({ name: 'matchiq_probe_total', help: 'probe', registers: [registry] }).inc(3);
-    const server = await startMetricsServer(registry, { host: '127.0.0.1', port: 0 });
+    new Counter({
+      name: 'matchiq_probe_total',
+      help: 'probe',
+      registers: [registry],
+    }).inc(3);
+    const server = await startMetricsServer(registry, {
+      host: '127.0.0.1',
+      port: 0,
+    });
     try {
       const base = `http://127.0.0.1:${server.port}`;
       const ok = await fetch(`${base}/metrics`);
@@ -101,7 +122,9 @@ describe('metrics listener', () => {
       expect(body).toContain('# HELP matchiq_probe_total probe');
       expect(body).toContain('matchiq_probe_total 3');
       expect((await fetch(`${base}/`)).status).toBe(404);
-      expect((await fetch(`${base}/metrics`, { method: 'POST' })).status).toBe(404);
+      expect((await fetch(`${base}/metrics`, { method: 'POST' })).status).toBe(
+        404,
+      );
     } finally {
       await server.close();
     }

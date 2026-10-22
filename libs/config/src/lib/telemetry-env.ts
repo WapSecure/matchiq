@@ -21,12 +21,7 @@ export const TelemetryEnv = z.object({
 
 /** `0` turns the metrics listener off. */
 export const metricsPort = (fallback: number) =>
-  z.coerce
-    .number()
-    .int()
-    .min(0)
-    .max(DEFAULT_METRICS.portMax)
-    .default(fallback);
+  z.coerce.number().int().min(0).max(DEFAULT_METRICS.portMax).default(fallback);
 
 export type LogFormat = z.infer<typeof LogFormat>;
 export type TelemetryEnv = z.infer<typeof TelemetryEnv>;

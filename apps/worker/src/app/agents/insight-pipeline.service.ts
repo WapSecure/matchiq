@@ -15,7 +15,10 @@ import {
 import { SessionManager } from '../replay/session-manager.service';
 import type { WriteOutcome } from '../replay/pipeline-writer';
 import { AgentsCallError } from './agents-client';
-import { WorkerMetrics } from '../telemetry/worker-metrics';
+import {
+  type PipelineCallOutcome,
+  WorkerMetrics,
+} from '../telemetry/worker-metrics';
 import { CircuitBreaker } from './circuit-breaker';
 
 export interface JobAttempt {
@@ -25,6 +28,13 @@ export interface JobAttempt {
 }
 
 export type JobOutcome = WriteOutcome | 'skipped';
+
+type SkipOutcome = Extract<PipelineCallOutcome, 'ai-disabled' | 'circuit-open'>;
+
+const SKIP_REASONS: Readonly<Record<SkipOutcome, string>> = {
+  'ai-disabled': FALLBACK_REASONS.aiDisabled,
+  'circuit-open': FALLBACK_REASONS.circuitOpen,
+};
 
 interface Decided {
   readonly publication: Publication;
@@ -78,6 +88,11 @@ export class InsightPipelineService {
     return this.sessions.publish(key, { insight: pending, ...decided });
   }
 
+  private skipReason(): SkipOutcome | null {
+    if (!this.env.AI_ENABLED) return 'ai-disabled';
+    return this.breaker.tryAcquire() ? null : 'circuit-open';
+  }
+
   private async decide(input: {
     insight: Insight;
     fixture: Fixture;
@@ -96,13 +111,10 @@ export class InsightPipelineService {
         retries: attempt.attemptsMade,
       }),
     });
-    if (!this.env.AI_ENABLED) {
-      this.metrics.pipelineCall('ai-disabled', 0);
-      return fallback(FALLBACK_REASONS.aiDisabled);
-    }
-    if (!this.breaker.tryAcquire()) {
-      this.metrics.pipelineCall('circuit-open', 0);
-      return fallback(FALLBACK_REASONS.circuitOpen);
+    const skipped = this.skipReason();
+    if (skipped !== null) {
+      this.metrics.pipelineCall(skipped, 0);
+      return fallback(SKIP_REASONS[skipped]);
     }
     const started = performance.now();
     const elapsed = () => (performance.now() - started) / 1_000;
