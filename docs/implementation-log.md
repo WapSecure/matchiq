@@ -18,6 +18,18 @@ Verification: run in CI (owner directive: no local suites). Locally: `api:openap
 
 Next: migrate the remaining web endpoints to the client and drop the web's local schema copies; document `Deprecation`/`Sunset` headers when the first deprecation happens.
 
+## 2026-10-22 — MQ-025 (3/3): Web sign-in, BFF and role-aware UI
+
+| Area                                                                                                                                                                                                       | Status | Evidence                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------- |
+| OIDC Authorization Code + PKCE with `openid-client` 6.8.8; encrypted httpOnly session cookie (chunked), refresh before expiry, RP-initiated sign-out; sign-in and sign-out audited through the API         | Done   | `auth-server.spec.ts`; e2e sign-in and sign-out               |
+| Same-origin BFF (`/bff/*`) for signed-in API calls; ticketed SSE straight to the API                                                                                                                       | Done   | `ticketed-transport.spec.ts`; e2e producer studio             |
+| Role-aware UI: `useCan`, `<RequirePermission>` hints, accessible 403 region (client gating and API 403), user menu with name, organisation and role; sign-in page with dev-only demo accounts in demo mode | Done   | `auth-ui.spec.tsx`; e2e viewer observatory, platform operator |
+| `WebServerEnv` (server-only) and `NEXT_PUBLIC_OIDC_ISSUER_URL` for the CSP                                                                                                                                 | Done   | `web-server-env.spec.ts`                                      |
+| Playwright against a bundled test issuer (CI) and against real Keycloak (`E2E_OIDC_ISSUER`)                                                                                                                | Done   | Keycloak: 22/22 passed (desktop light and dark)               |
+
+Limits: the compose `web` container runs the public demo only (the browser-facing issuer URL is not reachable inside it); sign-in runs with `pnpm nx dev web`. Playwright can leave the `next start` child running after a local run; check the e2e port before reusing it.
+
 ## 2026-10-22 — MQ-025 (2/3): API enforcement, Postgres RLS and cross-tenant isolation
 
 | Area                                                                                                                                                                                                                                       | Status | Evidence                                        |

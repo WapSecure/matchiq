@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ApiEnv, WebPublicEnv, WorkerEnv, loadEnv } from '../index.js';
+import {
+  ApiEnv,
+  WebPublicEnv,
+  WebServerEnv,
+  WorkerEnv,
+  loadEnv,
+} from '../index.js';
 
 const EXAMPLE_PATH = join(
   import.meta.dirname,
@@ -10,7 +16,11 @@ const EXAMPLE_PATH = join(
   '..',
   '.env.example',
 );
-const SECRET_KEYS = ['STREAM_TICKET_SECRET', 'AGENTS_SERVICE_TOKEN'] as const;
+const SECRET_KEYS = [
+  'STREAM_TICKET_SECRET',
+  'AGENTS_SERVICE_TOKEN',
+  'WEB_SESSION_SECRET',
+] as const;
 
 const parseDotenv = (text: string): Record<string, string> =>
   Object.fromEntries(
@@ -36,6 +46,7 @@ describe('.env.example', () => {
     ['api', ApiEnv],
     ['worker', WorkerEnv],
     ['web', WebPublicEnv],
+    ['web server', WebServerEnv],
   ] as const)(
     'is accepted by the %s schema once secrets are filled',
     (_, schema) => {

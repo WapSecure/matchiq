@@ -35,7 +35,7 @@ const installStreamMock = ({ frames }: { frames: string[] }) => {
         : input instanceof URL
           ? input.href
           : input.url;
-    if (!url.includes('/stream')) return original(input, init);
+    if (!/\/stream(\?|$)/.test(url)) return original(input, init);
     const body = new ReadableStream<Uint8Array>({
       start(controller) {
         w.__mqStreams.push(controller);
@@ -64,6 +64,9 @@ export const mockApi = async (
 
   await page.addInitScript(installStreamMock, { frames: stream.map(toFrame) });
   await page.route(`${API_BASE}/**`, (route) =>
+    handleRoute(route, options, recorder),
+  );
+  await page.route('**/bff/**', (route) =>
     handleRoute(route, options, recorder),
   );
 

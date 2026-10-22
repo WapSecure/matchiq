@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import { API_LIMITS, HTTP_HEADERS, MEDIA_TYPES } from '@/constants/api';
+import { whenSessionKnown } from '@/lib/auth/session-store';
 import { apiUrl } from '@/lib/env';
 import {
   httpError,
@@ -39,6 +40,7 @@ const readBody = async (response: Response): Promise<unknown> => {
 };
 
 const send = async (path: string, options: RequestOptions) => {
+  await whenSessionKnown();
   const timeout = AbortSignal.timeout(API_LIMITS.requestTimeoutMs);
   const signal = options.signal
     ? AbortSignal.any([options.signal, timeout])

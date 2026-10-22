@@ -7,6 +7,7 @@ import {
   type ReplayCommand as ReplayCommandType,
   type ReplaySpeed,
   ReplayStatus,
+  StreamTicket,
 } from '@matchiq/contracts';
 import { API_LIMITS, API_PATHS, HTTP_HEADERS } from '@/constants/api';
 import { requestJson } from './http-client';
@@ -21,7 +22,7 @@ import {
   TemplateList,
 } from './session-schemas';
 import { TraceList } from './trace-schemas';
-import { apiClient, validated } from './typed-client';
+import { validated } from './typed-client';
 
 export type EventsQuery = { afterSequence?: number; limit?: number };
 export type NarrativeQuery = { persona: Persona; locale: Locale };
@@ -33,7 +34,7 @@ const idempotent = () => ({
 /** Proof of the generated client (`@matchiq/api-client`); the rest still use `requestJson`. */
 export const fetchTemplates = (signal?: AbortSignal) =>
   validated(
-    () => apiClient.GET('/fixture-templates', { signal }),
+    (client) => client.GET('/fixture-templates', { signal }),
     TemplateList,
   );
 
@@ -103,3 +104,9 @@ export const fetchRecap = (fixtureId: string, signal?: AbortSignal) =>
 
 export const fetchAgentRuns = (fixtureId: string, signal?: AbortSignal) =>
   requestJson(API_PATHS.agentRuns(fixtureId), TraceList, { signal });
+
+/** Via the BFF for signed-in users; the ticket then opens the stream on the API directly. */
+export const fetchStreamTicket = (fixtureId: string) =>
+  requestJson(API_PATHS.streamTicket(fixtureId), StreamTicket, {
+    method: 'POST',
+  });

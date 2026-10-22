@@ -1,6 +1,7 @@
 import { type ApiClient, createApiClient } from '@matchiq/api-client';
 import type { z } from 'zod';
 import { API_LIMITS, HTTP_HEADERS, MEDIA_TYPES } from '@/constants/api';
+import { whenSessionKnown } from '@/lib/auth/session-store';
 import { apiUrl } from '@/lib/env';
 import {
   httpError,
@@ -24,14 +25,20 @@ const timedFetch = async (request: Request): Promise<Response> => {
   }
 };
 
-/** Generated from `docs/api/openapi.json`; the migration of the other endpoints is tracked in docs/api/README.md. */
-export const apiClient: ApiClient = createApiClient({
-  baseUrl: apiUrl(''),
-  fetch: timedFetch,
-  headers: {
-    [HTTP_HEADERS.accept]: `${MEDIA_TYPES.json}, ${MEDIA_TYPES.problem}`,
-  },
-});
+/**
+ * Generated from `docs/api/openapi.json`. Built per call because the base URL
+ * depends on the session: the API directly, or the BFF once signed in.
+ */
+const apiClient = async (): Promise<ApiClient> => {
+  await whenSessionKnown();
+  return createApiClient({
+    baseUrl: apiUrl(''),
+    fetch: timedFetch,
+    headers: {
+      [HTTP_HEADERS.accept]: `${MEDIA_TYPES.json}, ${MEDIA_TYPES.problem}`,
+    },
+  });
+};
 
 interface TypedResult {
   readonly data?: unknown;
@@ -41,12 +48,12 @@ interface TypedResult {
 
 /** Runs a typed call, then validates its body against the Zod contract. */
 export const validated = async <S extends z.ZodType>(
-  call: () => Promise<TypedResult>,
+  call: (client: ApiClient) => Promise<TypedResult>,
   schema: S,
 ): Promise<z.infer<S>> => {
   let result: TypedResult;
   try {
-    result = await call();
+    result = await call(await apiClient());
   } catch (error) {
     if (isApiError(error)) throw error;
     throw invalidResponseError(
