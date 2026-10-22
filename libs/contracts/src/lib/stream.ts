@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { LIMITS } from './constants.js';
+import { EditorialStatus, OverlayRetractCause } from './editorial.js';
 import { MatchEvent } from './events.js';
 import { Insight } from './insight.js';
 import { Narrative } from './narrative.js';
@@ -37,10 +39,13 @@ export const StreamMessage = z.discriminatedUnion('type', [
     z.strictObject({
       overlayId: OverlayId,
       revision: z.int().positive(),
-      reason: z.string().min(1).max(200),
+      reason: z.string().min(1).max(LIMITS.retractReasonMax),
+      /** Absent on streams written before editorial causes existed. */
+      cause: OverlayRetractCause.optional(),
     }),
   ),
   message('replay.status', ReplayStatus),
+  message('editorial.status', EditorialStatus),
   message('heartbeat', z.strictObject({})),
 ]);
 

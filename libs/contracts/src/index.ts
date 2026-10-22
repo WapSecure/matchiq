@@ -8,6 +8,8 @@ export * from './lib/agents.js';
 export * from './lib/narrative.js';
 export * from './lib/overlay.js';
 export * from './lib/replay.js';
+export * from './lib/editorial.js';
+export * from './lib/audit.js';
 export * from './lib/stream.js';
 export * from './lib/http.js';
 export * from './lib/json-schema.js';

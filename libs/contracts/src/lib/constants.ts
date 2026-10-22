@@ -22,6 +22,7 @@ export const PATTERNS = {
   formation: /^\d(-\d){2,4}$/,
   reasonCode: /^[A-Z][A-Z0-9_]{2,63}$/,
   sha256Hex: /^[0-9a-f]{64}$/,
+  auditAction: /^[a-z][a-z-]*(\.[a-z][a-z-]*)+$/,
 } as const;
 
 export const LIMITS = {
@@ -44,6 +45,13 @@ export const LIMITS = {
   narrativeHeadlineMax: 80,
   narrativeBodyMax: 600,
   ingestBatchMax: 500,
+  editorialReasonMin: 3,
+  editorialReasonMax: 280,
+  retractReasonMax: 200,
+  auditPageDefault: 50,
+  auditPageMax: 200,
+  auditCursorMax: 512,
+  auditIdentifierMax: 128,
 } as const;
 
 export const MESSAGES = {
@@ -59,4 +67,6 @@ export const MESSAGES = {
   windowOrder: 'windowEndMs must not precede windowStartMs',
   overlayOrder: 'clockEndMs must be after clockStartMs',
   overlayTooLong: 'display window exceeds maxDisplayMs',
+  auditRange: 'from must not be after to',
+  auditTarget: 'targetId requires targetType',
 } as const;
