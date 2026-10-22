@@ -22,7 +22,65 @@ const base = (sequence: number, clockMs: number) => ({
 
 const at = (x: number, y: number) => ({ x, y });
 
+type Side = 'home' | 'away';
+type Spot = [Side, number, number];
+
+const team = (side: Side) => (side === 'home' ? HOME_ID : AWAY_ID);
+const player = (side: Side, n: number) =>
+  `pl_${side}_${String(n).padStart(2, '0')}`;
+
+/** Earlier build-up in the live window, so the pitch map has a spread. */
+const BUILD_UP: MatchEvent[] = [
+  ...(
+    [
+      ['home', 55, 30],
+      ['away', 52, 40],
+      ['home', 48, 62],
+      ['away', 60, 70],
+      ['home', 66, 58],
+      ['away', 45, 35],
+    ] as Spot[]
+  ).map(([side, x, y], i): MatchEvent => ({
+    ...base(560 + i, (8 + i * 0.5) * MINUTE),
+    type: 'RECOVERY',
+    teamId: team(side),
+    playerId: player(side, 4 + i),
+    location: at(x, y),
+  })),
+  ...(
+    [
+      ['home', 72, 44],
+      ['away', 70, 50],
+      ['home', 69, 22],
+      ['away', 74, 28],
+    ] as Spot[]
+  ).map(([side, x, y], i): MatchEvent => ({
+    ...base(570 + i, (11 + i * 0.5) * MINUTE),
+    type: 'FINAL_THIRD_ENTRY',
+    teamId: team(side),
+    playerId: player(side, 7 + i),
+    location: at(x, y),
+  })),
+  ...(
+    [
+      ['home', 82, 30, 'OFF_TARGET'],
+      ['away', 84, 60, 'OFF_TARGET'],
+      ['home', 91, 52, 'BLOCKED'],
+      ['away', 87, 45, 'ON_TARGET'],
+    ] as [Side, number, number, 'OFF_TARGET' | 'BLOCKED' | 'ON_TARGET'][]
+  ).map(([side, x, y, outcome], i): MatchEvent => ({
+    ...base(580 + i, (12 + i * 0.5) * MINUTE),
+    type: 'SHOT',
+    teamId: team(side),
+    playerId: player(side, 9 + (i % 3)),
+    location: at(x, y),
+    outcome,
+    bodyPart: 'RIGHT_FOOT',
+  })),
+];
+
 const EVENTS: MatchEvent[] = [
+  ...BUILD_UP,
   {
     ...base(601, 14 * MINUTE),
     type: 'RECOVERY',

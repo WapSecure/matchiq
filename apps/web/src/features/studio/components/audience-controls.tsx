@@ -1,6 +1,7 @@
 'use client';
 
 import type { Locale, Persona } from '@matchiq/contracts';
+import { DeterministicIcon } from '@/components/icons';
 import { SegmentedControl } from '@/components/ui';
 import { LOCALE_OPTIONS, PERSONA_OPTIONS } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
@@ -36,10 +37,11 @@ export function LocaleSwitcher() {
 /** Persona and language for narratives; facts and figures stay identical. */
 export function AudienceBar() {
   return (
-    <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+    <div className="flex flex-wrap items-end gap-x-6 gap-y-3 rounded-lg border border-line bg-surface px-4 py-3 shadow-panel">
       <PersonaToggle />
       <LocaleSwitcher />
-      <p className="text-micro text-ink-subtle sm:ml-auto sm:max-w-xs sm:text-right">
+      <p className="flex max-w-md items-start gap-2 text-xs leading-relaxed text-ink-subtle lg:ml-auto">
+        <DeterministicIcon size={16} className="mt-px shrink-0 text-accent" />
         {STUDIO_COPY.controls.invariant}
       </p>
     </div>

@@ -17,6 +17,7 @@ export const STUDIO_COPY = {
     empty: 'No events yet. Start the replay to begin the feed.',
     count: (n: number) => `${n} events`,
     voided: 'Voided',
+    period: (n: number) => `Period ${n}`,
   },
   insights: {
     title: 'AI insight feed',

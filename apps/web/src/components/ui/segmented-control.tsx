@@ -41,10 +41,10 @@ export function SegmentedControl<T extends string | number>({
           <label
             key={String(option.value)}
             className={cn(
-              'relative flex h-7 cursor-pointer items-center rounded-sm px-2.5 text-xs font-medium transition-colors',
+              'press relative flex h-7 cursor-pointer items-center rounded-sm px-2.5 text-xs font-medium',
               'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1 has-[:focus-visible]:outline-accent',
               option.value === value
-                ? 'bg-surface-raised text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)]'
+                ? 'bg-selected text-ink shadow-panel ring-1 ring-line-strong'
                 : 'text-ink-muted hover:text-ink',
             )}
           >

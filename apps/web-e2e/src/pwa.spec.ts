@@ -48,8 +48,8 @@ test.describe('installable progressive web app', () => {
       display: 'standalone',
       start_url: '/fixtures',
       scope: '/',
-      theme_color: '#07090d',
-      background_color: '#07090d',
+      theme_color: '#080a0e',
+      background_color: '#080a0e',
     });
     expect(manifest.shortcuts[0].url).toBe('/fixtures');
 

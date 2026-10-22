@@ -11,7 +11,7 @@ function Toast({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section
       aria-label={label}
-      className="pointer-events-auto flex max-w-full items-center gap-3 rounded-lg border border-line-strong bg-surface-raised py-1.5 pl-3 pr-1.5 text-sm text-ink shadow-lg"
+      className="pointer-events-auto flex max-w-full items-center gap-3 rounded-lg border border-line-strong bg-surface py-1.5 pl-3 pr-1.5 text-sm text-ink shadow-float"
     >
       {children}
     </section>

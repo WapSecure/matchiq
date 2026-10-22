@@ -41,9 +41,9 @@ export function TraceCard({ trace, period }: TraceCardProps) {
     <article
       aria-labelledby={titleId}
       data-publication={trace.publication}
-      className="rounded-lg border border-line bg-surface"
+      className="overflow-hidden rounded-lg border border-line bg-surface shadow-panel"
     >
-      <header className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5">
+      <header className="flex flex-wrap items-center gap-2 border-b border-line bg-surface-raised/60 px-4 py-2.5">
         <h3 id={titleId} className="text-sm font-semibold text-ink">
           {kind}
         </h3>

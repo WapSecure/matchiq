@@ -1,5 +1,6 @@
 import type { Fixture, MatchSnapshot } from '@matchiq/contracts';
-import { TeamSwatch } from '@/components/match/team-swatch';
+import { TeamMonogram } from '@/components/match/team-monogram';
+import { SIDE_BG, type Side as TeamSide } from '@/components/match/team-swatch';
 import { Badge } from '@/components/ui';
 import { RECAP_COPY } from '@/constants/recap';
 import { WATERMARK } from '@/constants/studio';
@@ -12,14 +13,21 @@ type RecapScorelineProps = {
   recap: RecapDocument;
 };
 
-function Side({ name, side }: { name: string; side: 'home' | 'away' }) {
+function Side({ team, side }: { team: Fixture['home']; side: TeamSide }) {
   return (
     <span
-      className={`flex min-w-0 items-center gap-2 ${side === 'away' ? 'flex-row-reverse text-right' : ''}`}
+      className={`relative flex min-w-0 items-center gap-3 self-stretch ${side === 'away' ? 'flex-row-reverse pr-4 text-right' : 'pl-4'}`}
     >
-      <TeamSwatch side={side} className="size-3" />
-      <span className="truncate text-lg font-semibold text-ink sm:text-2xl">
-        {name}
+      <span
+        aria-hidden
+        className={`absolute inset-y-0 w-1 rounded-full ${side === 'away' ? 'right-0' : 'left-0'} ${SIDE_BG[side]}`}
+      />
+      <span className="hidden sm:flex">
+        <TeamMonogram shortName={team.shortName} side={side} size="lg" />
+      </span>
+      <span className="truncate text-lg font-semibold tracking-tight text-ink sm:text-2xl">
+        <span className="sm:hidden">{team.shortName}</span>
+        <span className="hidden sm:inline">{team.name}</span>
       </span>
     </span>
   );
@@ -40,7 +48,7 @@ export function RecapScoreline({
         home,
         away,
       )}
-      className="rounded-lg border border-line bg-surface px-4 py-6 sm:px-8"
+      className="rounded-lg border border-line bg-surface px-4 py-6 shadow-panel sm:px-8"
     >
       <div className="flex flex-wrap items-center gap-2">
         <p className="eyebrow text-accent">{RECAP_COPY.eyebrow}</p>
@@ -52,13 +60,13 @@ export function RecapScoreline({
       </div>
       <div
         aria-hidden
-        className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-6"
+        className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-6"
       >
-        <Side name={fixture.home.name} side="home" />
-        <span className="tabular rounded-md bg-surface-raised px-3 py-1 font-mono text-3xl font-semibold text-ink sm:text-5xl">
+        <Side team={fixture.home} side="home" />
+        <span className="tabular rounded-lg border border-line bg-surface-sunken px-4 py-2 font-mono text-4xl font-semibold tracking-tight text-ink sm:px-6 sm:text-6xl">
           {home}–{away}
         </span>
-        <Side name={fixture.away.name} side="away" />
+        <Side team={fixture.away} side="away" />
       </div>
       <p className="mt-3 text-center text-xs text-ink-muted">
         {RECAP_COPY.fullTime} · {fixture.competitionLabel}

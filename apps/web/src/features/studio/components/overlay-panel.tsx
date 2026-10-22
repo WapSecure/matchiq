@@ -6,7 +6,7 @@ import {
   OverlayCanvas,
   type Scorebug,
 } from '@/components/overlay/overlay-canvas';
-import { Panel, SegmentedControl } from '@/components/ui';
+import { Badge, Panel, SegmentedControl } from '@/components/ui';
 import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { formatClock } from '@/lib/format';
@@ -22,6 +22,24 @@ type OverlayPanelProps = {
   footer?: ReactNode;
 };
 
+function useScorebug(home: string, away: string): Scorebug | null {
+  const score = useMatchStore((s) => s.snapshot?.score ?? null);
+  const clock = useMatchStore((s) => formatClock(s.clock.period, s.clock.ms));
+  return score
+    ? { home, away, homeScore: score.home, awayScore: score.away, clock }
+    : null;
+}
+
+function Tally({ onAir }: { onAir: boolean }) {
+  return onAir ? (
+    <Badge tone="onair" dot>
+      {OVERLAY_COPY.onAir}
+    </Badge>
+  ) : (
+    <Badge dot>{OVERLAY_COPY.standbyTally}</Badge>
+  );
+}
+
 export function OverlayPanel({
   homeShort,
   awayShort,
@@ -35,16 +53,7 @@ export function OverlayPanel({
   const lastHeadline = useMatchStore((s) => s.retractions[0]?.headline ?? null);
   const onAir = useOnAirCue(persona, locale);
   const cues = onAir.cue ? [onAir.cue] : [];
-  const score = useMatchStore((s) => s.snapshot?.score ?? null);
-  const clock = useMatchStore((s) => formatClock(s.clock.period, s.clock.ms));
-  const scorebug: Scorebug | null = score
-    ? {
-        home: homeShort,
-        away: awayShort,
-        score: `${score.home}–${score.away}`,
-        clock,
-      }
-    : null;
+  const scorebug = useScorebug(homeShort, awayShort);
   const copy = STUDIO_COPY.overlay;
   return (
     <Panel
@@ -53,8 +62,9 @@ export function OverlayPanel({
       description={copy.description}
       Icon={BroadcastIcon}
       className={className}
+      actions={<Tally onAir={cues.length > 0} />}
     >
-      <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
         <OnAirMeta onAir={onAir} locale={locale} />
         <SegmentedControl
           className="ml-auto"
@@ -73,6 +83,14 @@ export function OverlayPanel({
         safeAreaLabel={copy.safeArea}
         frameLabel={copy.frameLabel(cues.length)}
       />
+      <p
+        className="mt-2 flex items-center gap-1.5 text-micro text-ink-subtle"
+        title={OVERLAY_COPY.programNoteHint}
+      >
+        <BroadcastIcon size={12} className="shrink-0" />
+        {OVERLAY_COPY.programNote}
+        <span className="sr-only">. {OVERLAY_COPY.programNoteHint}</span>
+      </p>
       {footer}
       <CueLog />
     </Panel>

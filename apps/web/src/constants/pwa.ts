@@ -1,5 +1,6 @@
 import type { Metadata, MetadataRoute, Viewport } from 'next';
 import { SITE } from './site';
+import { DARK_SCHEME_QUERY, LIGHT_SCHEME_QUERY, THEME_CHROME } from './theme';
 
 /**
  * Registration is production-only: `next dev` serves unhashed, constantly
@@ -21,11 +22,11 @@ export const PWA_ROUTES = {
   offline: '/offline',
 } as const;
 
-/** The dark broadcast canvas (`--color-canvas`) and a light-theme counterpart. */
+/** Browser chrome follows `--color-canvas` in each theme. */
 export const PWA_COLORS = {
-  dark: '#07090d',
-  light: '#f6f8fb',
-  accent: '#22c7e6',
+  dark: THEME_CHROME.dark,
+  light: THEME_CHROME.light,
+  accent: '#2ccbe8',
 } as const;
 
 const ICON_DIR = '/icons';
@@ -92,8 +93,8 @@ export const PWA_METADATA = {
 } satisfies Metadata;
 
 export const PWA_THEME_COLOR: Viewport['themeColor'] = [
-  { media: '(prefers-color-scheme: dark)', color: PWA_COLORS.dark },
-  { media: '(prefers-color-scheme: light)', color: PWA_COLORS.light },
+  { media: DARK_SCHEME_QUERY, color: PWA_COLORS.dark },
+  { media: LIGHT_SCHEME_QUERY, color: PWA_COLORS.light },
 ];
 
 export const PWA_COPY = {

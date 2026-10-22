@@ -1,69 +1,84 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { FIXTURE_ID } from './support/mock-fixture';
 import { mockApi } from './support/mock-api';
 
-const OUT_DIR = '../../docs/screenshots';
+const OUT_DIR = `${__dirname}/../../../docs/screenshots/premium`;
 const enabled = Boolean(process.env['CAPTURE_SCREENSHOTS']);
+/** `before` captures the pre-redesign build; `after` the current one. */
+const SET = process.env['SCREENSHOT_SET'] ?? 'after';
+const THEMES = (process.env['SCREENSHOT_THEMES'] ?? 'dark,light').split(',');
+
+const VIEWPORTS = [
+  { name: 'desktop-1440', viewport: { width: 1440, height: 900 }, scale: 1 },
+  { name: 'mobile-390', viewport: { width: 390, height: 844 }, scale: 2 },
+] as const;
+
+type Screen = {
+  name: string;
+  path: string;
+  ready: (page: Page) => Promise<void>;
+};
+
+const SCREENS: Screen[] = [
+  {
+    name: 'landing',
+    path: '/',
+    ready: (page) =>
+      expect(page.getByRole('heading', { level: 1 })).toBeVisible(),
+  },
+  {
+    name: 'lobby',
+    path: '/fixtures',
+    ready: (page) => expect(page.getByRole('article').first()).toBeVisible(),
+  },
+  {
+    name: 'studio',
+    path: `/studio/${FIXTURE_ID}`,
+    ready: (page) =>
+      expect(
+        page.getByText('Pressure building on the left').first(),
+      ).toBeVisible(),
+  },
+  {
+    name: 'recap',
+    path: `/studio/${FIXTURE_ID}/recap`,
+    ready: (page) =>
+      expect(page.getByRole('list', { name: 'Key moments' })).toBeVisible(),
+  },
+  {
+    name: 'observatory',
+    path: `/studio/${FIXTURE_ID}/observatory`,
+    ready: (page) =>
+      expect(page.getByRole('list', { name: 'Insight traces' })).toBeVisible(),
+  },
+];
 
 /** Opt-in visual capture for PR review: `CAPTURE_SCREENSHOTS=1 pnpm e2e`. */
-test.describe('review screenshots', () => {
-  test.skip(!enabled, 'set CAPTURE_SCREENSHOTS=1 to capture');
-  test.beforeEach(async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-  });
+for (const vp of VIEWPORTS) {
+  test.describe(`review screenshots ${vp.name}`, () => {
+    test.skip(!enabled, 'set CAPTURE_SCREENSHOTS=1 to capture');
+    test.use({ viewport: vp.viewport, deviceScaleFactor: vp.scale });
 
-  test('lobby', async ({ page }, info) => {
-    await mockApi(page);
-    await page.goto('/fixtures');
-    await expect(page.getByRole('article').first()).toBeVisible();
-    await page.screenshot({
-      path: `${OUT_DIR}/lobby-${info.project.name}.png`,
-      fullPage: true,
-    });
+    for (const theme of THEMES) {
+      for (const screen of SCREENS) {
+        test(`${screen.name} ${theme}`, async ({ page }, info) => {
+          test.skip(
+            info.project.name !== 'desktop-dark',
+            'captured once, from the desktop project',
+          );
+          await page.emulateMedia({
+            reducedMotion: 'reduce',
+            colorScheme: theme === 'light' ? 'light' : 'dark',
+          });
+          await mockApi(page);
+          await page.goto(screen.path);
+          await screen.ready(page);
+          await page.screenshot({
+            path: `${OUT_DIR}/${SET}/${screen.name}-${vp.name}-${theme}.png`,
+            fullPage: true,
+          });
+        });
+      }
+    }
   });
-
-  test('studio', async ({ page }, info) => {
-    await mockApi(page);
-    await page.goto(`/studio/${FIXTURE_ID}`);
-    await expect(page.getByText('Pressure building on the left')).toBeVisible();
-    await page.screenshot({
-      path: `${OUT_DIR}/studio-${info.project.name}.png`,
-      fullPage: true,
-    });
-  });
-
-  test('recap', async ({ page }, info) => {
-    await mockApi(page);
-    await page.goto(`/studio/${FIXTURE_ID}/recap`);
-    await expect(page.getByRole('list', { name: 'Key moments' })).toBeVisible();
-    await page.screenshot({
-      path: `${OUT_DIR}/recap-${info.project.name}.png`,
-      fullPage: true,
-    });
-  });
-
-  test('observatory', async ({ page }, info) => {
-    await mockApi(page);
-    await page.goto(`/studio/${FIXTURE_ID}/observatory`);
-    await expect(
-      page.getByRole('list', { name: 'Insight traces' }),
-    ).toBeVisible();
-    await page.screenshot({
-      path: `${OUT_DIR}/observatory-${info.project.name}.png`,
-      fullPage: true,
-    });
-  });
-
-  test('evidence drawer', async ({ page }, info) => {
-    await mockApi(page);
-    await page.goto(`/studio/${FIXTURE_ID}`);
-    await page
-      .getByRole('button', { name: /open evidence/i })
-      .first()
-      .click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.screenshot({
-      path: `${OUT_DIR}/evidence-${info.project.name}.png`,
-    });
-  });
-});
+}

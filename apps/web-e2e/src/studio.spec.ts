@@ -9,6 +9,10 @@ import { OVERLAY_ID } from './support/mock-match';
 import { mockStatus } from './support/mock-session';
 import { envelope } from './support/mock-stream';
 
+/** The feed, not the throttled live-region echo of the same headline. */
+const insightFeed = (page: Page) =>
+  page.getByRole('group', { name: 'AI insight feed' });
+
 const openStudio = async (page: Page) => {
   const api = await mockApi(page);
   await page.goto(`/studio/${FIXTURE_ID}`);
@@ -42,8 +46,9 @@ test.describe('live studio', () => {
     page,
   }) => {
     await openStudio(page);
-    await page.getByText('View as table').click();
-    const firstRow = page.locator('details table tbody tr').first();
+    const metrics = page.getByRole('region', { name: 'Live metrics' });
+    await metrics.getByText('View as table').click();
+    const firstRow = metrics.locator('details table tbody tr').first();
     await expect(firstRow).toContainText('Not available');
   });
 
@@ -82,14 +87,18 @@ test.describe('live studio', () => {
     const scoreboard = page.getByRole('region', { name: 'Scoreboard' });
     const before = [await metrics.innerText(), await scoreboard.innerText()];
     await page.getByRole('radio', { name: /Français/ }).check({ force: true });
-    await expect(page.getByText('Northbridge prend le contrôle')).toBeVisible();
+    await expect(
+      insightFeed(page).getByText('Northbridge prend le contrôle'),
+    ).toBeVisible();
     await page.getByRole('radio', { name: /English/ }).check({ force: true });
     await page.getByRole('radio', { name: 'Analyst' }).check({ force: true });
     await expect(
-      page.getByText('High regains drive home momentum swing'),
+      insightFeed(page).getByText('High regains drive home momentum swing'),
     ).toBeVisible();
     await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
-    await expect(page.getByText('Northbridge are on top now')).toBeVisible();
+    await expect(
+      insightFeed(page).getByText('Northbridge are on top now'),
+    ).toBeVisible();
     expect([await metrics.innerText(), await scoreboard.innerText()]).toEqual(
       before,
     );
@@ -169,7 +178,9 @@ test.describe('live studio', () => {
     await expect(
       languages.getByRole('radio', { name: 'Naijá (Pidgin) (PCM)' }),
     ).toBeChecked();
-    await expect(page.getByText('Northbridge don take control')).toBeVisible();
+    await expect(
+      insightFeed(page).getByText('Northbridge don take control'),
+    ).toBeVisible();
     await expect(scoreboard).toHaveText(before);
     await expectNoHorizontalOverflow(page);
     await expectNoBlockingA11yViolations(page);

@@ -21,8 +21,15 @@ export default defineConfig({
         cwd: workspaceRoot,
         timeout: 180_000,
       },
-  projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
-  ],
+  /** Every spec runs in both themes, on desktop and mobile. */
+  projects: (['dark', 'light'] as const).flatMap((colorScheme) => [
+    {
+      name: `desktop-${colorScheme}`,
+      use: { ...devices['Desktop Chrome'], colorScheme },
+    },
+    {
+      name: `mobile-${colorScheme}`,
+      use: { ...devices['Pixel 7'], colorScheme },
+    },
+  ]),
 });
