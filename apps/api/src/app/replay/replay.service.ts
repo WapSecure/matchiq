@@ -1,4 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import type { Principal } from '@matchiq/access';
 import type { ApiEnv } from '@matchiq/config';
 import {
   ReplayStatus,
@@ -14,6 +15,8 @@ import {
   type ReplaySessionView,
 } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
+import { actorTypeOf } from '../auth/actor';
+import { actorDetails } from '../auth/audit-trail.service';
 import {
   API_LIMITS,
   HEADERS,
@@ -32,6 +35,12 @@ export interface ItemList<T> {
   readonly items: T[];
 }
 
+export interface ReplayRequest {
+  readonly principal: Principal;
+  readonly idempotencyKey?: string;
+  readonly requestId?: string;
+}
+
 const capacityProblem = (active: number, max: number) =>
   problem('replayCapacity', {
     detail: REPLAY_CAPACITY.detail(active, max),
@@ -43,12 +52,18 @@ const capacityProblem = (active: number, max: number) =>
 const needsSlot = (command: ReplayCommand): boolean =>
   (REPLAY_CAPACITY.slotActions as readonly string[]).includes(command.action);
 
+const keyOf = (orgId: string, fixtureId: string): FixtureKey => ({
+  orgId,
+  fixtureId,
+});
+
 /**
  * Replay sessions (ADR-0013). The API creates sessions and validates
  * commands against persisted state; the worker owns playback and is the
  * authority on the resulting status, which reaches clients as `replay.status`.
- * Starting playback needs a free slot (ADR-0015): the API answers 503 with
- * `Retry-After` at the limit rather than accepting work the worker would drop.
+ * Starting playback needs a free slot: the API answers 503 with `Retry-After`
+ * at the limit rather than accepting work the worker would drop. Every
+ * lookup is scoped to the caller's organisation (ADR-0015).
  */
 @Injectable()
 export class ReplayService {
@@ -59,84 +74,90 @@ export class ReplayService {
     private readonly idempotency: IdempotencyService,
   ) {}
 
-  private keyOf(fixtureId: string): FixtureKey {
-    return { orgId: this.env.DEMO_ORG_ID, fixtureId };
+  async listTemplates(
+    orgId: string,
+  ): Promise<ItemList<FixtureTemplateSummary>> {
+    return { items: await this.stores.templates.list(orgId) };
   }
 
-  async listTemplates(): Promise<ItemList<FixtureTemplateSummary>> {
-    return { items: await this.stores.templates.list(this.env.DEMO_ORG_ID) };
+  async listSessions(
+    orgId: string,
+    limit: number,
+  ): Promise<ItemList<ReplaySessionView>> {
+    return { items: await this.stores.sessions.list(orgId, limit) };
   }
 
-  async listSessions(limit: number): Promise<ItemList<ReplaySessionView>> {
-    return {
-      items: await this.stores.sessions.list(this.env.DEMO_ORG_ID, limit),
-    };
-  }
-
-  createSession(input: {
-    templateId: string;
-    speed: ReplaySpeed;
-    idempotencyKey?: string;
-  }): Promise<IdempotentResult<CreatedSession>> {
-    const { templateId, speed } = input;
+  createSession(
+    request: ReplayRequest & { templateId: string; speed: ReplaySpeed },
+  ): Promise<IdempotentResult<CreatedSession>> {
+    const { templateId, speed } = request;
     return this.idempotent(
+      request,
       {
         scope: IDEMPOTENCY_SCOPES.createSession,
-        key: input.idempotencyKey,
         request: { templateId, speed },
         parse: (body) => CreatedSessionResponse.parse(body),
       },
       async () => ({
         status: HttpStatus.CREATED,
-        body: await this.create(templateId, speed),
+        body: await this.create(request.principal, templateId, speed),
       }),
     );
   }
 
-  async status(sessionId: string): Promise<ReplayStatus> {
-    return (await this.session(sessionId)).status;
+  async status(orgId: string, sessionId: string): Promise<ReplayStatus> {
+    return (await this.session(orgId, sessionId)).status;
   }
 
   /** 202 semantics: the returned status is the accepted target, confirmed later on the stream. */
-  command(input: {
-    sessionId: string;
-    command: ReplayCommand;
-    idempotencyKey?: string;
-  }): Promise<IdempotentResult<ReplayStatus>> {
-    const { sessionId, command } = input;
+  command(
+    request: ReplayRequest & { sessionId: string; command: ReplayCommand },
+  ): Promise<IdempotentResult<ReplayStatus>> {
+    const { sessionId, command } = request;
     return this.idempotent(
+      request,
       {
         scope: IDEMPOTENCY_SCOPES.replayCommand,
-        key: input.idempotencyKey,
         request: { sessionId, command },
         parse: (body) => ReplayStatus.parse(body),
       },
       async () => ({
         status: HttpStatus.ACCEPTED,
-        body: await this.apply(sessionId, command),
+        body: await this.apply(request.principal.orgId, sessionId, command),
       }),
     );
   }
 
   /** The key is stored only once the command is queued. */
   private idempotent<T>(
-    scope: Omit<IdempotencyScope<T>, 'orgId'>,
+    request: ReplayRequest,
+    scope: Omit<IdempotencyScope<T>, 'orgId' | 'key'>,
     work: () => Promise<{ status: number; body: T }>,
   ): Promise<IdempotentResult<T>> {
     return this.idempotency.run(
-      { ...scope, orgId: this.env.DEMO_ORG_ID },
+      {
+        ...scope,
+        orgId: request.principal.orgId,
+        key: request.idempotencyKey,
+      },
       work,
     );
   }
 
   private async create(
+    principal: Principal,
     templateId: string,
     speed: ReplaySpeed,
   ): Promise<CreatedSession> {
     let created: CreatedSession | null;
     try {
       created = await this.stores.sessions.create({
-        orgId: this.env.DEMO_ORG_ID,
+        orgId: principal.orgId,
+        actor: {
+          id: principal.userId,
+          type: actorTypeOf(principal),
+          details: actorDetails(principal),
+        },
         templateId,
         speed,
         capacity: {
@@ -151,18 +172,22 @@ export class ReplayService {
     }
     if (created === null)
       throw problem('templateNotFound', { detail: templateId });
-    await this.send(created.fixture.fixtureId, { action: 'start', speed });
+    await this.send(principal.orgId, created.fixture.fixtureId, {
+      action: 'start',
+      speed,
+    });
     return created;
   }
 
   private async apply(
+    orgId: string,
     sessionId: string,
     command: ReplayCommand,
   ): Promise<ReplayStatus> {
-    const session = await this.session(sessionId);
-    const template = (
-      await this.stores.templates.list(this.env.DEMO_ORG_ID)
-    ).find((t) => t.templateId === session.templateId);
+    const session = await this.session(orgId, sessionId);
+    const template = (await this.stores.templates.list(orgId)).find(
+      (t) => t.templateId === session.templateId,
+    );
     if (template === undefined)
       throw problem('templateNotFound', { detail: session.templateId });
     const check = checkTransition(
@@ -171,32 +196,40 @@ export class ReplayService {
       template.eventCount - 1,
     );
     if (!check.ok) throw problem('replayConflict', { detail: check.reason });
-    if (needsSlot(command)) await this.ensureSlot(sessionId);
-    await this.send(sessionId, command);
+    if (needsSlot(command)) await this.ensureSlot(orgId, sessionId);
+    await this.send(orgId, sessionId, command);
     return check.target;
   }
 
   /** Advisory: the worker re-checks when it applies the command. */
-  private async ensureSlot(sessionId: string): Promise<void> {
+  private async ensureSlot(orgId: string, sessionId: string): Promise<void> {
     const max = this.env.REPLAY_MAX_ACTIVE_SESSIONS;
     const active = await this.stores.sessions.countActive({
-      orgId: this.env.DEMO_ORG_ID,
+      orgId,
       idleMs: this.env.REPLAY_IDLE_TIMEOUT_MS,
       excludeFixtureId: sessionId,
     });
     if (active >= max) throw capacityProblem(active, max);
   }
 
-  private async session(sessionId: string): Promise<ReplaySessionView> {
-    const session = await this.stores.sessions.get(this.keyOf(sessionId));
+  /** Another organisation's session is indistinguishable from a missing one. */
+  private async session(
+    orgId: string,
+    sessionId: string,
+  ): Promise<ReplaySessionView> {
+    const session = await this.stores.sessions.get(keyOf(orgId, sessionId));
     if (session === null)
       throw problem('sessionNotFound', { detail: sessionId });
     return session;
   }
 
-  private async send(fixtureId: string, command: ReplayCommand): Promise<void> {
+  private async send(
+    orgId: string,
+    fixtureId: string,
+    command: ReplayCommand,
+  ): Promise<void> {
     try {
-      await this.bus.send({ ...this.keyOf(fixtureId), command });
+      await this.bus.send({ ...keyOf(orgId, fixtureId), command });
     } catch {
       throw problem('replayUnavailable', { detail: fixtureId });
     }

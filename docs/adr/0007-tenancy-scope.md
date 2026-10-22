@@ -1,6 +1,6 @@
 # ADR-0007: Tenant-ready schema, not enforced multi-tenancy
 
-- Status: Accepted (2026-10-21)
+- Status: Accepted (2026-10-21). Enforcement superseded by ADR-0015 (2026-10-22): tenant isolation is now enforced in the application and by Postgres row-level security.
 
 ## Decision
 

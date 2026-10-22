@@ -23,7 +23,14 @@ export const AUDIT_ACTIONS = {
 /** Dotted lower-case verb phrase; open so new actions never invalidate stored rows. */
 export const AuditAction = z.string().regex(PATTERNS.auditAction);
 
-export const AuditActorType = z.enum(['OPERATOR', 'SYSTEM', 'ANONYMOUS']);
+/** USER and SERVICE are OIDC principals (ADR-0015); OPERATOR is the dev/CI key. */
+export const AuditActorType = z.enum([
+  'USER',
+  'SERVICE',
+  'OPERATOR',
+  'SYSTEM',
+  'ANONYMOUS',
+]);
 
 export const AuditTargetType = z.enum([
   'fixture',

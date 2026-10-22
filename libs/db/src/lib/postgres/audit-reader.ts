@@ -19,6 +19,7 @@ import type { FixtureKey } from '../ports.js';
 import { auditEvents, fixtures } from '../schema/tables.js';
 import { fixtureMatch } from './ledger-transaction.js';
 import { readControl, readControls } from './editorial-queries.js';
+import { withTenant } from './tenant-scope.js';
 
 const a = auditEvents;
 
@@ -96,12 +97,14 @@ export class PostgresAuditReader implements AuditReader {
 
   /** Newest first; `(created_at, id)` keyset so concurrent inserts never shift pages. */
   async list(orgId: string, query: AuditEventQuery): Promise<AuditPage> {
-    const rows = await this.db
-      .select()
-      .from(a)
-      .where(and(...filters(orgId, query)))
-      .orderBy(desc(a.createdAt), desc(a.id))
-      .limit(query.limit + 1);
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select()
+        .from(a)
+        .where(and(...filters(orgId, query)))
+        .orderBy(desc(a.createdAt), desc(a.id))
+        .limit(query.limit + 1),
+    );
     const page = rows.slice(0, query.limit);
     const last = page.at(-1);
     return {
@@ -120,16 +123,18 @@ export class PostgresAuditReader implements AuditReader {
 export class PostgresEditorialReader implements EditorialReader {
   constructor(private readonly db: Database) {}
 
-  async status(key: FixtureKey): Promise<EditorialStatus | null> {
-    const [fixture] = await this.db
-      .select({ fixtureId: fixtures.fixtureId })
-      .from(fixtures)
-      .where(fixtureMatch(key));
-    if (fixture === undefined) return null;
-    return toEditorialStatus(key.fixtureId, await readControls(this.db, key));
+  status(key: FixtureKey): Promise<EditorialStatus | null> {
+    return withTenant(this.db, key.orgId, async (tx) => {
+      const [fixture] = await tx
+        .select({ fixtureId: fixtures.fixtureId })
+        .from(fixtures)
+        .where(fixtureMatch(key));
+      if (fixture === undefined) return null;
+      return toEditorialStatus(key.fixtureId, await readControls(tx, key));
+    });
   }
 
   killSwitch(orgId: string): Promise<EditorialControlRow | null> {
-    return readControl(this.db, orgId, 'ORG');
+    return withTenant(this.db, orgId, (tx) => readControl(tx, orgId, 'ORG'));
   }
 }

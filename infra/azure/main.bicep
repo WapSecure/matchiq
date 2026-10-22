@@ -42,7 +42,7 @@ param foundryLocation string = location
 param postgresAdminPassword string
 
 @secure()
-param operatorApiKey string
+param streamTicketSecret string
 
 @secure()
 param agentsServiceToken string
@@ -93,7 +93,7 @@ module keyVault 'modules/keyvault.bicep' = {
     name: names.keyVault
     readerPrincipalId: identity.outputs.principalId
     enablePurgeProtection: environmentName == 'prod'
-    operatorApiKey: operatorApiKey
+    streamTicketSecret: streamTicketSecret
     agentsServiceToken: agentsServiceToken
     tags: tags
   }
