@@ -1,6 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { ApiEnv } from '@matchiq/config';
 import {
+  type ItemList,
   ReplayStatus,
   type ReplayCommand,
   type ReplaySpeed,
@@ -28,9 +29,7 @@ import { REPLAY_COMMAND_BUS, REPLAY_STORES } from '../infrastructure/tokens';
 import { checkTransition } from './replay-transitions';
 import { CreatedSessionResponse } from './replay.schemas';
 
-export interface ItemList<T> {
-  readonly items: T[];
-}
+export type { ItemList } from '@matchiq/contracts';
 
 const capacityProblem = (active: number, max: number) =>
   problem('replayCapacity', {
