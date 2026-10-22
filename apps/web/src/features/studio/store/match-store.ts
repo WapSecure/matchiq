@@ -1,4 +1,6 @@
 import type {
+  EditorialControl,
+  EditorialStatus,
   MatchEvent,
   MatchSnapshot,
   ReplayStatus,
@@ -6,6 +8,7 @@ import type {
 } from '@matchiq/contracts';
 import { createStore, type StoreApi } from 'zustand/vanilla';
 import type { ConnectionStatus } from '@/lib/stream';
+import { reduceEditorial, withKillSwitch } from './reduce-editorial';
 import { reduceEvents } from './reduce-events';
 import { type Hydration, reduceHydration } from './reduce-hydration';
 import {
@@ -14,6 +17,7 @@ import {
   reduceReplay,
   type StatusSource,
 } from './reduce-message';
+import { reduceRetract, type RetractPayload } from './reduce-overlays';
 import { reduceSnapshot } from './reduce-snapshot';
 import type { MatchData } from './types';
 
@@ -28,6 +32,12 @@ export type MatchActions = {
   requestHydration: () => void;
   markHydrated: () => void;
   setConnection: (connection: ConnectionStatus) => void;
+  applyEditorial: (status: EditorialStatus, source?: StatusSource) => void;
+  /** An organisation kill-switch command result; the stream confirms it. */
+  applyKillSwitch: (killSwitch: EditorialControl) => void;
+  /** A confirmed producer retraction, applied before the stream echoes it. */
+  applyRetraction: (payload: RetractPayload) => void;
+  markSuppressed: (insightId: string) => void;
 };
 
 export type MatchStoreState = MatchData & MatchActions;
@@ -51,4 +61,15 @@ export const createMatchStore = (fixtureId: string): MatchStore =>
       set((state) => ({ hydrationToken: state.hydrationToken + 1 })),
     markHydrated: () => set({ hydrated: true }),
     setConnection: (connection) => set({ connection }),
+    applyEditorial: (status, source = 'stream') =>
+      set((state) => reduceEditorial(state, status, source)),
+    applyKillSwitch: (killSwitch) =>
+      set((state) =>
+        reduceEditorial(state, withKillSwitch(state, killSwitch), 'rest'),
+      ),
+    applyRetraction: (payload) => set((state) => reduceRetract(state, payload)),
+    markSuppressed: (insightId) =>
+      set((state) => ({
+        suppressed: { ...state.suppressed, [insightId]: true },
+      })),
   }));

@@ -2,7 +2,8 @@ import { expect, type Page, test } from '@playwright/test';
 import { expectNoBlockingA11yViolations } from './support/a11y';
 import { mockApi } from './support/mock-api';
 import { FIXTURE_ID } from './support/mock-fixture';
-import { OIDC_PASSWORD, OIDC_USERS } from './support/oidc-users';
+import { OIDC_USERS } from './support/oidc-users';
+import { signIn } from './support/sign-in';
 
 const ROLE_LABEL: Record<string, string> = {
   producer: 'Producer',
@@ -16,18 +17,6 @@ const userNamed = (username: string) => {
   const user = OIDC_USERS.find((u) => u.username === username);
   if (!user) throw new Error(`unknown test user ${username}`);
   return user;
-};
-
-/** Drives the provider's login form; Keycloak and the test issuer share field ids. */
-const signIn = async (page: Page, username: string, returnTo = '/fixtures') => {
-  await page.goto(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`);
-  await page
-    .getByRole('link', { name: 'Continue with single sign-on' })
-    .click();
-  await page.locator('#username').fill(username);
-  await page.locator('#password').fill(OIDC_PASSWORD);
-  await page.locator('#kc-login').click();
-  await page.waitForURL((url) => url.pathname === returnTo);
 };
 
 const openUserMenu = (page: Page) =>

@@ -5,6 +5,7 @@ import type {
   MatchSnapshot,
   Narrative,
   OverlayCue,
+  OverlayRetractCause,
   Period,
   ReplayStatus,
 } from '@matchiq/contracts';
@@ -25,6 +26,8 @@ export type Retraction = {
   headline: string | null;
   reason: string;
   ending: 'EXPIRED' | 'RETRACTED';
+  /** Machine-readable cause (ADR-0016); null on streams that predate it. */
+  cause: OverlayRetractCause | null;
 };
 
 export type MomentumPoint = {
@@ -51,6 +54,8 @@ export type MatchData = {
   narratives: NarrativeIndex;
   overlays: Record<string, OverlayEntry>;
   retractions: Retraction[];
+  /** Insights this producer suppressed; the read model confirms them later. */
+  suppressed: Record<string, true>;
   momentum: MomentumPoint[];
   connection: ConnectionStatus;
   /** Incremented when REST read models must be (re)loaded: join or gap. */

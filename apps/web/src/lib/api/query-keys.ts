@@ -1,3 +1,4 @@
+import type { AuditFilters } from './editorial-endpoints';
 import type { EventsQuery, NarrativeQuery } from './endpoints';
 
 export const queryKeys = {
@@ -15,4 +16,7 @@ export const queryKeys = {
   recap: (fixtureId: string) => ['fixtures', fixtureId, 'recap'] as const,
   agentRuns: (fixtureId: string) =>
     ['fixtures', fixtureId, 'agent-runs'] as const,
+  editorial: (fixtureId: string) =>
+    ['fixtures', fixtureId, 'editorial'] as const,
+  auditEvents: (filters: AuditFilters) => ['audit-events', filters] as const,
 };

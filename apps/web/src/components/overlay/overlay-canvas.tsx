@@ -15,6 +15,7 @@ type OverlayCanvasProps = {
   scorebug: Scorebug | null;
   watermark: string;
   standbyLabel: string;
+  standbyHeld?: boolean;
   /** Headline of the most recent cue that left air, shown while standing by. */
   lastAired?: string | null;
   safeAreaLabel: string;
@@ -46,6 +47,7 @@ export function OverlayCanvas({
   scorebug,
   watermark,
   standbyLabel,
+  standbyHeld = false,
   lastAired = null,
   safeAreaLabel,
   frameLabel,
@@ -79,7 +81,11 @@ export function OverlayCanvas({
           </span>
           <div className="absolute bottom-[1.4cqw] left-[1.4cqw] right-[1.4cqw] flex flex-col items-start gap-[0.8cqw]">
             {cues.length === 0 ? (
-              <OverlayStandby label={standbyLabel} lastAired={lastAired} />
+              <OverlayStandby
+                label={standbyLabel}
+                held={standbyHeld}
+                lastAired={lastAired}
+              />
             ) : (
               cues.map((cue) => (
                 <OverlayCue

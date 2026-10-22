@@ -2,7 +2,13 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 export type BadgeTone =
-  'neutral' | 'accent' | 'synthetic' | 'onair' | 'warning' | 'positive';
+  | 'neutral'
+  | 'accent'
+  | 'synthetic'
+  | 'onair'
+  | 'warning'
+  | 'positive'
+  | 'critical';
 
 const TONES: Record<BadgeTone, string> = {
   neutral: 'border-line-strong bg-surface-raised text-ink-muted',
@@ -11,6 +17,7 @@ const TONES: Record<BadgeTone, string> = {
   onair: 'border-onair/40 bg-onair/10 text-ink',
   warning: 'border-warning/35 bg-warning/10 text-warning',
   positive: 'border-positive/30 bg-positive/10 text-positive',
+  critical: 'border-critical/40 bg-critical/10 text-critical',
 };
 
 const DOT: Partial<Record<BadgeTone, string>> = {

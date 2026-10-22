@@ -11,6 +11,8 @@ import {
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 import { formatFraction, formatMinute } from '@/lib/format';
+import type { InsightMark } from '../editorial/insight-marks';
+import { SuppressInsightButton } from '../editorial/suppress-insight-button';
 import type { RosterTeam } from '../lib/roster';
 import type { NarrativeView } from '../store';
 import { NarrativePanel } from './narrative-panel';
@@ -21,6 +23,7 @@ export type KeyMomentCardProps = {
   persona: Persona;
   locale: string;
   team: RosterTeam | null;
+  mark: InsightMark;
   onOpenEvidence: (insightId: string) => void;
 };
 
@@ -60,6 +63,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
   persona,
   locale,
   team,
+  mark,
   onOpenEvidence,
 }: KeyMomentCardProps) {
   const headline =
@@ -70,6 +74,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
       className={cn(
         'flex flex-col gap-2.5 border-b border-line px-4 py-3.5 transition-colors last:border-0 hover:bg-surface-raised/50',
         PRIORITY_RAIL[insight.priority],
+        mark.suppressed && 'bg-surface-sunken/60',
       )}
     >
       <header className="flex flex-wrap items-center gap-2">
@@ -85,6 +90,11 @@ export const KeyMomentCard = memo(function KeyMomentCard({
             {team.shortName}
           </span>
         ) : null}
+        {mark.labels.map((label) => (
+          <Badge key={label} tone="warning">
+            {label}
+          </Badge>
+        ))}
         <span className="tabular ml-auto font-mono text-xs text-ink-subtle">
           {formatMinute(insight.period, insight.matchClockMs)}
         </span>
@@ -96,10 +106,16 @@ export const KeyMomentCard = memo(function KeyMomentCard({
         clamp={persona === 'BROADCAST'}
       />
       {persona === 'ANALYST' ? <AnalystFacts insight={insight} /> : null}
-      <footer className="flex items-center justify-between gap-2">
-        <span className="text-micro text-ink-subtle">
+      <footer className="flex items-center gap-2">
+        <span className="mr-auto text-micro text-ink-subtle">
           {CONFIDENCE_LABELS[insight.evidence.confidenceLabel]}
         </span>
+        {mark.suppressed || mark.published ? null : (
+          <SuppressInsightButton
+            insightId={insight.insightId}
+            headline={headline}
+          />
+        )}
         <Button
           size="xs"
           variant="ghost"

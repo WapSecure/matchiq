@@ -10,6 +10,8 @@ export {
 } from './button-styles';
 export { Container } from './container';
 export { FeatureCard } from './feature-card';
+export { SelectField, TextField } from './form-fields';
+export { Modal } from './modal';
 export { Panel } from './panel';
 export { SectionHeader } from './section-header';
 export { SegmentedControl, type SegmentOption } from './segmented-control';

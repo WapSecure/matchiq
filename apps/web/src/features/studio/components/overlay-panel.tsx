@@ -9,7 +9,10 @@ import {
 import { Badge, Panel, SegmentedControl } from '@/components/ui';
 import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
+import { MODE_VIEW } from '@/constants/editorial';
 import { formatClock } from '@/lib/format';
+import { useEditorialMode } from '../editorial/editorial-status';
+import { RetractCueButton } from '../editorial/retract-cue-button';
 import { useOnAirCue } from '../hooks/use-on-air-cue';
 import { useMatchStore, useStudioUi } from '../store';
 import { CueLog } from './cue-log';
@@ -54,6 +57,7 @@ export function OverlayPanel({
   const onAir = useOnAirCue(persona, locale);
   const cues = onAir.cue ? [onAir.cue] : [];
   const scorebug = useScorebug(homeShort, awayShort);
+  const heldBy = MODE_VIEW[useEditorialMode()].standby;
   const copy = STUDIO_COPY.overlay;
   return (
     <Panel
@@ -62,7 +66,12 @@ export function OverlayPanel({
       description={copy.description}
       Icon={BroadcastIcon}
       className={className}
-      actions={<Tally onAir={cues.length > 0} />}
+      actions={
+        <>
+          <RetractCueButton cue={onAir.cue} />
+          <Tally onAir={cues.length > 0} />
+        </>
+      }
     >
       <div className="mb-3 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
         <OnAirMeta onAir={onAir} locale={locale} />
@@ -78,7 +87,8 @@ export function OverlayPanel({
         cues={cues}
         scorebug={scorebug}
         watermark={WATERMARK}
-        standbyLabel={OVERLAY_COPY.standby}
+        standbyLabel={heldBy ?? OVERLAY_COPY.standby}
+        standbyHeld={heldBy !== null}
         lastAired={lastHeadline ? OVERLAY_COPY.lastAired(lastHeadline) : null}
         safeAreaLabel={copy.safeArea}
         frameLabel={copy.frameLabel(cues.length)}
