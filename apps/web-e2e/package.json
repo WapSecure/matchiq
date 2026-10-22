@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@matchiq/contracts": "workspace:*"
+    "@matchiq/contracts": "workspace:*",
+    "jose": "6.2.12"
   }
 }

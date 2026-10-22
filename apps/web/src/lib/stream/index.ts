@@ -21,3 +21,4 @@ export {
   type SseRequest,
   type SseTransport,
 } from './sse-transport';
+export { ticketedSseTransport, type TicketSource } from './ticketed-transport';

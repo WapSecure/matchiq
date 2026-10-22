@@ -1,3 +1,4 @@
+import { UserMenu } from '@/components/auth/user-menu';
 import { GithubIcon, LogoMark } from '@/components/icons';
 import { ButtonLink, Container } from '@/components/ui';
 import { HEADER_LABELS, NAV_ITEMS } from '@/constants/navigation';
@@ -48,6 +49,7 @@ export function SiteHeader() {
           </nav>
           <span aria-hidden className="h-5 w-px bg-line" />
           <ThemeToggle />
+          <UserMenu />
         </div>
       </Container>
     </header>

@@ -28,3 +28,4 @@ export const AUTH_ENV_MESSAGES = {
 
 export const HTTPS_PROTOCOL = 'https:';
 export const PROD_ENVIRONMENT = 'prod';
+export const DEFAULT_WEB_URL = 'http://localhost:4200';
