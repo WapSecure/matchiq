@@ -2,6 +2,9 @@
   "name": "@matchiq/web",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "icons:generate": "node scripts/generate-pwa-icons.mjs"
+  },
   "nx": {
     "name": "web",
     "sourceRoot": "apps/web/src",

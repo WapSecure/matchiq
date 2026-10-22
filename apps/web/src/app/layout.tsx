@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
+import { PwaPrompts } from '@/components/pwa/pwa-prompts';
+import { PWA_METADATA, PWA_THEME_COLOR } from '@/constants/pwa';
 import { SITE } from '@/constants/site';
 import './global.css';
 
@@ -9,10 +11,11 @@ export const metadata: Metadata = {
   title: { default: SITE.title, template: `%s · ${SITE.name}` },
   description: SITE.description,
   robots: { index: false, follow: false },
+  ...PWA_METADATA,
 };
 
 export const viewport: Viewport = {
-  themeColor: '#07090d',
+  themeColor: PWA_THEME_COLOR,
   colorScheme: 'dark',
 };
 
@@ -22,7 +25,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang={SITE.locale}
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        {children}
+        <PwaPrompts />
+      </body>
     </html>
   );
 }
