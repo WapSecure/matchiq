@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ChevronLeftIcon, LogoMark } from '@/components/icons';
+import { UserMenu } from '@/components/auth/user-menu';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Badge } from '@/components/ui';
 import {
@@ -96,6 +97,7 @@ export function StudioHeader({
         </Badge>
         {status}
         <ThemeToggle />
+        <UserMenu />
       </div>
       <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
         <StudioTabs fixtureId={fixtureId} view={view} />

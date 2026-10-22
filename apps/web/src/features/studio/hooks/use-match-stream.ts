@@ -4,8 +4,15 @@ import type { StreamMessage } from '@matchiq/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { API_PATHS, STREAM_TIMING } from '@/constants/api';
-import { apiUrl } from '@/lib/env';
-import { MatchStreamClient, type SseTransport } from '@/lib/stream';
+import { fetchStreamTicket } from '@/lib/api/endpoints';
+import { isSignedIn, whenSessionKnown } from '@/lib/auth/session-store';
+import { publicApiUrl } from '@/lib/env';
+import {
+  fetchSseTransport,
+  MatchStreamClient,
+  type SseTransport,
+  ticketedSseTransport,
+} from '@/lib/stream';
 import { useMatchStoreApi, useStudioUi } from '../store';
 import { hydrateStudio } from './hydrate';
 
@@ -16,6 +23,20 @@ type MatchStreamOptions = {
 };
 
 const STREAM_WARNING = '[matchiq] dropped invalid stream message:';
+
+/** Signed in, each connection presents a short-lived ticket; signed out, none is needed. */
+/** Decided per connection: a session can start or end while the studio is open. */
+const streamTransport = (fixtureId: string): SseTransport => {
+  const plain = fetchSseTransport();
+  const ticketed = ticketedSseTransport(
+    async () => (await fetchStreamTicket(fixtureId)).ticket,
+    plain,
+  );
+  return async function* stream(request) {
+    await whenSessionKnown();
+    yield* isSignedIn() ? ticketed(request) : plain(request);
+  };
+};
 
 /**
  * Connects the session stream to the match store. Messages are coalesced and
@@ -42,9 +63,9 @@ export const useMatchStream = (
     };
 
     const client = new MatchStreamClient({
-      url: apiUrl(API_PATHS.stream(fixtureId)),
+      url: publicApiUrl(API_PATHS.stream(fixtureId)),
       fixtureId,
-      transport,
+      transport: transport ?? streamTransport(fixtureId),
       onMessage: (message) => {
         queue.push(message);
         timer ??= setTimeout(flush, STREAM_TIMING.flushIntervalMs);
