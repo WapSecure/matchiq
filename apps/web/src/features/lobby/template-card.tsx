@@ -1,3 +1,4 @@
+import { RequirePermission } from '@/components/auth/require-permission';
 import { TeamMonogram } from '@/components/match/team-monogram';
 import { Badge } from '@/components/ui';
 import {
@@ -82,7 +83,12 @@ export function TemplateCard({
         <Facts template={template} />
       </div>
       <footer className="mt-auto border-t border-line bg-surface-raised/50 px-5 py-3">
-        <SessionStart templateId={template.templateId} title={template.title} />
+        <RequirePermission permission="replay:control">
+          <SessionStart
+            templateId={template.templateId}
+            title={template.title}
+          />
+        </RequirePermission>
       </footer>
     </article>
   );

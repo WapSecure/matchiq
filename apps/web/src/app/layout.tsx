@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { connection } from 'next/server';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
+import { SessionLoader } from '@/components/auth/session-loader';
 import { PwaPrompts } from '@/components/pwa/pwa-prompts';
 import { PWA_METADATA, PWA_THEME_COLOR } from '@/constants/pwa';
 import { SITE } from '@/constants/site';
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
+        <SessionLoader />
         {children}
         <PwaPrompts />
       </body>

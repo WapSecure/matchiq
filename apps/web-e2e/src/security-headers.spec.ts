@@ -8,6 +8,7 @@ const SCREENS = [
   `/studio/${FIXTURE_ID}`,
   `/studio/${FIXTURE_ID}/observatory`,
   `/studio/${FIXTURE_ID}/recap`,
+  '/sign-in',
   '/offline',
   '/no-such-page',
 ];

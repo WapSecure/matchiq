@@ -40,7 +40,7 @@ base-uri 'none'; form-action 'self' [<OIDC issuer origin>]; frame-ancestors 'non
 
 - Next's App Router streams inline scripts, so a hash alone cannot work. Next reads the nonce from the request's CSP header and stamps it on its scripts. The root layout calls `connection()` so every page renders per request.
 - The no-flash theme bootstrap (`lib/theme/theme-script.ts`) is a string literal. It is allowed by its SHA-256, computed from that same constant, so the hash cannot drift from the bytes the layout renders.
-- `connect-src` takes the origin of `NEXT_PUBLIC_API_BASE_URL` (build time) and of `OIDC_ISSUER_URL` (read at runtime by the web server, so one image can use Keycloak on :8180 locally or Entra ID). The issuer is also allowed in `form-action` for sign-in redirects. That is the seam for new origins: add an env-driven origin in `page-policy.ts`, never a wildcard.
+- `connect-src` takes the origin of `NEXT_PUBLIC_API_BASE_URL` (build time) and of the OIDC issuer as the browser reaches it: `NEXT_PUBLIC_OIDC_ISSUER_URL`, falling back to the server's `OIDC_ISSUER_URL`, read at runtime (Keycloak on :8180 locally, Entra ID in Azure). The issuer is also allowed in `form-action` for sign-in redirects. That is the seam for new origins: add an env-driven origin in `page-policy.ts`, never a wildcard.
 - `next dev` uses the same policy plus `'unsafe-eval'` (React's dev stack frames) and `ws:`/`wss:` (HMR). Production never has either; **[test]** `csp.spec.ts` checks this.
 - **[test]** `apps/web-e2e/src/security-headers.spec.ts` runs against the production build on every screen, in system, light and dark themes, on desktop and mobile. It fails on any `securitypolicyviolation` event or console error.
 
