@@ -5,6 +5,16 @@
  */
 export const CUE_MIN_DWELL_MS = 4_000;
 
+/** Extended real-time hold for walk-through demos at 20–30× replay. */
+export const CUE_EXTENDED_DWELL_MS = 10_000;
+
+export const CUE_HOLD_MS = {
+  standard: CUE_MIN_DWELL_MS,
+  extended: CUE_EXTENDED_DWELL_MS,
+} as const;
+
+export type CueHold = keyof typeof CUE_HOLD_MS;
+
 /**
  * `overlay.retract` reasons the worker sends when a cue simply ran its course
  * (`OVERLAY_END_REASONS` in the worker). Anything else is a real retraction
@@ -27,4 +37,15 @@ export const OVERLAY_COPY = {
   sourceHint:
     'Revision 1 uses the deterministic broadcast template; later revisions carry agent copy that passed the publish gate.',
   localeFallback: 'en-GB graphic',
+  standby: 'Standing by',
+  lastAired: (headline: string) => `Last on air: ${headline}`,
+  holdLegend: 'Cue hold',
+  holdOptions: [
+    { value: 'standard', label: 'Standard cue hold, 4 seconds', short: '4 s' },
+    {
+      value: 'extended',
+      label: 'Extended cue hold for demos, 10 seconds',
+      short: '10 s',
+    },
+  ],
 } as const;

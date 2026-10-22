@@ -47,11 +47,10 @@ export const STUDIO_COPY = {
   overlay: {
     title: 'Broadcast overlay preview',
     description: '16:9 graphics-safe frame at the current match clock',
-    empty: 'No approved cue on air',
     safeArea: 'Safe area',
     frameLabel: (count: number) =>
       count === 0
-        ? 'Overlay preview, no cue on air'
+        ? 'Overlay preview, standing by'
         : `Overlay preview, ${count} cue${count === 1 ? '' : 's'} on air`,
   },
   controls: {

@@ -83,8 +83,11 @@ export class SessionManager
       if (!RESUMABLE.has(session.status.state)) continue;
       const key = { orgId, fixtureId: session.sessionId };
       const runner = await this.runnerFor(key);
+      if (runner === null) continue;
+      // A rebuilt controller starts at the default speed; restore the session's own.
+      runner.command({ action: 'setSpeed', speed: session.status.speed });
       if (session.status.state === 'PLAYING') {
-        runner?.command({ action: 'resume' });
+        runner.command({ action: 'resume' });
       }
     }
   }

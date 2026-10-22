@@ -109,7 +109,7 @@ describe('OverlayCanvas', () => {
         ]}
         scorebug={null}
         watermark="Synthetic match demo"
-        emptyLabel="None"
+        standbyLabel="Standing by"
         safeAreaLabel="Safe area"
         frameLabel="Overlay preview"
       />,
@@ -121,18 +121,36 @@ describe('OverlayCanvas', () => {
     expect(area?.style.bottom).toBe('10%');
   });
 
-  it('shows the empty placeholder when nothing is on air', () => {
+  it('stands by with the last aired cue when nothing is on air', () => {
     render(
       <OverlayCanvas
         cues={[]}
         scorebug={null}
         watermark="W"
-        emptyLabel="No approved cue on air"
+        standbyLabel="Standing by"
+        lastAired="Last on air: Goal for Penbrook Town"
         safeAreaLabel="Safe area"
         frameLabel="Overlay preview"
       />,
     );
-    expect(screen.getByText('No approved cue on air')).toBeInTheDocument();
+    const standby = screen.getByTestId('overlay-standby');
+    expect(standby).toHaveTextContent('Standing by');
+    expect(standby).toHaveTextContent('Last on air: Goal for Penbrook Town');
+  });
+
+  it('hides the standby state while a cue is on air', () => {
+    render(
+      <OverlayCanvas
+        cues={[cue()]}
+        scorebug={null}
+        watermark="W"
+        standbyLabel="Standing by"
+        lastAired="Last on air: earlier"
+        safeAreaLabel="Safe area"
+        frameLabel="Overlay preview"
+      />,
+    );
+    expect(screen.queryByTestId('overlay-standby')).not.toBeInTheDocument();
   });
 });
 
