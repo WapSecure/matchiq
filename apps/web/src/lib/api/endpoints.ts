@@ -5,6 +5,7 @@ import {
   type Persona,
   ReplayCommand,
   type ReplayCommand as ReplayCommandType,
+  type FaultPlanInput,
   type ReplaySpeed,
   ReplayStatus,
 } from '@matchiq/contracts';
@@ -38,10 +39,14 @@ export const fetchSessions = (
 ) => requestJson(API_PATHS.sessions, SessionList, { signal, query: { limit } });
 
 /** Creates a fresh session of a template; the worker starts it at `speed`. */
-export const createSession = (templateId: string, speed: ReplaySpeed) =>
+export const createSession = (
+  templateId: string,
+  speed: ReplaySpeed,
+  faultPlan?: FaultPlanInput,
+) =>
   requestJson(API_PATHS.createSession(templateId), CreatedSession, {
     method: 'POST',
-    body: { speed },
+    body: { speed, ...(faultPlan && { faultPlan }) },
     headers: idempotent(),
   });
 

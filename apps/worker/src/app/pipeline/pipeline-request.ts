@@ -1,6 +1,7 @@
 import {
   PipelineRequest,
   SCHEMA_VERSION,
+  type FaultScenario,
   type Fixture,
   type Insight,
 } from '@matchiq/contracts';
@@ -18,6 +19,8 @@ export interface PipelineRequestInput {
   readonly insight: Insight;
   readonly revision: number;
   readonly deadlineMs: number;
+  /** Demo fault for this insight (ADR-0017); absent for every ordinary run. */
+  readonly fault?: FaultScenario;
 }
 
 /**
@@ -50,5 +53,6 @@ export const buildPipelineRequest = (
     },
     personas: [...PERSONAS],
     locales: [...LOCALES],
+    ...(input.fault && { fault: input.fault }),
   });
 };

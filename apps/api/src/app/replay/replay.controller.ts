@@ -42,6 +42,7 @@ export class ReplayController {
     const result = await this.replay.createSession({
       templateId,
       speed: body.speed,
+      ...(body.faultPlan && { faultPlan: body.faultPlan }),
       idempotencyKey: parseIdempotencyKey(idempotencyKey),
     });
     return respond(res, result);

@@ -57,6 +57,7 @@ const toView = (row: SessionRow): ReplaySessionView => ({
   },
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
+  ...(row.faultPlan === null ? {} : { faultPlan: row.faultPlan }),
 });
 
 const nextSessionNumber = async (
@@ -84,6 +85,7 @@ const sessionSelect = (db: Database | Transaction) =>
       appliedSequence: s.appliedSequence,
       period: s.period,
       matchClockMs: s.matchClockMs,
+      faultPlan: s.faultPlan,
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
       title: fixtures.title,
@@ -184,6 +186,7 @@ export class PostgresSessionStore implements SessionStore {
       sessionNumber,
       state: 'IDLE',
       speed: command.speed,
+      faultPlan: command.faultPlan ?? null,
     });
     await ledger.appendAudit({
       orgId: command.orgId,
@@ -193,7 +196,11 @@ export class PostgresSessionStore implements SessionStore {
       targetType: AUDIT_TARGET_TYPES.fixture,
       targetId: fixture.fixtureId,
       fixtureId: fixture.fixtureId,
-      details: { templateId: command.templateId, speed: command.speed },
+      details: {
+        templateId: command.templateId,
+        speed: command.speed,
+        ...(command.faultPlan ? { faultPlan: command.faultPlan } : {}),
+      },
     });
   }
 }

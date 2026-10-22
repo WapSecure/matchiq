@@ -352,6 +352,9 @@
               "pcm-NG"
             ]
           }
+        },
+        "fault": {
+          "$ref": "#/$defs/FaultScenario"
         }
       },
       "required": [
@@ -361,6 +364,14 @@
         "locales"
       ],
       "additionalProperties": false
+    },
+    "FaultScenario": {
+      "type": "string",
+      "enum": [
+        "WRITER_REVISE",
+        "MODEL_TIMEOUT",
+        "GATE_REJECT"
+      ]
     }
   }
 }

@@ -1,11 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { WorkerEnv } from '@matchiq/config';
-import type { Fixture, Insight } from '@matchiq/contracts';
-import type { InsightPipelineJob } from '@matchiq/db';
+import type {
+  FaultScenario,
+  Fixture,
+  Insight,
+  PipelineResult,
+} from '@matchiq/contracts';
+import type { FixtureKey, InsightPipelineJob, SessionStore } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
 import { FALLBACK_REASONS } from '../constants';
 import type { AgentPipelineDeps } from '../infrastructure/bundles';
-import { AGENT_PIPELINE_DEPS } from '../infrastructure/tokens';
+import { AGENT_PIPELINE_DEPS, SESSION_STORE } from '../infrastructure/tokens';
 import { buildPipelineRequest } from '../pipeline/pipeline-request';
 import {
   agentPublication,
@@ -16,6 +21,7 @@ import { SessionManager } from '../replay/session-manager.service';
 import type { WriteOutcome } from '../replay/pipeline-writer';
 import { AgentsCallError } from './agents-client';
 import { CircuitBreaker } from './circuit-breaker';
+import { faultFor, tamperForGate } from './demo-faults';
 
 export interface JobAttempt {
   /** Attempts already made before this one (BullMQ `attemptsMade`). */
@@ -45,6 +51,7 @@ export class InsightPipelineService {
     @Inject(APP_ENV) private readonly env: WorkerEnv,
     @Inject(AGENT_PIPELINE_DEPS) private readonly deps: AgentPipelineDeps,
     private readonly sessions: SessionManager,
+    @Inject(SESSION_STORE) private readonly sessionStore: SessionStore,
   ) {
     this.breaker = new CircuitBreaker({
       failureThreshold: env.AGENT_CIRCUIT_FAILURE_THRESHOLD,
@@ -72,6 +79,7 @@ export class InsightPipelineService {
       fixture,
       job,
       attempt,
+      fault: await this.faultOf(key, pending.insightId),
     });
     return this.sessions.publish(key, { insight: pending, ...decided });
   }
@@ -81,8 +89,9 @@ export class InsightPipelineService {
     fixture: Fixture;
     job: InsightPipelineJob;
     attempt: JobAttempt;
+    fault: FaultScenario | undefined;
   }): Promise<Decided> {
-    const { insight, fixture, job, attempt } = input;
+    const { insight, fixture, attempt } = input;
     const createdAt = this.deps.clock.now().toISOString();
     const fallback = (reason: string): Decided => ({
       claim: 'TEMPLATE',
@@ -98,15 +107,7 @@ export class InsightPipelineService {
     if (!this.breaker.tryAcquire())
       return fallback(FALLBACK_REASONS.circuitOpen);
     try {
-      const result = await this.deps.client.run(
-        buildPipelineRequest({
-          orgId: job.orgId,
-          fixture,
-          insight,
-          revision: job.revision,
-          deadlineMs: this.env.AGENT_TIMEOUT_MS,
-        }),
-      );
+      const result = await this.callAgents(input);
       this.breaker.recordSuccess();
       const publication = agentPublication({
         insight,
@@ -126,5 +127,37 @@ export class InsightPipelineService {
       if (call?.retriable === true && !lastAttempt) throw error;
       return fallback(call?.message ?? FALLBACK_REASONS.unreachable);
     }
+  }
+
+  private async callAgents(input: {
+    insight: Insight;
+    fixture: Fixture;
+    job: InsightPipelineJob;
+    fault: FaultScenario | undefined;
+  }): Promise<PipelineResult> {
+    const { fault, job } = input;
+    const answer = await this.deps.client.run(
+      buildPipelineRequest({
+        orgId: job.orgId,
+        fixture: input.fixture,
+        insight: input.insight,
+        revision: job.revision,
+        deadlineMs: this.env.AGENT_TIMEOUT_MS,
+        ...(fault && { fault }),
+      }),
+    );
+    return fault === 'GATE_REJECT' ? tamperForGate(answer) : answer;
+  }
+
+  /** Demo faults apply only where enabled, to sessions created with a plan. */
+  private async faultOf(
+    key: FixtureKey,
+    insightId: string,
+  ): Promise<FaultScenario | undefined> {
+    if (!this.env.DEMO_FAULTS_ENABLED) return undefined;
+    const session = await this.sessionStore.get(key);
+    if (session?.faultPlan === undefined) return undefined;
+    const insights = await this.deps.reader.insights(key);
+    return faultFor(session.faultPlan, insights, insightId);
   }
 }

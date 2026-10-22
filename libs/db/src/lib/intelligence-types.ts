@@ -1,6 +1,7 @@
 import type {
   AgentRun,
   ConfidenceLabel,
+  FaultPlan,
   Fixture,
   Insight,
   InsightKind,
@@ -85,6 +86,8 @@ export interface ReplaySessionView {
   readonly status: ReplayStatus;
   readonly createdAt: string;
   readonly updatedAt: string;
+  /** Present only on demo sessions created with simulated failures (ADR-0017). */
+  readonly faultPlan?: FaultPlan;
 }
 
 export interface CreatedSession {
@@ -258,6 +261,7 @@ export interface CreateSessionCommand {
   readonly orgId: string;
   readonly templateId: string;
   readonly speed: ReplayStatus['speed'];
+  readonly faultPlan?: FaultPlan;
   /** When set, creation fails with `SessionCapacityExceeded` at the limit. */
   readonly capacity?: SessionCapacity;
 }

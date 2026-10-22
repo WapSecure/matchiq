@@ -148,6 +148,12 @@ class Packet(BaseModel):
     policyVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
 
 
+class FaultScenario(StrEnum):
+    WRITER_REVISE = "WRITER_REVISE"
+    MODEL_TIMEOUT = "MODEL_TIMEOUT"
+    GATE_REJECT = "GATE_REJECT"
+
+
 class PipelineRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -156,3 +162,4 @@ class PipelineRequest(BaseModel):
     packet: Packet
     personas: Annotated[list[Persona], Field(min_length=1)]
     locales: Annotated[list[Locale], Field(min_length=1)]
+    fault: FaultScenario | None = None

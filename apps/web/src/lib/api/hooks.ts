@@ -4,6 +4,7 @@ import type {
   Locale,
   Persona,
   ReplayCommand,
+  FaultPlanInput,
   ReplaySpeed,
 } from '@matchiq/contracts';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -39,10 +40,12 @@ export const useCreateSession = () =>
     mutationFn: ({
       templateId,
       speed,
+      faultPlan,
     }: {
       templateId: string;
       speed: ReplaySpeed;
-    }) => createSession(templateId, speed),
+      faultPlan?: FaultPlanInput;
+    }) => createSession(templateId, speed, faultPlan),
   });
 
 export const useFixture = (fixtureId: string) =>

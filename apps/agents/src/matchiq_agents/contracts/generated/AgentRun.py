@@ -30,6 +30,12 @@ class Outcome(StrEnum):
     FALLBACK = "FALLBACK"
 
 
+class FaultScenario(StrEnum):
+    WRITER_REVISE = "WRITER_REVISE"
+    MODEL_TIMEOUT = "MODEL_TIMEOUT"
+    GATE_REJECT = "GATE_REJECT"
+
+
 class AgentRun(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -46,3 +52,5 @@ class AgentRun(BaseModel):
     tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
     retries: Annotated[int, Field(ge=0, le=2)]
     outcome: Outcome
+    faultInjected: FaultScenario | None = None
+    faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None

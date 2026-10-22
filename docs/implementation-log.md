@@ -2,6 +2,21 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-22 — MQ-031: Deterministic demo fault scenarios (failure and recovery chains)
+
+| Area                                                                                                                                                                                        | Status | Evidence                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------- |
+| Contracts: `FaultScenario`, `FaultPlan`, `CreateReplaySession.faultPlan`, `PipelineRequest.fault`, `AgentRun.faultInjected` / `faultNote`; JSON Schema and Pydantic regenerated             | Done   | `pnpm codegen` output committed                                                                 |
+| `DEMO_FAULTS_ENABLED` (api, worker, agents), refused at startup in prod                                                                                                                     | Done   | `demo-faults-env.spec.ts`, `test_faults.py`                                                     |
+| API: plan validated and stored (`replay_sessions.fault_plan`, migration `0004_session_fault_plan`), shown on the session, audited; 403 `demo-faults-disabled` when off                      | Done   | `demo-faults.integration.spec.ts` (api)                                                         |
+| Worker: deterministic plan resolution per insight (kinds, everyNth), `PipelineRequest.fault`, and `GATE_REJECT` tampering ahead of the publish gate                                         | Done   | `demo-faults.spec.ts`, `demo-faults.integration.spec.ts` (worker)                               |
+| Agents: `FaultInjectingModel` (`ModelPort` decorator) and `FaultAwareOrchestrator` with an isolated breaker per faulted run; revise and timeout chains annotated; works with every provider | Done   | `tests/test_faults.py` (mock and scripted providers)                                            |
+| Lobby "Demo scenario" select (demo mode only); Observatory fault badge and chain                                                                                                            | Done   | `fault-chain.spec.tsx`; Playwright `demo-faults.spec.ts` (axe, both themes, desktop and mobile) |
+
+Verification ran in CI only, by owner directive (the machine was overloaded). Locally: codegen, Ruff, Pyright, and lint and typecheck of the changed TypeScript projects.
+
+Limitations: simulated timeouts are raised at once, so their latency is not representative. The lobby select needs `NEXT_PUBLIC_DEMO_MODE=true` at build time. With `ollama` or `foundry` the revision is real model output and could itself fail its checks; that case falls back to the persona's template, which is also a valid chain.
+
 ## 2026-10-22 — MQ-023: Editorial control, kill switch and audit trail (backend)
 
 | Area                                                                                                                                                                                                                                                   | Status | Evidence                                                                                                                  |

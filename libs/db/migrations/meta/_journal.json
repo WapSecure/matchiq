@@ -29,6 +29,13 @@
       "when": 1792669929924,
       "tag": "0003_editorial_control_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792684057589,
+      "tag": "0004_session_fault_plan",
+      "breakpoints": true
     }
   ]
 }

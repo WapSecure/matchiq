@@ -24,6 +24,8 @@ Covers both the product's runtime agents and the coding agents that build the re
 
 **Local slow lane (ADR-0011 addendum).** `AGENT_TIMEOUT_MS` may be up to 180 s for local inference, and cloud providers keep short deadlines. On `ollama` the AI critique is off by default, timeouts have their own breaker threshold, and rejected output is not retried. Templates are always on air first. A late agent narrative replaces them only after the deterministic checks and the worker's gate pass.
 
+**Demo fault scenarios (ADR-0017).** A session can be created with a fault plan (`WRITER_REVISE`, `MODEL_TIMEOUT`, `GATE_REJECT`) to show a failure and recovery chain on demand. This needs `DEMO_FAULTS_ENABLED=true`, which every service refuses at startup in prod. Each faulted run carries `faultInjected` and is shown as "Simulated failure (demo)". A faulted run uses its own circuit breaker, so it never degrades real sessions. A simulated failure is never described as a real outage.
+
 **Evaluation (M2).** 30 golden insight cases plus adversarial inputs. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled.
 
 ## Coding agents (Claude Code and others)

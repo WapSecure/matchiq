@@ -21,7 +21,7 @@ import {
   type TestDatabase,
 } from '@matchiq/db/testing';
 import { ManualScheduler } from '@matchiq/replay';
-import type { ReplaySpeed, StreamMessage } from '@matchiq/contracts';
+import type { FaultPlan, ReplaySpeed, StreamMessage } from '@matchiq/contracts';
 import type { AgentsClient } from '../app/agents/agents-client';
 import { InsightPipelineService } from '../app/agents/insight-pipeline.service';
 import { AppModule } from '../app/app.module';
@@ -116,8 +116,14 @@ export const replayToEnd = async (
   t: TestWorker,
   templateId: string,
   speed: ReplaySpeed = 30,
+  faultPlan?: FaultPlan,
 ): Promise<FixtureKey> => {
-  const created = await t.store.create({ orgId: ORG, templateId, speed });
+  const created = await t.store.create({
+    orgId: ORG,
+    templateId,
+    speed,
+    ...(faultPlan && { faultPlan }),
+  });
   if (created === null) throw new Error(`template ${templateId} missing`);
   const key = { orgId: ORG, fixtureId: created.fixture.fixtureId };
   await t.sessions.handle({ ...key, command: { action: 'start', speed } });

@@ -7,6 +7,7 @@ import {
   VerificationResult,
 } from './agents.js';
 import { LIMITS } from './constants.js';
+import { FaultScenario } from './faults.js';
 import { PipelineStatus } from './insight.js';
 import { NarrativeSource } from './narrative.js';
 import { OverlayKind } from './overlay.js';
@@ -27,6 +28,8 @@ export const PipelineRequest = z
     packet: FactPacket,
     personas: z.array(Persona).min(1),
     locales: z.array(Locale).min(1),
+    /** Demo fault for this insight (ADR-0017); ignored unless demo faults are enabled. */
+    fault: FaultScenario.optional(),
   })
   .meta({ id: 'PipelineRequest' });
 

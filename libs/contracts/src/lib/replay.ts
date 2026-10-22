@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FaultPlan } from './faults.js';
 import { FixtureId, MatchClockMs, Period } from './primitives.js';
 
 export const REPLAY_SPEEDS = [1, 5, 20, 30] as const;
@@ -26,7 +27,14 @@ export const ReplayCommand = z.discriminatedUnion('action', [
   }),
 ]);
 
+/** `POST /fixtures/:templateId/sessions`; `faultPlan` is refused unless demo faults are on. */
+export const CreateReplaySession = z.strictObject({
+  speed: ReplaySpeed,
+  faultPlan: FaultPlan.optional(),
+});
+
 export type ReplaySpeed = z.infer<typeof ReplaySpeed>;
 export type ReplayState = z.infer<typeof ReplayState>;
 export type ReplayStatus = z.infer<typeof ReplayStatus>;
 export type ReplayCommand = z.infer<typeof ReplayCommand>;
+export type CreateReplaySession = z.infer<typeof CreateReplaySession>;

@@ -99,6 +99,7 @@ services:
     image: matchiq-api:local
     environment:
       APP_ENV: ${APP_ENV:-local}
+      DEMO_FAULTS_ENABLED: ${DEMO_FAULTS_ENABLED:-false}
       APP_VERSION: ${APP_VERSION:-0.0.0-dev}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       DEMO_ORG_ID: ${DEMO_ORG_ID:-org_demo}
@@ -134,6 +135,7 @@ services:
     image: matchiq-worker:local
     environment:
       APP_ENV: ${APP_ENV:-local}
+      DEMO_FAULTS_ENABLED: ${DEMO_FAULTS_ENABLED:-false}
       APP_VERSION: ${APP_VERSION:-0.0.0-dev}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       DEMO_ORG_ID: ${DEMO_ORG_ID:-org_demo}
@@ -171,6 +173,7 @@ services:
     image: matchiq-agents:local
     environment:
       APP_ENV: ${APP_ENV:-local}
+      DEMO_FAULTS_ENABLED: ${DEMO_FAULTS_ENABLED:-false}
       APP_VERSION: ${APP_VERSION:-0.0.0-dev}
       AGENTS_PORT: '8000'
       AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
