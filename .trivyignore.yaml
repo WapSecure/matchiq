@@ -1,0 +1,24 @@
+# Trivy exceptions. Policy (docs/engineering/SECURITY_STANDARDS.md#container-and-iac-scanning):
+# - Only for a finding that is not exploitable here or has no fix yet worth taking.
+# - Every entry names the finding id, the paths or image it applies to, a
+#   `statement` saying why it is safe, and an `expired_at` no more than 90 days out.
+# - Expired entries stop matching, so the finding fails CI again until re-reviewed.
+# Example:
+# vulnerabilities:
+#   - id: CVE-0000-00000
+#     paths: ['usr/local/lib/node_modules/npm/package.json']
+#     statement: npm is not invoked at runtime; the image runs node directly.
+#     expired_at: 2027-01-15
+vulnerabilities: []
+misconfigurations:
+  - id: AZU-0013
+    paths: ['keyvault.json']
+    statement: >-
+      Key Vault keeps public network access because the Container Apps
+      environment has no VNet, and Container Apps is not a trusted service that
+      can bypass a deny-by-default ACL. Access is RBAC-only (Key Vault Secrets
+      User for the apps managed identity), with no access policies or keys.
+      Private endpoints for prod are planned (spec §49). This template has
+      never been deployed (ADR-0003).
+    expired_at: 2027-01-20
+secrets: []

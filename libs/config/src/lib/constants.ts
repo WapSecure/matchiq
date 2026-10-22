@@ -42,6 +42,11 @@ export const ENV_PATTERNS = {
   postgresProtocol: /^postgres(ql)?$/,
   redisProtocol: /^rediss?$/,
   redisKeyPrefix: /^[a-z][a-z0-9_-]{0,31}$/,
+  origin: /^https?:\/\/[A-Za-z0-9.-]+(:\d{1,5})?$/,
+} as const;
+
+export const ENV_MESSAGES = {
+  origin: 'must be an exact origin such as https://app.example.com',
 } as const;
 
 export const DEFAULT_DEMO_ORG_ID = 'org_demo';

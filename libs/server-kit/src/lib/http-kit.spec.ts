@@ -126,5 +126,19 @@ describe('HTTP baseline', () => {
     const res = await request(app.getHttpServer()).get('/api/v1/probe/missing');
     expect(res.headers['x-content-type-options']).toBe('nosniff');
     expect(res.headers['x-powered-by']).toBeUndefined();
+    expect(res.headers['content-security-policy']).toBe(
+      "default-src 'none';base-uri 'none';form-action 'none';frame-ancestors 'none'",
+    );
+    expect(res.headers['strict-transport-security']).toMatch(/max-age=\d+/);
+    expect(res.headers['x-frame-options']).toBe('DENY');
+    expect(res.headers['cross-origin-resource-policy']).toBe('same-origin');
+  });
+
+  it('denies cross-origin browser calls without an allowlist', async () => {
+    const res = await request(app.getHttpServer())
+      .options('/api/v1/probe/missing')
+      .set('Origin', 'https://evil.example')
+      .set('Access-Control-Request-Method', 'GET');
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
   });
 });
