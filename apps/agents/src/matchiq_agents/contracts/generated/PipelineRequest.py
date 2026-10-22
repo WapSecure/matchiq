@@ -143,7 +143,7 @@ class Packet(BaseModel):
     entities: Entities
     persona: Persona
     locale: Locale
-    deadlineMs: Annotated[int, Field(gt=0, le=30000)]
+    deadlineMs: Annotated[int, Field(gt=0, le=180000)]
     policyVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
 
 

@@ -75,7 +75,7 @@ class ModelRunner:
         return min(remaining, max(self._call_cap_ms, self._policy.min_call_ms))
 
     async def _attempt[T: BaseModel, R](self, call: ModelCall[T, R], state: _Attempts) -> R | None:
-        """One call. Transport faults and timeouts trip the breaker; rejected output does not."""
+        """One call. Transport faults and timeouts count toward the breaker; bad output does not."""
         budget_ms = self._call_budget_ms()
         if budget_ms < self._policy.min_call_ms:
             state.outcome = RunOutcome.TIMED_OUT
@@ -92,7 +92,7 @@ class ModelRunner:
                 )
         except TimeoutError:
             state.outcome = RunOutcome.TIMED_OUT
-            self._breaker.record_failure()
+            self._breaker.record_timeout()
             return None
         except Exception:
             logger.warning("model call failed", extra={"agent": call.prompt.agent.value})

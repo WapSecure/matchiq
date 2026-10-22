@@ -12,6 +12,13 @@ DEFAULT_CIRCUIT_FAILURE_THRESHOLD: Final = 5
 DEFAULT_CIRCUIT_RESET_MS: Final = 30_000
 RETRY_BACKOFF_BASE_MS: Final = 100
 PER_CALL_DEADLINE_SHARE: Final = 0.5
+# Local inference is serial (Ollama runs one request at a time by default) and the batched
+# Localization call is the longest; one call may use up to this share of a slow-lane deadline.
+LOCAL_PER_CALL_DEADLINE_SHARE: Final = 0.75
+# Consecutive timeouts before a local model's breaker opens (ADR-0011 addendum): one pipeline
+# times out at most twice before its deadline is spent, so this is four pipelines in a row
+# without a single answer.
+LOCAL_CIRCUIT_TIMEOUT_THRESHOLD: Final = 8
 DEADLINE_RESERVE_MS: Final = 50
 MIN_MODEL_CALL_MS: Final = 200
 WORKFLOW_GRACE_MS: Final = 1_000

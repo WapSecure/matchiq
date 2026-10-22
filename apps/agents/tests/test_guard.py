@@ -11,9 +11,10 @@ from matchiq_agents.guard.text import (
     extract_numerals,
     forbidden_categories,
     is_safe_entity_name,
+    restore_names,
     unknown_capitalised,
 )
-from matchiq_agents.roster.convert import facts_payload, to_overlay
+from matchiq_agents.roster.convert import facts_payload, tidy, to_overlay
 from matchiq_agents.templates.fallback import TemplateFallback
 from tests.support.builders import CaseSpec, build_request
 
@@ -178,3 +179,17 @@ def test_pidgin_localisation_must_keep_numbers_and_names() -> None:
     assert check_localised(source, spelled, VIEW) == []
     invented = target.model_copy(update={"body": target.body.replace("5", "siks")})
     assert IssueCode.UNSUPPORTED_NUMBER in _codes(check_localised(source, invented, VIEW))
+
+
+def test_allowlisted_names_get_their_capitals_back_and_hashtags_go() -> None:
+    names = {"Harbour City", "Tomas Varell"}
+    text = "harbour city press high; tomas varell #MatchIQ #PressingHard"
+    assert tidy(text, names) == "Harbour City press high; Tomas Varell"
+    assert restore_names("harbourcity and Arsenal", names) == "harbourcity and Arsenal"
+
+
+def test_number_words_leaking_across_locales_are_caught() -> None:
+    for locale in (Locale.fr_FR, Locale.es_ES):
+        values = [n.value for n in extract_numerals("Dem don score nain goals, nine.", locale)]
+        assert values == [9.0, 9.0]
+    assert extract_numerals("Tu es là et il joue.", Locale.fr_FR) == []

@@ -31,7 +31,7 @@ async def produce(
     if use_template:
         return ctx.fallback.overlay(), (ctx.local_run(BROADCAST_PRODUCER.agent),), None
     payload = ProducerInput(
-        facts=facts_payload(ctx.view),
+        facts=facts_payload(ctx.view, free_text=False),
         broadcast_draft=text_pairs([broadcast])[0],
         headline_max=OVERLAY_LIMITS.headline_max,
         body_max=OVERLAY_LIMITS.body_max,

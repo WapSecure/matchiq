@@ -13,9 +13,14 @@ from matchiq_agents.contracts.types import (
     Verdict,
 )
 from matchiq_agents.models.mock import MockModel
-from matchiq_agents.models.port import ModelPort
+from matchiq_agents.models.port import ModelPort, ModelUsage
 from matchiq_agents.pipeline import orchestrator as orchestrator_module
-from matchiq_agents.roster.schemas import CritiqueOutput, WriterOutput
+from matchiq_agents.roster.schemas import (
+    CritiqueOutput,
+    LocalizationOutput,
+    WriterInput,
+    WriterOutput,
+)
 from matchiq_agents.settings import Settings
 from matchiq_agents.wiring import build_orchestrator
 from tests.conftest import TOKEN
@@ -123,3 +128,87 @@ async def test_away_team_subject_is_named() -> None:
     assert all(
         "Northgate Rovers" in d.body for d in result.narratives if d.persona.value == "CASUAL"
     )
+
+
+def _break_persona(persona: str, *, always: bool) -> Any:
+    def override(answer: BaseModel, count: int) -> BaseModel | None:
+        assert isinstance(answer, WriterOutput)
+        if count > 1 and not always:
+            return None
+        drafts = [
+            d.model_copy(update={"body": d.body + " Nine goals."}) if d.persona == persona else d
+            for d in answer.drafts
+        ]
+        return answer.model_copy(update={"drafts": drafts})
+
+    return override
+
+
+class RecordingModel(ScriptedModel):
+    """Remembers each writer payload so tests can see which personas a revision asked for."""
+
+    def __init__(self, overrides: Any) -> None:
+        super().__init__(overrides)
+        self.writer_personas: list[list[str]] = []
+
+    async def generate[T: BaseModel](
+        self,
+        agent_name: AgentName,
+        instructions: str,
+        payload: BaseModel,
+        response_model: type[T],
+        deadline: Any,
+    ) -> tuple[T, ModelUsage]:
+        if isinstance(payload, WriterInput):
+            self.writer_personas.append([p.value for p in payload.personas])
+        return await super().generate(agent_name, instructions, payload, response_model, deadline)
+
+
+async def test_revision_asks_only_for_the_failing_persona() -> None:
+    model = RecordingModel({AgentName.NARRATIVE_WRITER: _break_persona("CASUAL", always=False)})
+    result = await _run(model)
+    assert result.status is PipelineStatus.VERIFIED
+    assert model.writer_personas == [["CASUAL", "ANALYST", "BROADCAST"], ["CASUAL"]]
+    assert {d.source for d in result.narratives} == {NarrativeSource.AGENT}
+
+
+async def test_a_persona_that_keeps_failing_falls_back_alone() -> None:
+    model = ScriptedModel({AgentName.NARRATIVE_WRITER: _break_persona("ANALYST", always=True)})
+    result = await _run(model)
+    assert result.status is PipelineStatus.FALLBACK
+    assert result.fallbackReason is not None
+    assert "replaced ANALYST" in result.fallbackReason
+    sources = {(d.persona.value, d.source) for d in result.narratives}
+    assert ("ANALYST", NarrativeSource.TEMPLATE) in sources
+    assert ("CASUAL", NarrativeSource.AGENT) in sources
+    assert ("BROADCAST", NarrativeSource.AGENT) in sources
+    assert result.overlay is not None
+
+
+async def test_localization_is_one_call_and_falls_back_per_item() -> None:
+    def break_french_casual(answer: BaseModel, _count: int) -> BaseModel:
+        assert isinstance(answer, LocalizationOutput)
+        drafts = [
+            d.model_copy(update={"body": d.body + " 99."})
+            if (d.locale, d.persona) == ("fr-FR", "CASUAL")
+            else d
+            for d in answer.drafts
+        ]
+        return answer.model_copy(update={"drafts": drafts})
+
+    model = ScriptedModel({AgentName.LOCALIZATION: break_french_casual})
+    result = await _run(model)
+    assert model.calls[AgentName.LOCALIZATION] == 1
+    by_variant = {(d.locale.value, d.persona.value): d for d in result.narratives}
+    assert by_variant[("fr-FR", "CASUAL")].source is NarrativeSource.TEMPLATE
+    assert by_variant[("fr-FR", "ANALYST")].source is NarrativeSource.AGENT
+    assert by_variant[("pcm-NG", "CASUAL")].source is NarrativeSource.AGENT
+    assert len(result.narratives) == 12
+
+
+async def test_local_inference_makes_four_model_calls_per_clean_run() -> None:
+    local = Settings(agents_service_token=SecretStr(TOKEN), agent_critique_enabled=False)
+    model = ScriptedModel()
+    await build_orchestrator(local, FakeClock(), model).run(build_request())
+    assert sum(model.calls.values()) == 4
+    assert AgentName.FACT_CHECKER not in model.calls
