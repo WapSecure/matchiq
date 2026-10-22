@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "@matchiq/access": "workspace:*",
+    "@matchiq/auth": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
     "@matchiq/db": "workspace:*",

@@ -3,7 +3,8 @@ import { ApiEnv, ConfigError, apiDocsEnabled, loadEnv } from '../index.js';
 const base = {
   DATABASE_URL: 'postgresql://matchiq:matchiq@localhost:5432/matchiq',
   REDIS_URL: 'redis://localhost:6379',
-  OPERATOR_API_KEY: 'k'.repeat(32),
+  STREAM_TICKET_SECRET: 's'.repeat(32),
+  AUTH_ANONYMOUS_DEMO_ENABLED: 'true',
 };
 
 const docsFor = (env: Record<string, string>) =>

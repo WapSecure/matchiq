@@ -16,6 +16,8 @@ export const EventPageQuery = z.strictObject({
 
 export const StreamQuery = z.strictObject({
   lastEventId: z.coerce.number().int().nonnegative().optional(),
+  /** Verified by the authentication guard; declared so the strict schema admits it. */
+  ticket: z.string().min(1).max(API_LIMITS.streamTicketMaxLength).optional(),
 });
 
 export const FixtureIdParam = FixtureId;

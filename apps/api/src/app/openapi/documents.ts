@@ -26,6 +26,7 @@ export const servedDocument = (env: ApiEnv): OpenApiDocument =>
         description: DOCUMENT_TEXT.configuredServer,
       },
     ],
+    ...(env.OIDC_ISSUER_URL ? { oidcIssuerUrl: env.OIDC_ISSUER_URL } : {}),
   });
 
 export const serializeDocument = (document: OpenApiDocument): string =>

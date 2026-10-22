@@ -12,6 +12,7 @@ import {
   startTestApp,
   type TestApp,
 } from '../../test/test-app';
+import { nestRouteAuth } from '../../test/nest-route-auth';
 import { OPENAPI_PATTERNS } from './openapi.constants';
 import { API_ROUTES } from './routes';
 
@@ -83,6 +84,14 @@ describe('OpenAPI contract (integration)', () => {
     expect(registryRoutes().sort()).toEqual(served);
   });
 
+  it('documents the same auth each handler declares to the guards', () => {
+    const declared = Object.fromEntries(nestRouteAuth(t.app));
+    const documented = Object.fromEntries(
+      API_ROUTES.map((r) => [`${r.method.toUpperCase()} ${r.path}`, r.auth]),
+    );
+    expect(documented).toEqual(declared);
+  });
+
   it('serves the document with this deployment as its server', async () => {
     const res = await fetch(`${t.baseUrl}/openapi.json`);
     expect(res.status).toBe(200);
@@ -134,7 +143,12 @@ describe('OpenAPI contract (integration)', () => {
     };
     await expectConforms('createReplaySession', created);
     const id = session.session.sessionId;
+    await expectConforms(
+      'issueStreamTicket',
+      await postJson(`${t.baseUrl}/fixtures/${id}/stream-tickets`, {}, {}),
+    );
     const reads: [string, string][] = [
+      ['getMe', '/me'],
       ['listReplaySessions', '/replay-sessions'],
       ['getFixture', `/fixtures/${id}`],
       ['listFixtureEvents', `/fixtures/${id}/events?limit=5`],

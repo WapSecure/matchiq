@@ -20,7 +20,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     summary: 'Latest deterministic match snapshot',
     description:
       'Every statistic comes from the football engine. Use it to recover after a stream gap.',
-    auth: { kind: 'public' },
+    auth: 'fixtures:read',
     params: FixturePath,
     success: {
       status: 200,
@@ -35,7 +35,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures/{fixtureId}/insights',
     tag: TAGS.intelligence,
     summary: 'Detected insights with their evidence',
-    auth: { kind: 'public' },
+    auth: 'insights:read',
     params: FixturePath,
     success: {
       status: 200,
@@ -50,7 +50,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures/{fixtureId}/narratives',
     tag: TAGS.intelligence,
     summary: 'Published narratives, optionally for one persona and locale',
-    auth: { kind: 'public' },
+    auth: 'insights:read',
     params: FixturePath,
     query: NarrativeQuery,
     success: {
@@ -66,7 +66,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures/{fixtureId}/overlays',
     tag: TAGS.intelligence,
     summary: 'Overlay cues published for the fixture',
-    auth: { kind: 'public' },
+    auth: 'overlays:read',
     params: FixturePath,
     success: {
       status: 200,
@@ -83,7 +83,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     summary: 'Full-time recap document',
     description:
       '`404 recap-not-ready` until the match has ended; poll or wait for full time.',
-    auth: { kind: 'public' },
+    auth: 'insights:read',
     params: FixturePath,
     success: {
       status: 200,
@@ -99,7 +99,7 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.intelligence,
     summary: 'Agent runs, gate verdicts and editorial decisions per insight',
     description: 'The Agent Observatory. Holds no prompts or secrets.',
-    auth: { kind: 'public' },
+    auth: 'agents:traces:read',
     params: FixturePath,
     success: {
       status: 200,

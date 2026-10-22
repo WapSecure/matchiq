@@ -47,7 +47,11 @@ Roles are the spec §40 names. Permissions are the spec §45 scopes plus the one
 
 ### Audit
 
-Privileged actions write `audit_events` with the real actor (`userId`), organisation, request ID and the actor's roles: fixture creation, ingest, replay session creation and commands, stream ticket issue, sign-in and sign-out (recorded by the BFF through `POST /api/v1/me/sign-in` and `/sign-out`), and every 403 for an authenticated principal.
+Privileged actions write `audit_events` with the real actor (`userId`), its type (`USER`, `SERVICE`, `OPERATOR` for the dev/CI key, `ANONYMOUS`, `SYSTEM`), organisation, request ID and the actor's roles: fixture creation, ingest, replay session creation and commands, the editorial actions of ADR-0016, sign-in and sign-out (recorded by the BFF through `POST /api/v1/me/sign-in` and `/sign-out`), and every 403 for an authenticated principal. Stream tickets are not audited: they are read access and are reissued on every reconnect.
+
+The editorial `ACTOR_RESOLVER` seam of ADR-0016 is replaced by this principal: `actorFromPrincipal` adapts it to the editorial `Actor`, and `RequirePermission` is the single declaration both use.
+
+`DEMO_ORG_ID` remains only as the default seed tenant and the organisation of platform-level worker audit rows (retention runs); no request is scoped by it.
 
 ## Alternatives considered
 

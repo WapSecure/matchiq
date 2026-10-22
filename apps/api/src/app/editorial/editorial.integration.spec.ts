@@ -54,19 +54,19 @@ describe('Editorial control API (integration)', () => {
       ['/insights/in_any/suppress'],
       ['/fixtures/fx_any/editorial/freeze'],
       ['/editorial/kill-switch/activate'],
-    ])('answers 401 problem details for %s without a key', async (path) => {
+    ])('refuses %s to the anonymous demo with a 403 problem', async (path) => {
       const res = await postJson(`${t.baseUrl}${path}`, reason, {});
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(403);
       expect(res.headers.get('content-type')).toContain(
         'application/problem+json',
       );
-      expect((await jsonOf(res)).type).toBe('urn:matchiq:problem:unauthorized');
+      expect((await jsonOf(res)).type).toBe('urn:matchiq:problem:forbidden');
     });
 
-    it('answers 401 for a wrong key and 401 for audit reads without one', async () => {
+    it('answers 401 for a wrong key and 403 for anonymous audit reads', async () => {
       const wrong = { authorization: `Bearer ${'w'.repeat(48)}` };
       expect((await retract('ov_any', wrong)).status).toBe(401);
-      expect((await fetch(`${t.baseUrl}/audit-events`)).status).toBe(401);
+      expect((await fetch(`${t.baseUrl}/audit-events`)).status).toBe(403);
     });
 
     it('rejects a missing or blank reason with a 422 validation problem', async () => {
@@ -109,7 +109,7 @@ describe('Editorial control API (integration)', () => {
       const [audit] = await auditsOf(t.sql, 'overlay.retracted');
       expect(audit).toMatchObject({
         id: body.auditId,
-        actor: 'operator',
+        actor: 'operator-key',
         actor_type: 'OPERATOR',
         target_type: 'overlay',
         target_id: 'ov_r1',
@@ -185,7 +185,7 @@ describe('Editorial control API (integration)', () => {
       const ctx = {
         actor: {
           type: 'OPERATOR' as const,
-          id: 'operator',
+          id: 'operator-key',
           orgId: key.orgId,
           permissions: new Set<never>(),
         },

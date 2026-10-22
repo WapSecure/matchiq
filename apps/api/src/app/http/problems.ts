@@ -5,7 +5,6 @@ import { PROBLEMS } from '../constants';
 export type ProblemKind = keyof typeof PROBLEMS;
 
 export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
-  unauthorized: HttpStatus.UNAUTHORIZED,
   fixtureNotFound: HttpStatus.NOT_FOUND,
   fixtureExists: HttpStatus.CONFLICT,
   fixtureMismatch: HttpStatus.UNPROCESSABLE_ENTITY,

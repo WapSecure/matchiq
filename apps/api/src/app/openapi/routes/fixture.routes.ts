@@ -24,14 +24,13 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures',
     tag: TAGS.fixtures,
     summary: 'Create a synthetic fixture',
-    auth: { kind: 'operator' },
+    auth: 'fixtures:write',
     body: Fixture,
     idempotent: true,
     success: { status: 201, description: 'Created', body: json(Fixture) },
     problems: [
       'badRequest',
       'validation',
-      'unauthorized',
       'fixtureExists',
       'invalidHeader',
       'idempotencyMismatch',
@@ -43,7 +42,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures',
     tag: TAGS.fixtures,
     summary: 'List fixtures, newest first (bounded by `limit`, no cursor)',
-    auth: { kind: 'public' },
+    auth: 'fixtures:read',
     query: FixtureListQuery,
     success: { status: 200, description: 'Fixtures', body: json(FixtureList) },
     problems: ['validation'],
@@ -54,7 +53,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     path: '/fixtures/{fixtureId}',
     tag: TAGS.fixtures,
     summary: 'Get one fixture with teams and squads',
-    auth: { kind: 'public' },
+    auth: 'fixtures:read',
     params: FixturePath,
     success: { status: 200, description: 'The fixture', body: json(Fixture) },
     problems: ['validation', 'fixtureNotFound'],
@@ -67,7 +66,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     summary: 'Page through the event ledger in sequence order',
     description:
       'Keyset pagination: pass `nextAfterSequence` back as `afterSequence` until it is null.',
-    auth: { kind: 'public' },
+    auth: 'fixtures:read',
     params: FixturePath,
     query: EventPageQuery,
     success: {
@@ -85,7 +84,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     summary: 'Append a batch of events to the ledger',
     description:
       'Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.',
-    auth: { kind: 'operator' },
+    auth: 'events:ingest',
     params: FixturePath,
     body: IngestBatchRequest,
     idempotent: true,
@@ -97,7 +96,6 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     problems: [
       'badRequest',
       'validation',
-      'unauthorized',
       'fixtureNotFound',
       'fixtureMismatch',
       'eventConflict',
@@ -112,7 +110,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.stream,
     summary: 'Subscribe to the fixture stream (SSE)',
     description: STREAM_TEXT.description,
-    auth: { kind: 'public' },
+    auth: 'fixtures:read',
     params: FixturePath,
     query: StreamQuery,
     success: {

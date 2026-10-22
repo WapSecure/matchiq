@@ -71,11 +71,24 @@ describe('OpenAPI document', () => {
     }
   });
 
-  it('marks operator routes with the operator key and leaves reads anonymous', () => {
+  it('lists OIDC and the operator key, plus anonymous only where the demo principal may call', () => {
     const byId = new Map(operations().map((op) => [op.operationId, op]));
-    expect(byId.get('createFixture')?.security).toEqual([{ operatorKey: [] }]);
-    expect(byId.get('freezeFixture')?.security).toEqual([{ operatorKey: [] }]);
-    expect(byId.get('getFixture')?.security).toEqual([]);
+    const signedIn = [{ oidc: [] }, { operatorKey: [] }];
+    expect(byId.get('createFixture')?.security).toEqual(signedIn);
+    expect(byId.get('freezeFixture')?.security).toEqual(signedIn);
+    expect(byId.get('getFixture')?.security).toEqual([...signedIn, {}]);
+    expect(byId.get('streamFixture')?.security).toEqual([
+      ...signedIn,
+      { streamTicket: [] },
+      {},
+    ]);
+    expect(byId.get('getLiveness')?.security).toEqual([]);
+    expect(byId.get('createFixture')).toHaveProperty(
+      ['x-matchiq-permission'],
+      'fixtures:write',
+    );
+    expect(byId.get('createFixture')?.responses['401']).toBeDefined();
+    expect(byId.get('getLiveness')?.responses['401']).toBeUndefined();
   });
 
   it('documents the stream as text/event-stream carrying StreamMessage', () => {
@@ -92,10 +105,10 @@ describe('OpenAPI document', () => {
     expect(document.components?.schemas).toHaveProperty('StreamMessage');
   });
 
-  it('declares the operator key and the planned OIDC scheme', () => {
+  it('declares the OIDC, operator-key and stream-ticket schemes', () => {
     const schemes = committedDocument().components?.securitySchemes ?? {};
-    expect(schemes).toHaveProperty(['operatorKey', 'scheme'], 'bearer');
     expect(schemes).toHaveProperty(['oidc', 'type'], 'openIdConnect');
-    expect(schemes).toHaveProperty(['oidc', 'x-matchiq-status'], 'planned');
+    expect(schemes).toHaveProperty(['operatorKey', 'scheme'], 'bearer');
+    expect(schemes).toHaveProperty(['streamTicket', 'in'], 'query');
   });
 });

@@ -204,6 +204,9 @@ importers:
       '@matchiq/access':
         specifier: workspace:*
         version: link:../../libs/access
+      '@matchiq/auth':
+        specifier: workspace:*
+        version: link:../../libs/auth
       '@matchiq/config':
         specifier: workspace:*
         version: link:../../libs/config

@@ -5,14 +5,17 @@ import type { ProblemRef } from './problem-catalog';
 
 export type HttpMethod = 'get' | 'post';
 
-export type RouteAuth =
-  | { readonly kind: 'public' }
-  | { readonly kind: 'operator' }
-  | { readonly kind: 'permission'; readonly permission: Permission };
+/**
+ * What `@RequirePermission` (or `@PublicRoute`) declares on the handler;
+ * `openapi.integration.spec.ts` reads the metadata and compares.
+ * `authenticated` is `@RequireAuthenticated` (any principal, `/me`).
+ */
+export type RouteAuth = 'public' | 'authenticated' | Permission;
 
 export type SuccessBody =
   | { readonly kind: 'json'; readonly schema: z.ZodType }
   | { readonly kind: 'stream' }
+  | { readonly kind: 'none' }
   | { readonly kind: 'raw'; readonly mediaType: string };
 
 /**

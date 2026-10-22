@@ -16,7 +16,7 @@ export const PLATFORM_ROUTES: readonly ApiRoute[] = [
     path: '/health/live',
     tag: TAGS.platform,
     summary: 'Liveness: the process is serving requests',
-    auth: { kind: 'public' },
+    auth: 'public',
     success: { status: 200, description: 'Alive', body: json(HealthStatus) },
     problems: [],
   },
@@ -26,7 +26,7 @@ export const PLATFORM_ROUTES: readonly ApiRoute[] = [
     path: '/health/ready',
     tag: TAGS.platform,
     summary: 'Readiness: Postgres and Redis are reachable',
-    auth: { kind: 'public' },
+    auth: 'public',
     success: {
       status: 200,
       description: 'Ready or degraded',
@@ -46,7 +46,7 @@ export const PLATFORM_ROUTES: readonly ApiRoute[] = [
     path: '/openapi.json',
     tag: TAGS.platform,
     summary: 'This OpenAPI 3.1 document',
-    auth: { kind: 'public' },
+    auth: 'public',
     success: {
       status: 200,
       description: 'OpenAPI document',
@@ -61,7 +61,7 @@ export const PLATFORM_ROUTES: readonly ApiRoute[] = [
     path: '/docs',
     tag: TAGS.platform,
     summary: 'Interactive API reference (self-hosted Swagger UI)',
-    auth: { kind: 'public' },
+    auth: 'public',
     success: {
       status: 200,
       description: 'HTML page',
@@ -76,7 +76,7 @@ export const PLATFORM_ROUTES: readonly ApiRoute[] = [
     path: '/docs/{asset}',
     tag: TAGS.platform,
     summary: 'Static asset of the API reference page',
-    auth: { kind: 'public' },
+    auth: 'public',
     params: DocsAssetPath,
     success: {
       status: 200,

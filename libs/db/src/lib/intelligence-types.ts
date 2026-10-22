@@ -1,5 +1,6 @@
 import type {
   AgentRun,
+  AuditActorType,
   CreatedSession,
   Fixture,
   FixtureTemplateSummary,
@@ -160,6 +161,12 @@ export interface TemplateStore {
 
 export interface CreateSessionCommand {
   readonly orgId: string;
+  /** The caller recorded in the audit row; defaults to the anonymous viewer. */
+  readonly actor?: {
+    readonly id: string;
+    readonly type: AuditActorType;
+    readonly details: Record<string, unknown>;
+  };
   readonly templateId: string;
   readonly speed: ReplayStatus['speed'];
   /** When set, creation fails with `SessionCapacityExceeded` at the limit. */

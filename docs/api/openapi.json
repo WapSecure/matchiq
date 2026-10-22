@@ -36,6 +36,9 @@
       "name": "Audit"
     },
     {
+      "name": "Identity"
+    },
+    {
       "name": "Platform"
     }
   ],
@@ -44,15 +47,19 @@
       "post": {
         "operationId": "createFixture",
         "summary": "Create a synthetic fixture",
-        "description": "Access: operator key (`Authorization: Bearer <OPERATOR_API_KEY>`).",
+        "description": "Access: requires the `fixtures:write` permission.",
         "tags": [
           "Fixtures"
         ],
         "security": [
           {
+            "oidc": []
+          },
+          {
             "operatorKey": []
           }
         ],
+        "x-matchiq-permission": "fixtures:write",
         "parameters": [
           {
             "$ref": "#/components/parameters/RequestId"
@@ -128,7 +135,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -144,11 +151,39 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
                     }
                   }
                 }
@@ -282,17 +317,61 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
       "get": {
         "operationId": "listFixtures",
         "summary": "List fixtures, newest first (bounded by `limit`, no cursor)",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Fixtures"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "query",
@@ -320,6 +399,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FixtureList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -414,6 +549,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -422,11 +592,20 @@
       "get": {
         "operationId": "getFixture",
         "summary": "Get one fixture with teams and squads",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Fixtures"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "path",
@@ -453,6 +632,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Fixture"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -575,6 +810,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -583,11 +853,20 @@
       "get": {
         "operationId": "listFixtureEvents",
         "summary": "Page through the event ledger in sequence order",
-        "description": "Keyset pagination: pass `nextAfterSequence` back as `afterSequence` until it is null.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "Keyset pagination: pass `nextAfterSequence` back as `afterSequence` until it is null.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Fixtures"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "path",
@@ -638,6 +917,62 @@
               }
             }
           },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "`fixture-not-found`: Fixture not found",
             "x-problem-types": [
@@ -756,6 +1091,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -764,15 +1134,19 @@
       "post": {
         "operationId": "ingestEvents",
         "summary": "Append a batch of events to the ledger",
-        "description": "Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.\n\nAccess: operator key (`Authorization: Bearer <OPERATOR_API_KEY>`).",
+        "description": "Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.\n\nAccess: requires the `events:ingest` permission.",
         "tags": [
           "Fixtures"
         ],
         "security": [
           {
+            "oidc": []
+          },
+          {
             "operatorKey": []
           }
         ],
+        "x-matchiq-permission": "events:ingest",
         "parameters": [
           {
             "in": "path",
@@ -857,7 +1231,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -873,11 +1247,39 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
                     }
                   }
                 }
@@ -1048,6 +1450,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1056,11 +1493,23 @@
       "get": {
         "operationId": "streamFixture",
         "summary": "Subscribe to the fixture stream (SSE)",
-        "description": "Server-Sent Events. Each event has `id: <streamSequence>`, `event: <type>` and `data: <StreamMessage JSON>`. Heartbeats keep the connection open. On a gap, refetch `/state` and reconnect with `Last-Event-ID`.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "Server-Sent Events. Each event has `id: <streamSequence>`, `event: <type>` and `data: <StreamMessage JSON>`. Heartbeats keep the connection open. On a gap, refetch `/state` and reconnect with `Last-Event-ID`.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Stream"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {
+            "streamTicket": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "path",
@@ -1078,6 +1527,15 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "ticket",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
             }
           },
           {
@@ -1128,6 +1586,62 @@
                       "type": "urn:matchiq:problem:invalid-header",
                       "title": "Invalid request header",
                       "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
                     }
                   }
                 }
@@ -1254,8 +1768,9 @@
             }
           },
           "503": {
-            "description": "`stream-unavailable`: Live stream is temporarily unavailable",
+            "description": "`auth-unavailable`: The identity provider is unreachable; `stream-unavailable`: Live stream is temporarily unavailable",
             "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable",
               "urn:matchiq:problem:stream-unavailable"
             ],
             "headers": {
@@ -1276,6 +1791,14 @@
                   "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  },
                   "stream-unavailable": {
                     "summary": "Live stream is temporarily unavailable",
                     "value": {
@@ -1291,129 +1814,41 @@
         }
       }
     },
-    "/fixture-templates": {
-      "get": {
-        "operationId": "listFixtureTemplates",
-        "summary": "List replayable fixture templates (the lobby)",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+    "/fixtures/{fixtureId}/stream-tickets": {
+      "post": {
+        "operationId": "issueStreamTicket",
+        "summary": "Issue a short-lived ticket that opens this fixture stream",
+        "description": "`EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0015).\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
-          "Replay"
+          "Stream"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
-            "$ref": "#/components/parameters/RequestId"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Templates",
-            "headers": {
-              "X-Request-ID": {
-                "$ref": "#/components/headers/RequestId"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FixtureTemplateList"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "`rate-limited`: Too many requests",
-            "x-problem-types": [
-              "urn:matchiq:problem:rate-limited"
-            ],
-            "headers": {
-              "X-Request-ID": {
-                "$ref": "#/components/headers/RequestId"
-              },
-              "Retry-After": {
-                "schema": {
-                  "type": "string",
-                  "pattern": "^(0|[1-9]\\d{0,15})$",
-                  "description": "Seconds to wait before retrying."
-                }
-              }
-            },
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "rate-limited": {
-                    "summary": "Too many requests",
-                    "value": {
-                      "type": "urn:matchiq:problem:rate-limited",
-                      "title": "Too many requests",
-                      "status": 429
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "`internal-error`: Internal server error",
-            "x-problem-types": [
-              "urn:matchiq:problem:internal-error"
-            ],
-            "headers": {
-              "X-Request-ID": {
-                "$ref": "#/components/headers/RequestId"
-              }
-            },
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "internal-error": {
-                    "summary": "Internal server error",
-                    "value": {
-                      "type": "urn:matchiq:problem:internal-error",
-                      "title": "Internal server error",
-                      "status": 500
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/replay-sessions": {
-      "get": {
-        "operationId": "listReplaySessions",
-        "summary": "List recent replay sessions to join",
-        "description": "Access: anonymous (the synthetic demo organisation).",
-        "tags": [
-          "Replay"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
+            "in": "path",
+            "name": "fixtureId",
             "schema": {
-              "default": 20,
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
-            }
+              "type": "string",
+              "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "required": true
           },
           {
             "$ref": "#/components/parameters/RequestId"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Sessions, most recent first",
+          "201": {
+            "description": "Ticket",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -1422,7 +1857,91 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReplaySessionList"
+                  "$ref": "#/components/schemas/StreamTicket"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`fixture-not-found`: Fixture not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:fixture-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "fixture-not-found": {
+                    "summary": "Fixture not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:fixture-not-found",
+                      "title": "Fixture not found",
+                      "status": 404
+                    }
+                  }
                 }
               }
             }
@@ -1517,6 +2036,1045 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "operationId": "getMe",
+        "summary": "The caller as the API sees it",
+        "description": "Roles and permissions are display hints; the API enforces them per route.\n\nAccess: any authenticated caller, including the anonymous demo principal.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "authenticated",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access profile",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/sign-in": {
+      "post": {
+        "operationId": "recordSignIn",
+        "summary": "Record a sign-in in the audit trail (called by the web BFF)",
+        "description": "Access: any authenticated caller, including the anonymous demo principal.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "authenticated",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Recorded",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/sign-out": {
+      "post": {
+        "operationId": "recordSignOut",
+        "summary": "Record a sign-out in the audit trail (called by the web BFF)",
+        "description": "Access: any authenticated caller, including the anonymous demo principal.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "authenticated",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Recorded",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fixture-templates": {
+      "get": {
+        "operationId": "listFixtureTemplates",
+        "summary": "List replayable fixture templates (the lobby)",
+        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "tags": [
+          "Replay"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templates",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixtureTemplateList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/replay-sessions": {
+      "get": {
+        "operationId": "listReplaySessions",
+        "summary": "List recent replay sessions to join",
+        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "tags": [
+          "Replay"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sessions, most recent first",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplaySessionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1525,11 +3083,20 @@
       "post": {
         "operationId": "createReplaySession",
         "summary": "Start a new replay session of a template",
-        "description": "`fixtureId` is the template. The session gets its own fixture and ledger. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "`fixtureId` is the template. The session gets its own fixture and ledger. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).\n\nAccess: requires the `replay:control` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Replay"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "replay:control",
         "parameters": [
           {
             "in": "path",
@@ -1633,6 +3200,62 @@
                       "type": "urn:matchiq:problem:invalid-header",
                       "title": "Invalid request header",
                       "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
                     }
                   }
                 }
@@ -1768,8 +3391,9 @@
             }
           },
           "503": {
-            "description": "`replay-capacity`: Every replay slot is in use",
+            "description": "`auth-unavailable`: The identity provider is unreachable; `replay-capacity`: Every replay slot is in use",
             "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable",
               "urn:matchiq:problem:replay-capacity"
             ],
             "headers": {
@@ -1790,6 +3414,14 @@
                   "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  },
                   "replay-capacity": {
                     "summary": "Every replay slot is in use",
                     "value": {
@@ -1809,11 +3441,20 @@
       "post": {
         "operationId": "sendReplayCommand",
         "summary": "Start, pause, resume, change speed or seek a session",
-        "description": "The worker applies the command; the resulting status also arrives as `replay.status` on the stream. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "The worker applies the command; the resulting status also arrives as `replay.status` on the stream. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).\n\nAccess: requires the `replay:control` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Replay"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "replay:control",
         "parameters": [
           {
             "in": "path",
@@ -1891,6 +3532,62 @@
                       "type": "urn:matchiq:problem:invalid-header",
                       "title": "Invalid request header",
                       "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
                     }
                   }
                 }
@@ -2063,8 +3760,9 @@
             }
           },
           "503": {
-            "description": "`replay-capacity`: Every replay slot is in use; `replay-unavailable`: Replay control is temporarily unavailable",
+            "description": "`auth-unavailable`: The identity provider is unreachable; `replay-capacity`: Every replay slot is in use; `replay-unavailable`: Replay control is temporarily unavailable",
             "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable",
               "urn:matchiq:problem:replay-capacity",
               "urn:matchiq:problem:replay-unavailable"
             ],
@@ -2086,6 +3784,14 @@
                   "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  },
                   "replay-capacity": {
                     "summary": "Every replay slot is in use",
                     "value": {
@@ -2111,11 +3817,20 @@
       "get": {
         "operationId": "getReplayStatus",
         "summary": "Get the persisted replay status of a session",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Replay"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "path",
@@ -2142,6 +3857,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReplayStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -2264,6 +4035,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2272,11 +4078,20 @@
       "get": {
         "operationId": "getMatchState",
         "summary": "Latest deterministic match snapshot",
-        "description": "Every statistic comes from the football engine. Use it to recover after a stream gap.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "Every statistic comes from the football engine. Use it to recover after a stream gap.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
             "in": "path",
@@ -2303,6 +4118,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MatchSnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -2434,6 +4305,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2442,11 +4348,20 @@
       "get": {
         "operationId": "listInsights",
         "summary": "Detected insights with their evidence",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "insights:read",
         "parameters": [
           {
             "in": "path",
@@ -2473,6 +4388,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InsightList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -2595,6 +4566,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2603,11 +4609,20 @@
       "get": {
         "operationId": "listNarratives",
         "summary": "Published narratives, optionally for one persona and locale",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "insights:read",
         "parameters": [
           {
             "in": "path",
@@ -2663,6 +4678,62 @@
               }
             }
           },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "`fixture-not-found`: Fixture not found",
             "x-problem-types": [
@@ -2781,6 +4852,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2789,11 +4895,20 @@
       "get": {
         "operationId": "listOverlays",
         "summary": "Overlay cues published for the fixture",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "overlays:read",
         "parameters": [
           {
             "in": "path",
@@ -2824,6 +4939,62 @@
               }
             }
           },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "`fixture-not-found`: Fixture not found",
             "x-problem-types": [
@@ -2942,6 +5113,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2950,11 +5156,20 @@
       "get": {
         "operationId": "getRecap",
         "summary": "Full-time recap document",
-        "description": "`404 recap-not-ready` until the match has ended; poll or wait for full time.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "`404 recap-not-ready` until the match has ended; poll or wait for full time.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "insights:read",
         "parameters": [
           {
             "in": "path",
@@ -2981,6 +5196,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RecapDocument"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -3112,6 +5383,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3120,11 +5426,20 @@
       "get": {
         "operationId": "listAgentRuns",
         "summary": "Agent runs, gate verdicts and editorial decisions per insight",
-        "description": "The Agent Observatory. Holds no prompts or secrets.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "The Agent Observatory. Holds no prompts or secrets.\n\nAccess: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "agents:traces:read",
         "parameters": [
           {
             "in": "path",
@@ -3151,6 +5466,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InsightTraceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -3273,6 +5644,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3281,11 +5687,14 @@
       "post": {
         "operationId": "retractOverlay",
         "summary": "Take an on-air overlay cue off air",
-        "description": "Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:publish` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -3375,7 +5784,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -3391,10 +5800,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -3403,7 +5812,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -3419,10 +5828,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -3585,6 +5994,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3593,11 +6037,14 @@
       "post": {
         "operationId": "suppressInsight",
         "summary": "Suppress an insight before its narratives publish",
-        "description": "Access: requires the `editorial:approve` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:approve` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -3687,7 +6134,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -3703,10 +6150,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -3715,7 +6162,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -3731,10 +6178,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -3897,6 +6344,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3905,11 +6387,20 @@
       "get": {
         "operationId": "getEditorialStatus",
         "summary": "Effective on-air policy for a fixture",
-        "description": "Public: viewers render a \"graphics paused\" state from this and `editorial.status`.\n\nAccess: anonymous (the synthetic demo organisation).",
+        "description": "Public: viewers render a \"graphics paused\" state from this and `editorial.status`.\n\nAccess: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Editorial"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "overlays:read",
         "parameters": [
           {
             "in": "path",
@@ -3936,6 +6427,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EditorialStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -4058,6 +6605,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4066,11 +6648,14 @@
       "post": {
         "operationId": "freezeFixture",
         "summary": "Hold new cues for one session",
-        "description": "Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:publish` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -4160,7 +6745,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -4176,10 +6761,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -4188,7 +6773,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -4204,10 +6789,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -4342,6 +6927,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4350,11 +6970,14 @@
       "post": {
         "operationId": "resumeFixture",
         "summary": "Lift a session freeze",
-        "description": "Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:publish` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -4444,7 +7067,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -4460,10 +7083,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -4472,7 +7095,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -4488,10 +7111,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -4626,6 +7249,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4634,11 +7292,20 @@
       "get": {
         "operationId": "getKillSwitch",
         "summary": "Organisation kill switch state",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Editorial"
         ],
-        "security": [],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "overlays:read",
         "parameters": [
           {
             "$ref": "#/components/parameters/RequestId"
@@ -4656,6 +7323,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/KillSwitchStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
                 }
               }
             }
@@ -4722,6 +7445,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4730,11 +7488,14 @@
       "post": {
         "operationId": "activateKillSwitch",
         "summary": "Take every cue off air across the organisation",
-        "description": "Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:publish` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -4815,7 +7576,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -4831,10 +7592,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -4843,7 +7604,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -4859,10 +7620,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -4969,6 +7730,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4977,11 +7773,14 @@
       "post": {
         "operationId": "releaseKillSwitch",
         "summary": "Release the organisation kill switch",
-        "description": "Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Access: requires the `editorial:publish` permission.",
         "tags": [
           "Editorial"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -5062,7 +7861,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -5078,10 +7877,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -5090,7 +7889,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -5106,10 +7905,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -5216,6 +8015,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -5224,11 +8058,14 @@
       "get": {
         "operationId": "listAuditEvents",
         "summary": "The caller organisation's audit trail, newest first",
-        "description": "Keyset pagination: pass `nextCursor` back as `cursor` until it is null.\n\nAccess: requires the `audit:read` permission (operator key today; OIDC roles per ADR-0015).",
+        "description": "Keyset pagination: pass `nextCursor` back as `cursor` until it is null.\n\nAccess: requires the `audit:read` permission.",
         "tags": [
           "Audit"
         ],
         "security": [
+          {
+            "oidc": []
+          },
           {
             "operatorKey": []
           }
@@ -5249,6 +8086,8 @@
             "schema": {
               "type": "string",
               "enum": [
+                "USER",
+                "SERVICE",
                 "OPERATOR",
                 "SYSTEM",
                 "ANONYMOUS"
@@ -5372,7 +8211,7 @@
             }
           },
           "401": {
-            "description": "`unauthorized`: Operator credentials required",
+            "description": "`unauthorized`: Authentication required",
             "x-problem-types": [
               "urn:matchiq:problem:unauthorized"
             ],
@@ -5388,10 +8227,10 @@
                 },
                 "examples": {
                   "unauthorized": {
-                    "summary": "Operator credentials required",
+                    "summary": "Authentication required",
                     "value": {
                       "type": "urn:matchiq:problem:unauthorized",
-                      "title": "Operator credentials required",
+                      "title": "Authentication required",
                       "status": 401
                     }
                   }
@@ -5400,7 +8239,7 @@
             }
           },
           "403": {
-            "description": "`forbidden`: The caller lacks the required permission",
+            "description": "`forbidden`: You do not have permission for this action",
             "x-problem-types": [
               "urn:matchiq:problem:forbidden"
             ],
@@ -5416,10 +8255,10 @@
                 },
                 "examples": {
                   "forbidden": {
-                    "summary": "The caller lacks the required permission",
+                    "summary": "You do not have permission for this action",
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
-                      "title": "The caller lacks the required permission",
+                      "title": "You do not have permission for this action",
                       "status": 403
                     }
                   }
@@ -5517,6 +8356,41 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -5525,7 +8399,7 @@
       "get": {
         "operationId": "getLiveness",
         "summary": "Liveness: the process is serving requests",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: public, no credentials (`@PublicRoute`).",
         "tags": [
           "Platform"
         ],
@@ -5621,7 +8495,7 @@
       "get": {
         "operationId": "getReadiness",
         "summary": "Readiness: Postgres and Redis are reachable",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: public, no credentials (`@PublicRoute`).",
         "tags": [
           "Platform"
         ],
@@ -5732,7 +8606,7 @@
       "get": {
         "operationId": "getOpenApiDocument",
         "summary": "This OpenAPI 3.1 document",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: public, no credentials (`@PublicRoute`).",
         "tags": [
           "Platform"
         ],
@@ -5838,7 +8712,7 @@
       "get": {
         "operationId": "getApiDocs",
         "summary": "Interactive API reference (self-hosted Swagger UI)",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: public, no credentials (`@PublicRoute`).",
         "tags": [
           "Platform"
         ],
@@ -5935,7 +8809,7 @@
       "get": {
         "operationId": "getApiDocsAsset",
         "summary": "Static asset of the API reference page",
-        "description": "Access: anonymous (the synthetic demo organisation).",
+        "description": "Access: public, no credentials (`@PublicRoute`).",
         "tags": [
           "Platform"
         ],
@@ -9632,6 +12506,8 @@
               "type": {
                 "type": "string",
                 "enum": [
+                  "USER",
+                  "SERVICE",
                   "OPERATOR",
                   "SYSTEM",
                   "ANONYMOUS"
@@ -10353,6 +13229,81 @@
         ],
         "additionalProperties": false
       },
+      "StreamTicket": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "ticket",
+          "expiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "AccessProfile": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "user",
+              "service",
+              "anonymous",
+              "operator-key"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "orgId": {
+            "type": "string",
+            "pattern": "^org_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "orgName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "displayName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "userId",
+          "orgId",
+          "orgName",
+          "displayName",
+          "roles",
+          "permissions"
+        ],
+        "additionalProperties": false
+      },
       "StreamMessage": {
         "oneOf": [
           {
@@ -10842,16 +13793,21 @@
       }
     },
     "securitySchemes": {
-      "operatorKey": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Shared operator key (`OPERATOR_API_KEY`), sent as `Authorization: Bearer <key>`. Grants the developer and producer permissions; a dev and CI fallback once OIDC lands."
-      },
       "oidc": {
         "type": "openIdConnect",
         "openIdConnectUrl": "https://issuer.example/.well-known/openid-configuration",
-        "description": "Planned (ADR-0015 stage 2): OIDC access tokens from the configured issuer. Not accepted by this build; routes list only the operator key until enforcement lands.",
-        "x-matchiq-status": "planned"
+        "description": "OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0015). Roles map to permissions; a token `scope` naming MatchIQ permissions narrows them."
+      },
+      "operatorKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Dev and CI fallback (`AUTH_OPERATOR_KEY_ENABLED`, refused in prod): `Authorization: Bearer <OPERATOR_API_KEY>`. Acts as developer + producer."
+      },
+      "streamTicket": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "ticket",
+        "description": "Short-lived ticket from `POST /fixtures/{fixtureId}/stream-tickets`, accepted only on that fixture stream."
       }
     }
   }

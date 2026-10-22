@@ -19,17 +19,10 @@ import { FixturePath } from './fixture.routes';
 
 const COMMAND_PROBLEMS: readonly ProblemRef[] = [
   'badRequest',
-  'unauthorized',
-  'forbidden',
   'validation',
   'invalidHeader',
   'idempotencyMismatch',
 ];
-
-const publish = {
-  kind: 'permission',
-  permission: 'editorial:publish',
-} as const;
 
 const command = (
   route: Omit<ApiRoute, 'tag' | 'method' | 'body' | 'idempotent' | 'auth'> & {
@@ -40,7 +33,7 @@ const command = (
   method: 'post',
   body: EditorialCommand,
   idempotent: true,
-  auth: publish,
+  auth: 'editorial:publish',
   ...route,
 });
 
@@ -61,7 +54,7 @@ export const EDITORIAL_ROUTES: readonly ApiRoute[] = [
     operationId: 'suppressInsight',
     path: '/insights/{insightId}/suppress',
     summary: 'Suppress an insight before its narratives publish',
-    auth: { kind: 'permission', permission: 'editorial:approve' },
+    auth: 'editorial:approve',
     params: z.strictObject({ insightId: InsightId }),
     success: {
       status: 200,
@@ -78,7 +71,7 @@ export const EDITORIAL_ROUTES: readonly ApiRoute[] = [
     summary: 'Effective on-air policy for a fixture',
     description:
       'Public: viewers render a "graphics paused" state from this and `editorial.status`.',
-    auth: { kind: 'public' },
+    auth: 'overlays:read',
     params: FixturePath,
     success: {
       status: 200,
@@ -117,7 +110,7 @@ export const EDITORIAL_ROUTES: readonly ApiRoute[] = [
     path: '/editorial/kill-switch',
     tag: TAGS.editorial,
     summary: 'Organisation kill switch state',
-    auth: { kind: 'public' },
+    auth: 'overlays:read',
     success: {
       status: 200,
       description: 'Kill switch',
@@ -155,13 +148,13 @@ export const EDITORIAL_ROUTES: readonly ApiRoute[] = [
     summary: "The caller organisation's audit trail, newest first",
     description:
       'Keyset pagination: pass `nextCursor` back as `cursor` until it is null.',
-    auth: { kind: 'permission', permission: 'audit:read' },
+    auth: 'audit:read',
     query: AuditEventQuery,
     success: {
       status: 200,
       description: 'One page of audit events',
       body: json(AuditEventPage),
     },
-    problems: ['unauthorized', 'forbidden', 'validation', 'invalidCursor'],
+    problems: ['validation', 'invalidCursor'],
   },
 ];

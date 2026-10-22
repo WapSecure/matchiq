@@ -104,4 +104,6 @@ export const NAMED_SCHEMAS = {
   AuditEvent: contracts.AuditEvent,
   AuditEventPage: contracts.AuditEventPage,
   HealthStatus: contracts.HealthStatus,
+  StreamTicket: contracts.StreamTicket,
+  AccessProfile: contracts.AccessProfile,
 } as const;

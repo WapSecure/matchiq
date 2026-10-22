@@ -13,13 +13,13 @@ export interface paths {
         };
         /**
          * List fixtures, newest first (bounded by `limit`, no cursor)
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listFixtures"];
         put?: never;
         /**
          * Create a synthetic fixture
-         * @description Access: operator key (`Authorization: Bearer <OPERATOR_API_KEY>`).
+         * @description Access: requires the `fixtures:write` permission.
          */
         post: operations["createFixture"];
         delete?: never;
@@ -37,7 +37,7 @@ export interface paths {
         };
         /**
          * Get one fixture with teams and squads
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getFixture"];
         put?: never;
@@ -59,7 +59,7 @@ export interface paths {
          * Page through the event ledger in sequence order
          * @description Keyset pagination: pass `nextAfterSequence` back as `afterSequence` until it is null.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listFixtureEvents"];
         put?: never;
@@ -83,7 +83,7 @@ export interface paths {
          * Append a batch of events to the ledger
          * @description Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.
          *
-         *     Access: operator key (`Authorization: Bearer <OPERATOR_API_KEY>`).
+         *     Access: requires the `events:ingest` permission.
          */
         post: operations["ingestEvents"];
         delete?: never;
@@ -103,11 +103,95 @@ export interface paths {
          * Subscribe to the fixture stream (SSE)
          * @description Server-Sent Events. Each event has `id: <streamSequence>`, `event: <type>` and `data: <StreamMessage JSON>`. Heartbeats keep the connection open. On a gap, refetch `/state` and reconnect with `Last-Event-ID`.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["streamFixture"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fixtures/{fixtureId}/stream-tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue a short-lived ticket that opens this fixture stream
+         * @description `EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0015).
+         *
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         */
+        post: operations["issueStreamTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The caller as the API sees it
+         * @description Roles and permissions are display hints; the API enforces them per route.
+         *
+         *     Access: any authenticated caller, including the anonymous demo principal.
+         */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a sign-in in the audit trail (called by the web BFF)
+         * @description Access: any authenticated caller, including the anonymous demo principal.
+         */
+        post: operations["recordSignIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a sign-out in the audit trail (called by the web BFF)
+         * @description Access: any authenticated caller, including the anonymous demo principal.
+         */
+        post: operations["recordSignOut"];
         delete?: never;
         options?: never;
         head?: never;
@@ -123,7 +207,7 @@ export interface paths {
         };
         /**
          * List replayable fixture templates (the lobby)
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listFixtureTemplates"];
         put?: never;
@@ -143,7 +227,7 @@ export interface paths {
         };
         /**
          * List recent replay sessions to join
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listReplaySessions"];
         put?: never;
@@ -167,7 +251,7 @@ export interface paths {
          * Start a new replay session of a template
          * @description `fixtureId` is the template. The session gets its own fixture and ledger. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `replay:control` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         post: operations["createReplaySession"];
         delete?: never;
@@ -185,7 +269,7 @@ export interface paths {
         };
         /**
          * Get the persisted replay status of a session
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getReplayStatus"];
         put?: never;
@@ -193,7 +277,7 @@ export interface paths {
          * Start, pause, resume, change speed or seek a session
          * @description The worker applies the command; the resulting status also arrives as `replay.status` on the stream. Anonymous and rate-limited per client by the stricter `replay` bucket (ADR-0010).
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `replay:control` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         post: operations["sendReplayCommand"];
         delete?: never;
@@ -213,7 +297,7 @@ export interface paths {
          * Latest deterministic match snapshot
          * @description Every statistic comes from the football engine. Use it to recover after a stream gap.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getMatchState"];
         put?: never;
@@ -233,7 +317,7 @@ export interface paths {
         };
         /**
          * Detected insights with their evidence
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listInsights"];
         put?: never;
@@ -253,7 +337,7 @@ export interface paths {
         };
         /**
          * Published narratives, optionally for one persona and locale
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listNarratives"];
         put?: never;
@@ -273,7 +357,7 @@ export interface paths {
         };
         /**
          * Overlay cues published for the fixture
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listOverlays"];
         put?: never;
@@ -295,7 +379,7 @@ export interface paths {
          * Full-time recap document
          * @description `404 recap-not-ready` until the match has ended; poll or wait for full time.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getRecap"];
         put?: never;
@@ -317,7 +401,7 @@ export interface paths {
          * Agent runs, gate verdicts and editorial decisions per insight
          * @description The Agent Observatory. Holds no prompts or secrets.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listAgentRuns"];
         put?: never;
@@ -339,7 +423,7 @@ export interface paths {
         put?: never;
         /**
          * Take an on-air overlay cue off air
-         * @description Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:publish` permission.
          */
         post: operations["retractOverlay"];
         delete?: never;
@@ -359,7 +443,7 @@ export interface paths {
         put?: never;
         /**
          * Suppress an insight before its narratives publish
-         * @description Access: requires the `editorial:approve` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:approve` permission.
          */
         post: operations["suppressInsight"];
         delete?: never;
@@ -379,7 +463,7 @@ export interface paths {
          * Effective on-air policy for a fixture
          * @description Public: viewers render a "graphics paused" state from this and `editorial.status`.
          *
-         *     Access: anonymous (the synthetic demo organisation).
+         *     Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getEditorialStatus"];
         put?: never;
@@ -401,7 +485,7 @@ export interface paths {
         put?: never;
         /**
          * Hold new cues for one session
-         * @description Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:publish` permission.
          */
         post: operations["freezeFixture"];
         delete?: never;
@@ -421,7 +505,7 @@ export interface paths {
         put?: never;
         /**
          * Lift a session freeze
-         * @description Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:publish` permission.
          */
         post: operations["resumeFixture"];
         delete?: never;
@@ -439,7 +523,7 @@ export interface paths {
         };
         /**
          * Organisation kill switch state
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getKillSwitch"];
         put?: never;
@@ -461,7 +545,7 @@ export interface paths {
         put?: never;
         /**
          * Take every cue off air across the organisation
-         * @description Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:publish` permission.
          */
         post: operations["activateKillSwitch"];
         delete?: never;
@@ -481,7 +565,7 @@ export interface paths {
         put?: never;
         /**
          * Release the organisation kill switch
-         * @description Access: requires the `editorial:publish` permission (operator key today; OIDC roles per ADR-0015).
+         * @description Access: requires the `editorial:publish` permission.
          */
         post: operations["releaseKillSwitch"];
         delete?: never;
@@ -501,7 +585,7 @@ export interface paths {
          * The caller organisation's audit trail, newest first
          * @description Keyset pagination: pass `nextCursor` back as `cursor` until it is null.
          *
-         *     Access: requires the `audit:read` permission (operator key today; OIDC roles per ADR-0015).
+         *     Access: requires the `audit:read` permission.
          */
         get: operations["listAuditEvents"];
         put?: never;
@@ -521,7 +605,7 @@ export interface paths {
         };
         /**
          * Liveness: the process is serving requests
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: public, no credentials (`@PublicRoute`).
          */
         get: operations["getLiveness"];
         put?: never;
@@ -541,7 +625,7 @@ export interface paths {
         };
         /**
          * Readiness: Postgres and Redis are reachable
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: public, no credentials (`@PublicRoute`).
          */
         get: operations["getReadiness"];
         put?: never;
@@ -561,7 +645,7 @@ export interface paths {
         };
         /**
          * This OpenAPI 3.1 document
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: public, no credentials (`@PublicRoute`).
          */
         get: operations["getOpenApiDocument"];
         put?: never;
@@ -581,7 +665,7 @@ export interface paths {
         };
         /**
          * Interactive API reference (self-hosted Swagger UI)
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: public, no credentials (`@PublicRoute`).
          */
         get: operations["getApiDocs"];
         put?: never;
@@ -601,7 +685,7 @@ export interface paths {
         };
         /**
          * Static asset of the API reference page
-         * @description Access: anonymous (the synthetic demo organisation).
+         * @description Access: public, no credentials (`@PublicRoute`).
          */
         get: operations["getApiDocsAsset"];
         put?: never;
@@ -1364,7 +1448,7 @@ export interface components {
             action: string;
             actor: {
                 /** @enum {string} */
-                type: "OPERATOR" | "SYSTEM" | "ANONYMOUS";
+                type: "USER" | "SERVICE" | "OPERATOR" | "SYSTEM" | "ANONYMOUS";
                 id: string;
             };
             target: {
@@ -1501,6 +1585,21 @@ export interface components {
                     detail?: string;
                 };
             };
+        };
+        StreamTicket: {
+            ticket: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        AccessProfile: {
+            /** @enum {string} */
+            kind: "user" | "service" | "anonymous" | "operator-key";
+            userId: string;
+            orgId: string;
+            orgName: string | null;
+            displayName: string | null;
+            roles: string[];
+            permissions: string[];
         };
         StreamMessage: {
             /** @constant */
@@ -1653,6 +1752,26 @@ export interface operations {
                     "application/json": components["schemas"]["FixtureList"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `validation-failed`: Request validation failed */
             422: {
                 headers: {
@@ -1678,6 +1797,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1725,8 +1855,18 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -1776,6 +1916,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getFixture: {
@@ -1800,6 +1951,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Fixture"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found */
@@ -1837,6 +2008,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1872,6 +2054,26 @@ export interface operations {
                     "application/json": components["schemas"]["EventPage"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `fixture-not-found`: Fixture not found */
             404: {
                 headers: {
@@ -1907,6 +2109,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1956,8 +2169,18 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -2017,12 +2240,24 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     streamFixture: {
         parameters: {
             query?: {
                 lastEventId?: number;
+                ticket?: string;
             };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
@@ -2049,6 +2284,26 @@ export interface operations {
             };
             /** @description `invalid-header`: Invalid request header */
             400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -2098,7 +2353,329 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `stream-unavailable`: Live stream is temporarily unavailable */
+            /** @description `auth-unavailable`: The identity provider is unreachable; `stream-unavailable`: Live stream is temporarily unavailable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    issueStreamTicket: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path: {
+                fixtureId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ticket */
+            201: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreamTicket"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `fixture-not-found`: Fixture not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access profile */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessProfile"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    recordSignIn: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recorded */
+            204: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    recordSignOut: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recorded */
+            204: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
             503: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2133,6 +2710,26 @@ export interface operations {
                     "application/json": components["schemas"]["FixtureTemplateList"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `rate-limited`: Too many requests */
             429: {
                 headers: {
@@ -2148,6 +2745,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2180,6 +2788,26 @@ export interface operations {
                     "application/json": components["schemas"]["ReplaySessionList"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `validation-failed`: Request validation failed */
             422: {
                 headers: {
@@ -2205,6 +2833,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2256,6 +2895,26 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `fixture-template-not-found`: Fixture template not found */
             404: {
                 headers: {
@@ -2297,7 +2956,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `replay-capacity`: Every replay slot is in use */
+            /** @description `auth-unavailable`: The identity provider is unreachable; `replay-capacity`: Every replay slot is in use */
             503: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2332,6 +2991,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReplayStatus"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `replay-session-not-found`: Replay session not found */
@@ -2375,6 +3054,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     sendReplayCommand: {
@@ -2410,6 +3100,26 @@ export interface operations {
             };
             /** @description `bad-request`: Malformed request body; `invalid-header`: Invalid request header */
             400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -2469,7 +3179,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `replay-capacity`: Every replay slot is in use; `replay-unavailable`: Replay control is temporarily unavailable */
+            /** @description `auth-unavailable`: The identity provider is unreachable; `replay-capacity`: Every replay slot is in use; `replay-unavailable`: Replay control is temporarily unavailable */
             503: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2504,6 +3214,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MatchSnapshot"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found; `state-not-found`: No match state has been projected yet */
@@ -2547,6 +3277,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     listInsights: {
@@ -2571,6 +3312,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InsightList"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found */
@@ -2608,6 +3369,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2643,6 +3415,26 @@ export interface operations {
                     "application/json": components["schemas"]["NarrativeList"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `fixture-not-found`: Fixture not found */
             404: {
                 headers: {
@@ -2678,6 +3470,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2710,6 +3513,26 @@ export interface operations {
                     "application/json": components["schemas"]["OverlayList"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `fixture-not-found`: Fixture not found */
             404: {
                 headers: {
@@ -2751,6 +3574,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getRecap: {
@@ -2775,6 +3609,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RecapDocument"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found; `recap-not-ready`: The recap is available once the match has ended */
@@ -2818,6 +3672,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     listAgentRuns: {
@@ -2842,6 +3707,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InsightTraceList"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found */
@@ -2879,6 +3764,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2928,7 +3824,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2938,7 +3834,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2999,6 +3895,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     suppressInsight: {
@@ -3042,7 +3949,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3052,7 +3959,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3113,6 +4020,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getEditorialStatus: {
@@ -3137,6 +4055,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EditorialStatus"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `fixture-not-found`: Fixture not found */
@@ -3174,6 +4112,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3223,7 +4172,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3233,7 +4182,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3278,6 +4227,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3327,7 +4287,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3337,7 +4297,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3388,6 +4348,17 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getKillSwitch: {
@@ -3412,6 +4383,26 @@ export interface operations {
                     "application/json": components["schemas"]["KillSwitchStatus"];
                 };
             };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description `rate-limited`: Too many requests */
             429: {
                 headers: {
@@ -3427,6 +4418,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3474,7 +4476,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3484,7 +4486,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3519,6 +4521,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3566,7 +4579,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3576,7 +4589,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3617,13 +4630,24 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     listAuditEvents: {
         parameters: {
             query?: {
                 action?: string;
-                actorType?: "OPERATOR" | "SYSTEM" | "ANONYMOUS";
+                actorType?: "USER" | "SERVICE" | "OPERATOR" | "SYSTEM" | "ANONYMOUS";
                 targetType?: "fixture" | "overlay" | "insight" | "organization" | "retention";
                 targetId?: string;
                 fixtureId?: string;
@@ -3661,7 +4685,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `unauthorized`: Operator credentials required */
+            /** @description `unauthorized`: Authentication required */
             401: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3671,7 +4695,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: The caller lacks the required permission */
+            /** @description `forbidden`: You do not have permission for this action */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3706,6 +4730,17 @@ export interface operations {
             500: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
                 content: {

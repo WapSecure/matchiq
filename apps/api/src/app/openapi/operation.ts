@@ -1,3 +1,4 @@
+import { ANONYMOUS_ROLE, ROLE_PERMISSIONS } from '@matchiq/access';
 import { ProblemDetails } from '@matchiq/contracts';
 import { z } from 'zod';
 import type {
@@ -17,6 +18,7 @@ import {
 import { ACCESS, EXTENSIONS, MEDIA, SECURITY } from './openapi.constants';
 import {
   ALWAYS,
+  GUARDED,
   problemEntry,
   type ProblemEntry,
   type ProblemRef,
@@ -29,7 +31,10 @@ const TEXT = { type: 'string' } as const;
 /** Statuses whose problems carry `Retry-After`. */
 const RETRY_STATUSES = new Set([429, 503]);
 
+const ANONYMOUS = new Set<string>(ROLE_PERMISSIONS[ANONYMOUS_ROLE]);
+
 const content = (body: SuccessBody) => {
+  if (body.kind === 'none') return undefined;
   if (body.kind === 'json') return { [MEDIA.json]: { schema: body.schema } };
   if (body.kind === 'raw') return { [body.mediaType]: { schema: TEXT } };
   return {
@@ -76,9 +81,11 @@ const problemResponse = (
   [EXTENSIONS.problemTypes]: entries.map((e) => problemType(e.slug)),
 });
 
-const groupByStatus = (refs: readonly ProblemRef[]) => {
+const groupByStatus = (route: ApiRoute) => {
   const groups = new Map<number, ProblemEntry[]>();
-  for (const ref of new Set([...refs, ...ALWAYS])) {
+  const guarded = route.auth === 'public' ? [] : GUARDED;
+  const refs: ProblemRef[] = [...guarded, ...route.problems, ...ALWAYS];
+  for (const ref of new Set(refs)) {
     const entry = problemEntry(ref);
     groups.set(entry.status, [...(groups.get(entry.status) ?? []), entry]);
   }
@@ -86,15 +93,16 @@ const groupByStatus = (refs: readonly ProblemRef[]) => {
 };
 
 const responsesOf = (route: ApiRoute): ZodOpenApiResponsesObject => {
+  const body = content(route.success.body);
   const success = {
     headers: successHeaders(route),
-    content: content(route.success.body),
+    ...(body ? { content: body } : {}),
   };
   const successes = [route.success, ...(route.alsoSucceedsWith ?? [])].map(
     ({ status, description }) =>
       [String(status), { description, ...success }] as const,
   );
-  const problems = groupByStatus(route.problems).map(
+  const problems = groupByStatus(route).map(
     ([status, entries]) =>
       [String(status), problemResponse(status, entries)] as const,
   );
@@ -104,15 +112,26 @@ const responsesOf = (route: ApiRoute): ZodOpenApiResponsesObject => {
   ]);
 };
 
-const ACCESS_TEXT: Record<ApiRoute['auth']['kind'], (r: ApiRoute) => string> = {
-  public: () => ACCESS.public,
-  operator: () => ACCESS.operator,
-  permission: (r) =>
-    r.auth.kind === 'permission' ? ACCESS.permission(r.auth.permission) : '',
+const anonymousAllowed = (route: ApiRoute): boolean =>
+  route.auth === 'authenticated' || ANONYMOUS.has(route.auth);
+
+const accessText = (route: ApiRoute): string => {
+  if (route.auth === 'public') return ACCESS.public;
+  if (route.auth === 'authenticated') return ACCESS.authenticated;
+  return ACCESS.permission(route.auth, anonymousAllowed(route));
 };
 
-const securityOf = (route: ApiRoute) =>
-  route.auth.kind === 'public' ? [] : [{ [SECURITY.operatorKey]: [] }];
+/** Alternatives: OIDC, the dev/CI operator key, a stream ticket on `/stream`, and `{}` when the anonymous demo may call it. */
+const securityOf = (route: ApiRoute) => {
+  if (route.auth === 'public') return [];
+  const schemes: Record<string, string[]>[] = [
+    { [SECURITY.oidc]: [] },
+    { [SECURITY.operatorKey]: [] },
+  ];
+  if (route.success.body.kind === 'stream')
+    schemes.push({ [SECURITY.streamTicket]: [] });
+  return anonymousAllowed(route) ? [...schemes, {}] : schemes;
+};
 
 const headerParams = (route: ApiRoute) => [
   RequestIdParam,
@@ -123,14 +142,12 @@ const headerParams = (route: ApiRoute) => [
 export const operationOf = (route: ApiRoute): ZodOpenApiOperationObject => ({
   operationId: route.operationId,
   summary: route.summary,
-  description: [route.description, ACCESS_TEXT[route.auth.kind](route)]
+  description: [route.description, accessText(route)]
     .filter(Boolean)
     .join('\n\n'),
   tags: [route.tag],
   security: securityOf(route),
-  ...(route.auth.kind === 'permission'
-    ? { [EXTENSIONS.permission]: route.auth.permission }
-    : {}),
+  ...(route.auth === 'public' ? {} : { [EXTENSIONS.permission]: route.auth }),
   ...(route.conditional ? { [EXTENSIONS.conditional]: route.conditional } : {}),
   parameters: headerParams(route),
   requestParams: {

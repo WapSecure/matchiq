@@ -63,13 +63,18 @@ Errors are RFC 9457 `application/problem+json` with `type = urn:matchiq:problem:
 | 409    | `fixture-exists`, `event-conflict`, `replay-state-conflict`, `overlay-not-on-air`, `insight-already-published`                                                |
 | 422    | `validation-failed`, `fixture-mismatch`, `idempotency-key-reused`                                                                                             |
 | 429    | `rate-limited`. Honour `Retry-After` (the replay bucket sends `Retry-After-replay`)                                                                           |
-| 503    | `replay-capacity` (with `Retry-After`), `replay-unavailable`, `stream-unavailable`                                                                            |
+| 503    | `replay-capacity` (with `Retry-After`), `replay-unavailable`, `stream-unavailable`, `auth-unavailable`                                                        |
 
 ## Authentication
 
-- **Anonymous:** demo reads, the stream and replay controls (rate-limited; ADR-0010, ADR-0015).
-- **Operator key (today):** `Authorization: Bearer <OPERATOR_API_KEY>` for fixture creation, ingest, editorial commands and the audit trail. Operations list it under `security` and name their permission in `x-matchiq-permission`.
-- **OIDC (planned):** the `oidc` scheme is declared with `x-matchiq-status: planned`. No operation accepts it until ADR-0015 API enforcement lands. The same permissions then come from token roles.
+Every operation names its permission in `x-matchiq-permission` (ADR-0015), and its `security` lists the ways in:
+
+- **OIDC (`oidc`):** `Authorization: Bearer <access token>` from `OIDC_ISSUER_URL`. Roles map to permissions. A token `scope` that names MatchIQ permissions narrows them.
+- **Operator key (`operatorKey`):** `Authorization: Bearer <OPERATOR_API_KEY>`, a dev and CI fallback behind `AUTH_OPERATOR_KEY_ENABLED` that is refused in prod. It acts as developer + producer.
+- **Stream ticket (`streamTicket`):** `?ticket=` from `POST /fixtures/{id}/stream-tickets`, valid on that fixture's stream only.
+- **Anonymous (`{}`):** listed only where the anonymous demo principal holds the permission (demo reads, traces and replay controls) and `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+
+Health and the docs routes are public. A missing or bad credential is `401 unauthorized`, and a valid caller without the permission is `403 forbidden`. When the identity provider cannot be reached, the API answers `503 auth-unavailable`. `openapi.integration.spec.ts` checks that the documented permission equals the one each handler declares to the guards.
 
 ## Streaming
 

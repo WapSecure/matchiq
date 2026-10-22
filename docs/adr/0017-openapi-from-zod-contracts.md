@@ -19,7 +19,7 @@ The API had no machine-readable description. Integrators had to read controllers
   - RFC 9457 responses per route, grouped by status, with an example and `x-problem-types` for each `type` URI.
   - The `Idempotency-Key`, `X-Request-ID` and `Last-Event-ID` request headers, and the `Idempotent-Replayed`, `Retry-After` and `X-Request-ID` response headers.
   - The SSE endpoint as `text/event-stream`, with `x-sse-data` pointing at the `StreamMessage` component (OpenAPI 3.1 has no item schema for event streams).
-  - The operator-key bearer scheme on operator routes, and an `openIdConnect` scheme marked `x-matchiq-status: planned` that no route lists until ADR-0015 enforcement lands.
+  - Security per operation from ADR-0015: `oidc` (`openIdConnect`, discovery from `OIDC_ISSUER_URL`), the dev/CI `operatorKey`, `streamTicket` on the stream, and `{}` where the anonymous demo principal holds the permission. `x-matchiq-permission` names the permission, and the integration spec checks it against the `@RequirePermission`/`@PublicRoute` metadata the guards read.
   - `info.version` from `apps/api/package.json`, which a test enforces. `servers` come from `API_PUBLIC_URL` when served, and from the config default in the committed file.
 - **Serving.** `GET /api/v1/openapi.json` and a self-hosted Swagger UI at `/api/v1/docs`. The assets come from the exact-pinned `swagger-ui-dist`, with no CDN, under a page CSP with `script-src 'self'` and no validator call-out. Both are on unless `APP_ENV=prod`; `API_DOCS_ENABLED` overrides that either way.
 - **Typed client.** `libs/api-client` holds `openapi-typescript` output generated from the committed document (`nx run api-client:codegen`, which is checked for drift) and an `openapi-fetch` wrapper. The web's `fetchTemplates` uses it and still validates the body with Zod. The remaining endpoints migrate later.
@@ -39,5 +39,5 @@ The API had no machine-readable description. Integrators had to read controllers
 ## Consequences
 
 - A new controller route fails CI until it has a registry entry, and a removed route fails until its entry goes.
-- The registry states auth and problems by hand, so it can be wrong where tests do not reach. The response-conformance test covers success bodies only. Guard metadata is not cross-checked yet (a follow-up, once the identity guards settle).
+- The registry states auth and problems by hand, so it can be wrong where tests do not reach. Auth is cross-checked against guard metadata, but problem kinds are not, and the response-conformance test covers success bodies only.
 - The committed document is about 340 kB. Shared contracts are named components, and other reused sub-schemas are inlined, which keeps type names stable for clients.

@@ -86,7 +86,7 @@ Revisit Azure Container Apps (`infra/azure`) as soon as a subscription or hackat
    git clone https://github.com/WapSecure/matchiq.git && cd matchiq && git checkout <release-sha>
    cat > .env <<EOF
    POSTGRES_PASSWORD=$(openssl rand -hex 24)
-   OPERATOR_API_KEY=$(openssl rand -hex 32)
+   STREAM_TICKET_SECRET=$(openssl rand -hex 32)
    AGENTS_SERVICE_TOKEN=$(openssl rand -hex 32)
    EOF
    chmod 600 .env

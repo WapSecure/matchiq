@@ -19,8 +19,9 @@ export const MEDIA = {
 } as const;
 
 export const SECURITY = {
-  operatorKey: 'operatorKey',
   oidc: 'oidc',
+  operatorKey: 'operatorKey',
+  streamTicket: 'streamTicket',
 } as const;
 
 export const TAGS = {
@@ -30,6 +31,7 @@ export const TAGS = {
   stream: 'Stream',
   editorial: 'Editorial',
   audit: 'Audit',
+  identity: 'Identity',
   platform: 'Platform',
 } as const;
 
@@ -39,7 +41,6 @@ export const EXTENSIONS = {
   permission: 'x-matchiq-permission',
   problemTypes: 'x-problem-types',
   streamMessage: 'x-sse-data',
-  status: 'x-matchiq-status',
   conditional: 'x-matchiq-conditional',
 } as const;
 
@@ -55,14 +56,16 @@ export const DOCUMENT_TEXT = {
   license: 'MIT',
   localServer: 'Local development',
   configuredServer: 'This deployment (API_PUBLIC_URL)',
-  operatorKey:
-    'Shared operator key (`OPERATOR_API_KEY`), sent as `Authorization: Bearer <key>`. ' +
-    'Grants the developer and producer permissions; a dev and CI fallback once OIDC lands.',
   oidc:
-    'Planned (ADR-0015 stage 2): OIDC access tokens from the configured issuer. ' +
-    'Not accepted by this build; routes list only the operator key until enforcement lands.',
+    'OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0015). ' +
+    'Roles map to permissions; a token `scope` naming MatchIQ permissions narrows them.',
   oidcDiscovery: 'https://issuer.example/.well-known/openid-configuration',
-  planned: 'planned',
+  operatorKey:
+    'Dev and CI fallback (`AUTH_OPERATOR_KEY_ENABLED`, refused in prod): `Authorization: Bearer <OPERATOR_API_KEY>`. ' +
+    'Acts as developer + producer.',
+  streamTicket:
+    'Short-lived ticket from `POST /fixtures/{fixtureId}/stream-tickets`, accepted only on that fixture stream.',
+  streamTicketParam: 'ticket',
   docsConditional: 'Served unless APP_ENV=prod, or when API_DOCS_ENABLED=true.',
 } as const;
 
@@ -79,11 +82,14 @@ export const HEADER_TEXT = {
 } as const;
 
 export const ACCESS = {
-  public: 'Access: anonymous (the synthetic demo organisation).',
-  operator:
-    'Access: operator key (`Authorization: Bearer <OPERATOR_API_KEY>`).',
-  permission: (permission: string) =>
-    `Access: requires the \`${permission}\` permission (operator key today; OIDC roles per ADR-0015).`,
+  public: 'Access: public, no credentials (`@PublicRoute`).',
+  authenticated:
+    'Access: any authenticated caller, including the anonymous demo principal.',
+  permission: (permission: string, anonymous: boolean) =>
+    `Access: requires the \`${permission}\` permission.` +
+    (anonymous
+      ? ' The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.'
+      : ''),
 } as const;
 
 export const STREAM_TEXT = {

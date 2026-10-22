@@ -3,7 +3,6 @@ import { NAMED_SCHEMAS } from './components';
 import {
   API_CONTRACT_VERSION,
   DOCUMENT_TEXT,
-  EXTENSIONS,
   OPENAPI_PATTERNS,
   OPENAPI_VERSION,
   SECURITY,
@@ -66,16 +65,21 @@ export const buildOpenApiDocument = (
       components: {
         schemas: { ...NAMED_SCHEMAS },
         securitySchemes: {
+          [SECURITY.oidc]: {
+            type: 'openIdConnect',
+            openIdConnectUrl: oidcDiscovery(options.oidcIssuerUrl),
+            description: DOCUMENT_TEXT.oidc,
+          },
           [SECURITY.operatorKey]: {
             type: 'http',
             scheme: 'bearer',
             description: DOCUMENT_TEXT.operatorKey,
           },
-          [SECURITY.oidc]: {
-            type: 'openIdConnect',
-            openIdConnectUrl: oidcDiscovery(options.oidcIssuerUrl),
-            description: DOCUMENT_TEXT.oidc,
-            [EXTENSIONS.status]: DOCUMENT_TEXT.planned,
+          [SECURITY.streamTicket]: {
+            type: 'apiKey',
+            in: 'query',
+            name: DOCUMENT_TEXT.streamTicketParam,
+            description: DOCUMENT_TEXT.streamTicket,
           },
         },
       },

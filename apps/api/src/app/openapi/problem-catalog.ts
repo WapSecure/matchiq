@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { PROBLEMS as AUTH_PROBLEMS } from '@matchiq/auth';
 import {
   PROBLEM_SLUGS,
   PROBLEM_TITLES,
@@ -13,8 +14,17 @@ export interface ProblemEntry {
   readonly title: string;
 }
 
-/** Problems raised by the shared HTTP kit rather than a route's service. */
+/** Problems raised by the shared HTTP kit and the auth guards rather than a route's service. */
 const GENERIC = {
+  unauthorized: {
+    status: HttpStatus.UNAUTHORIZED,
+    ...AUTH_PROBLEMS.unauthorized,
+  },
+  forbidden: { status: HttpStatus.FORBIDDEN, ...AUTH_PROBLEMS.forbidden },
+  authUnavailable: {
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    ...AUTH_PROBLEMS.authUnavailable,
+  },
   badRequest: {
     status: HttpStatus.BAD_REQUEST,
     slug: PROBLEM_SLUGS[HttpStatus.BAD_REQUEST] ?? '',
@@ -53,3 +63,10 @@ export const problemType = (slug: string): string =>
 
 /** Every route can answer these; routes list only what their own handler adds. */
 export const ALWAYS: readonly ProblemRef[] = ['rateLimited', 'internal'];
+
+/** Added by the authentication and permission guards to every non-public route. */
+export const GUARDED: readonly ProblemRef[] = [
+  'unauthorized',
+  'forbidden',
+  'authUnavailable',
+];
