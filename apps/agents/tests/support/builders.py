@@ -35,6 +35,20 @@ class CaseSpec:
     confidence: str = "medium"
     deadline_ms: int = 8000
     event_ids: tuple[str, ...] = ("ev_00101", "ev_00112", "ev_00127")
+    # Squad-sized allowlist, as the worker sends for a real fixture (36 players).
+    squad_players: int = 0
+
+
+FIRST_NAMES = ("Arlo", "Bram", "Cael", "Dario", "Emil", "Fenn")
+LAST_NAMES = ("Ashby", "Brook", "Calder", "Dunmore", "Ellery", "Fairley")
+
+
+def squad(count: int) -> list[dict[str, str]]:
+    names = [f"{first} {last}" for first in FIRST_NAMES for last in LAST_NAMES][:count]
+    return [
+        {"playerId": f"pl_squad_{index}", "teamId": HOME if index % 2 else AWAY, "displayName": n}
+        for index, n in enumerate(names)
+    ]
 
 
 def build_payload(spec: CaseSpec) -> dict[str, Any]:
@@ -63,7 +77,10 @@ def build_payload(spec: CaseSpec) -> dict[str, Any]:
             {"teamId": HOME, "name": spec.team_name},
             {"teamId": AWAY, "name": spec.away_name},
         ],
-        "players": [{"playerId": STAR, "teamId": HOME, "displayName": spec.player_name}],
+        "players": [
+            {"playerId": STAR, "teamId": HOME, "displayName": spec.player_name},
+            *squad(spec.squad_players),
+        ],
     }
     packet["deadlineMs"] = spec.deadline_ms
     payload["personas"] = list(spec.personas)

@@ -296,7 +296,7 @@
     "deadlineMs": {
       "type": "integer",
       "exclusiveMinimum": 0,
-      "maximum": 30000
+      "maximum": 180000
     },
     "policyVersion": {
       "type": "string",

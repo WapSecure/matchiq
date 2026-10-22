@@ -4,8 +4,11 @@ Conversion re-validates against the generated (strict) contract models, so malfo
 raises `ValueError` and counts as a failed attempt.
 """
 
-from collections.abc import Sequence
+import re
+from collections.abc import Collection, Iterable, Sequence
 from typing import Final
+
+from pydantic import ValidationError
 
 from matchiq_agents.contracts.types import (
     AgentName,
@@ -20,6 +23,7 @@ from matchiq_agents.contracts.types import (
     Persona,
 )
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
+from matchiq_agents.guard.text import restore_names
 from matchiq_agents.limits import OVERLAY_DURATION_MS, OVERLAY_PRIORITY
 from matchiq_agents.roster.schemas import (
     AnalystOutput,
@@ -30,7 +34,8 @@ from matchiq_agents.roster.schemas import (
 )
 
 SCHEMA_VERSION: Final = 1
-MISSING_PERSONAS: Final = "model output is missing personas: {personas}"
+HASHTAG_REGEX: Final = re.compile(r"(?<!\w)#\w+")
+NO_USABLE_DRAFT: Final = "model output has no usable draft for personas: {personas}"
 
 OVERLAY_KINDS: Final[dict[InsightKind, OverlayKind]] = {
     InsightKind.GOAL: OverlayKind.SCORE_UPDATE,
@@ -43,23 +48,41 @@ OVERLAY_KINDS: Final[dict[InsightKind, OverlayKind]] = {
 }
 
 
-def facts_payload(view: FactView) -> FactsPayload:
+def facts_payload(
+    view: FactView, *, free_text: bool = True, metric_refs: Collection[str] | None = None
+) -> FactsPayload:
+    """The data block for one agent, trimmed to what that agent needs (ADR-0011 addendum).
+
+    `free_text=False` drops the engine's rationale and counter-evidence prose: only the Analyst
+    (and the critique) reason over it, and small models otherwise copy its wording and numbers
+    into drafts. `metric_refs` keeps only the metrics already cited upstream (a real packet has
+    about 28). Output is checked against the full evidence either way.
+    """
+    metrics = {
+        ref: value
+        for ref, value in view.metrics.items()
+        if metric_refs is None or ref in metric_refs
+    }
     return FactsPayload(
         insight_kind=view.kind,
         subject_team=view.team_name,
         subject_player=view.player_name,
-        computed_metrics=dict(view.metrics),
+        computed_metrics=metrics,
         event_ids=list(view.event_ids),
         confidence_label=view.confidence,
         data_coverage=view.data_coverage,
-        rationale=view.rationale,
-        counter_evidence=list(view.counter_evidence),
-        entities=sorted(view.entity_names),
+        rationale=view.rationale if free_text else "",
+        counter_evidence=list(view.counter_evidence) if free_text else [],
+        entities=view.prompt_entities,
     )
 
 
 def cited_out(values: Sequence[CitedValue]) -> list[CitedValueOut]:
     return [CitedValueOut(metric_ref=value.metricRef, value=value.value) for value in values]
+
+
+def cited_refs(drafts: Iterable[NarrativeDraft]) -> set[str]:
+    return {value.metricRef for draft in drafts for value in draft.citedValues}
 
 
 def text_pairs(drafts: Sequence[NarrativeDraft]) -> list[TextPair]:
@@ -72,7 +95,10 @@ def to_analysis(output: AnalystOutput, view: FactView) -> AgentResult:
             "schemaVersion": SCHEMA_VERSION,
             "runId": view.run_id,
             "agent": AgentName.MATCH_ANALYST,
-            "claims": [claim.model_dump() for claim in output.claims],
+            "claims": [
+                {**claim.model_dump(), "text": tidy(claim.text, view.entity_names)}
+                for claim in output.claims
+            ],
             "limitations": output.limitations,
             "locale": CANONICAL_LOCALE,
             "confidenceLabel": output.confidence_label,
@@ -87,15 +113,41 @@ def make_draft(draft: DraftOut, locale: Locale, source: NarrativeSource) -> Narr
     )
 
 
+def tidy(text: str, names: Iterable[str]) -> str:
+    """Deterministic clean-up of model prose: canonical name capitals, no hashtags.
+
+    Both edits only re-case allowlisted names or delete text, so they cannot add a claim; the
+    Fact Checker still checks the result.
+    """
+    return " ".join(HASHTAG_REGEX.sub("", restore_names(text, names)).split())
+
+
+def named(draft: DraftOut, names: Iterable[str]) -> DraftOut:
+    return draft.model_copy(
+        update={"headline": tidy(draft.headline, names), "body": tidy(draft.body, names)}
+    )
+
+
 def to_drafts(
     drafts: Sequence[DraftOut], personas: Sequence[Persona], locale: Locale, source: NarrativeSource
 ) -> list[NarrativeDraft]:
-    """One draft per requested persona, in request order; anything else is a failed attempt."""
-    by_persona = {Persona(draft.persona): draft for draft in drafts}
-    missing = [persona.value for persona in personas if persona not in by_persona]
-    if missing:
-        raise ValueError(MISSING_PERSONAS.format(personas=", ".join(missing)))
-    return [make_draft(by_persona[persona], locale, source) for persona in personas]
+    """Contract-valid drafts for the requested personas, in request order.
+
+    A persona that is missing or invalid is left out for the Fact Checker to flag, so one bad
+    persona never discards the others; output with no usable draft is a failed attempt.
+    """
+    by_persona: dict[Persona, NarrativeDraft] = {}
+    for draft in drafts:
+        persona = Persona(draft.persona)
+        if persona not in personas or persona in by_persona:
+            continue
+        try:
+            by_persona[persona] = make_draft(draft, locale, source)
+        except ValidationError:
+            continue
+    if not by_persona:
+        raise ValueError(NO_USABLE_DRAFT.format(personas=", ".join(p.value for p in personas)))
+    return [by_persona[persona] for persona in personas if persona in by_persona]
 
 
 def to_overlay(
@@ -106,8 +158,8 @@ def to_overlay(
             "kind": OVERLAY_KINDS[view.kind],
             "priority": OVERLAY_PRIORITY[view.priority],
             "durationMs": OVERLAY_DURATION_MS[view.priority],
-            "headline": headline,
-            "body": body,
+            "headline": tidy(headline, view.entity_names),
+            "body": tidy(body, view.entity_names),
             "evidenceEventIds": list(view.event_ids),
             "metricRefs": list(dict.fromkeys(metric_refs)),
         }
