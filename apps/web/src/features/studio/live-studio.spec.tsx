@@ -98,6 +98,30 @@ describe('LiveStudio', () => {
     ).toHaveLength(1);
   });
 
+  it('dates each insight by its own period, not the current one (MQ-024)', async () => {
+    const goal = (id: string, period: 1 | 2, minute: number) =>
+      insight({
+        insightId: id,
+        kind: 'GOAL',
+        priority: 'P0',
+        period,
+        matchClockMs: minute * 60_000,
+      });
+    await renderStudio(
+      baseRoutes({
+        'GET /insights': items([goal('in_h1', 1, 22), goal('in_h2', 2, 19)]),
+        'GET /replay': {
+          body: status({ appliedSequence: 2, period: 2, matchClockMs: 3e6 }),
+        },
+      }),
+    );
+    await screen.findAllByRole('article', { name: 'Goal' });
+    const minutes = screen
+      .getAllByRole('article', { name: 'Goal' })
+      .map((card) => within(card).getByText(/'$/).textContent);
+    expect(minutes).toEqual(["65'", "23'"]);
+  });
+
   it('applies streamed insights, narratives and cues', async () => {
     const { push } = await renderStudio();
     await push(

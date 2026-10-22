@@ -5,7 +5,7 @@ import type { MatchData } from './types';
 export const narrativeKey = (persona: string, locale: string): string =>
   `${persona}:${locale}`;
 
-/** Upserts by `insightId`; newest match-clock first, bounded. */
+/** Upserts by `insightId`; latest in match time first, bounded. */
 export const reduceInsight = (
   state: MatchData,
   insight: Insight,
@@ -14,7 +14,7 @@ export const reduceInsight = (
     (i) => i.insightId !== insight.insightId,
   );
   const insights = [insight, ...others]
-    .sort((a, b) => b.matchClockMs - a.matchClockMs)
+    .sort((a, b) => b.period - a.period || b.matchClockMs - a.matchClockMs)
     .slice(0, STORE_LIMITS.insightsMax);
   return { insights };
 };

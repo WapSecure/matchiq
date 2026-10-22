@@ -3,6 +3,7 @@ import {
   formatFraction,
   formatMetric,
   formatMinute,
+  formatSharePair,
   formatWindow,
 } from './format';
 
@@ -33,5 +34,41 @@ describe('metric formatting', () => {
       formatMetric({ status: 'unavailable', reason: 'NO_TRACKING_DATA' }),
     ).toBeNull();
     expect(formatFraction(0.937)).toBe('94%');
+  });
+});
+
+describe('possession share formatting', () => {
+  const pct = (value: number, numerator?: number, denominator?: number) => ({
+    status: 'available' as const,
+    value,
+    unit: 'percent' as const,
+    ...(numerator === undefined ? {} : { numerator, denominator }),
+  });
+
+  it('never shows a pair that sums to 101% (fx_comeback_42_s5: 48.5 / 51.5)', () => {
+    expect(
+      formatSharePair(
+        pct(48.5, 2_000_511, 4_121_923),
+        pct(51.5, 2_121_412, 4_121_923),
+      ),
+    ).toEqual(['49%', '51%']);
+    expect(formatSharePair(pct(48.5), pct(51.5))).toEqual(['49%', '51%']);
+  });
+
+  it('sums to 100% for every engine split', () => {
+    for (let tenths = 0; tenths <= 1000; tenths += 1) {
+      const pair = formatSharePair(pct(tenths / 10), pct((1000 - tenths) / 10));
+      const [h, a] = (pair ?? []).map((s) => Number.parseInt(s, 10));
+      expect((h ?? 0) + (a ?? 0)).toBe(100);
+    }
+  });
+
+  it('is null when either side is unavailable', () => {
+    expect(
+      formatSharePair(pct(50), {
+        status: 'unavailable',
+        reason: 'NO_TRACKING_DATA',
+      }),
+    ).toBeNull();
   });
 });
