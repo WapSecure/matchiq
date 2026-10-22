@@ -116,6 +116,8 @@ test.describe('editorial controls', () => {
     ).toBeVisible();
     await expect(page.getByText('End of the audit trail.')).toBeVisible();
     await page.getByText('1 field changed').first().click();
+    // At rest under the sticky header, which otherwise overlaps the filters once scrolled.
+    await page.evaluate(() => window.scrollTo(0, 0));
     await expectNoBlockingA11yViolations(page);
     await expectNoHorizontalOverflow(page);
   });

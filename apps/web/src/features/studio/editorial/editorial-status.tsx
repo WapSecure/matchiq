@@ -11,19 +11,16 @@ import { useMatchStore } from '../store';
 export const useEditorialMode = (): EditorialMode =>
   useMatchStore((s) => s.editorial?.mode ?? 'AUTO');
 
-export function EditorialChip({ className }: { className?: string }) {
-  const mode = useEditorialMode();
-  const view = MODE_VIEW[mode];
+/** Hidden on narrow screens, where the header has no room and the banner carries the state. */
+export function EditorialChip() {
+  const view = MODE_VIEW[useEditorialMode()];
   return (
-    <Badge
-      tone={view.tone}
-      dot
-      data-testid="editorial-chip"
-      className={cn(mode === 'AUTO' && 'hidden md:inline-flex', className)}
-    >
-      <span className="sr-only">{EDITORIAL_COPY.chipPrefix}</span>
-      {view.label}
-    </Badge>
+    <span className="hidden shrink-0 md:flex">
+      <Badge tone={view.tone} dot data-testid="editorial-chip">
+        <span className="sr-only">{EDITORIAL_COPY.chipPrefix}</span>
+        {view.label}
+      </Badge>
+    </span>
   );
 }
 
