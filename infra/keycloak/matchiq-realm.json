@@ -1,0 +1,370 @@
+{
+  "realm": "matchiq",
+  "displayName": "MatchIQ (local development)",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "loginWithEmailAllowed": true,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 28800,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "clientScopeMappings": {
+    "matchiq-api": [
+      {
+        "client": "matchiq-web",
+        "roles": [
+          "platform-operator",
+          "tenant-owner",
+          "producer",
+          "analyst",
+          "developer",
+          "viewer"
+        ]
+      }
+    ]
+  },
+  "roles": {
+    "client": {
+      "matchiq-api": [
+        {
+          "name": "platform-operator",
+          "description": "MatchIQ platform-operator (spec \u00a740)",
+          "clientRole": true
+        },
+        {
+          "name": "tenant-owner",
+          "description": "MatchIQ tenant-owner (spec \u00a740)",
+          "clientRole": true
+        },
+        {
+          "name": "producer",
+          "description": "MatchIQ producer (spec \u00a740)",
+          "clientRole": true
+        },
+        {
+          "name": "analyst",
+          "description": "MatchIQ analyst (spec \u00a740)",
+          "clientRole": true
+        },
+        {
+          "name": "developer",
+          "description": "MatchIQ developer (spec \u00a740)",
+          "clientRole": true
+        },
+        {
+          "name": "viewer",
+          "description": "MatchIQ viewer (spec \u00a740)",
+          "clientRole": true
+        }
+      ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "matchiq-api",
+      "name": "MatchIQ API (resource server)",
+      "description": "Audience of access tokens; holds the product roles.",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "matchiq-web",
+      "name": "MatchIQ web (BFF)",
+      "description": "Authorization Code + PKCE. Public client for local development only.",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": [
+        "http://localhost:4200/auth/callback",
+        "http://localhost:4318/auth/callback",
+        "http://127.0.0.1:4318/auth/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "http://localhost:4318",
+        "http://127.0.0.1:4318"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:4200/*##http://localhost:4318/*##http://127.0.0.1:4318/*",
+        "access.token.lifespan": "300"
+      },
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["basic", "profile"],
+      "optionalClientScopes": ["offline_access"],
+      "protocolMappers": [
+        {
+          "name": "audience-matchiq-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "matchiq-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "org",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "org",
+            "claim.name": "org",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true",
+            "multivalued": "false"
+          }
+        },
+        {
+          "name": "org-name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "org_name",
+            "claim.name": "org_name",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true",
+            "multivalued": "false"
+          }
+        },
+        {
+          "name": "matchiq-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "usermodel.clientRoleMapping.clientId": "matchiq-api",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "harbour.owner",
+      "enabled": true,
+      "email": "harbour.owner@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Hana",
+      "lastName": "Owner",
+      "attributes": {
+        "org": ["org_demo"],
+        "org_name": ["Harbour Media (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["tenant-owner"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "harbour.producer",
+      "enabled": true,
+      "email": "harbour.producer@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Pat",
+      "lastName": "Producer",
+      "attributes": {
+        "org": ["org_demo"],
+        "org_name": ["Harbour Media (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["producer"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "harbour.analyst",
+      "enabled": true,
+      "email": "harbour.analyst@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Ana",
+      "lastName": "Analyst",
+      "attributes": {
+        "org": ["org_demo"],
+        "org_name": ["Harbour Media (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["analyst"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "harbour.developer",
+      "enabled": true,
+      "email": "harbour.developer@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Dev",
+      "lastName": "Developer",
+      "attributes": {
+        "org": ["org_demo"],
+        "org_name": ["Harbour Media (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["developer"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "harbour.viewer",
+      "enabled": true,
+      "email": "harbour.viewer@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Vic",
+      "lastName": "Viewer",
+      "attributes": {
+        "org": ["org_demo"],
+        "org_name": ["Harbour Media (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["viewer"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "northbank.producer",
+      "enabled": true,
+      "email": "northbank.producer@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Nia",
+      "lastName": "Producer",
+      "attributes": {
+        "org": ["org_northbank"],
+        "org_name": ["Northbank Sports Network (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["producer"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "northbank.viewer",
+      "enabled": true,
+      "email": "northbank.viewer@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Noah",
+      "lastName": "Viewer",
+      "attributes": {
+        "org": ["org_northbank"],
+        "org_name": ["Northbank Sports Network (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["viewer"]
+      },
+      "requiredActions": []
+    },
+    {
+      "username": "platform.operator",
+      "enabled": true,
+      "email": "platform.operator@matchiq.test",
+      "emailVerified": true,
+      "firstName": "Olu",
+      "lastName": "Operator",
+      "attributes": {
+        "org": ["org_platform"],
+        "org_name": ["MatchIQ Platform (synthetic)"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "matchiq-dev-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "matchiq-api": ["platform-operator"]
+      },
+      "requiredActions": []
+    }
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"unmanagedAttributePolicy\":\"ADMIN_EDIT\",\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"firstName\",\"displayName\":\"${firstName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"lastName\",\"displayName\":\"${lastName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+          ]
+        }
+      }
+    ]
+  }
+}

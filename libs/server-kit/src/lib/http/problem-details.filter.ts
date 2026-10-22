@@ -13,6 +13,7 @@ import {
   PROBLEM_SLUGS,
   PROBLEM_TITLES,
   PROBLEM_TYPE_PREFIX,
+  QUERY_SEPARATOR,
 } from '../constants';
 import { ProblemException } from './problem.exception';
 import { RequestValidationError } from './request-validation.error';
@@ -20,6 +21,9 @@ import { requestIdOf } from './request-id.middleware';
 
 const problemType = (status: number, slug?: string): string =>
   `${PROBLEM_TYPE_PREFIX}${slug ?? PROBLEM_SLUGS[status] ?? `http-${status}`}`;
+
+const pathOf = (req: Request): string =>
+  req.originalUrl.split(QUERY_SEPARATOR, 1)[0] ?? req.originalUrl;
 
 const titleOf = (exception: HttpException): string => {
   const body = exception.getResponse();
@@ -59,7 +63,8 @@ export class ProblemDetailsFilter implements ExceptionFilter {
   }
 
   private toProblem(exception: unknown, req: Request): ProblemDetails {
-    const base = { instance: req.originalUrl, requestId: requestIdOf(req) };
+    // The query is dropped: it can carry a stream ticket (ADR-0015).
+    const base = { instance: pathOf(req), requestId: requestIdOf(req) };
 
     if (exception instanceof ProblemException) {
       const { status, title, detail, slug, errors } = exception.problem;

@@ -2,6 +2,7 @@ export const REQUEST_ID_HEADER = 'x-request-id';
 export const REQUEST_ID_PATTERN = /^[A-Za-z0-9._:-]{8,128}$/;
 export const PROBLEM_CONTENT_TYPE = 'application/problem+json';
 export const PROBLEM_TYPE_PREFIX = 'urn:matchiq:problem:';
+export const QUERY_SEPARATOR = '?';
 export const API_GLOBAL_PREFIX = 'api/v1';
 export const HEALTH_ROUTE = 'health';
 export const HEALTH_CHECK_TIMEOUT_MS = 2_000;

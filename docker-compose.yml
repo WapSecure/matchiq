@@ -37,6 +37,36 @@ services:
       timeout: 3s
       retries: 10
 
+  # --- Local OpenID Connect provider (ADR-0015); `pnpm infra:up` starts it ---
+  # Dev-only: in-memory H2 store, bootstrap admin admin/admin, seeded users with
+  # the password in docs/security/IDENTITY_AND_ACCESS.md. Never expose it.
+  keycloak:
+    profiles: [infra]
+    image: quay.io/keycloak/keycloak:26.7.5@sha256:37dbaf6f0722c9ec246335f36e1ef8b2e6cb960f7c27e0d8c615121a3d475a85
+    command: ['start-dev', '--import-realm']
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # Fixes the token issuer so host and container callers agree on it.
+      KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT:-8180}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: 'true'
+      KC_HEALTH_ENABLED: 'true'
+    ports:
+      - '127.0.0.1:${KEYCLOAK_PORT:-8180}:8080'
+    volumes:
+      - ./infra/keycloak/matchiq-realm.json:/opt/keycloak/data/import/matchiq-realm.json:ro
+    healthcheck:
+      # The image ships no curl; probe the management port over bash's /dev/tcp.
+      test:
+        [
+          'CMD-SHELL',
+          "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
   # --- Opt-in application stack: docker compose --profile app up --build ---
   # Values come from .env via interpolation; defaults are local-only placeholders.
   # Explicit blocks (not env_file) keep compose-DNS URLs authoritative over the localhost URLs in .env.

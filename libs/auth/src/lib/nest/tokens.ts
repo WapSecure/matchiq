@@ -1,0 +1,3 @@
+export const AUTHENTICATOR = Symbol('AUTHENTICATOR');
+export const STREAM_TICKETS = Symbol('STREAM_TICKETS');
+export const ACCESS_DENIED_LISTENER = Symbol('ACCESS_DENIED_LISTENER');

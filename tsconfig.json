@@ -38,6 +38,12 @@
     },
     {
       "path": "./libs/canonical-json"
+    },
+    {
+      "path": "./libs/access"
+    },
+    {
+      "path": "./libs/auth"
     }
   ],
   "compilerOptions": {}
