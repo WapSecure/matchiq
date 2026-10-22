@@ -51,6 +51,23 @@ export class PostgresOutboxStore implements OutboxStore {
     if (outcome.failure !== undefined) throw outcome.failure;
     return outcome.count;
   }
+
+  /** Unpublished rows and the age of the oldest, for the outbox lag metrics. */
+  async backlog(): Promise<OutboxBacklog> {
+    const [row] = await this.db
+      .select({
+        count: sql<number>`count(*)::int`,
+        oldestAgeSeconds: sql<number>`coalesce(extract(epoch from now() - min(${t.createdAt})), 0)::float8`,
+      })
+      .from(t)
+      .where(isNull(t.publishedAt));
+    return row ?? { count: 0, oldestAgeSeconds: 0 };
+  }
+}
+
+export interface OutboxBacklog {
+  readonly count: number;
+  readonly oldestAgeSeconds: number;
 }
 
 interface ClaimedRow {

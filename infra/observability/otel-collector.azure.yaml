@@ -1,0 +1,27 @@
+# Azure Monitor seam (not exercised; ADR-0017). The services stay on OTLP; this
+# collector variant forwards traces to Application Insights through the contrib
+# azuremonitor exporter. Run it with APPLICATIONINSIGHTS_CONNECTION_STRING set:
+#   docker compose --profile observability run ... --config /etc/otelcol/azure.yaml
+# Do not claim Azure telemetry works until a trace is seen in App Insights.
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+  batch: {}
+
+exporters:
+  azuremonitor:
+    connection_string: ${env:APPLICATIONINSIGHTS_CONNECTION_STRING}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [azuremonitor]

@@ -8,7 +8,12 @@ import {
   PermissionGuard,
 } from '@matchiq/auth';
 import type { ApiEnv } from '@matchiq/config';
-import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
+import {
+  EnvModule,
+  HealthModule,
+  HttpKitModule,
+  TelemetryModule,
+} from '@matchiq/server-kit';
 import { AuditTrail } from './auth/audit-trail.service';
 import { PrincipalThrottlerGuard } from './auth/principal-throttler.guard';
 import { AuditController } from './editorial/audit.controller';
@@ -40,6 +45,7 @@ import { replayThrottler } from './replay/replay-throttle';
 import { ReplayService } from './replay/replay.service';
 import { StreamController } from './stream/stream.controller';
 import { StreamService } from './stream/stream.service';
+import { StreamGauges } from './telemetry/stream-gauges';
 
 export const API_CONTROLLERS = [
   FixturesController,
@@ -60,6 +66,7 @@ export class AppModule {
       module: AppModule,
       imports: [
         EnvModule.forRoot(env),
+        TelemetryModule.forRoot({ service: SERVICE_NAME }),
         HttpKitModule,
         AuthModule.forRoot(env),
         InfrastructureModule.forRoot(env),
@@ -99,6 +106,7 @@ export class AppModule {
         OutboxRelayService,
         ReplayService,
         IntelligenceService,
+        StreamGauges,
         { provide: OUTBOX_NOTIFIER, useExisting: OutboxRelayService },
       ],
     };

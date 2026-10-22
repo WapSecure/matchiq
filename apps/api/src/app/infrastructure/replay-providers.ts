@@ -15,6 +15,7 @@ import {
   type SessionStore,
   type TemplateStore,
 } from '@matchiq/db';
+import { queueTelemetry } from '@matchiq/server-kit';
 import { Redis } from 'ioredis';
 import { QUEUE_CONNECTION_NAME } from '../constants';
 import {
@@ -88,7 +89,11 @@ export const replayProviders = (env: ApiEnv): Provider[] => [
   {
     provide: REPLAY_COMMAND_BUS,
     useFactory: (connection: Redis) =>
-      new BullMqReplayCommandBus({ connection, prefix: env.REDIS_KEY_PREFIX }),
+      new BullMqReplayCommandBus({
+        connection,
+        prefix: env.REDIS_KEY_PREFIX,
+        telemetry: queueTelemetry(),
+      }),
     inject: [QUEUE_CONNECTION],
   },
   CommandBusLifecycle,

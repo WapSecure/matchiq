@@ -63,6 +63,8 @@ export interface FakeAgentsServer {
   readonly url: string;
   readonly requests: PipelineRequest[];
   readonly authorizations: (string | undefined)[];
+  /** W3C `traceparent` of each pipeline call (undefined when tracing is off). */
+  readonly traceparents: (string | undefined)[];
   behave(behaviour: FakeBehaviour): void;
   close(): Promise<void>;
 }
@@ -79,6 +81,7 @@ export const startFakeAgents = async (
   let behaviour = initial;
   const requests: PipelineRequest[] = [];
   const authorizations: (string | undefined)[] = [];
+  const traceparents: (string | undefined)[] = [];
   const server: Server = createServer((req, res) => {
     void readBody(req).then((raw) => {
       if (req.url?.includes('/health')) {
@@ -86,6 +89,7 @@ export const startFakeAgents = async (
         return;
       }
       authorizations.push(req.headers.authorization);
+      traceparents.push(req.headers.traceparent as string | undefined);
       const request = PipelineRequest.parse(JSON.parse(raw));
       requests.push(request);
       const reply = behaviour(request);
@@ -102,6 +106,7 @@ export const startFakeAgents = async (
     url: `http://127.0.0.1:${port}`,
     requests,
     authorizations,
+    traceparents,
     behave: (next) => {
       behaviour = next;
     },

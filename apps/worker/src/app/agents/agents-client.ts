@@ -1,4 +1,9 @@
 import { PipelineResult, type PipelineRequest } from '@matchiq/contracts';
+import {
+  CORRELATION_ID_HEADER,
+  injectTraceHeaders,
+  withClientSpan,
+} from '@matchiq/server-kit';
 import { AGENTS_HTTP, FALLBACK_REASONS } from '../constants';
 
 /** Port to the stateless agents service; it proposes, the worker's gate commits. */
@@ -45,7 +50,15 @@ const retriableStatus = (status: number): boolean =>
 export class HttpAgentsClient implements AgentsClient {
   constructor(private readonly options: HttpAgentsClientOptions) {}
 
-  async run(request: PipelineRequest): Promise<PipelineResult> {
+  run(request: PipelineRequest): Promise<PipelineResult> {
+    return withClientSpan(
+      AGENTS_HTTP.spanName,
+      { [AGENTS_HTTP.correlationAttribute]: request.packet.correlationId },
+      () => this.call(request),
+    );
+  }
+
+  private async call(request: PipelineRequest): Promise<PipelineResult> {
     const response = await this.post(request);
     if (!response.ok) {
       throw new AgentsCallError(
@@ -87,10 +100,11 @@ export class HttpAgentsClient implements AgentsClient {
         new URL(AGENTS_HTTP.pipelinePath, this.options.baseUrl),
         {
           method: 'POST',
-          headers: {
+          headers: injectTraceHeaders({
             authorization: `${AGENTS_HTTP.bearerPrefix}${this.options.token}`,
             'content-type': AGENTS_HTTP.contentType,
-          },
+            [CORRELATION_ID_HEADER]: request.packet.correlationId,
+          }),
           body: JSON.stringify(request),
           signal: AbortSignal.timeout(this.options.timeoutMs),
         },
