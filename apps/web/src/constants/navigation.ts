@@ -6,9 +6,11 @@ export const ROUTES = {
     `/studio/${encodeURIComponent(fixtureId)}/recap`,
   observatory: (fixtureId: string) =>
     `/studio/${encodeURIComponent(fixtureId)}/observatory`,
+  audit: (fixtureId: string) =>
+    `/studio/${encodeURIComponent(fixtureId)}/audit`,
 } as const;
 
-export type StudioView = 'live' | 'recap' | 'observatory';
+export type StudioView = 'live' | 'recap' | 'observatory' | 'audit';
 
 export const STUDIO_TABS: readonly {
   view: StudioView;
@@ -18,6 +20,7 @@ export const STUDIO_TABS: readonly {
   { view: 'live', label: 'Live studio', href: ROUTES.studio },
   { view: 'recap', label: 'Recap', href: ROUTES.recap },
   { view: 'observatory', label: 'Agent observatory', href: ROUTES.observatory },
+  { view: 'audit', label: 'Audit trail', href: ROUTES.audit },
 ];
 
 export const STUDIO_TABS_LABEL = 'Session views';

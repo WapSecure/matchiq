@@ -1,6 +1,7 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import type { QueryClient } from '@tanstack/react-query';
 import { API_LIMITS } from '@/constants/api';
+import { fetchEditorialStatus } from '@/lib/api/editorial-endpoints';
 import {
   fetchFixtureEvents,
   fetchInsights,
@@ -81,6 +82,9 @@ export const hydrateStudio = async (
       fetchOverlays(fixtureId, s),
     ).then((overlays) => store.getState().applyHydration({ overlays })),
     hydrateNarratives(ctx, audience.persona, audience.locale),
+    fresh(ctx, queryKeys.editorial(fixtureId), (s) =>
+      fetchEditorialStatus(fixtureId, s),
+    ).then((status) => store.getState().applyEditorial(status, 'rest')),
   ]);
   store.getState().markHydrated();
 };

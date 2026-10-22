@@ -1,4 +1,4 @@
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md';
 
 export const BUTTON_BASE =
@@ -10,6 +10,8 @@ export const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   secondary:
     'border border-line-strong bg-surface text-ink shadow-panel hover:border-control hover:bg-surface-raised',
   ghost: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
+  danger:
+    'border border-critical/45 bg-critical/10 text-critical shadow-panel hover:border-critical/70 hover:bg-critical/15',
 };
 
 export const BUTTON_SIZES: Record<ButtonSize, string> = {

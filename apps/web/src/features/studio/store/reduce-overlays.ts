@@ -1,4 +1,4 @@
-import type { OverlayCue } from '@matchiq/contracts';
+import type { OverlayCue, OverlayRetractCause } from '@matchiq/contracts';
 import { STORE_LIMITS } from '@/constants/api';
 import { NATURAL_CUE_ENDS } from '@/constants/overlay';
 import type { MatchData, OverlayEntry, Retraction } from './types';
@@ -7,6 +7,7 @@ export type RetractPayload = {
   overlayId: string;
   revision: number;
   reason: string;
+  cause?: OverlayRetractCause;
 };
 
 /** A stale or duplicate revision is a no-op (spec §44). */
@@ -47,6 +48,7 @@ const logEntry = (
   headline: entry?.cue?.headline ?? null,
   reason: payload.reason,
   ending: NATURAL_CUE_ENDS.has(payload.reason) ? 'EXPIRED' : 'RETRACTED',
+  cause: payload.cause ?? null,
 });
 
 export const reduceRetract = (

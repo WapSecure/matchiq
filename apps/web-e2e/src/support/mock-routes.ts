@@ -1,4 +1,5 @@
 import type { Route } from '@playwright/test';
+import { type EditorialRecorder, handleEditorial } from './mock-editorial';
 import { FIXTURE_ID, mockFixture } from './mock-fixture';
 import {
   mockEvents,
@@ -62,7 +63,11 @@ export type MockApiOptions = {
   faults?: boolean;
 };
 
-export type Recorder = { replayCommands: unknown[]; sessionStarts: unknown[] };
+export type Recorder = {
+  replayCommands: unknown[];
+  sessionStarts: unknown[];
+  editorialCommands: EditorialRecorder;
+};
 
 const initialState = () =>
   mockSnapshot(
@@ -169,6 +174,13 @@ export const handleRoute = (
   if (request.method() === 'OPTIONS') return preflight(route);
   if (path === '/fixture-templates' || path === '/replay-sessions')
     return handleLobby(route, path, options);
+  const editorial = handleEditorial(
+    route,
+    path,
+    recorder.editorialCommands,
+    json,
+  );
+  if (editorial) return editorial;
   if (!path.startsWith('/fixtures/')) return problem(route, 404, 'Not found');
   if (request.method() === 'POST')
     return handlePost(route, path, options, recorder);
