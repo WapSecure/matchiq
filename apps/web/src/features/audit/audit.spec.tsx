@@ -116,7 +116,7 @@ describe('AuditView', () => {
       'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },
     });
     renderView();
-    await screen.findByRole('table');
+    await screen.findByRole('table', { name: /Audit events/ });
     await userEvent.selectOptions(screen.getByLabelText('Actor'), 'SYSTEM');
     await userEvent.click(
       screen.getByRole('button', { name: 'Apply filters' }),
