@@ -203,7 +203,10 @@ jobs:
         run: |
           az bicep install --version v0.48.1
           mkdir -p "$RUNNER_TEMP/arm"
-          az bicep build --file infra/azure/main.bicep --outfile "$RUNNER_TEMP/arm/main.json"
+          # Modules compile separately: Trivy does not inspect templates nested in deployments.
+          for file in infra/azure/main.bicep infra/azure/modules/*.bicep; do
+            az bicep build --file "$file" --outdir "$RUNNER_TEMP/arm"
+          done
       - name: Misconfiguration scan (infra, compose, Dockerfiles)
         run: >-
           trivy config --quiet --severity HIGH,CRITICAL
@@ -215,6 +218,11 @@ jobs:
         run: >-
           trivy config --quiet --severity HIGH,CRITICAL
           --ignorefile .trivyignore.yaml --exit-code 1 "$RUNNER_TEMP/arm"
+      - name: ARM templates were recognised
+        run: |
+          trivy config --quiet --format json --output "$RUNNER_TEMP/arm.json" "$RUNNER_TEMP/arm"
+          jq -e '[.Results[]? | select(.Type == "azure-arm")] | length > 0' "$RUNNER_TEMP/arm.json" \
+            || { echo "::error::Trivy scanned no ARM templates"; exit 1; }
       - name: Lockfile vulnerability scan (fail on fixable high or critical)
         # Report every scanner's findings even when an earlier one fails.
         if: success() || failure()

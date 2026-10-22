@@ -12,9 +12,11 @@ import { MAIN_CONTENT_ID } from '@/constants/site';
 
 export const metadata: Metadata = { title: PWA_COPY.offline.metaTitle };
 
-/** Precached by `public/sw.js` and served for any navigation that fails offline. */
-export const dynamic = 'force-static';
-
+/**
+ * Precached by `public/sw.js` and served for any navigation that fails offline.
+ * Rendered per request like every page so its scripts carry the CSP nonce; the
+ * cached copy keeps the matching CSP header.
+ */
 export default function OfflinePage() {
   const copy = PWA_COPY.offline;
   return (
