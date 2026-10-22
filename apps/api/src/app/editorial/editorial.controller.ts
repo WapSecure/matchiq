@@ -19,7 +19,8 @@ import {
 } from '@matchiq/contracts';
 import { ZodValidationPipe } from '@matchiq/server-kit';
 import type { Response } from 'express';
-import { RequirePermission } from '../auth/permissions.guard';
+import type { Actor } from '../auth/actor';
+import { CurrentActor, RequirePermission } from '../auth/permissions.guard';
 import { ROUTE_PARAMS, ROUTES } from '../constants';
 import { FixtureIdParam } from '../fixtures/fixtures.schemas';
 import { respond } from '../http/respond';
@@ -65,12 +66,14 @@ export class EditorialController {
 export class EditorialControlsController {
   constructor(private readonly controls: EditorialControlsService) {}
 
-  /** Public: viewers render a "graphics paused" state from this and `editorial.status`. */
+  /** Viewers render a "graphics paused" state from this and `editorial.status`. */
   @Get(`${ROUTES.fixtures}/${ROUTES.editorial}`)
+  @RequirePermission('overlays:read')
   status(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
+    @CurrentActor() actor: Actor,
   ): Promise<EditorialStatus> {
-    return this.controls.status(fixtureId);
+    return this.controls.status(actor.orgId, fixtureId);
   }
 
   @Post(`${ROUTES.fixtures}/${ROUTES.editorialFreeze}`)
@@ -96,8 +99,9 @@ export class EditorialControlsController {
   }
 
   @Get(ROUTES.killSwitch)
-  killSwitch(): Promise<KillSwitchStatus> {
-    return this.controls.killSwitch();
+  @RequirePermission('overlays:read')
+  killSwitch(@CurrentActor() actor: Actor): Promise<KillSwitchStatus> {
+    return this.controls.killSwitch(actor.orgId);
   }
 
   @Post(ROUTES.killSwitchActivate)

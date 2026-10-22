@@ -21,6 +21,7 @@ import {
   streamMessages,
 } from '../schema/tables.js';
 import { claimIdempotencyKey } from './idempotency.js';
+import { TenantPin } from './tenant-scope.js';
 
 export const fixtureMatch = (key: FixtureKey) =>
   and(eq(fixtures.orgId, key.orgId), eq(fixtures.fixtureId, key.fixtureId));
@@ -47,15 +48,23 @@ const auditValues = (entry: AuditEntry) => ({
   details: entry.details,
 });
 
-/** Extended by the worker's pipeline transaction (see pipeline-transaction.ts). */
+/**
+ * Extended by the worker's pipeline transaction (see pipeline-transaction.ts).
+ * Every operation pins the transaction to its organisation first, so all of
+ * its statements run under row-level security for that tenant (ADR-0015).
+ */
 export class PostgresLedgerTransaction implements LedgerTransaction {
-  constructor(protected readonly tx: Transaction) {}
+  constructor(
+    protected readonly tx: Transaction,
+    protected readonly pin: TenantPin = new TenantPin(tx),
+  ) {}
 
   async insertFixture(
     orgId: string,
     fixture: Fixture,
     payloadHash: string,
   ): Promise<boolean> {
+    await this.pin.to(orgId);
     const rows = await this.tx
       .insert(fixtures)
       .values({
@@ -75,6 +84,7 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
   }
 
   async lockFixture(key: FixtureKey): Promise<boolean> {
+    await this.pin.to(key.orgId);
     const rows = await this.tx
       .select({ fixtureId: fixtures.fixtureId })
       .from(fixtures)
@@ -83,11 +93,12 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
     return rows.length > 0;
   }
 
-  findEventRefs(
+  async findEventRefs(
     key: FixtureKey,
     eventIds: readonly string[],
     sequences: readonly number[],
   ): Promise<StoredEventRef[]> {
+    await this.pin.to(key.orgId);
     return this.tx
       .select({
         eventId: matchEvents.eventId,
@@ -112,6 +123,7 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
     events: readonly HashedEvent[],
   ): Promise<void> {
     if (events.length === 0) return;
+    await this.pin.to(key.orgId);
     await this.tx.insert(matchEvents).values(
       events.map(({ event, payloadHash }) => ({
         orgId: key.orgId,
@@ -135,6 +147,7 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
     drafts: readonly StreamMessageDraft[],
   ): Promise<StreamMessage[]> {
     if (drafts.length === 0) return [];
+    await this.pin.to(key.orgId);
     const [row] = await this.tx
       .update(fixtures)
       .set({ streamHead: sql`${fixtures.streamHead} + ${drafts.length}` })
@@ -158,6 +171,7 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
   }
 
   async appendAudit(entry: AuditEntry): Promise<string> {
+    await this.pin.to(entry.orgId);
     const [row] = await this.tx
       .insert(auditEvents)
       .values(auditValues(entry))
@@ -168,10 +182,14 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
 
   async appendAudits(entries: readonly AuditEntry[]): Promise<void> {
     if (entries.length === 0) return;
+    for (const entry of entries) await this.pin.to(entry.orgId);
     await this.tx.insert(auditEvents).values(entries.map(auditValues));
   }
 
-  claimIdempotencyKey(request: IdempotencyRequest): Promise<IdempotencyClaim> {
+  async claimIdempotencyKey(
+    request: IdempotencyRequest,
+  ): Promise<IdempotencyClaim> {
+    await this.pin.to(request.orgId);
     return claimIdempotencyKey(this.tx, request);
   }
 
@@ -179,6 +197,7 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
     request: IdempotencyRequest,
     response: StoredResponse,
   ): Promise<void> {
+    await this.pin.to(request.orgId);
     await this.tx
       .update(idempotencyKeys)
       .set({ responseStatus: response.status, responseBody: response.body })

@@ -15,7 +15,7 @@ import {
   orgIdField,
   secret,
 } from './fields.js';
-import { AppEnvironment } from './schemas.js';
+import { AppEnvironment } from './environment.js';
 
 /** Claim names differ per identity provider (Keycloak, Entra ID); ADR-0015. */
 export const OidcClaimFields = {

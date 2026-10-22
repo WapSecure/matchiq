@@ -33,8 +33,22 @@
     {
       "idx": 4,
       "version": "7",
-      "when": 1792684057589,
-      "tag": "0004_session_fault_plan",
+      "when": 1792675451152,
+      "tag": "0004_tenant_row_level_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792675453844,
+      "tag": "0005_audit_actor_types",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792708311376,
+      "tag": "0006_session_fault_plan",
       "breakpoints": true
     }
   ]

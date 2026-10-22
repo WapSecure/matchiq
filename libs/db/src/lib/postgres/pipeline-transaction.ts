@@ -41,6 +41,7 @@ class PostgresPipelineTransaction
   implements PipelineTransaction
 {
   async ledgerHead(key: FixtureKey): Promise<number> {
+    await this.pin.to(key.orgId);
     const [row] = await this.tx
       .select({ head: max(matchEvents.sequence) })
       .from(matchEvents)
@@ -57,6 +58,7 @@ class PostgresPipelineTransaction
     key: FixtureKey,
     rows: readonly InsightRecord[],
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     if (rows.length === 0) return;
     await this.tx
       .insert(insights)
@@ -84,6 +86,7 @@ class PostgresPipelineTransaction
     insightId: string,
     publication: Exclude<InsightPublication, 'PENDING'>,
   ): Promise<boolean> {
+    await this.pin.to(key.orgId);
     const rows = await this.tx
       .update(insights)
       .set({ publication, updatedAt: sql`now()` })
@@ -104,6 +107,7 @@ class PostgresPipelineTransaction
     insightId: string,
     completion: InsightCompletion,
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     await this.tx
       .update(insights)
       .set({
@@ -119,6 +123,7 @@ class PostgresPipelineTransaction
     key: FixtureKey,
     items: readonly Narrative[],
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     if (items.length === 0) return;
     await this.tx
       .insert(narratives)
@@ -139,6 +144,7 @@ class PostgresPipelineTransaction
   }
 
   async upsertOverlay(key: FixtureKey, record: OverlayRecord): Promise<void> {
+    await this.pin.to(key.orgId);
     const { cue } = record;
     const values = {
       revision: cue.revision,
@@ -176,6 +182,7 @@ class PostgresPipelineTransaction
     overlayId: string,
     end: { status: OverlayCue['status']; reason: string },
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     await this.tx
       .update(overlayCues)
       .set({ status: end.status, endReason: end.reason, updatedAt: sql`now()` })
@@ -197,6 +204,7 @@ class PostgresPipelineTransaction
     insightId: string,
     runs: readonly AgentRun[],
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     if (runs.length === 0) return;
     await this.tx.insert(agentRuns).values(
       runs.map((run) => ({
@@ -214,22 +222,26 @@ class PostgresPipelineTransaction
     );
   }
 
-  saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
+  async saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
+    await this.pin.to(key.orgId);
     return writes.saveSnapshot(this.tx, key, snapshot);
   }
 
-  updateSession(key: FixtureKey, status: ReplayStatus): Promise<void> {
+  async updateSession(key: FixtureKey, status: ReplayStatus): Promise<void> {
+    await this.pin.to(key.orgId);
     return writes.updateSession(this.tx, key, status);
   }
 
-  updateSessionProgress(
+  async updateSessionProgress(
     key: FixtureKey,
     progress: SessionProgress,
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     return writes.updateSessionProgress(this.tx, key, progress);
   }
 
-  saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
+  async saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
+    await this.pin.to(key.orgId);
     return writes.saveRecap(this.tx, key, recap);
   }
 }

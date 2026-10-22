@@ -1,5 +1,5 @@
 {
-  "id": "437ad6b8-223b-4734-89cb-c35ec8bc34c8",
+  "id": "d994cd0f-b1bf-4f7d-9fea-7e8e8a0760d7",
   "prevId": "1366857c-c449-4f7f-b791-210f25d420e3",
   "version": "7",
   "dialect": "postgresql",
@@ -132,9 +132,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "audit_events_recent_idx": {
           "name": "audit_events_recent_idx",
@@ -159,9 +159,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "audit_events_fixture_idx": {
           "name": "audit_events_fixture_idx",
@@ -192,9 +192,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "audit_events_action_idx": {
           "name": "audit_events_action_idx",
@@ -225,9 +225,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -346,9 +346,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -431,9 +431,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -573,47 +573,47 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "match_events_fixture_fk": {
           "name": "match_events_fixture_fk",
           "tableFrom": "match_events",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "match_events_sequence_uq": {
           "name": "match_events_sequence_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "org_id",
             "fixture_id",
             "sequence"
-          ]
+          ],
+          "nullsNotDistinct": false
         },
         "match_events_event_id_uq": {
           "name": "match_events_event_id_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "org_id",
             "fixture_id",
             "event_id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -701,27 +701,27 @@
             }
           ],
           "isUnique": false,
-          "where": "\"stream_messages\".\"published_at\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"stream_messages\".\"published_at\" is null",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "stream_messages_fixture_fk": {
           "name": "stream_messages_fixture_fk",
           "tableFrom": "stream_messages",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -847,9 +847,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "agent_runs_correlation_idx": {
           "name": "agent_runs_correlation_idx",
@@ -868,26 +868,26 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "agent_runs_fixture_fk": {
           "name": "agent_runs_fixture_fk",
           "tableFrom": "agent_runs",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1130,9 +1130,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "insights_id_idx": {
           "name": "insights_id_idx",
@@ -1151,9 +1151,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "insights_pending_idx": {
           "name": "insights_pending_idx",
@@ -1172,27 +1172,27 @@
             }
           ],
           "isUnique": false,
-          "where": "\"insights\".\"publication\" = 'PENDING'",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"insights\".\"publication\" = 'PENDING'",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "insights_fixture_fk": {
           "name": "insights_fixture_fk",
           "tableFrom": "insights",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1258,17 +1258,17 @@
         "match_recaps_fixture_fk": {
           "name": "match_recaps_fixture_fk",
           "tableFrom": "match_recaps",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1326,17 +1326,17 @@
         "match_snapshots_fixture_fk": {
           "name": "match_snapshots_fixture_fk",
           "tableFrom": "match_snapshots",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1429,17 +1429,17 @@
         "narratives_fixture_fk": {
           "name": "narratives_fixture_fk",
           "tableFrom": "narratives",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1455,7 +1455,6 @@
       "uniqueConstraints": {
         "narratives_variant_uq": {
           "name": "narratives_variant_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "org_id",
             "fixture_id",
@@ -1463,7 +1462,8 @@
             "persona",
             "locale",
             "revision"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -1609,9 +1609,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "overlay_cues_id_idx": {
           "name": "overlay_cues_id_idx",
@@ -1630,26 +1630,26 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "overlay_cues_fixture_fk": {
           "name": "overlay_cues_fixture_fk",
           "tableFrom": "overlay_cues",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1727,12 +1727,6 @@
           "notNull": true,
           "default": 0
         },
-        "fault_plan": {
-          "name": "fault_plan",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp (3) with time zone",
@@ -1766,9 +1760,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "replay_sessions_activity_idx": {
           "name": "replay_sessions_activity_idx",
@@ -1793,9 +1787,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "replay_sessions_updated_idx": {
           "name": "replay_sessions_updated_idx",
@@ -1808,41 +1802,41 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "replay_sessions_fixture_fk": {
           "name": "replay_sessions_fixture_fk",
           "tableFrom": "replay_sessions",
-          "tableTo": "fixtures",
           "columnsFrom": [
             "org_id",
             "fixture_id"
           ],
+          "tableTo": "fixtures",
           "columnsTo": [
             "org_id",
             "fixture_id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "replay_sessions_template_fk": {
           "name": "replay_sessions_template_fk",
           "tableFrom": "replay_sessions",
-          "tableTo": "fixture_templates",
           "columnsFrom": [
             "org_id",
             "template_id"
           ],
+          "tableTo": "fixture_templates",
           "columnsTo": [
             "org_id",
             "template_id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1857,12 +1851,12 @@
       "uniqueConstraints": {
         "replay_sessions_number_uq": {
           "name": "replay_sessions_number_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "org_id",
             "template_id",
             "session_number"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -1942,10 +1936,10 @@
   },
   "enums": {},
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

@@ -1,5 +1,6 @@
 import type {
   AgentRun,
+  AuditActorType,
   ConfidenceLabel,
   FaultPlan,
   Fixture,
@@ -259,6 +260,12 @@ export interface TemplateStore {
 
 export interface CreateSessionCommand {
   readonly orgId: string;
+  /** The caller recorded in the audit row; defaults to the anonymous viewer. */
+  readonly actor?: {
+    readonly id: string;
+    readonly type: AuditActorType;
+    readonly details: Record<string, unknown>;
+  };
   readonly templateId: string;
   readonly speed: ReplayStatus['speed'];
   readonly faultPlan?: FaultPlan;

@@ -37,6 +37,42 @@ The source of truth is `libs/access/src/lib/matrix.ts`; `libs/access/tests/matri
 
 If a token's `scope` claim names any of these permissions, the effective set is the intersection with the role permissions, so a client can narrow a user's access but never widen it.
 
+## API enforcement
+
+- Guards run in this order on every request: `AuthenticationGuard` (resolves the principal), `PrincipalThrottlerGuard` (signed-in callers get a per-user budget; the anonymous demo keeps the per-IP one), `PermissionGuard` (deny by default).
+- Every route declares one permission with `@RequirePermission` (or `@RequireAuthenticated` for `/me`); health is `@PublicRoute`. `apps/api/src/app/auth/route-permissions.spec.ts` fails if a route declares nothing.
+- Services receive the organisation from `@CurrentPrincipal()` / `@FixtureScope()` / `@Caller()`, never from `DEMO_ORG_ID`, the path, the query or the body. Another organisation's id answers the same 404 as a missing one.
+- Editorial routes (ADR-0016) use the same declaration; the principal is adapted to their `Actor`.
+
+| Route                                                                       | Permission           |
+| --------------------------------------------------------------------------- | -------------------- |
+| `GET /fixtures`, `/fixtures/:id`, `/events`, `/state`, `/stream`, `/replay` | `fixtures:read`      |
+| `GET /fixture-templates`, `/replay-sessions`, `POST /stream-tickets`        | `fixtures:read`      |
+| `POST /fixtures`                                                            | `fixtures:write`     |
+| `POST /fixtures/:id/events:batch`                                           | `events:ingest`      |
+| `GET /insights`, `/narratives`, `/recap`                                    | `insights:read`      |
+| `GET /overlays`, `/editorial`, `/editorial/kill-switch`                     | `overlays:read`      |
+| `GET /agent-runs`                                                           | `agents:traces:read` |
+| `POST /fixtures/:id/sessions`, `POST /fixtures/:id/replay`                  | `replay:control`     |
+| `POST /insights/:id/suppress`                                               | `editorial:approve`  |
+| `POST /overlays/:id/retract`, freeze, resume, kill switch                   | `editorial:publish`  |
+| `GET /audit-events`                                                         | `audit:read`         |
+| `GET /me`, `POST /me/sign-in`, `POST /me/sign-out`                          | any principal        |
+
+### Streams
+
+`POST /api/v1/fixtures/:id/stream-tickets` returns `{ ticket, expiresAt }`: an HS256 JWT (`STREAM_TICKET_SECRET`) bound to the user, organisation and fixture, valid for `STREAM_TICKET_TTL_SECONDS` (60). `GET /fixtures/:id/stream?ticket=` accepts it for that fixture only, and the principal it yields can only read. Bearer headers work on the stream too. Problem responses never echo the query string.
+
+### Row-level security
+
+Migration `0004_tenant_row_level_security` creates the `matchiq_app` role (`NOLOGIN`, no `BYPASSRLS`), grants it DML on every table with `org_id`, enables RLS with the policy `org_id = current_setting('app.org_id', true)`, and revokes `UPDATE`/`DELETE` on `audit_events`. Every tenant transaction starts with `set_config('app.org_id', …, true), set_config('role', 'matchiq_app', true)`; the ledger, pipeline and editorial transactions pin to the first organisation they touch and refuse a second. With the role set but no organisation, queries see nothing. System work runs as the owner: migrations, seeding, the outbox relay, retention, the worker's boot scans (`systemListInState`, `systemPendingInsights`).
+
+In production the API and worker connect as a role that may `SET ROLE matchiq_app` (the migration grants it to a non-superuser migrating role).
+
+### Audit
+
+Rows carry the real actor id (the token `sub`), `actor_type` (`USER`, `SERVICE`, `OPERATOR`, `ANONYMOUS`, `SYSTEM`; migration `0005_audit_actor_types`) and the actor's roles: fixture creation, ingest, replay sessions and commands, editorial actions, sign-in and sign-out, and every 403 for a signed-in caller (`auth.access-denied`).
+
 ## Local setup
 
 ```bash
@@ -111,3 +147,9 @@ Literal claim names win over dotted paths, so Entra's `extn.org` works as a name
 - `libs/access`: the matrix rules and claim mapping (Keycloak and Entra shapes, missing or multiple organisations, unknown roles, scope narrowing).
 - `libs/auth`: token verification against a local test issuer (valid, expired, within skew, not yet valid, wrong audience, wrong issuer, tampered payload, foreign key, unknown `kid`, `alg: none`, HMAC, ID-token type, missing claims, unreachable or spoofed discovery, JWKS caching), stream tickets (binding, expiry, narrowing, tampering) and the Nest guards (401 and 403 problem details and challenges, deny-by-default, anonymous fallback, operator key).
 - `libs/config`: `AuthEnv` cross-field rules (issuer and audience together, operator key refused in prod, https issuer in prod, at least one way in).
+- `libs/db` (real Postgres): every `org_id` table has RLS and a policy and the app role has nothing else; a tenant sees only its rows without a `WHERE`; no organisation means no rows; cross-tenant writes are refused; `audit_events` is append-only for the app role; a two-tenant unit of work is refused and rolled back; readers answer guessed ids with nothing.
+- `apps/api` access control (real API, test issuer): anonymous reads and 403 on writes; 401 for expired, wrong-audience, wrong-issuer, foreign-key and tampered tokens; viewer writes refused and audited; scopes narrow but never widen; platform operator gets no tenant data; tokens without an organisation or role are refused; developer writes audited as themselves; operator key; `/me`, sign-in and sign-out audit; per-user rate-limit budget; 401 with a bare challenge when the anonymous demo is off.
+- `apps/api` cross-tenant isolation: org A cannot list, read (fixture, events, state, insights, narratives, overlays, recap, agent runs, replay status), command, stream, ticket, suppress, retract, freeze, resume or read editorial status for org B; the kill switch and `audit-events` stay per organisation; organisation hints in headers, query and body are ignored; identical ids are namespaced; audit rows carry the real user.
+- `apps/api` route declarations: every route declares a permission.
+
+Exercised against the real local Keycloak realm: a PKCE login as `harbour.producer` produced a token the API accepted (`GET /me` returned `org_demo`, role `producer`); a `northbank.viewer` token was refused `POST /fixtures` with 403; the producer started a replay session.

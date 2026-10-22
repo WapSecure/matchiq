@@ -1,64 +1,60 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { RequirePermission } from '@matchiq/auth';
 import type {
   Insight,
   MatchSnapshot,
   Narrative,
   OverlayCue,
 } from '@matchiq/contracts';
-import type { InsightTrace, RecapDocument } from '@matchiq/db';
+import type { FixtureKey, InsightTrace, RecapDocument } from '@matchiq/db';
 import { ZodValidationPipe } from '@matchiq/server-kit';
-import { ROUTE_PARAMS, ROUTES } from '../constants';
-import { FixtureIdParam } from '../fixtures/fixtures.schemas';
+import { ROUTES } from '../constants';
+import { FixtureScope } from '../http/fixture-scope';
 import type { ItemList } from '../replay/replay.service';
 import { NarrativeQuery } from './intelligence.schemas';
 import { IntelligenceService } from './intelligence.service';
-
-const fixtureIdPipe = new ZodValidationPipe(FixtureIdParam);
 
 @Controller(ROUTES.fixtures)
 export class IntelligenceController {
   constructor(private readonly intelligence: IntelligenceService) {}
 
   @Get(ROUTES.state)
-  state(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
-  ): Promise<MatchSnapshot> {
-    return this.intelligence.state(fixtureId);
+  @RequirePermission('fixtures:read')
+  state(@FixtureScope() key: FixtureKey): Promise<MatchSnapshot> {
+    return this.intelligence.state(key);
   }
 
   @Get(ROUTES.insights)
-  insights(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
-  ): Promise<ItemList<Insight>> {
-    return this.intelligence.insights(fixtureId);
+  @RequirePermission('insights:read')
+  insights(@FixtureScope() key: FixtureKey): Promise<ItemList<Insight>> {
+    return this.intelligence.insights(key);
   }
 
+  /** Narratives are stored only once the gate publishes them. */
   @Get(ROUTES.narratives)
+  @RequirePermission('insights:read')
   narratives(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
+    @FixtureScope() key: FixtureKey,
     @Query(new ZodValidationPipe(NarrativeQuery)) query: NarrativeQuery,
   ): Promise<ItemList<Narrative>> {
-    return this.intelligence.narratives(fixtureId, query);
+    return this.intelligence.narratives(key, query);
   }
 
   @Get(ROUTES.overlays)
-  overlays(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
-  ): Promise<ItemList<OverlayCue>> {
-    return this.intelligence.overlays(fixtureId);
+  @RequirePermission('overlays:read')
+  overlays(@FixtureScope() key: FixtureKey): Promise<ItemList<OverlayCue>> {
+    return this.intelligence.overlays(key);
   }
 
   @Get(ROUTES.recap)
-  recap(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
-  ): Promise<RecapDocument> {
-    return this.intelligence.recap(fixtureId);
+  @RequirePermission('insights:read')
+  recap(@FixtureScope() key: FixtureKey): Promise<RecapDocument> {
+    return this.intelligence.recap(key);
   }
 
   @Get(ROUTES.agentRuns)
-  agentRuns(
-    @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
-  ): Promise<ItemList<InsightTrace>> {
-    return this.intelligence.traces(fixtureId);
+  @RequirePermission('agents:traces:read')
+  agentRuns(@FixtureScope() key: FixtureKey): Promise<ItemList<InsightTrace>> {
+    return this.intelligence.traces(key);
   }
 }

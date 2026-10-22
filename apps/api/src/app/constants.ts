@@ -7,6 +7,10 @@ export const ROUTES = {
   eventsBatch: ':fixtureId/events\\:batch',
   events: ':fixtureId/events',
   stream: ':fixtureId/stream',
+  streamTickets: ':fixtureId/stream-tickets',
+  me: 'me',
+  meSignIn: 'sign-in',
+  meSignOut: 'sign-out',
   sessions: ':fixtureId/sessions',
   replay: ':fixtureId/replay',
   state: ':fixtureId/state',
@@ -51,24 +55,21 @@ export const HEADERS = {
   correlationId: 'x-correlation-id',
 } as const;
 
+/** Audit actions the API records with the real actor (ADR-0015). */
+export const API_AUDIT_ACTIONS = {
+  replayCommand: 'replay.command.accepted',
+  signedIn: 'auth.signed-in',
+  signedOut: 'auth.signed-out',
+  accessDenied: 'auth.access-denied',
+} as const;
+
+export const AUDIT_TARGET_KINDS = { user: 'user', route: 'route' } as const;
 export const HEADER_NAMES = { cacheControl: 'Cache-Control' } as const;
 export const CACHE_CONTROL = { noStore: 'no-store' } as const;
 
-export const AUTH = {
-  bearerPrefix: 'Bearer ',
-  challenge: 'Bearer realm="matchiq-operator"',
-  operatorActor: 'operator',
-} as const;
-
-export const AUTH_DETAILS = {
-  missing: 'Send Authorization: Bearer <operator key>',
-  invalid: 'The operator key is not valid',
-  missingPermission: (permission: string) =>
-    `This action requires the ${permission} permission`,
-} as const;
-
 export const API_LIMITS = {
   jsonBodyLimit: '2mb',
+  streamTicketMaxLength: 4_096,
   fixtureListDefault: 50,
   fixtureListMax: 100,
   eventPageDefault: 100,
@@ -120,10 +121,6 @@ export const SSE = {
 } as const;
 
 export const PROBLEMS = {
-  unauthorized: {
-    title: 'Operator credentials required',
-    slug: 'unauthorized',
-  },
   fixtureNotFound: { title: 'Fixture not found', slug: 'fixture-not-found' },
   fixtureExists: { title: 'Fixture already exists', slug: 'fixture-exists' },
   fixtureMismatch: {

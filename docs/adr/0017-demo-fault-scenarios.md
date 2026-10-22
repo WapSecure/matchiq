@@ -8,7 +8,7 @@ The demo must show at least one failure and recovery chain. Real failures (a slo
 
 ## Decision
 
-**Per-session plan, chosen in the lobby.** `CreateReplaySession` (`libs/contracts`) accepts an optional `faultPlan`: a `FaultScenario`, optional `insightKinds`, and `everyNth` (default 1). The plan faults the 1st, (1 + everyNth)th, … insight of those kinds, counted in detection order, which is deterministic per template (ADR-0008). It is stored on `replay_sessions.fault_plan` (migration `0004_session_fault_plan`), shown on the session view, and recorded in the `session.created` audit row. The lobby shows an advanced "Demo scenario" select only when `NEXT_PUBLIC_DEMO_MODE=true` (every third insight is faulted).
+**Per-session plan, chosen in the lobby.** `CreateReplaySession` (`libs/contracts`) accepts an optional `faultPlan`: a `FaultScenario`, optional `insightKinds`, and `everyNth` (default 1). The plan faults the 1st, (1 + everyNth)th, … insight of those kinds, counted in detection order, which is deterministic per template (ADR-0008). It is stored on `replay_sessions.fault_plan` (migration `0006_session_fault_plan`), shown on the session view, and recorded in the `session.created` audit row. The lobby shows an advanced "Demo scenario" select only when `NEXT_PUBLIC_DEMO_MODE=true` (every third insight is faulted).
 
 We rejected an environment-wide default: it could not be chosen per demo, and it would fault every session on a shared stage environment.
 

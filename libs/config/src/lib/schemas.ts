@@ -18,6 +18,8 @@ import {
   secret,
 } from './fields.js';
 import { checkDemoFaults, DemoFaultFields } from './demo-faults-env.js';
+import { AppEnvironment } from './environment.js';
+import { AuthFields, checkAuthEnv } from './auth-env.js';
 import {
   ReplayCapacityEnv,
   RetentionEnv,
@@ -27,7 +29,7 @@ import {
 const postgresUrl = z.url({ protocol: ENV_PATTERNS.postgresProtocol });
 const redisUrl = z.url({ protocol: ENV_PATTERNS.redisProtocol });
 
-export const AppEnvironment = z.enum(['local', 'test', 'dev', 'stage', 'prod']);
+export { AppEnvironment } from './environment.js';
 export const LogLevel = z.enum([
   'fatal',
   'error',
@@ -48,6 +50,9 @@ export const CommonEnv = z.object({
   OTEL_SERVICE_NAME: optionalString,
   APPLICATIONINSIGHTS_CONNECTION_STRING: optionalString,
 });
+
+/** `pnpm seed:fixtures` loads templates for `DEMO_ORG_ID` plus these organisations. */
+export const SeedEnv = z.object({ SEED_ORG_IDS: csv });
 
 /** Connection settings shared by every process that talks to Postgres. */
 export const DatabaseEnv = z.object({
@@ -101,8 +106,7 @@ export const ApiEnv = CommonEnv.extend({
     .int()
     .positive()
     .default(ENV_LIMITS.rateLimitPerMinute),
-  /** Bearer secret for operator-only endpoints until Entra ID is wired. */
-  OPERATOR_API_KEY: secret,
+  ...AuthFields,
   /** Per-client cap on anonymous replay controls (ADR-0010), stricter than reads. */
   REPLAY_RATE_LIMIT_PER_MINUTE: z.coerce
     .number()
@@ -110,7 +114,9 @@ export const ApiEnv = CommonEnv.extend({
     .positive()
     .default(ENV_LIMITS.replayRateLimitPerMinute),
   ...DemoFaultFields,
-}).superRefine(checkDemoFaults);
+})
+  .superRefine(checkAuthEnv)
+  .superRefine(checkDemoFaults);
 
 export const WorkerEnv = CommonEnv.extend({
   ...DatabaseEnv.shape,
@@ -164,7 +170,6 @@ export const WebPublicEnv = z.object({
   NEXT_PUBLIC_DEMO_MODE: booleanFlag,
 });
 
-export type AppEnvironment = z.infer<typeof AppEnvironment>;
 export type LogLevel = z.infer<typeof LogLevel>;
 export type CommonEnv = z.infer<typeof CommonEnv>;
 export type DatabaseEnv = z.infer<typeof DatabaseEnv>;

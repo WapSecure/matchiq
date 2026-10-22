@@ -97,5 +97,8 @@ export const METADATA = {
   streamTicket: 'matchiq:accepts-stream-ticket',
 } as const;
 
+/** Declared instead of a permission: any authenticated caller, anonymous demo included. */
+export const ANY_PRINCIPAL = 'principal:any';
+
 /** Express request property holding the resolved principal. */
 export const PRINCIPAL_PROPERTY = 'matchiqPrincipal';
