@@ -26,3 +26,11 @@ export const PROBLEM_SLUGS: Readonly<Record<number, string>> = {
 };
 
 export const EXPRESS_SETTINGS = { trustProxy: 'trust proxy' } as const;
+
+/** JSON and SSE responses never need to load or embed anything. */
+export const API_CONTENT_SECURITY_POLICY = {
+  'default-src': ["'none'"],
+  'base-uri': ["'none'"],
+  'form-action': ["'none'"],
+  'frame-ancestors': ["'none'"],
+} as const satisfies Readonly<Record<string, readonly string[]>>;

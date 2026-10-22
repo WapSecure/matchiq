@@ -16,12 +16,14 @@ import {
   flag,
   optionalString,
   optionalUrl,
+  originList,
   port,
   secret,
 } from './fields.js';
 import { AppEnvironment } from './environment.js';
 import { AuthFields, checkAuthEnv } from './auth-env.js';
 import {
+  ApiDocsEnv,
   ReplayCapacityEnv,
   RetentionEnv,
   TrustProxyEnv,
@@ -96,6 +98,7 @@ export const ApiEnv = CommonEnv.extend({
   ...OutboxRelayEnv.shape,
   ...ReplayCapacityEnv.shape,
   ...TrustProxyEnv.shape,
+  ...ApiDocsEnv.shape,
   SSE_HEARTBEAT_MS: boundedInt(
     ENV_LIMITS.sseHeartbeatMinMs,
     ENV_LIMITS.sseHeartbeatMaxMs,
@@ -104,7 +107,7 @@ export const ApiEnv = CommonEnv.extend({
   API_PORT: port(DEFAULT_PORTS.api),
   METRICS_PORT: metricsPort(DEFAULT_METRICS.apiPort),
   API_PUBLIC_URL: z.url().default(DEFAULT_URLS.apiPublic),
-  CORS_ALLOWED_ORIGINS: csv,
+  CORS_ALLOWED_ORIGINS: originList,
   RATE_LIMIT_PER_MINUTE: z.coerce
     .number()
     .int()

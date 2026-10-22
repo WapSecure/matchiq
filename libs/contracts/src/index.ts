@@ -15,3 +15,5 @@ export * from './lib/http.js';
 export * from './lib/json-schema.js';
 export * from './lib/pipeline.js';
 export * from './lib/access.js';
+export * from './lib/lobby.js';
+export * from './lib/reads.js';

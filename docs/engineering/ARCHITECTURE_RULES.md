@@ -18,6 +18,7 @@ The source of truth for product behaviour is `docs/product/MatchIQ_Enterprise_Ma
 | db             | `libs/db`             | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters.                      |
 | access         | `libs/access`         | `scope:shared` `type:domain`      | Roles, permissions, the role → permission matrix and claim mapping (ADR-0015). Framework-free.            |
 | auth           | `libs/auth`           | `scope:server` `type:data-access` | OIDC access-token verification (JWKS), stream tickets, Nest guards and `@RequirePermission`.              |
+| api-client     | `libs/api-client`     | `scope:shared` `type:util`        | Typed `openapi-fetch` client generated from `docs/api/openapi.json` (ADR-0017). Never hand-edited.        |
 
 Planned for M1 (created by their owning stream with these tags):
 
