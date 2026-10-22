@@ -26,7 +26,10 @@
         "cwd": "{projectRoot}"
       },
       "inputs": [
-        { "dependentTasksOutputFiles": "**/*.json" },
+        {
+          "dependentTasksOutputFiles": "**/*.json",
+          "transitive": true
+        },
         "{projectRoot}/pyproject.toml",
         "{projectRoot}/uv.lock"
       ],

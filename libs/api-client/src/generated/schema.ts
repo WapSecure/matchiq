@@ -1290,6 +1290,12 @@ export interface components {
             retries: number;
             /** @enum {string} */
             outcome: "SUCCEEDED" | "FAILED" | "TIMED_OUT" | "FALLBACK";
+            promptHash?: string;
+            costEstimateUsd?: number;
+            repairs?: {
+                code: string;
+                detail: string;
+            }[];
         };
         ReplayCommand: {
             /** @constant */

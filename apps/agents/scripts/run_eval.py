@@ -7,6 +7,11 @@ Usage (from apps/agents):
     FOUNDRY_PROJECT_ENDPOINT=... FOUNDRY_MODEL=... uv run python scripts/run_eval.py \
         --provider foundry
 
+`--json PATH` writes every case (rejections, narratives, overlay, runs) as a JSON artifact;
+`--baseline PATH` writes the compact record checked in under tests/eval/baselines/, which the
+CI prompt gate compares with the current prompts (docs/ai/EVALUATION.md).
+The load average is printed at the start and end: local latency is meaningless without it.
+
 `--deadline-ms` replaces the default request deadline (cases that set their own, such as
 `tight_deadline`, keep it). `--cases N` runs an evenly spaced, deterministic sample of N
 cases; `--case NAME` adds a named case.
@@ -17,6 +22,7 @@ unsupported claim.
 
 import argparse
 import asyncio
+import json
 import os
 import statistics
 import sys
@@ -28,15 +34,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from tests.eval import artifact
+from tests.eval.artifact import CaseRun
 from tests.eval.cases import ADVERSARIAL_INPUTS, BASE, GOLDEN, EvalCase
 from tests.eval.harness import CaseReport, evaluate
+from tests.eval.taxonomy import RejectionCollector, counts, narrative_share, taxonomy
 from tests.support.builders import build_request
 
 from matchiq_agents.clock import SystemClock
 from matchiq_agents.contracts.types import PipelineResult, RunProvider
+from matchiq_agents.models.resilience import StageTimer
 from matchiq_agents.pipeline.orchestrator import PipelineOrchestrator
 from matchiq_agents.settings import Settings
-from matchiq_agents.wiring import build_orchestrator
+from matchiq_agents.wiring import build_model, build_orchestrator
 
 PROVIDERS = ("mock", "ollama", "foundry")
 PLACEHOLDER_TOKEN = "eval-" + "x" * 32
@@ -137,6 +147,10 @@ def _agent_latencies(results: list[PipelineResult]) -> str:
     )
 
 
+def _load() -> str:
+    return " ".join(f"{value:.2f}" for value in os.getloadavg())
+
+
 def _summary(
     reports: list[CaseReport], latencies: list[float], results: list[PipelineResult]
 ) -> str:
@@ -164,24 +178,59 @@ def _summary(
     )
 
 
-async def main(provider: str, cases: list[EvalCase], *, verbose: bool) -> int:
+async def main(
+    provider: str,
+    cases: list[EvalCase],
+    *,
+    verbose: bool,
+    json_path: Path | None,
+    baseline_path: Path | None,
+) -> int:
     settings = _settings(provider)
-    orchestrator = build_orchestrator(settings, SystemClock())
-    print(f"provider={provider} deployment={orchestrator.model.deployment or '-'}")
+    model = build_model(settings)
+    # One latency history across cases, as in the service process.
+    timer = StageTimer()
+    collector = RejectionCollector().install()
+    load_start = _load()
+    print(f"provider={provider} deployment={model.deployment or '-'}")
+    print(f"load_average_start={load_start}")
     print(HEADER)
-    reports: list[CaseReport] = []
-    latencies: list[float] = []
-    results: list[PipelineResult] = []
+    runs: list[CaseRun] = []
     for case in cases:
+        # A fresh breaker per case: one slow case must not open the breaker for the rest.
+        orchestrator = build_orchestrator(settings, SystemClock(), model, timer)
         report, elapsed_ms, result = await _run_case(orchestrator, case)
-        reports.append(report)
-        latencies.append(elapsed_ms)
-        results.append(result)
+        runs.append(CaseRun(report, elapsed_ms, result, collector.drain()))
         print(_row(report, elapsed_ms, result), flush=True)
         if verbose or report.violations:
             print(f"    {_details(report, result)}", flush=True)
-    print(_summary(reports, latencies, results))
-    return 1 if any(report.violations for report in reports) else 0
+    results = [run.result for run in runs]
+    rejections = [rejection for run in runs for rejection in run.rejections]
+    summary = _summary([run.report for run in runs], [run.latency_ms for run in runs], results)
+    print(summary)
+    print(narrative_share(results))
+    print(taxonomy(rejections))
+    load_end = _load()
+    print(f"load_average_end={load_end}")
+    meta: dict[str, object] = {
+        "provider": provider,
+        "deployment": model.deployment,
+        "deadlineMs": cases[0].spec.deadline_ms if cases else None,
+        "loadAverageStart": load_start,
+        "loadAverageEnd": load_end,
+    }
+    lines = [*summary.splitlines(), *narrative_share(results).splitlines()]
+    if json_path is not None:
+        await _write(json_path, artifact.full(meta, runs, lines))
+    if baseline_path is not None:
+        compact = artifact.baseline(meta, runs, lines, counts(rejections))
+        await _write(baseline_path, compact)
+    return 1 if any(run.report.violations for run in runs) else 0
+
+
+async def _write(path: Path, content: dict[str, object]) -> None:
+    text = json.dumps(content, indent=1, ensure_ascii=False) + "\n"
+    await asyncio.to_thread(path.write_text, text)
 
 
 if __name__ == "__main__":
@@ -191,6 +240,15 @@ if __name__ == "__main__":
     parser.add_argument("--cases", type=int, default=None, help="evenly spaced sample size")
     parser.add_argument("--case", action="append", default=[], help="also run this case by name")
     parser.add_argument("--verbose", action="store_true", help="print reasons and issues per case")
+    parser.add_argument("--json", type=Path, default=None, help="write every result here")
+    parser.add_argument("--baseline", type=Path, default=None, help="write the compact baseline")
     args = parser.parse_args()
     selected = select_cases(args.cases, args.deadline_ms, args.case)
-    sys.exit(asyncio.run(main(args.provider, selected, verbose=args.verbose)))
+    run = main(
+        args.provider,
+        selected,
+        verbose=args.verbose,
+        json_path=args.json,
+        baseline_path=args.baseline,
+    )
+    sys.exit(asyncio.run(run))

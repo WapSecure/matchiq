@@ -1,10 +1,12 @@
 """Builds `AgentRun` trace records (AI_AGENT_GOVERNANCE.md rule 6)."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import UUID
 
 from matchiq_agents.contracts.types import AgentName, AgentRun, RunOutcome, RunProvider
+from matchiq_agents.guard.repair import Repair
+from matchiq_agents.limits import MAX_REPAIRS, REPAIR_DETAIL_MAX
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,6 +21,9 @@ class RunRecord:
     model_deployment: str | None = None
     tokens_in: int | None = None
     tokens_out: int | None = None
+    prompt_hash: str | None = None
+    cost_estimate_usd: float | None = None
+    repairs: tuple[Repair, ...] = field(default=())
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +36,13 @@ class RunScope:
             "modelDeployment": record.model_deployment,
             "tokensIn": record.tokens_in,
             "tokensOut": record.tokens_out,
+            "promptHash": record.prompt_hash,
+            "costEstimateUsd": record.cost_estimate_usd,
+            "repairs": [
+                {"code": r.code, "detail": r.detail[:REPAIR_DETAIL_MAX]}
+                for r in record.repairs[:MAX_REPAIRS]
+            ]
+            or None,
         }
         return AgentRun.model_validate(
             {

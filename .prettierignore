@@ -12,3 +12,4 @@ docs/product/
 libs/db/migrations/meta
 docs/api/openapi.json
 libs/api-client/src/generated/
+apps/agents/tests/eval/baselines/

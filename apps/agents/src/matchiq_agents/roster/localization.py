@@ -21,10 +21,13 @@ from matchiq_agents.contracts.types import (
 )
 from matchiq_agents.domain.facts import CANONICAL_LOCALE
 from matchiq_agents.guard.locale_checks import check_localised
+from matchiq_agents.guard.repair import Repair
+from matchiq_agents.pipeline import diagnostics
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.convert import cited_refs, facts_payload, text_pairs, tidy
 from matchiq_agents.roster.prompts import LOCALIZATION
+from matchiq_agents.roster.repairs import repair_body, repair_text
 from matchiq_agents.roster.schemas import LocalizationInput, LocalizationOutput, LocalizedOut
 
 NOTHING_ACCEPTED: Final = "no localised item passed checks"
@@ -36,22 +39,47 @@ def serve_original(draft: NarrativeDraft, locale: Locale) -> NarrativeDraft:
     return draft.model_copy(update={"locale": locale, "localeFallback": True})
 
 
+def _repaired(
+    item: LocalizedOut, source: NarrativeDraft, ctx: AgentContext, log: list[Repair]
+) -> tuple[str, str]:
+    locale, values = Locale(item.locale), [value.value for value in source.citedValues]
+    tag = f"{item.locale} {item.persona}"
+    names = ctx.view.entity_names
+    headline = repair_text(
+        tidy(item.headline, names), ctx.view, values, f"{tag} headline", log, locale
+    )
+    body = repair_text(tidy(item.body, names), ctx.view, values, f"{tag} body", log, locale)
+    return headline, repair_body(body, source.persona, f"{tag} body", log)
+
+
 def _translated(
-    item: LocalizedOut, source: NarrativeDraft, ctx: AgentContext
+    item: LocalizedOut, source: NarrativeDraft, ctx: AgentContext, log: list[Repair]
 ) -> NarrativeDraft | None:
+    run_id, persona, locale = ctx.runner.scope.run_id, source.persona, Locale(item.locale)
+    item_log: list[Repair] = []
+    headline, body = _repaired(item, source, ctx, item_log)
     try:
         target = NarrativeDraft.model_validate(
             {
                 **source.model_dump(),
-                "locale": Locale(item.locale),
-                "headline": tidy(item.headline, ctx.view.entity_names),
-                "body": tidy(item.body, ctx.view.entity_names),
+                "locale": locale,
+                "headline": headline,
+                "body": body,
                 "source": NarrativeSource.AGENT,
             }
         )
     except ValidationError:
+        diagnostics.report_item(run_id, LOCALIZATION.agent, persona, locale)
         return None
-    return None if check_localised(source, target, ctx.view) else target
+    issues = check_localised(source, target, ctx.view)
+    text = f"{target.headline}\n{target.body}"
+    diagnostics.report(
+        run_id, LOCALIZATION.agent, issues, persona=persona, locale=locale, text=text
+    )
+    if issues:
+        return None
+    log.extend(item_log)
+    return target
 
 
 def _accept(
@@ -59,6 +87,7 @@ def _accept(
     sources: Sequence[NarrativeDraft],
     targets: Sequence[Locale],
     ctx: AgentContext,
+    log: list[Repair],
 ) -> dict[ItemKey, NarrativeDraft]:
     """Keeps every item that passes; a call with no usable item counts as a failed attempt."""
     by_persona = {draft.persona: draft for draft in sources}
@@ -68,11 +97,11 @@ def _accept(
         source = by_persona.get(key[0])
         if source is None or key[1] not in targets or key in accepted:
             continue
-        target = _translated(item, source, ctx)
+        target = _translated(item, source, ctx, log)
         if target is not None:
             accepted[key] = target
     if not accepted:
-        raise ValueError(NOTHING_ACCEPTED)
+        raise diagnostics.OutputRejectedError(NOTHING_ACCEPTED)
     return accepted
 
 
@@ -94,11 +123,13 @@ async def _translate(
         drafts=text_pairs(sources),
         protected_terms=ctx.view.prompt_entities,
     )
+    log: list[Repair] = []
     call = ModelCall(
         prompt=LOCALIZATION,
         payload=payload,
         response_model=LocalizationOutput,
-        convert=lambda output: _accept(output, sources, targets, ctx),
+        convert=lambda output: _accept(output, sources, targets, ctx, log),
+        repairs=log,
     )
     accepted, run = await ctx.runner.run(call)
     return accepted or {}, run
@@ -107,8 +138,13 @@ async def _translate(
 async def localise_all(
     ctx: AgentContext, sources: Sequence[NarrativeDraft], locales: Sequence[Locale]
 ) -> tuple[list[NarrativeDraft], tuple[AgentRun, ...]]:
-    """Every requested locale, in request order; en-GB is the source drafts themselves."""
+    """Every requested locale and persona, in request order; en-GB is the source drafts.
+
+    BROADCAST is drafted for the overlay even when no BROADCAST narrative was requested; only
+    requested personas are translated.
+    """
     targets = [locale for locale in locales if locale is not CANONICAL_LOCALE]
+    sources = [draft for draft in sources if draft.persona in ctx.view.personas]
     agent_sources = [draft for draft in sources if draft.source is NarrativeSource.AGENT]
     runs: list[AgentRun] = []
     translated: dict[ItemKey, NarrativeDraft] = {}
