@@ -20,6 +20,13 @@ Verification: `pnpm verify` green. Test counts: contracts 60, db 15, api 98 (26 
 
 Next: producer UI (retract, suppress, freeze and kill-switch buttons, audit view); swap the resolver and guard for `libs/auth` when ADR-0015 API enforcement lands.
 
+## 2026-10-22 — MQ-027: Unique row keys in the Agent Observatory
+
+| Area                                                                                                                                                                                                                                   | Status | Evidence                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------- |
+| Run table keyed on `runId` + agent + provider + `startedAt` (the `AgentRun` contract has no per-row id; `runId` is shared by every step of a run), so an ollama timeout and its template fallback for the same agent are both rendered | Done   | `run-table.spec.tsx`: three rows render with no duplicate-key `console.error`; fails on the old key |
+| `withUniqueKeys` helper (occurrence suffix for repeats) applied to other lists keyed on values the contracts do not guarantee unique: gate rejection codes and details, evidence event ids, counter-evidence descriptions              | Done   | `unique-keys.spec.ts`                                                                               |
+
 ## 2026-10-22 — MQ-025 (1/3): Identity foundation — ADR-0015, access and auth libraries, Keycloak
 
 | Area                                                                                                                                                                                                                                          | Status | Evidence                                                                                                        |

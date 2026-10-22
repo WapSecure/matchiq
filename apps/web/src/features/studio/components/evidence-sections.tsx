@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { EVIDENCE_COPY } from '@/constants/evidence';
 import { CONFIDENCE_LABELS } from '@/constants/match';
 import { formatFraction, formatMinute, formatWindow } from '@/lib/format';
+import { withUniqueKeys } from '@/lib/unique-keys';
 import { describeEvent } from '../lib/describe-event';
 import type { Roster } from '../lib/roster';
 
@@ -62,11 +63,11 @@ export function EvidenceEvents({
   const byId = new Map(events.map((e) => [e.eventId, e]));
   return (
     <ol className="flex flex-col gap-1.5">
-      {ids.map((id) => {
+      {withUniqueKeys(ids, String).map(({ item: id, key }) => {
         const event = byId.get(id);
         const described = event ? describeEvent(event, roster) : null;
         return (
-          <li key={id} className="grid grid-cols-[3rem_1fr] gap-2 text-sm">
+          <li key={key} className="grid grid-cols-[3rem_1fr] gap-2 text-sm">
             <span className="tabular font-mono text-xs text-ink-subtle">
               {event ? formatMinute(event.period, event.matchClockMs) : '—'}
             </span>
@@ -98,19 +99,21 @@ export function CounterEvidenceList({
   }
   return (
     <ul className="flex flex-col gap-2 text-sm">
-      {evidence.counterEvidence.map((item) => (
-        <li
-          key={item.description}
-          className="rounded-md border border-line bg-surface-sunken p-2"
-        >
-          <p className="text-ink">{item.description}</p>
-          {item.eventIds.length > 0 ? (
-            <p className="mt-0.5 font-mono text-micro text-ink-subtle">
-              {item.eventIds.join(', ')}
-            </p>
-          ) : null}
-        </li>
-      ))}
+      {withUniqueKeys(evidence.counterEvidence, (c) => c.description).map(
+        ({ item, key }) => (
+          <li
+            key={key}
+            className="rounded-md border border-line bg-surface-sunken p-2"
+          >
+            <p className="text-ink">{item.description}</p>
+            {item.eventIds.length > 0 ? (
+              <p className="mt-0.5 font-mono text-micro text-ink-subtle">
+                {item.eventIds.join(', ')}
+              </p>
+            ) : null}
+          </li>
+        ),
+      )}
     </ul>
   );
 }
