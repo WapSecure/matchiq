@@ -40,7 +40,7 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
           const parsed = ReplaySpeed.safeParse(Number(e.target.value));
           if (parsed.success) setSpeed(parsed.data);
         }}
-        className="tabular h-8 rounded-md border border-line-strong bg-surface-raised px-2 text-sm text-ink"
+        className="tabular h-8 rounded-md border border-control bg-surface px-2 text-sm text-ink shadow-panel hover:border-ink-subtle"
       >
         {REPLAY_SPEEDS.map((s) => (
           <option key={s} value={s}>

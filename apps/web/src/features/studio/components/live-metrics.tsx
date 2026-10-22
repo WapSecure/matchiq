@@ -18,7 +18,7 @@ type LiveMetricsProps = {
 
 function MetricsSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-3" aria-hidden>
+    <div className="grid gap-4 @2xl:grid-cols-3" aria-hidden>
       <Skeleton className="h-24" />
       <Skeleton className="h-40" />
       <Skeleton className="h-40" />
@@ -36,9 +36,15 @@ export function LiveMetrics({
   const momentum = useMatchStore((s) => s.momentum);
   const m = STUDIO_COPY.metrics;
   return (
-    <Panel id="metrics" title={m.title} Icon={ChartIcon} className={className}>
+    <Panel
+      id="metrics"
+      title={m.title}
+      Icon={ChartIcon}
+      className={className}
+      bodyClassName="@container"
+    >
       {snapshot ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-[1fr_1.2fr_1.6fr]">
+        <div className="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-[1fr_1.2fr_1.6fr]">
           <PossessionBar
             label={m.possession}
             homeName={homeName}
@@ -58,7 +64,7 @@ export function LiveMetrics({
           </div>
           {momentum.length > 0 ? (
             <MomentumChart
-              className="md:col-span-2 xl:col-span-1"
+              className="@2xl:col-span-2 @5xl:col-span-1"
               title={m.momentum}
               description={m.momentumDescription}
               homeName={homeName}
@@ -70,7 +76,7 @@ export function LiveMetrics({
             <EmptyState
               compact
               title={m.momentumEmpty}
-              className="md:col-span-2 xl:col-span-1"
+              className="@2xl:col-span-2 @5xl:col-span-1"
             />
           )}
         </div>

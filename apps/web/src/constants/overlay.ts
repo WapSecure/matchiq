@@ -1,3 +1,17 @@
+import type { OverlayKind } from '@matchiq/contracts';
+
+export type CueTone = 'accent' | 'score' | 'discipline';
+
+/** Lower-third tab colour per cue kind; the tab always carries the kind label. */
+export const CUE_KIND_TONE: Record<OverlayKind, CueTone> = {
+  SCORE_UPDATE: 'score',
+  KEY_MOMENT: 'accent',
+  TACTICAL_INSIGHT: 'accent',
+  STAT_COMPARISON: 'accent',
+  DISCIPLINE: 'discipline',
+  SUBSTITUTION: 'accent',
+};
+
 /**
  * Minimum real-time display for a cue. At 20–30× a 7 s match-clock window is
  * a quarter of a second of wall time, so the preview holds a cue at least this
@@ -39,6 +53,11 @@ export const OVERLAY_COPY = {
   localeFallback: 'en-GB graphic',
   standby: 'Standing by',
   lastAired: (headline: string) => `Last on air: ${headline}`,
+  onAir: 'On air',
+  standbyTally: 'Standby',
+  programNote: 'Program preview · always in broadcast colours',
+  programNoteHint:
+    'The preview stands in for on-air video, so it stays dark in both themes.',
   holdLegend: 'Cue hold',
   holdOptions: [
     { value: 'standard', label: 'Standard cue hold, 4 seconds', short: '4 s' },

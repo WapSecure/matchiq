@@ -55,7 +55,7 @@ export function SeekBar({ total, applied, onCommit, disabled }: SeekBarProps) {
             timer.current = setTimeout(() => commit(next), SEEK_COMMIT_IDLE_MS);
           }}
           onPointerUp={() => commit()}
-          className="h-1 min-w-0 flex-1 cursor-pointer accent-[var(--color-accent)] disabled:cursor-not-allowed"
+          className="h-1 min-w-0 flex-1 cursor-pointer accent-[var(--mq-accent)] disabled:cursor-not-allowed"
         />
         <span className="tabular shrink-0 font-mono text-micro text-ink-subtle">
           {REPLAY_COPY.seekValue(shown, total)}

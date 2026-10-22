@@ -14,6 +14,7 @@ import { InsightFeed } from './components/insight-feed';
 import { LiveAnnouncer } from './components/live-announcer';
 import { LiveMetrics } from './components/live-metrics';
 import { OverlayPanel } from './components/overlay-panel';
+import { PitchPanel } from './components/pitch-panel';
 import { ReplayControls } from './components/replay-controls';
 import { ScoreboardStrip } from './components/scoreboard-strip';
 import { SessionFrame } from './components/session-frame';
@@ -29,42 +30,51 @@ type LiveStudioProps = {
   transport?: SseTransport;
 };
 
-const SIDE_PANEL = 'max-h-[32rem] xl:h-0 xl:max-h-none xl:min-h-full';
+/**
+ * Console grid. xl: primary column (scoreboard → program preview → transport
+ * → pitch) beside a secondary stack. 2xl: the secondary stack splits in two.
+ */
+const GRID =
+  'grid items-start gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(22rem,1fr)] 2xl:grid-cols-[minmax(0,1.45fr)_minmax(22rem,1fr)_minmax(22rem,1fr)]';
+const COLUMN = 'flex min-w-0 flex-col gap-4';
+const FEED = 'max-h-[34rem] xl:max-h-[38rem] 2xl:max-h-[calc(100dvh-9rem)]';
 
 function StudioGrid({ fixture }: { fixture: Fixture }) {
   const roster = useMemo(() => buildRoster(fixture), [fixture]);
   return (
     <>
-      <ScoreboardStrip fixture={fixture} />
       <main
         id={MAIN_CONTENT_ID}
         className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-4 lg:px-6"
       >
         <AudienceBar />
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)_minmax(0,1fr)]">
-          <OverlayPanel
-            homeShort={fixture.home.shortName}
-            awayShort={fixture.away.shortName}
-            className="xl:col-start-2 xl:row-start-1"
-            footer={
-              <div className="mt-4">
-                <ReplayControls sessionId={fixture.fixtureId} />
-              </div>
-            }
-          />
-          <InsightFeed
-            roster={roster}
-            className={`${SIDE_PANEL} xl:col-start-3 xl:row-start-1`}
-          />
-          <TimelinePanel
-            roster={roster}
-            className={`${SIDE_PANEL} lg:col-span-2 xl:col-span-1 xl:col-start-1 xl:row-start-1`}
-          />
+        <div className={GRID}>
+          <div className={COLUMN}>
+            <ScoreboardStrip fixture={fixture} />
+            <OverlayPanel
+              homeShort={fixture.home.shortName}
+              awayShort={fixture.away.shortName}
+              footer={
+                <div className="mt-4 border-t border-line pt-4">
+                  <ReplayControls sessionId={fixture.fixtureId} />
+                </div>
+              }
+            />
+            <PitchPanel fixture={fixture} roster={roster} />
+          </div>
+          <div className={`${COLUMN} 2xl:contents`}>
+            <div className="min-w-0 2xl:sticky 2xl:top-28">
+              <InsightFeed roster={roster} className={FEED} />
+            </div>
+            <div className={COLUMN}>
+              <TimelinePanel roster={roster} className="max-h-[30rem]" />
+              <LiveMetrics
+                homeName={fixture.home.name}
+                awayName={fixture.away.name}
+              />
+            </div>
+          </div>
         </div>
-        <LiveMetrics
-          homeName={fixture.home.name}
-          awayName={fixture.away.name}
-        />
       </main>
       <EvidenceDrawer roster={roster} />
       <LiveAnnouncer />
@@ -80,7 +90,6 @@ function StudioScreen({
   useMatchStream(fixtureId, { transport });
   useStudioHydration(fixtureId);
   useEffect(() => closeEvidence, [closeEvidence]);
-
   return (
     <SessionFrame
       fixtureId={fixtureId}

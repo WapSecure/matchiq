@@ -31,11 +31,11 @@ export function TraceSummary({ traces }: { traces: readonly InsightTrace[] }) {
     [copy.rejected, s.rejected],
   ];
   return (
-    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
+    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line shadow-panel sm:grid-cols-3 lg:grid-cols-6">
       {tiles.map(([label, value]) => (
         <div key={label} className="bg-surface px-4 py-3">
           <dt className="text-micro text-ink-subtle">{label}</dt>
-          <dd className="tabular mt-0.5 text-xl font-semibold text-ink">
+          <dd className="tabular mt-1 font-mono text-2xl font-semibold tracking-tight text-ink">
             {value}
           </dd>
         </div>

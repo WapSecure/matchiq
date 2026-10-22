@@ -32,24 +32,28 @@ export function Panel({
     <section
       aria-labelledby={headingId}
       className={cn(
-        'flex min-w-0 flex-col rounded-lg border border-line bg-surface',
+        'flex min-w-0 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel',
         className,
       )}
     >
-      <header className="flex min-h-11 items-center justify-between gap-3 border-b border-line px-4 py-2">
-        <div className="flex min-w-0 items-center gap-2">
+      <header className="flex min-h-12 shrink-0 items-center justify-between gap-3 border-b border-line px-4 py-2">
+        <div className="flex min-w-0 items-center gap-2.5">
           {Icon ? (
-            <Icon size={16} className="shrink-0 text-ink-subtle" />
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md border border-line bg-surface-raised text-ink-muted">
+              <Icon size={14} />
+            </span>
           ) : null}
           <div className="min-w-0">
             <h2
               id={headingId}
-              className="truncate text-[13px] font-semibold tracking-tight text-ink"
+              className="truncate text-[13px] font-semibold leading-5 tracking-tight text-ink"
             >
               {title}
             </h2>
             {description ? (
-              <p className="truncate text-xs text-ink-subtle">{description}</p>
+              <p className="truncate text-xs leading-4 text-ink-subtle">
+                {description}
+              </p>
             ) : null}
           </div>
         </div>
@@ -63,7 +67,8 @@ export function Panel({
         role={scrollable ? 'group' : undefined}
         className={cn(
           'min-w-0 flex-1 p-4',
-          scrollable && 'overflow-y-auto',
+          scrollable &&
+            'overflow-y-auto overscroll-contain focus-visible:-outline-offset-2',
           bodyClassName,
         )}
       >

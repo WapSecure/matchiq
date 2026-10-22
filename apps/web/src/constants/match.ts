@@ -145,3 +145,5 @@ export const OVERLAY_KIND_LABELS: Record<OverlayKind, string> = {
 };
 
 export const NOT_AVAILABLE = 'Not available';
+
+export const SIDE_LABELS = { home: 'Home', away: 'Away' } as const;

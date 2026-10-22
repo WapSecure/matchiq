@@ -46,12 +46,13 @@ test.describe('judge quick-start', () => {
     await expect(trigger).toBeFocused();
 
     const metrics = page.getByRole('region', { name: 'Live metrics' });
+    const feed = page.getByRole('group', { name: 'AI insight feed' });
     const before = (await metrics.textContent()) ?? '';
     await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
-    await expect(page.getByText('Northbridge are on top now')).toBeVisible();
+    await expect(feed.getByText('Northbridge are on top now')).toBeVisible();
     await page.getByRole('radio', { name: /Français/ }).check({ force: true });
     await page.getByRole('radio', { name: 'Broadcast' }).check({ force: true });
-    await expect(page.getByText('Northbridge prend le contrôle')).toBeVisible();
+    await expect(feed.getByText('Northbridge prend le contrôle')).toBeVisible();
     await expect(
       page.getByRole('group', { name: /1 cue on air/ }),
     ).toContainText('Pressure building on the left');

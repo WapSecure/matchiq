@@ -17,6 +17,13 @@ export const HERO = {
   primaryCta: { label: 'Open fixture lobby', href: '/fixtures' },
   howItWorks: { label: 'How it works', href: '#pipeline' },
   secondaryCta: { label: 'View source' },
+  facts: [
+    { value: '0', label: 'numbers written by a model' },
+    { value: '3 × 4', label: 'audiences × languages, same facts' },
+    { value: '16:9', label: 'graphics-safe broadcast preview' },
+  ],
+  disclosure:
+    'Demo runs on seeded synthetic matches. No real clubs, players or league marks.',
 } as const;
 
 export const PIPELINE = {
