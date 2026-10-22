@@ -25,6 +25,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
 };
 
 export const ACTOR_TYPE_LABELS: Record<AuditActorType, string> = {
+  USER: 'User',
+  SERVICE: 'Service',
   OPERATOR: 'Operator',
   SYSTEM: 'System',
   ANONYMOUS: 'Anonymous',
