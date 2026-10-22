@@ -36,7 +36,7 @@ const fixtureFk = (name: string, t: { orgId: PgColumn; fixtureId: PgColumn }) =>
     name,
     columns: [t.orgId, t.fixtureId],
     foreignColumns: [fixtures.orgId, fixtures.fixtureId],
-  });
+  }).onDelete('cascade');
 
 /** Golden fixture files loaded by `pnpm seed:fixtures`; replay sessions copy from these. */
 export const fixtureTemplates = pgTable(
@@ -98,6 +98,8 @@ export const replaySessions = pgTable(
       foreignColumns: [fixtureTemplates.orgId, fixtureTemplates.templateId],
     }),
     index('replay_sessions_created_idx').on(t.orgId, t.createdAt),
+    index('replay_sessions_activity_idx').on(t.orgId, t.state, t.updatedAt),
+    index('replay_sessions_updated_idx').on(t.updatedAt),
   ],
 );
 
@@ -129,6 +131,9 @@ export const insights = pgTable(
     }),
     fixtureFk('insights_fixture_fk', t),
     index('insights_order_idx').on(t.orgId, t.fixtureId, t.detectedSequence),
+    index('insights_pending_idx')
+      .on(t.orgId, t.createdAt)
+      .where(sql`${t.publication} = 'PENDING'`),
   ],
 );
 

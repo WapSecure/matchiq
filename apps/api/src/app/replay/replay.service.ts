@@ -1,44 +1,62 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { ApiEnv } from '@matchiq/config';
-import type {
-  ReplayCommand,
-  ReplaySpeed,
+import {
   ReplayStatus,
+  type ReplayCommand,
+  type ReplaySpeed,
 } from '@matchiq/contracts';
-import type {
-  CreatedSession,
-  FixtureKey,
-  FixtureTemplateSummary,
-  ReplayCommandBus,
-  ReplaySessionView,
-  SessionStore,
-  TemplateStore,
+import {
+  SessionCapacityExceeded,
+  type CreatedSession,
+  type FixtureKey,
+  type FixtureTemplateSummary,
+  type ReplayCommandBus,
+  type ReplaySessionView,
 } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
-import { problem } from '../http/problems';
 import {
-  REPLAY_COMMAND_BUS,
-  SESSION_STORE,
-  TEMPLATE_STORE,
-} from '../infrastructure/tokens';
+  API_LIMITS,
+  HEADERS,
+  IDEMPOTENCY_SCOPES,
+  REPLAY_CAPACITY,
+} from '../constants';
+import type { IdempotencyScope, IdempotentResult } from '../http/idempotency';
+import { IdempotencyService } from '../http/idempotency.service';
+import { problem } from '../http/problems';
+import type { ReplayStores } from '../infrastructure/replay-providers';
+import { REPLAY_COMMAND_BUS, REPLAY_STORES } from '../infrastructure/tokens';
 import { checkTransition } from './replay-transitions';
+import { CreatedSessionResponse } from './replay.schemas';
 
 export interface ItemList<T> {
   readonly items: T[];
 }
 
+const capacityProblem = (active: number, max: number) =>
+  problem('replayCapacity', {
+    detail: REPLAY_CAPACITY.detail(active, max),
+    headers: {
+      [HEADERS.retryAfter]: String(API_LIMITS.replayCapacityRetryAfterS),
+    },
+  });
+
+const needsSlot = (command: ReplayCommand): boolean =>
+  (REPLAY_CAPACITY.slotActions as readonly string[]).includes(command.action);
+
 /**
  * Replay sessions (ADR-0013). The API creates sessions and validates
  * commands against persisted state; the worker owns playback and is the
  * authority on the resulting status, which reaches clients as `replay.status`.
+ * Starting playback needs a free slot (ADR-0015): the API answers 503 with
+ * `Retry-After` at the limit rather than accepting work the worker would drop.
  */
 @Injectable()
 export class ReplayService {
   constructor(
     @Inject(APP_ENV) private readonly env: ApiEnv,
-    @Inject(TEMPLATE_STORE) private readonly templates: TemplateStore,
-    @Inject(SESSION_STORE) private readonly sessions: SessionStore,
+    @Inject(REPLAY_STORES) private readonly stores: ReplayStores,
     @Inject(REPLAY_COMMAND_BUS) private readonly bus: ReplayCommandBus,
+    private readonly idempotency: IdempotencyService,
   ) {}
 
   private keyOf(fixtureId: string): FixtureKey {
@@ -46,26 +64,33 @@ export class ReplayService {
   }
 
   async listTemplates(): Promise<ItemList<FixtureTemplateSummary>> {
-    return { items: await this.templates.list(this.env.DEMO_ORG_ID) };
+    return { items: await this.stores.templates.list(this.env.DEMO_ORG_ID) };
   }
 
   async listSessions(limit: number): Promise<ItemList<ReplaySessionView>> {
-    return { items: await this.sessions.list(this.env.DEMO_ORG_ID, limit) };
+    return {
+      items: await this.stores.sessions.list(this.env.DEMO_ORG_ID, limit),
+    };
   }
 
-  async createSession(
-    templateId: string,
-    speed: ReplaySpeed,
-  ): Promise<CreatedSession> {
-    const created = await this.sessions.create({
-      orgId: this.env.DEMO_ORG_ID,
-      templateId,
-      speed,
-    });
-    if (created === null)
-      throw problem('templateNotFound', { detail: templateId });
-    await this.send(created.fixture.fixtureId, { action: 'start', speed });
-    return created;
+  createSession(input: {
+    templateId: string;
+    speed: ReplaySpeed;
+    idempotencyKey?: string;
+  }): Promise<IdempotentResult<CreatedSession>> {
+    const { templateId, speed } = input;
+    return this.idempotent(
+      {
+        scope: IDEMPOTENCY_SCOPES.createSession,
+        key: input.idempotencyKey,
+        request: { templateId, speed },
+        parse: (body) => CreatedSessionResponse.parse(body),
+      },
+      async () => ({
+        status: HttpStatus.CREATED,
+        body: await this.create(templateId, speed),
+      }),
+    );
   }
 
   async status(sessionId: string): Promise<ReplayStatus> {
@@ -73,14 +98,71 @@ export class ReplayService {
   }
 
   /** 202 semantics: the returned status is the accepted target, confirmed later on the stream. */
-  async command(
+  command(input: {
+    sessionId: string;
+    command: ReplayCommand;
+    idempotencyKey?: string;
+  }): Promise<IdempotentResult<ReplayStatus>> {
+    const { sessionId, command } = input;
+    return this.idempotent(
+      {
+        scope: IDEMPOTENCY_SCOPES.replayCommand,
+        key: input.idempotencyKey,
+        request: { sessionId, command },
+        parse: (body) => ReplayStatus.parse(body),
+      },
+      async () => ({
+        status: HttpStatus.ACCEPTED,
+        body: await this.apply(sessionId, command),
+      }),
+    );
+  }
+
+  /** The key is stored only once the command is queued. */
+  private idempotent<T>(
+    scope: Omit<IdempotencyScope<T>, 'orgId'>,
+    work: () => Promise<{ status: number; body: T }>,
+  ): Promise<IdempotentResult<T>> {
+    return this.idempotency.run(
+      { ...scope, orgId: this.env.DEMO_ORG_ID },
+      work,
+    );
+  }
+
+  private async create(
+    templateId: string,
+    speed: ReplaySpeed,
+  ): Promise<CreatedSession> {
+    let created: CreatedSession | null;
+    try {
+      created = await this.stores.sessions.create({
+        orgId: this.env.DEMO_ORG_ID,
+        templateId,
+        speed,
+        capacity: {
+          max: this.env.REPLAY_MAX_ACTIVE_SESSIONS,
+          idleMs: this.env.REPLAY_IDLE_TIMEOUT_MS,
+        },
+      });
+    } catch (error) {
+      if (error instanceof SessionCapacityExceeded)
+        throw capacityProblem(error.active, error.max);
+      throw error;
+    }
+    if (created === null)
+      throw problem('templateNotFound', { detail: templateId });
+    await this.send(created.fixture.fixtureId, { action: 'start', speed });
+    return created;
+  }
+
+  private async apply(
     sessionId: string,
     command: ReplayCommand,
   ): Promise<ReplayStatus> {
     const session = await this.session(sessionId);
-    const template = (await this.templates.list(this.env.DEMO_ORG_ID)).find(
-      (t) => t.templateId === session.templateId,
-    );
+    const template = (
+      await this.stores.templates.list(this.env.DEMO_ORG_ID)
+    ).find((t) => t.templateId === session.templateId);
     if (template === undefined)
       throw problem('templateNotFound', { detail: session.templateId });
     const check = checkTransition(
@@ -89,12 +171,24 @@ export class ReplayService {
       template.eventCount - 1,
     );
     if (!check.ok) throw problem('replayConflict', { detail: check.reason });
+    if (needsSlot(command)) await this.ensureSlot(sessionId);
     await this.send(sessionId, command);
     return check.target;
   }
 
+  /** Advisory: the worker re-checks when it applies the command. */
+  private async ensureSlot(sessionId: string): Promise<void> {
+    const max = this.env.REPLAY_MAX_ACTIVE_SESSIONS;
+    const active = await this.stores.sessions.countActive({
+      orgId: this.env.DEMO_ORG_ID,
+      idleMs: this.env.REPLAY_IDLE_TIMEOUT_MS,
+      excludeFixtureId: sessionId,
+    });
+    if (active >= max) throw capacityProblem(active, max);
+  }
+
   private async session(sessionId: string): Promise<ReplaySessionView> {
-    const session = await this.sessions.get(this.keyOf(sessionId));
+    const session = await this.stores.sessions.get(this.keyOf(sessionId));
     if (session === null)
       throw problem('sessionNotFound', { detail: sessionId });
     return session;

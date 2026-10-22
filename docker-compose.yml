@@ -70,16 +70,23 @@ services:
   # --- Opt-in application stack: docker compose --profile app up --build ---
   # Values come from .env via interpolation; defaults are local-only placeholders.
   # Explicit blocks (not env_file) keep compose-DNS URLs authoritative over the localhost URLs in .env.
-  # One-shot schema migration from the api image (Nx prune ships libs/db with its migrations).
+  # One-shot schema migration and template seed from the api image (Nx prune ships libs/db
+  # with its migrations; the image carries fixtures/). Seeding is idempotent, so a fresh
+  # `--profile app up` is demo-ready and a re-run writes nothing.
   migrate:
     profiles: [app]
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     image: matchiq-api:local
-    command: ['node', 'workspace_modules/@matchiq/db/dist/cli/migrate.js']
+    # Run from node_modules so libs/db resolves its own dependencies (synthetic-data).
+    command:
+      - sh
+      - -c
+      - node node_modules/@matchiq/db/dist/cli/migrate.js && node node_modules/@matchiq/db/dist/cli/seed-fixtures.js fixtures
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-matchiq}:${POSTGRES_PASSWORD:-matchiq_local_only}@postgres:5432/${POSTGRES_DB:-matchiq}
+      DEMO_ORG_ID: ${DEMO_ORG_ID:-org_demo}
     depends_on:
       postgres: { condition: service_healthy }
     restart: 'no'
@@ -108,6 +115,9 @@ services:
       OUTBOX_BATCH_SIZE: ${OUTBOX_BATCH_SIZE:-200}
       SSE_HEARTBEAT_MS: ${SSE_HEARTBEAT_MS:-15000}
       REPLAY_RATE_LIMIT_PER_MINUTE: ${REPLAY_RATE_LIMIT_PER_MINUTE:-30}
+      REPLAY_MAX_ACTIVE_SESSIONS: ${REPLAY_MAX_ACTIVE_SESSIONS:-10}
+      REPLAY_IDLE_TIMEOUT_MS: ${REPLAY_IDLE_TIMEOUT_MS:-600000}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
       OPERATOR_API_KEY: ${OPERATOR_API_KEY:-local_only_operator_api_key_change_me}
       OTEL_SERVICE_NAME: matchiq-api
     ports:
@@ -140,6 +150,11 @@ services:
       AI_ENABLED: ${AI_ENABLED:-false}
       AGENT_JOB_CONCURRENCY: ${AGENT_JOB_CONCURRENCY:-2}
       REPLAY_MAX_ACTIVE_SESSIONS: ${REPLAY_MAX_ACTIVE_SESSIONS:-10}
+      REPLAY_IDLE_TIMEOUT_MS: ${REPLAY_IDLE_TIMEOUT_MS:-600000}
+      RETENTION_ENABLED: ${RETENTION_ENABLED:-true}
+      SESSION_RETENTION_DAYS: ${SESSION_RETENTION_DAYS:-7}
+      IDEMPOTENCY_RETENTION_HOURS: ${IDEMPOTENCY_RETENTION_HOURS:-24}
+      RETENTION_INTERVAL_MS: ${RETENTION_INTERVAL_MS:-3600000}
       OTEL_SERVICE_NAME: matchiq-worker
     ports:
       - '127.0.0.1:${WORKER_PORT:-3001}:3001'

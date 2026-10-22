@@ -2,12 +2,13 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
+  Headers,
   Param,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ReplayCommand, type ReplayStatus } from '@matchiq/contracts';
 import type {
   CreatedSession,
@@ -15,7 +16,9 @@ import type {
   ReplaySessionView,
 } from '@matchiq/db';
 import { ZodValidationPipe } from '@matchiq/server-kit';
-import { ROUTE_PARAMS, ROUTES } from '../constants';
+import { HEADERS, ROUTE_PARAMS, ROUTES } from '../constants';
+import { parseIdempotencyKey } from '../http/idempotency';
+import { respond } from '../http/respond';
 import { FixtureIdParam } from '../fixtures/fixtures.schemas';
 import { ReplayThrottled } from './replay-throttle';
 import { CreateSessionBody, SessionListQuery } from './replay.schemas';
@@ -30,21 +33,34 @@ export class ReplayController {
   /** Starts a new session of a template: a fresh fixture and ledger fed at `speed`. */
   @Post(ROUTES.sessions)
   @ReplayThrottled()
-  createSession(
+  async createSession(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) templateId: string,
     @Body(new ZodValidationPipe(CreateSessionBody)) body: CreateSessionBody,
+    @Headers(HEADERS.idempotencyKey) idempotencyKey: string | undefined,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<CreatedSession> {
-    return this.replay.createSession(templateId, body.speed);
+    const result = await this.replay.createSession({
+      templateId,
+      speed: body.speed,
+      idempotencyKey: parseIdempotencyKey(idempotencyKey),
+    });
+    return respond(res, result);
   }
 
   @Post(ROUTES.replay)
-  @HttpCode(HttpStatus.ACCEPTED)
   @ReplayThrottled()
-  command(
+  async command(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) sessionId: string,
     @Body(new ZodValidationPipe(ReplayCommand)) command: ReplayCommand,
+    @Headers(HEADERS.idempotencyKey) idempotencyKey: string | undefined,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ReplayStatus> {
-    return this.replay.command(sessionId, command);
+    const result = await this.replay.command({
+      sessionId,
+      command,
+      idempotencyKey: parseIdempotencyKey(idempotencyKey),
+    });
+    return respond(res, result);
   }
 
   @Get(ROUTES.replay)

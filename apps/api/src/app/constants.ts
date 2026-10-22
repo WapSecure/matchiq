@@ -30,6 +30,7 @@ export const HEADERS = {
   wwwAuthenticate: 'WWW-Authenticate',
   idempotencyKey: 'idempotency-key',
   idempotentReplay: 'Idempotent-Replayed',
+  retryAfter: 'Retry-After',
   lastEventId: 'last-event-id',
   requestId: 'x-request-id',
 } as const;
@@ -56,6 +57,8 @@ export const API_LIMITS = {
   shutdownGraceMs: 5_000,
   sessionListDefault: 20,
   sessionListMax: 100,
+  /** Seconds a client should wait after a replay-capacity 503. */
+  replayCapacityRetryAfterS: 30,
 } as const;
 
 export const PATTERNS = {
@@ -69,6 +72,8 @@ export const ID_PREFIXES = { ingestion: 'ing_' } as const;
 export const IDEMPOTENCY_SCOPES = {
   createFixture: 'POST /fixtures',
   ingestBatch: 'POST /fixtures/events:batch',
+  createSession: 'POST /fixtures/sessions',
+  replayCommand: 'POST /fixtures/replay',
 } as const;
 
 export const AUDIT_TARGETS = { fixture: 'fixture' } as const;
@@ -122,6 +127,10 @@ export const PROBLEMS = {
     title: 'Replay control is temporarily unavailable',
     slug: 'replay-unavailable',
   },
+  replayCapacity: {
+    title: 'Every replay slot is in use',
+    slug: 'replay-capacity',
+  },
   stateNotFound: {
     title: 'No match state has been projected yet',
     slug: 'state-not-found',
@@ -130,6 +139,13 @@ export const PROBLEMS = {
     title: 'The recap is available once the match has ended',
     slug: 'recap-not-ready',
   },
+} as const;
+
+export const REPLAY_CAPACITY = {
+  detail: (active: number, max: number) =>
+    `${active} of ${max} replay sessions are playing; try again shortly or join a running session`,
+  /** Commands that move a session into PLAYING and so need a free slot. */
+  slotActions: ['start', 'resume'],
 } as const;
 
 export const REPLAY_CONFLICTS = {

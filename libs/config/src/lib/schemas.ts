@@ -17,6 +17,11 @@ import {
   port,
   secret,
 } from './fields.js';
+import {
+  ReplayCapacityEnv,
+  RetentionEnv,
+  TrustProxyEnv,
+} from './operations-env.js';
 
 const postgresUrl = z.url({ protocol: ENV_PATTERNS.postgresProtocol });
 const redisUrl = z.url({ protocol: ENV_PATTERNS.redisProtocol });
@@ -80,6 +85,8 @@ export const ApiEnv = CommonEnv.extend({
   ...DatabaseEnv.shape,
   ...RedisEnv.shape,
   ...OutboxRelayEnv.shape,
+  ...ReplayCapacityEnv.shape,
+  ...TrustProxyEnv.shape,
   SSE_HEARTBEAT_MS: boundedInt(
     ENV_LIMITS.sseHeartbeatMinMs,
     ENV_LIMITS.sseHeartbeatMaxMs,
@@ -107,6 +114,8 @@ export const WorkerEnv = CommonEnv.extend({
   ...DatabaseEnv.shape,
   ...RedisEnv.shape,
   ...OutboxRelayEnv.shape,
+  ...ReplayCapacityEnv.shape,
+  ...RetentionEnv.shape,
   WORKER_PORT: port(DEFAULT_PORTS.worker),
   AGENTS_SERVICE_URL: z.url().default(DEFAULT_URLS.agentsService),
   AGENTS_SERVICE_TOKEN: secret,
@@ -144,12 +153,6 @@ export const WorkerEnv = CommonEnv.extend({
     ENV_LIMITS.agentCircuitCooldownMinMs,
     ENV_LIMITS.agentCircuitCooldownMaxMs,
     ENV_LIMITS.agentCircuitCooldownDefaultMs,
-  ),
-  /** Replay sessions the worker drives at once; further starts wait in the queue. */
-  REPLAY_MAX_ACTIVE_SESSIONS: boundedInt(
-    1,
-    ENV_LIMITS.replayActiveSessionsMax,
-    ENV_LIMITS.replayActiveSessionsDefault,
   ),
 });
 

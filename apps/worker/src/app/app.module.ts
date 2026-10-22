@@ -11,6 +11,9 @@ import {
   RedisHealthIndicator,
 } from './infrastructure/health.indicators';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
+import { InsightRecoveryService } from './maintenance/insight-recovery.service';
+import { MAINTENANCE_PROVIDERS } from './maintenance/maintenance.providers';
+import { RetentionService } from './maintenance/retention.service';
 import {
   QUEUE_CONSUMERS,
   type QueueConsumerConfig,
@@ -63,8 +66,17 @@ export class AppModule {
         SessionManager,
         InsightPipelineService,
         QueueConsumers,
+        ...MAINTENANCE_PROVIDERS,
+        InsightRecoveryService,
+        RetentionService,
       ],
-      exports: [SessionManager, InsightPipelineService, RecapService],
+      exports: [
+        SessionManager,
+        InsightPipelineService,
+        RecapService,
+        InsightRecoveryService,
+        RetentionService,
+      ],
     };
   }
 }
