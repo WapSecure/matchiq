@@ -72,6 +72,7 @@ export const toInsight = (
     fixtureId: context.fixtureId,
     kind: candidate.kind,
     priority: candidate.priority,
+    period: event.period,
     matchClockMs: event.matchClockMs,
     teamId: context.teamIds[candidate.side],
     ...(candidate.playerId === undefined

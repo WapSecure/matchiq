@@ -1,9 +1,11 @@
 import type { MetricValue, PossessionBasis } from '@matchiq/contracts';
 import { POSSESSION_BASIS_LABELS } from '@/constants/match';
 import { cn } from '@/lib/cn';
-import { formatNumber } from '@/lib/format';
+import { formatSharePair } from '@/lib/format';
 import { MetricValueText } from './metric-value';
 import { SIDE_BG, TeamSwatch } from './team-swatch';
+
+const VALUE_CLASS = 'text-xl font-semibold text-ink';
 
 type PossessionBarProps = {
   label: string;
@@ -17,10 +19,12 @@ type PossessionBarProps = {
 function SideValue({
   name,
   metric,
+  share,
   side,
 }: {
   name: string;
   metric: MetricValue;
+  share: string | undefined;
   side: 'home' | 'away';
 }) {
   return (
@@ -34,10 +38,11 @@ function SideValue({
         <TeamSwatch side={side} />
         {name}
       </span>
-      <MetricValueText
-        metric={metric}
-        className="text-xl font-semibold text-ink"
-      />
+      {share === undefined ? (
+        <MetricValueText metric={metric} className={VALUE_CLASS} />
+      ) : (
+        <span className={cn('tabular', VALUE_CLASS)}>{share}</span>
+      )}
     </div>
   );
 }
@@ -50,8 +55,8 @@ export function PossessionBar({
   away,
   basis,
 }: PossessionBarProps) {
-  const both = home.status === 'available' && away.status === 'available';
-  const homeShare = both ? home.value : 0;
+  const shares = formatSharePair(home, away);
+  const homeShare = home.status === 'available' ? home.value : 0;
   return (
     <figure className="flex flex-col gap-3">
       <figcaption className="flex items-baseline justify-between gap-2">
@@ -61,13 +66,23 @@ export function PossessionBar({
         </span>
       </figcaption>
       <div className="flex items-end justify-between gap-4">
-        <SideValue name={homeName} metric={home} side="home" />
-        <SideValue name={awayName} metric={away} side="away" />
+        <SideValue
+          name={homeName}
+          metric={home}
+          share={shares?.[0]}
+          side="home"
+        />
+        <SideValue
+          name={awayName}
+          metric={away}
+          share={shares?.[1]}
+          side="away"
+        />
       </div>
-      {both ? (
+      {shares ? (
         <div
           role="img"
-          aria-label={`${homeName} ${formatNumber(home.value, home.unit)}, ${awayName} ${formatNumber(away.value, away.unit)}`}
+          aria-label={`${homeName} ${shares[0]}, ${awayName} ${shares[1]}`}
           className="flex h-2 gap-0.5 overflow-hidden rounded-full"
         >
           <span

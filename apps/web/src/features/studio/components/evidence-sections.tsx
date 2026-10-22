@@ -21,18 +21,12 @@ export function EvidenceSection({
   );
 }
 
-export function EvidenceSummary({
-  insight,
-  period,
-}: {
-  insight: Insight;
-  period: number | null;
-}) {
+export function EvidenceSummary({ insight }: { insight: Insight }) {
   const e = insight.evidence;
   const rows: [string, string][] = [
     [
       EVIDENCE_COPY.fields.window,
-      formatWindow(period, e.windowStartMs, e.windowEndMs),
+      formatWindow(insight.period, e.windowStartMs, e.windowEndMs),
     ],
     [EVIDENCE_COPY.fields.confidence, CONFIDENCE_LABELS[e.confidenceLabel]],
     [EVIDENCE_COPY.fields.coverage, formatFraction(e.dataCoverage)],

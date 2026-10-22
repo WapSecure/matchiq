@@ -2,6 +2,7 @@ import { project, toSnapshot } from '../src/index.js';
 import { buildFixture, kickedOff, MIN } from './builders.js';
 
 const fixture = buildFixture();
+const SEC = 1_000;
 const snap = (events: Parameters<typeof project>[1]) =>
   toSnapshot(project(fixture, events));
 
@@ -49,6 +50,31 @@ describe('possessionPct (TIME_WEIGHTED)', () => {
     const snapshot = snap(s.events);
     expect(snapshot.home.possessionPct).toMatchObject({ value: 50 });
     expect(snapshot.away.possessionPct).toMatchObject({ value: 50 });
+  });
+
+  it('publishes shares that sum to exactly 100 when both halves tie at the last decimal', () => {
+    const s = kickedOff();
+    s.at(1, 0).possession('home');
+    s.at(1, 49 * SEC).possession('away');
+    s.at(1, 400 * SEC).possession(null);
+    const { home, away } = snap(s.events);
+    // Rounded on their own, 12.25 and 87.75 would show 12.3 and 87.8 (100.1).
+    expect(home.possessionPct).toMatchObject({ value: 12.3 });
+    expect(away.possessionPct).toMatchObject({ value: 87.7 });
+  });
+
+  it('keeps the pair at 100 for any split', () => {
+    for (let homeSec = 1; homeSec < 400; homeSec += 1) {
+      const s = kickedOff();
+      s.at(1, 0).possession('home');
+      s.at(1, homeSec * SEC).possession('away');
+      s.at(1, 400 * SEC).possession(null);
+      const { home, away } = snap(s.events);
+      if (home.possessionPct.status !== 'available') throw new Error('n/a');
+      if (away.possessionPct.status !== 'available') throw new Error('n/a');
+      const tenths = (home.possessionPct.value + away.possessionPct.value) * 10;
+      expect(Math.round(tenths)).toBe(1000);
+    }
   });
 
   it('is unavailable when only contested time has elapsed', () => {

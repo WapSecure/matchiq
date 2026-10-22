@@ -68,6 +68,11 @@
                     "P2"
                   ]
                 },
+                "period": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
                 "matchClockMs": {
                   "type": "integer",
                   "minimum": 0,
@@ -217,6 +222,7 @@
                 "fixtureId",
                 "kind",
                 "priority",
+                "period",
                 "matchClockMs",
                 "reasonCode",
                 "evidence",

@@ -139,6 +139,7 @@ export const insight = (overrides: Partial<Insight> = {}): Insight => ({
   fixtureId: FX,
   kind: 'SHOT_BURST',
   priority: 'P1',
+  period: 1,
   matchClockMs: 590_000,
   teamId: HOME,
   reasonCode: 'SHOT_BURST_HOME',

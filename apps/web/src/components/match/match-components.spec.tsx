@@ -47,6 +47,23 @@ describe('unavailable metrics', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows whole-percent shares that sum to 100', () => {
+    render(
+      <PossessionBar
+        label="Possession"
+        homeName="Home"
+        awayName="Away"
+        home={available(48.5)}
+        away={available(51.5)}
+        basis="TIME_WEIGHTED"
+      />,
+    );
+    expect(
+      screen.getByRole('img', { name: 'Home 49%, Away 51%' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('52%')).not.toBeInTheDocument();
+  });
+
   it('keeps comparison values as table text, not colour alone', () => {
     render(
       <StatComparison
