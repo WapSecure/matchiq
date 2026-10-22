@@ -15,6 +15,7 @@ import {
   flag,
   optionalString,
   optionalUrl,
+  originList,
   port,
   secret,
 } from './fields.js';
@@ -102,7 +103,7 @@ export const ApiEnv = CommonEnv.extend({
   ),
   API_PORT: port(DEFAULT_PORTS.api),
   API_PUBLIC_URL: z.url().default(DEFAULT_URLS.apiPublic),
-  CORS_ALLOWED_ORIGINS: csv,
+  CORS_ALLOWED_ORIGINS: originList,
   RATE_LIMIT_PER_MINUTE: z.coerce
     .number()
     .int()

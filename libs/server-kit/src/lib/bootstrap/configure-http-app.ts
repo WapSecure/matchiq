@@ -1,6 +1,10 @@
 import type { INestApplication } from '@nestjs/common';
 import helmet from 'helmet';
-import { API_GLOBAL_PREFIX, EXPRESS_SETTINGS } from '../constants';
+import {
+  API_CONTENT_SECURITY_POLICY,
+  API_GLOBAL_PREFIX,
+  EXPRESS_SETTINGS,
+} from '../constants';
 import { ProblemDetailsFilter } from '../http/problem-details.filter';
 
 export interface HttpAppOptions {
@@ -11,11 +15,21 @@ export interface HttpAppOptions {
    * reverse proxy it makes `req.ip` (rate limiting, logs) the real client.
    */
   readonly trustProxy?: false | number | readonly string[];
+  /**
+   * Helmet CSP directives. The default suits JSON and SSE only; a service that
+   * serves HTML (for example interactive API docs) must pass its own policy.
+   */
+  readonly contentSecurityPolicy?: Readonly<Record<string, readonly string[]>>;
 }
 
 interface ExpressSettings {
   set(setting: string, value: unknown): void;
 }
+
+const toDirectives = (
+  policy: Readonly<Record<string, readonly string[]>>,
+): Record<string, string[]> =>
+  Object.fromEntries(Object.entries(policy).map(([k, v]) => [k, [...v]]));
 
 /** Applies the security and error-handling baseline shared by every MatchIQ HTTP service. */
 export const configureHttpApp = (
@@ -28,7 +42,17 @@ export const configureHttpApp = (
     EXPRESS_SETTINGS.trustProxy,
     Array.isArray(trustProxy) ? [...trustProxy] : trustProxy,
   );
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: false,
+        directives: toDirectives(
+          options.contentSecurityPolicy ?? API_CONTENT_SECURITY_POLICY,
+        ),
+      },
+      frameguard: { action: 'deny' },
+    }),
+  );
   app.setGlobalPrefix(options.globalPrefix ?? API_GLOBAL_PREFIX);
   app.useGlobalFilters(new ProblemDetailsFilter());
   app.enableCors({

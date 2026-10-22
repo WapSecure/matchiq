@@ -14,3 +14,13 @@ export const SYNTHETIC_DISCLOSURE = {
 
 export const SKIP_LINK_LABEL = 'Skip to content';
 export const MAIN_CONTENT_ID = 'main-content';
+
+export const NOT_FOUND_COPY = {
+  metaTitle: 'Page not found',
+  eyebrow: '404',
+  title: 'This page does not exist',
+  description:
+    'The link may be out of date, or the fixture may have been removed. Pick a synthetic fixture to continue.',
+  action: 'Browse fixtures',
+  href: '/fixtures',
+} as const;
