@@ -15,17 +15,21 @@ from matchiq_agents.contracts.types import (
     Issue,
     IssueCode,
     NarrativeDraft,
+    NarrativeSource,
     Persona,
     RunOutcome,
     Verdict,
     VerificationResult,
 )
+from matchiq_agents.domain.facts import CANONICAL_LOCALE
 from matchiq_agents.guard import messages
 from matchiq_agents.guard.checks import check_analysis, check_draft, check_drafts, issue
 from matchiq_agents.limits import MAX_DRAFT_ATTEMPTS
+from matchiq_agents.pipeline import diagnostics
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import DETERMINISTIC_CHECKS_VERSION, AgentContext
 from matchiq_agents.roster.convert import facts_payload, text_pairs
+from matchiq_agents.roster.notes import revision_note
 from matchiq_agents.roster.prompts import FACT_CHECKER
 from matchiq_agents.roster.schemas import CritiqueInput, CritiqueOutput
 
@@ -33,6 +37,7 @@ from matchiq_agents.roster.schemas import CritiqueInput, CritiqueOutput
 # by the cited evidence"). See the proposed contract change in the implementation log.
 CRITIQUE_CODE: Final = IssueCode.UNCITED_EVIDENCE
 ALWAYS_REJECT: Final = frozenset({IssueCode.FORBIDDEN_CLAIM})
+SCREEN_UNAVAILABLE: Final = "screen_unavailable"
 REVISION_NOTE: Final = "{persona}: {detail}"
 
 
@@ -77,11 +82,11 @@ class Verification:
 
     def notes(self) -> tuple[str, ...]:
         personal = [
-            REVISION_NOTE.format(persona=persona.value, detail=found.detail)
+            REVISION_NOTE.format(persona=persona.value, detail=revision_note(found))
             for persona in self.revisable
             for found in self.by_persona[persona]
         ]
-        return (*personal, *(found.detail for found in self.shared))
+        return (*personal, *(revision_note(found) for found in self.shared))
 
     def passing(self, drafts: Sequence[NarrativeDraft]) -> tuple[NarrativeDraft, ...]:
         return tuple(draft for draft in drafts if draft.persona not in self.failing)
@@ -116,6 +121,28 @@ def _per_persona(ctx: AgentContext, drafts: Sequence[NarrativeDraft]) -> dict[Pe
     return by_persona
 
 
+async def _screen(
+    ctx: AgentContext, drafts: Sequence[NarrativeDraft]
+) -> dict[Persona, list[Issue]]:
+    """The hosted safety screen, when configured. It fails closed: an error is unsafe."""
+    agent = [draft for draft in drafts if draft.source is NarrativeSource.AGENT]
+    if ctx.safety is None or not agent:
+        return {}
+    texts = [f"{draft.headline}\n{draft.body}" for draft in agent]
+    try:
+        verdicts = await ctx.safety.screen(texts, CANONICAL_LOCALE)
+    except Exception:
+        verdicts = [[SCREEN_UNAVAILABLE] for _ in agent]
+    return {
+        draft.persona: [
+            issue(IssueCode.FORBIDDEN_CLAIM, messages.UNSAFE.format(category=category))
+            for category in categories
+        ]
+        for draft, categories in zip(agent, verdicts, strict=False)
+        if categories
+    }
+
+
 async def _critique(
     ctx: AgentContext, drafts: Sequence[NarrativeDraft]
 ) -> tuple[list[Issue], AgentRun]:
@@ -134,6 +161,26 @@ async def _critique(
     ], run
 
 
+def _report(
+    ctx: AgentContext,
+    shared: Sequence[Issue],
+    by_persona: dict[Persona, list[Issue]],
+    drafts: Sequence[NarrativeDraft],
+    attempt: int,
+) -> None:
+    """Agent drafts only: a template that fails is a template bug, not model behaviour."""
+    run_id = ctx.runner.scope.run_id
+    texts = {d.persona: f"{d.headline}\n{d.body}" for d in drafts}
+    agent_written = {d.persona for d in drafts if d.source is NarrativeSource.AGENT}
+    diagnostics.report(run_id, FACT_CHECKER.agent, shared, attempt=attempt)
+    for persona, found in by_persona.items():
+        if persona in agent_written or persona not in texts:
+            text = texts.get(persona, "")
+            diagnostics.report(
+                run_id, FACT_CHECKER.agent, found, persona=persona, attempt=attempt, text=text
+            )
+
+
 async def verify(
     ctx: AgentContext,
     analysis: AgentResult | None,
@@ -150,6 +197,10 @@ async def verify(
             FACT_CHECKER.agent, RunOutcome.SUCCEEDED, DETERMINISTIC_CHECKS_VERSION, started_ms
         )
     ]
+    # The fallback round re-checks drafts that already passed the screen, plus templates.
+    if critique and not shared and not any(by_persona.values()):
+        by_persona.update(await _screen(ctx, drafts))
+    _report(ctx, shared, by_persona, drafts, attempt)
     clean = not shared and not any(by_persona.values())
     if clean and critique and ctx.critique_enabled:
         shared, critique_run = await _critique(ctx, drafts)

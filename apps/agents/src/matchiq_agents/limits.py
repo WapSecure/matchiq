@@ -14,6 +14,8 @@ CLAIM_TEXT_MAX: Final = 400
 LIMITATION_MAX: Final = 200
 MAX_AGENT_RETRIES: Final = 2
 MAX_DRAFT_ATTEMPTS: Final = 2
+MAX_REPAIRS: Final = 16
+REPAIR_DETAIL_MAX: Final = 160
 
 
 @dataclass(frozen=True, slots=True)

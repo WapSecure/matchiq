@@ -16,6 +16,8 @@ from matchiq_agents.contracts.types import (
 from matchiq_agents.guard.text import is_safe_entity_name, name_tokens
 
 CANONICAL_LOCALE: Final = Locale.en_GB
+# The worker lists the home team first (`apps/worker/src/app/pipeline/artifacts.ts`).
+TEAM_SIDES: Final = ("home", "away")
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,6 +29,8 @@ class FactView:
     priority: InsightPriority
     team_name: str | None
     player_name: str | None
+    # "home" or "away" for the subject team, as metric refs name it; None without a team.
+    subject_side: str | None
     metrics: MappingProxyType[str, float]
     event_ids: tuple[str, ...]
     confidence: ConfidenceLabel
@@ -72,6 +76,9 @@ def build_fact_view(request: PipelineRequest) -> FactView:
     names = [*teams.values(), *players.values()]
     safe = frozenset(name for name in names if is_safe_entity_name(name))
     team_name = teams.get(insight.teamId) if insight.teamId else None
+    team_ids = list(teams)
+    index = team_ids.index(insight.teamId) if insight.teamId in team_ids else None
+    side = TEAM_SIDES[index] if index is not None and index < len(TEAM_SIDES) else None
     player_name = players.get(insight.playerId) if insight.playerId else None
     return FactView(
         run_id=packet.runId,
@@ -81,6 +88,7 @@ def build_fact_view(request: PipelineRequest) -> FactView:
         priority=insight.priority,
         team_name=team_name if team_name in safe else None,
         player_name=player_name if player_name in safe else None,
+        subject_side=side,
         metrics=MappingProxyType(dict(sorted(insight.evidence.computedMetrics.items()))),
         event_ids=_ordered_unique([event.root for event in insight.evidence.eventIds]),
         confidence=ConfidenceLabel(insight.evidence.confidenceLabel.value),

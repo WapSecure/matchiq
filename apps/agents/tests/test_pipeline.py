@@ -64,7 +64,10 @@ async def test_revise_regenerates_once_then_passes() -> None:
         assert isinstance(answer, WriterOutput)
         if count > 1:
             return None
-        drafts = [d.model_copy(update={"body": d.body + " Nine goals."}) for d in answer.drafts]
+        drafts = [
+            d.model_copy(update={"body": d.body.rstrip(".") + " with nine goals."})
+            for d in answer.drafts
+        ]
         return answer.model_copy(update={"drafts": drafts})
 
     result = await _run(ScriptedModel({AgentName.NARRATIVE_WRITER: bad_first}))
@@ -140,7 +143,9 @@ def _break_persona(persona: str, *, always: bool) -> Any:
         if count > 1 and not always:
             return None
         drafts = [
-            d.model_copy(update={"body": d.body + " Nine goals."}) if d.persona == persona else d
+            d.model_copy(update={"body": d.body.rstrip(".") + " with nine goals."})
+            if d.persona == persona
+            else d
             for d in answer.drafts
         ]
         return answer.model_copy(update={"drafts": drafts})
@@ -193,7 +198,7 @@ async def test_localization_is_one_call_and_falls_back_per_item() -> None:
     def break_french_casual(answer: BaseModel, _count: int) -> BaseModel:
         assert isinstance(answer, LocalizationOutput)
         drafts = [
-            d.model_copy(update={"body": d.body + " 99."})
+            d.model_copy(update={"body": d.body.rstrip(".") + " 99."})
             if (d.locale, d.persona) == ("fr-FR", "CASUAL")
             else d
             for d in answer.drafts

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LIMITS } from './constants.js';
+import { LIMITS, PATTERNS } from './constants.js';
 import { Insight } from './insight.js';
 import {
   ConfidenceLabel,
@@ -118,6 +118,20 @@ export const AgentRun = z.strictObject({
   tokensOut: z.int().nonnegative().optional(),
   retries: z.int().min(0).max(LIMITS.maxAgentRetries),
   outcome: AgentRunOutcome,
+  /** SHA-256 of the prompt text; `promptVersion` alone cannot prove which text ran. */
+  promptHash: z.string().regex(PATTERNS.sha256Hex).optional(),
+  /** Estimate from the configured price table; 0 for local inference, absent when unknown. */
+  costEstimateUsd: z.number().nonnegative().optional(),
+  /** Deterministic, meaning-preserving edits applied to model output before the checks. */
+  repairs: z
+    .array(
+      z.strictObject({
+        code: z.string().regex(PATTERNS.reasonCode),
+        detail: z.string().min(1).max(LIMITS.repairDetailMax),
+      }),
+    )
+    .max(LIMITS.maxRepairsPerRun)
+    .optional(),
 });
 
 export type AgentName = z.infer<typeof AgentName>;

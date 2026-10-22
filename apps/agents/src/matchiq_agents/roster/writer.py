@@ -14,10 +14,13 @@ from matchiq_agents.contracts.types import (
     Persona,
 )
 from matchiq_agents.domain.facts import CANONICAL_LOCALE
+from matchiq_agents.guard.repair import Repair
+from matchiq_agents.pipeline import diagnostics
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.convert import facts_payload, named, to_drafts
 from matchiq_agents.roster.prompts import NARRATIVE_WRITER
+from matchiq_agents.roster.repairs import repair_draft
 from matchiq_agents.roster.schemas import ClaimOut, WriterInput, WriterOutput
 
 
@@ -54,15 +57,23 @@ async def write(
     notes: Sequence[str],
     personas: Sequence[Persona],
 ) -> tuple[list[NarrativeDraft] | None, AgentRun]:
+    log: list[Repair] = []
     call = ModelCall(
         prompt=NARRATIVE_WRITER,
         payload=writer_input(ctx, analysis, notes, personas),
         response_model=WriterOutput,
         convert=lambda output: to_drafts(
-            [named(draft, ctx.view.entity_names) for draft in output.drafts],
+            [
+                repair_draft(named(draft, ctx.view.entity_names), ctx.view, log)
+                for draft in output.drafts
+            ],
             personas,
             CANONICAL_LOCALE,
             NarrativeSource.AGENT,
+            lambda persona: diagnostics.report_item(
+                ctx.runner.scope.run_id, NARRATIVE_WRITER.agent, persona
+            ),
         ),
+        repairs=log,
     )
     return await ctx.runner.run(call)
