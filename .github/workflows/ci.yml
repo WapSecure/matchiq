@@ -108,9 +108,17 @@ jobs:
         run: pnpm format:check
       - name: Lint, typecheck, test, build
         run: pnpm nx run-many -t lint typecheck test build --parallel=3
+      - name: OpenAPI lint (Spectral)
+        run: |
+          set +e
+          out=$(pnpm exec spectral lint docs/api/openapi.json --ruleset .spectral.yaml --fail-severity warn 2>&1)
+          code=$?
+          echo "$out"
+          { echo '### Spectral: `docs/api/openapi.json`'; echo '```'; echo "$out"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
       - name: Generated contracts are up to date
         run: |
-          pnpm nx run-many -t export-json-schema codegen --skip-nx-cache
+          pnpm nx run-many -t export-json-schema openapi codegen --skip-nx-cache
           git diff --exit-code
           test -z "$(git status --porcelain)" || { git status --porcelain; exit 1; }
 

@@ -1,0 +1,48 @@
+# Lints docs/api/openapi.json (`pnpm nx run api:openapi-lint`); warnings fail CI.
+extends: [[spectral:oas, recommended]]
+rules:
+  # The product has no public support contact; the licence and description stand in.
+  info-contact: off
+  operation-tag-defined: error
+  operation-operationId-unique: error
+  oas3-valid-media-example: error
+  oas3-valid-schema-example: error
+
+  matchiq-operation-security-declared:
+    description: Every operation states its security, `[]` for anonymous reads.
+    severity: error
+    given: $.paths[*][get,post,put,patch,delete]
+    then:
+      field: security
+      function: truthy
+
+  matchiq-errors-are-problem-details:
+    description: Every 4xx and 5xx response is RFC 9457 `application/problem+json`.
+    severity: error
+    given: $.paths[*][get,post,put,patch,delete].responses[?(@property.match(/^[45]/))]
+    then:
+      field: content.application/problem+json
+      function: truthy
+
+  matchiq-problem-type-urns:
+    description: Documented problem types use the `urn:matchiq:problem:` namespace (ADR-0005).
+    severity: error
+    given: $.paths[*][*].responses[*].x-problem-types[*]
+    then:
+      function: pattern
+      functionOptions:
+        match: '^urn:matchiq:problem:[a-z0-9-]+$'
+
+  matchiq-summary-present:
+    description: Every operation has a summary for the reference page.
+    severity: error
+    given: $.paths[*][get,post,put,patch,delete]
+    then:
+      field: summary
+      function: truthy
+
+overrides:
+  # Readiness answers 503 with its HealthStatus body (degraded semantics), not a problem.
+  - files: ['docs/api/openapi.json#/paths/~1health~1ready/get/responses/503']
+    rules:
+      matchiq-errors-are-problem-details: off
