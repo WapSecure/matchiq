@@ -26,8 +26,12 @@
         "cwd": "{projectRoot}"
       },
       "inputs": [
-        "{workspaceRoot}/libs/contracts/generated/json-schema/**/*",
-        "{projectRoot}/pyproject.toml"
+        {
+          "dependentTasksOutputFiles": "**/*.json",
+          "transitive": true
+        },
+        "{projectRoot}/pyproject.toml",
+        "{projectRoot}/uv.lock"
       ],
       "outputs": ["{projectRoot}/src/matchiq_agents/contracts/generated"],
       "cache": true

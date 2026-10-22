@@ -6,6 +6,7 @@ from typing import Final
 from matchiq_agents.contracts.types import Issue, Persona
 
 ANALYST_FALLBACK: Final = "analyst: model output unavailable or ungrounded"
+ANALYST_SKIPPED: Final = "analyst: skipped to leave the writer time; template analysis"
 WRITER_FALLBACK: Final = "writer: model output unavailable"
 REJECTED_DRAFTS: Final = "fact checker rejected drafts ({codes})"
 REPLACED_PERSONAS: Final = "fact checker replaced {personas} with templates ({codes})"

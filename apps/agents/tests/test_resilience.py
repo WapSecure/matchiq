@@ -14,7 +14,7 @@ from matchiq_agents.pipeline.recorder import RunScope
 from matchiq_agents.pipeline.runner import ModelCall, ModelRunner
 from matchiq_agents.roster.convert import facts_payload
 from matchiq_agents.roster.prompts import MATCH_ANALYST
-from matchiq_agents.roster.schemas import AnalystOutput
+from matchiq_agents.roster.schemas import AnalystInput, AnalystOutput
 from tests.support.builders import build_request
 from tests.support.models import FailingModel, FakeClock, HangingModel
 
@@ -55,7 +55,7 @@ def _call(
 ) -> ModelCall[AnalystOutput, BaseModel]:
     return ModelCall(
         prompt=MATCH_ANALYST,
-        payload=facts_payload(VIEW),
+        payload=AnalystInput(facts=facts_payload(VIEW), revision_notes=[]),
         response_model=AnalystOutput,
         convert=convert,
     )

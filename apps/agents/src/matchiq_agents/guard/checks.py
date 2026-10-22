@@ -15,6 +15,7 @@ from matchiq_agents.contracts.types import (
 )
 from matchiq_agents.domain.facts import FactView
 from matchiq_agents.guard import messages
+from matchiq_agents.guard.safety import unsafe_categories
 from matchiq_agents.guard.text import extract_numerals, forbidden_categories, unknown_capitalised
 from matchiq_agents.limits import OVERLAY_LIMITS, PERSONA_LIMITS, TextLimits
 
@@ -75,6 +76,9 @@ def check_text(
         )
     for category in forbidden_categories(text):
         detail = messages.FORBIDDEN.format(category=category)
+        found.append(issue(IssueCode.FORBIDDEN_CLAIM, detail, index))
+    for category in unsafe_categories(text):
+        detail = messages.UNSAFE.format(category=category)
         found.append(issue(IssueCode.FORBIDDEN_CLAIM, detail, index))
     return found
 

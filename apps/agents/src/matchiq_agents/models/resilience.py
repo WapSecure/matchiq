@@ -1,9 +1,11 @@
 """Retry policy and the circuit breaker shared by model calls (AI_AGENT_GOVERNANCE.md rule 4)."""
 
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from enum import StrEnum
 
 from matchiq_agents.clock import Clock
+from matchiq_agents.contracts.types import AgentName
 
 
 class BreakerState(StrEnum):
@@ -21,6 +23,40 @@ class RetryPolicy:
     per_call_share: float
     reserve_ms: float
     min_call_ms: float
+    # Per-agent share of the deadline one call may use; agents not listed use `per_call_share`.
+    agent_shares: Mapping[AgentName, float] = field(default_factory=dict[AgentName, float])
+    # Whether a timed-out call is tried again. Local inference is serial: a retry only waits.
+    retry_timeouts: bool = True
+    # Extra attempts after rejected output that resend the payload with the violations fed
+    # back (`ModelCall.revise`), only while at least `feedback_min_share` of the deadline is left.
+    feedback_retries: int = 0
+    feedback_min_share: float = 0.0
+    # Skip an optional stage when the observed latencies say the stages after it cannot fit.
+    plan_stages: bool = False
+
+
+class StageTimer:
+    """Process-wide moving average of each agent's call latency (deadline-aware planning).
+
+    A timeout only bounds the true latency from below, so it counts at `timeout_factor` times
+    the time it used. With no observation yet an agent has no estimate, and planning assumes it
+    fits.
+    """
+
+    def __init__(self, weight: float = 0.3, timeout_factor: float = 1.25) -> None:
+        self._weight = weight
+        self._timeout_factor = timeout_factor
+        self._ms: dict[AgentName, float] = {}
+
+    def observe(self, agent: AgentName, latency_ms: float, *, timed_out: bool = False) -> None:
+        latency_ms = latency_ms * self._timeout_factor if timed_out else latency_ms
+        previous = self._ms.get(agent)
+        self._ms[agent] = (
+            latency_ms if previous is None else previous + self._weight * (latency_ms - previous)
+        )
+
+    def estimate(self, agent: AgentName) -> float | None:
+        return self._ms.get(agent)
 
 
 class CircuitBreaker:
