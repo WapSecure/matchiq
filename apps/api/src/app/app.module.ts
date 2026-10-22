@@ -25,6 +25,7 @@ import {
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { OUTBOX_NOTIFIER } from './infrastructure/tokens';
 import { IngestService } from './ingest/ingest.service';
+import { OpenApiModule } from './openapi/openapi.module';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
@@ -54,6 +55,7 @@ export class AppModule {
             API_LIMITS.rateLimitWindowMs,
           ),
         ]),
+        OpenApiModule.forRoot(env),
         HealthModule.forRoot({
           service: SERVICE_NAME,
           version: env.APP_VERSION,

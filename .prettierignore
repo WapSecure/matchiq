@@ -10,3 +10,5 @@ libs/contracts/generated/
 apps/agents/src/matchiq_agents/contracts/generated/
 docs/product/
 libs/db/migrations/meta
+docs/api/openapi.json
+libs/api-client/src/generated/

@@ -87,3 +87,22 @@ export const RetentionEnv = z.object({
     OPERATIONS_LIMITS.retentionIntervalDefaultMs,
   ),
 });
+
+/**
+ * `GET /api/v1/openapi.json` and `/api/v1/docs`. Unset means on everywhere
+ * except `APP_ENV=prod`; `true` or `false` overrides that.
+ */
+export const ApiDocsEnv = z.object({
+  API_DOCS_ENABLED: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z
+      .enum(['true', 'false'])
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v === 'true')),
+  ),
+});
+
+export const apiDocsEnabled = (env: {
+  readonly APP_ENV: string;
+  readonly API_DOCS_ENABLED?: boolean | undefined;
+}): boolean => env.API_DOCS_ENABLED ?? env.APP_ENV !== 'prod';
