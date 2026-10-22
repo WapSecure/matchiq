@@ -132,6 +132,14 @@ class Outcome(StrEnum):
     FALLBACK = "FALLBACK"
 
 
+class Repair(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    code: Annotated[str, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+    detail: Annotated[str, Field(max_length=160, min_length=1)]
+
+
 class Persona(StrEnum):
     CASUAL = "CASUAL"
     ANALYST = "ANALYST"
@@ -205,6 +213,9 @@ class Run(BaseModel):
     tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
     retries: Annotated[int, Field(ge=0, le=2)]
     outcome: Outcome
+    promptHash: Annotated[str | None, Field(pattern="^[0-9a-f]{64}$")] = None
+    costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
+    repairs: Annotated[list[Repair] | None, Field(max_length=16)] = None
     faultInjected: FaultScenario | None = None
     faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None
 

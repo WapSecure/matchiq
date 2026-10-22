@@ -1,4 +1,7 @@
+from types import MappingProxyType
 from typing import Final
+
+from matchiq_agents.contracts.types import AgentName
 
 SERVICE_NAME: Final = "matchiq-agents"
 API_PREFIX: Final = "/api/v1"
@@ -15,6 +18,22 @@ PER_CALL_DEADLINE_SHARE: Final = 0.5
 # Local inference is serial (Ollama runs one request at a time by default) and the batched
 # Localization call is the longest; one call may use up to this share of a slow-lane deadline.
 LOCAL_PER_CALL_DEADLINE_SHARE: Final = 0.75
+# Per-agent caps, as shares of the whole deadline (ADR-0011 addendum 2), ordered by what each
+# stage contributes to air: the Writer produces every agent narrative, so it may use whatever is
+# left; a slow Analyst is cut short, because its template analysis still feeds the Writer.
+# Measured on a contended M1 Pro (about 10 tokens/s out, 30 tokens/s prefill): Analyst 22-52 s,
+# Writer about 70 s.
+LOCAL_AGENT_DEADLINE_SHARES: Final = MappingProxyType(
+    {
+        AgentName.MATCH_ANALYST: 0.25,
+        AgentName.NARRATIVE_WRITER: 0.9,
+        AgentName.LOCALIZATION: 0.75,
+        AgentName.BROADCAST_PRODUCER: 0.2,
+    }
+)
+LOCAL_FEEDBACK_RETRIES: Final = 1
+# A feedback retry only starts while this share of the deadline is still left.
+LOCAL_FEEDBACK_MIN_SHARE: Final = 0.6
 # Consecutive timeouts before a local model's breaker opens (ADR-0011 addendum): one pipeline
 # times out at most twice before its deadline is spent, so this is four pipelines in a row
 # without a single answer.

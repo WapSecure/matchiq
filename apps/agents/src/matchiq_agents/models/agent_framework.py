@@ -15,14 +15,10 @@ from pydantic import BaseModel, ValidationError
 
 from matchiq_agents.clock import Deadline
 from matchiq_agents.contracts.types import AgentName, RunProvider
-from matchiq_agents.guard.data_block import render_prompt
+from matchiq_agents.guard.data_block import USER_TASK, render_prompt
 from matchiq_agents.limits import MAX_OUTPUT_TOKENS
 from matchiq_agents.models.port import ModelOutputError, ModelUsage
 
-USER_TASK: Final = (
-    "Process the data block according to your instructions. Answer only with JSON that matches "
-    "the required response schema."
-)
 EMPTY_OUTPUT: Final = "model returned no structured output"
 WRONG_TYPE: Final = "model returned {actual}, expected {expected}"
 UNPARSEABLE: Final = "model output does not match {expected}"

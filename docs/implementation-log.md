@@ -17,6 +17,36 @@ Verification ran in CI only, by owner directive (the machine was overloaded). Lo
 
 Limitations: simulated timeouts are raised at once, so their latency is not representative. The lobby select needs `NEXT_PUBLIC_DEMO_MODE=true` at build time. With `ollama` or `foundry` the revision is real model output and could itself fail its checks; that case falls back to the persona's template, which is also a valid chain.
 
+## 2026-10-22 — MQ-026: Grounded narrative acceptance, prompt registry and AI governance
+
+Design: ADR-0011 addendum 2. Methodology: `docs/ai/EVALUATION.md`. All live numbers come from `qwen2.5:7b-instruct` on Ollama 0.40.7 on an M1 Pro that was shared with other workloads throughout. Probes during the session measured prefill at about 30 tokens/s (normally about 300) and generation at 8–12 tokens/s (normally about 20). Tests were verified in CI, per the owner's CI-first directive.
+
+| Area                                                                                                                                                                                                                       | Status | Evidence                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------- |
+| Failure taxonomy: every rejected output logged per stage, rule, persona, locale and attempt (`pipeline/diagnostics.py`); `run_eval.py` prints it with the agent share per persona and locale, and records the load average | Done   | `tests/test_diagnostics.py`                                                                        |
+| Prompts v2: positive, concrete rules, output fields described, one grounded example per agent (golden case `sample_high_regains`, team renamed so it cannot be copied into another insight)                                | Done   | `tests/test_prompts.py` (every example passes the checks)                                          |
+| Input shaping: the Analyst sees the 6 most relevant metrics; the checks keep the full evidence                                                                                                                             | Done   | `tests/test_input_shaping.py`                                                                      |
+| Deterministic repairs (sentence trim, window phrase to "recently", overlay ref), recorded on `AgentRun.repairs`                                                                                                            | Done   | `tests/test_repair.py`; live run applied `DROP_WINDOW` 3 times (`pressure_swing_pcm`)              |
+| Feedback retry (Analyst, Producer), no retry of local timeouts, per-agent deadline shares, deadline-aware Analyst skip                                                                                                     | Done   | `tests/test_retry_policy.py`                                                                       |
+| Prompt registry (version + SHA-256, append-only) and CI gate against the recorded Ollama baseline                                                                                                                          | Done   | `tests/test_prompt_registry.py`, `tests/eval/baselines/ollama-qwen2.5-7b-instruct.json`            |
+| `AgentRun.promptHash`, `costEstimateUsd` (`AGENT_PRICE_TABLE`), `repairs`: contract fields added (optional), codegen regenerated                                                                                           | Done   | `tests/test_governance.py`                                                                         |
+| Content safety: deterministic blocklist in every text check; `ContentSafetyScreen` port (Azure AI Content Safety not wired)                                                                                                | Done   | `tests/test_governance.py`                                                                         |
+| `agents:codegen` Nx cache: hashed on the dependent task outputs (`dependentTasksOutputFiles`), so a contract change no longer restores stale Pydantic models                                                               | Done   | Reproduced (stale `AgentRun.py` restored from cache), then fixed and rechecked across three states |
+| Localization few-shot shows only CASUAL items; the model then translated only CASUAL, and ANALYST/BROADCAST were served in en-GB (`localeFallback`)                                                                        | Open   | Next ticket: example with every persona or an explicit item count, and a new baseline              |
+
+### Evaluation (deadline 120 s, same 13 cases: `--cases 12 --case real_packet_shape`)
+
+| Run                                       | Load avg start → end | Status                  | Narratives (AGENT / AGENT+localeFallback / TEMPLATE) | Agent share | Violations | Latency p50 / p95 | Calls p50 (max) |
+| ----------------------------------------- | -------------------- | ----------------------- | ---------------------------------------------------- | ----------- | ---------- | ----------------- | --------------- |
+| Before (dev code, inside the 46-case run) | 21.8 → 12.7          | 13 FALLBACK             | 2 / 6 / 125                                          | 1.5%        | 0          | 116.1 s / 118.1 s | 3               |
+| After                                     | 12.1 → 47.2          | 1 VERIFIED, 12 FALLBACK | 18 / 13 / 102                                        | 13.5%       | 0          | 115.7 s / 116.3 s | 2 (5)           |
+
+Full 46-case before-run (load 21.8 → 12.7): 1 VERIFIED, 45 FALLBACK. Narratives were 40 AGENT, 31 AGENT+localeFallback and 382 TEMPLATE (9%), with 0 violations. There were 95 rejections: Analyst timeouts 41, Writer timeouts 19, Analyst UNSUPPORTED_NUMERAL 7, TOO_MANY_SENTENCES 5, Analyst SPELLED_NUMBER 4, WINDOW_LENGTH 4, Localization timeouts 4, NUMERALS_CHANGED 3, UNKNOWN_NAME 2, and others 6.
+
+After-run rejections: 19. 18 were timeouts (Writer 8, Analyst 7, Producer 2, Localization 1) and 1 was a WINDOW_LENGTH ("14 in the rolling 10 minutes"), which the repair missed because its pattern lacked "rolling"; that is fixed and tested. Content rejections fell from 10 in the same 13 cases to 1. The first four cases ran while the load was low and all four produced agent narratives. As other workloads pushed the load from 12 to 47, Writer calls took over 86 s and timed out. On the same machine at load 8, a single Writer call took 31–34 s through Agent Framework.
+
+A quiet-machine speed check was not possible: the machine stayed loaded by parallel streams for the whole session.
+
 ## 2026-10-22 — MQ-025 (3/3): Web sign-in, BFF and role-aware UI
 
 | Area                                                                                                                                                                                                       | Status | Evidence                                                      |

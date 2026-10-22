@@ -37,6 +37,8 @@ export const LIMITS = {
   /** Local inference (Ollama, ADR-0011 addendum) needs minutes; cloud keeps its short AGENT_TIMEOUT_MS. */
   maxAgentDeadlineMs: 180_000,
   maxAgentRetries: 2,
+  maxRepairsPerRun: 16,
+  repairDetailMax: 160,
   overlayMinDisplayMs: 2_000,
   overlayMaxDisplayMs: 15_000,
   overlayHeadlineMax: 60,

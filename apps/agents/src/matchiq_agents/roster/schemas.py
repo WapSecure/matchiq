@@ -43,6 +43,12 @@ class FactsPayload(StrictModel):
     entities: list[str]
 
 
+class AnalystInput(StrictModel):
+    facts: FactsPayload
+    # Violations of the previous attempt, with the fix; empty on the first attempt.
+    revision_notes: list[str]
+
+
 class CitedValueOut(StrictModel):
     metric_ref: str
     value: float
@@ -124,6 +130,7 @@ class ProducerInput(StrictModel):
     broadcast_draft: TextPair
     headline_max: int
     body_max: int
+    revision_notes: list[str]
 
 
 class ProducerOutput(StrictModel):
