@@ -36,14 +36,15 @@ export const countActiveSessions = async (
   return row?.n ?? 0;
 };
 
+/** Runs as the owner role across organisations (system scope, ADR-0015). */
 export const listSessionsInState = (
   db: Executor,
-  input: { orgId: string; state: ReplayState; limit: number },
+  input: { state: ReplayState; limit: number },
 ): Promise<FixtureKey[]> =>
   db
     .select({ orgId: s.orgId, fixtureId: s.fixtureId })
     .from(s)
-    .where(and(eq(s.orgId, input.orgId), eq(s.state, input.state)))
+    .where(eq(s.state, input.state))
     .orderBy(desc(s.updatedAt))
     .limit(input.limit);
 

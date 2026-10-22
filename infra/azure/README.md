@@ -9,7 +9,7 @@ This is the reference deployment from spec §14, §30 and §49. Every resource g
 | Module                      | Resource (API version)                                                                                                                                                                                                | Notes                                                                                                                                                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `modules/identity.bicep`    | `Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30`                                                                                                                                                         | One identity for all apps. It is the only principal that receives role assignments.                                                                                                                                   |
-| `modules/keyvault.bicep`    | `Microsoft.KeyVault/vaults@2026-02-01`, `vaults/secrets`, role assignment **Key Vault Secrets User** (`4633458b-…`)                                                                                                   | RBAC mode with 7-day soft delete. Purge protection is on in prod only. Holds `operator-api-key`, `agents-service-token`, `database-url`, `redis-url` and `appinsights-connection-string`.                             |
+| `modules/keyvault.bicep`    | `Microsoft.KeyVault/vaults@2026-02-01`, `vaults/secrets`, role assignment **Key Vault Secrets User** (`4633458b-…`)                                                                                                   | RBAC mode with 7-day soft delete. Purge protection is on in prod only. Holds `stream-ticket-secret`, `agents-service-token`, `database-url`, `redis-url` and `appinsights-connection-string`.                         |
 | `modules/monitoring.bicep`  | `Microsoft.OperationalInsights/workspaces@2025-07-01`, `Microsoft.Insights/components@2020-02-02`                                                                                                                     | PerGB2018 tier, 30-day retention, 1 GB/day ingestion cap. App Insights is workspace-based.                                                                                                                            |
 | `modules/registry.bicep`    | `Microsoft.ContainerRegistry/registries@2025-11-01` (Basic), role assignment **AcrPull** (`7f951dda-…`)                                                                                                               | Admin user and anonymous pull are disabled. Images are pulled with the managed identity.                                                                                                                              |
 | `modules/postgres.bicep`    | `Microsoft.DBforPostgreSQL/flexibleServers@2025-08-01` (PostgreSQL 17, Burstable B1ms, 32 GB), `databases`, `firewallRules`                                                                                           | Password auth backs `DATABASE_URL`. Entra auth is also enabled, ready for a later managed-identity migration. The `0.0.0.0` firewall rule admits Azure services only.                                                 |
@@ -39,7 +39,7 @@ Nothing is granted at subscription scope except the budget, which is a resource-
 | App    | Ingress        | Key env (plain)                                                                                         | Secrets (Key Vault refs)                                          |
 | ------ | -------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | web    | external :4200 | `PORT`. `NEXT_PUBLIC_API_BASE_URL` is a **build arg** set by the workflow from the `apiBaseUrl` output. | none                                                              |
-| api    | external :3000 | `API_PUBLIC_URL`, `CORS_ALLOWED_ORIGINS` (the web origin)                                               | `DATABASE_URL`, `REDIS_URL`, `OPERATOR_API_KEY`, App Insights     |
+| api    | external :3000 | `API_PUBLIC_URL`, `CORS_ALLOWED_ORIGINS` (the web origin), `AUTH_ANONYMOUS_DEMO_ENABLED`                | `DATABASE_URL`, `REDIS_URL`, `STREAM_TICKET_SECRET`, App Insights |
 | worker | internal :3001 | `AGENTS_SERVICE_URL=https://<agents>.internal.<domain>`, `AI_ENABLED`                                   | `DATABASE_URL`, `REDIS_URL`, `AGENTS_SERVICE_TOKEN`, App Insights |
 | agents | internal :8000 | `MODEL_PROVIDER`, `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_MODEL`, `AZURE_CLIENT_ID`                        | `AGENTS_SERVICE_TOKEN`                                            |
 
@@ -53,7 +53,7 @@ Nothing is granted at subscription scope except the budget, which is a resource-
 | Variable                                               | Required                              | Purpose                                                |
 | ------------------------------------------------------ | ------------------------------------- | ------------------------------------------------------ |
 | `POSTGRES_ADMIN_PASSWORD`                              | yes                                   | Flexible Server admin password (16 or more characters) |
-| `OPERATOR_API_KEY`, `AGENTS_SERVICE_TOKEN`             | yes                                   | 32 or more characters (`openssl rand -hex 32`)         |
+| `STREAM_TICKET_SECRET`, `AGENTS_SERVICE_TOKEN`         | yes                                   | 32 or more characters (`openssl rand -hex 32`)         |
 | `AZURE_LOCATION`                                       | no (`swedencentral`)                  | Region                                                 |
 | `IMAGE_TAG`, `DEPLOY_APPS`, `APP_VERSION`              | set by the workflow                   | Image tag; platform-only first pass                    |
 | `FOUNDRY_MODEL_NAME`, `FOUNDRY_MODEL_VERSION`          | prod (stage if `DEPLOY_FOUNDRY=true`) | Pick from the Foundry model catalog for the region     |
@@ -67,7 +67,7 @@ Prod forces `modelProvider = 'foundry'`, because the agents service refuses `MOD
 ```bash
 az bicep build --file infra/azure/main.bicep --stdout > /dev/null
 az bicep lint  --file infra/azure/main.bicep
-POSTGRES_ADMIN_PASSWORD=x OPERATOR_API_KEY=x AGENTS_SERVICE_TOKEN=x FOUNDRY_MODEL_NAME=x FOUNDRY_MODEL_VERSION=x \
+POSTGRES_ADMIN_PASSWORD=x STREAM_TICKET_SECRET=x AGENTS_SERVICE_TOKEN=x FOUNDRY_MODEL_NAME=x FOUNDRY_MODEL_VERSION=x \
   az bicep build-params --file infra/azure/env/prod.bicepparam --stdout > /dev/null
 ```
 
@@ -78,7 +78,7 @@ CI runs the same checks in the `infra` job of `.github/workflows/ci.yml`.
 ```bash
 az login
 az group create --name rg-matchiq-dev --location swedencentral
-export POSTGRES_ADMIN_PASSWORD=… OPERATOR_API_KEY=… AGENTS_SERVICE_TOKEN=… BUDGET_CONTACT_EMAILS=…
+export POSTGRES_ADMIN_PASSWORD=… STREAM_TICKET_SECRET=… AGENTS_SERVICE_TOKEN=… BUDGET_CONTACT_EMAILS=…
 
 # what-if: shows the changes and creates nothing
 az deployment group what-if --resource-group rg-matchiq-dev --parameters infra/azure/env/dev.bicepparam
@@ -102,7 +102,7 @@ GitHub setup the owner must do:
 2. Add federated credentials for `repo:WapSecure/matchiq:environment:<env>-plan` and `repo:WapSecure/matchiq:environment:<env>`.
 3. Assign the app registration roles on the resource group only.
 4. Set environment variables: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `AZURE_LOCATION`, `BUDGET_CONTACT_EMAILS` and `FOUNDRY_MODEL_*`.
-5. Set environment secrets: `POSTGRES_ADMIN_PASSWORD`, `OPERATOR_API_KEY` and `AGENTS_SERVICE_TOKEN`.
+5. Set environment secrets: `POSTGRES_ADMIN_PASSWORD`, `STREAM_TICKET_SECRET` and `AGENTS_SERVICE_TOKEN`.
 
 ## Teardown
 

@@ -96,3 +96,10 @@ export const TEST_DATABASE_PREFIX = 'mq_test_';
 export const DEFAULT_TEST_DATABASE_URL =
   'postgresql://matchiq:matchiq_local_only@localhost:54320/matchiq';
 export const DEFAULT_TEST_REDIS_URL = 'redis://localhost:63790';
+
+/** ADR-0015: tenant transactions run as this non-owner role with RLS on. */
+export const TENANCY = {
+  appRole: 'matchiq_app',
+  orgSetting: 'app.org_id',
+  roleSetting: 'role',
+} as const;

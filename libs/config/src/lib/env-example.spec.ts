@@ -10,7 +10,7 @@ const EXAMPLE_PATH = join(
   '..',
   '.env.example',
 );
-const SECRET_KEYS = ['OPERATOR_API_KEY', 'AGENTS_SERVICE_TOKEN'] as const;
+const SECRET_KEYS = ['STREAM_TICKET_SECRET', 'AGENTS_SERVICE_TOKEN'] as const;
 
 const parseDotenv = (text: string): Record<string, string> =>
   Object.fromEntries(

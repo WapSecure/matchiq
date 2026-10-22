@@ -15,6 +15,25 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 Verification ran in CI (owner directive: no local test runs). Locally: `nx run-many -t lint typecheck -p web web-e2e`.
 
+## 2026-10-22 — MQ-025 (2/3): API enforcement, Postgres RLS and cross-tenant isolation
+
+| Area                                                                                                                                                                                                                                       | Status | Evidence                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ----------------------------------------------- |
+| API authenticates OIDC access tokens (JWKS), the anonymous demo tenant and the dev/CI operator key; guards run authentication → per-principal throttling → permissions                                                                     | Done   | `access-control.integration.spec.ts` (17)       |
+| Every route declares one permission (editorial routes included); a test walks every controller                                                                                                                                             | Done   | `route-permissions.spec.ts`                     |
+| Organisation from the principal only: fixtures, ingest, replay, intelligence, stream, editorial and audit services take it from `@CurrentPrincipal`/`@FixtureScope`/`@Caller`; editorial `ACTOR_RESOLVER` replaced by `actorFromPrincipal` | Done   | `DEMO_ORG_ID` no longer scopes any request      |
+| Stream tickets: `POST /fixtures/:id/stream-tickets`, `?ticket=` on the stream, bound to fixture and org                                                                                                                                    | Done   | `tenancy.integration.spec.ts`, `guards.spec.ts` |
+| `GET /me`, `POST /me/sign-in`, `POST /me/sign-out` (audited)                                                                                                                                                                               | Done   | `access-control.integration.spec.ts`            |
+| Postgres RLS on every `org_id` table (migration 0004), non-owner `matchiq_app` role, transaction pinning to one org, append-only audit for the app role; actor types `USER`/`SERVICE` (migration 0005)                                     | Done   | `libs/db/tests/tenancy.integration.spec.ts` (7) |
+| Cross-tenant suite: list, read, command, stream, ticket, suppress, retract, freeze/resume, kill switch, audit-events, spoofed org hints, namespaced ids, real actor on audit rows                                                          | Done   | `tenancy.integration.spec.ts` (20)              |
+| Worker: org carried by every job; pipeline and editorial transactions pin to it; boot scans are explicit system queries across orgs                                                                                                        | Done   | worker suite green                              |
+| Seeding for several orgs (`SEED_ORG_IDS`), compose, VPS overlay and Azure IaC switched from `OPERATOR_API_KEY` to `STREAM_TICKET_SECRET` + anonymous demo                                                                                  | Done   | `az bicep build`/`lint` clean                   |
+| Real Keycloak: PKCE login as `harbour.producer` → API accepted the token (`/me`: `org_demo`, `producer`); `northbank.viewer` refused `POST /fixtures` (403); producer started a session                                                    | Done   | manual run against `infra/keycloak` realm       |
+
+Test runs: api 157 (18 suites), worker 102 + 1 skipped, db 22, auth 32, access 25, config 31. `pnpm perf:replay`: 1,470 events at max speed in 2.5 s (≈ 580 events/s, floor 100) on a shared, loaded machine; the earlier unloaded figure was ≈ 900 events/s. Each reader call now opens a short transaction to set the tenant, which costs round trips; not profiled further.
+
+Limits: membership revocation is bounded by the access-token lifetime (5 min); no SCIM or organisation self-service; stream tickets are reusable until expiry.
+
 ## 2026-10-22 — MQ-023: Editorial control, kill switch and audit trail (backend)
 
 | Area                                                                                                                                                                                                                                                   | Status | Evidence                                                                                                                  |

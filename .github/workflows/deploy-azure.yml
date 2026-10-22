@@ -43,7 +43,7 @@ jobs:
       id-token: write
     env:
       POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
-      OPERATOR_API_KEY: ${{ secrets.OPERATOR_API_KEY }}
+      STREAM_TICKET_SECRET: ${{ secrets.STREAM_TICKET_SECRET }}
       AGENTS_SERVICE_TOKEN: ${{ secrets.AGENTS_SERVICE_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -73,7 +73,7 @@ jobs:
       id-token: write
     env:
       POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
-      OPERATOR_API_KEY: ${{ secrets.OPERATOR_API_KEY }}
+      STREAM_TICKET_SECRET: ${{ secrets.STREAM_TICKET_SECRET }}
       AGENTS_SERVICE_TOKEN: ${{ secrets.AGENTS_SERVICE_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
