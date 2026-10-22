@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import type { ApiEnv } from '@matchiq/config';
 import {
   AUDIT_ACTIONS,
   EditorialStatusResult,
@@ -17,7 +16,6 @@ import {
   type EditorialUnitOfWork,
   type StoredResponse,
 } from '@matchiq/db';
-import { APP_ENV } from '@matchiq/server-kit';
 import { AUDIT_TARGETS, IDEMPOTENCY_SCOPES } from '../constants';
 import { type IdempotentResult, withIdempotency } from '../http/idempotency';
 import { problem } from '../http/problems';
@@ -45,28 +43,20 @@ const controlView = (row: EditorialControlRow | null): EditorialControl => ({
 @Injectable()
 export class EditorialControlsService {
   constructor(
-    @Inject(APP_ENV) private readonly env: ApiEnv,
     @Inject(EDITORIAL_UOW) private readonly uow: EditorialUnitOfWork,
     @Inject(EDITORIAL_READER) private readonly reader: EditorialReader,
     private readonly effects: EditorialEffects,
   ) {}
 
-  async status(fixtureId: string): Promise<EditorialStatus> {
-    const status = await this.reader.status({
-      orgId: this.env.DEMO_ORG_ID,
-      fixtureId,
-    });
+  async status(orgId: string, fixtureId: string): Promise<EditorialStatus> {
+    const status = await this.reader.status({ orgId, fixtureId });
     if (status === null)
       throw problem('fixtureNotFound', { detail: fixtureId });
     return status;
   }
 
-  async killSwitch(): Promise<KillSwitchStatus> {
-    return {
-      killSwitch: controlView(
-        await this.reader.killSwitch(this.env.DEMO_ORG_ID),
-      ),
-    };
+  async killSwitch(orgId: string): Promise<KillSwitchStatus> {
+    return { killSwitch: controlView(await this.reader.killSwitch(orgId)) };
   }
 
   async setFreeze(

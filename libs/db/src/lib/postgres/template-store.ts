@@ -10,6 +10,7 @@ import type {
   TemplateUpsertOutcome,
 } from '../intelligence-types.js';
 import { fixtureTemplates } from '../schema/intelligence-tables.js';
+import { withTenant } from './tenant-scope.js';
 
 const t = fixtureTemplates;
 
@@ -80,19 +81,23 @@ export class PostgresTemplateStore implements TemplateStore {
   ): Promise<TemplateUpsertOutcome> {
     const templateId = input.fixture.fixtureId;
     const changes = changesOf(input);
-    const existing = await this.db
-      .select({ hash: t.eventsHash })
-      .from(t)
-      .where(and(eq(t.orgId, orgId), eq(t.templateId, templateId)));
-    const rows = await this.db
-      .insert(t)
-      .values({ orgId, templateId, ...changes })
-      .onConflictDoUpdate({
-        target: [t.orgId, t.templateId],
-        set: { ...changes, updatedAt: sql`now()` },
-        setWhere: ne(t.eventsHash, changes.eventsHash),
-      })
-      .returning({ templateId: t.templateId });
+    const existing = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select({ hash: t.eventsHash })
+        .from(t)
+        .where(and(eq(t.orgId, orgId), eq(t.templateId, templateId))),
+    );
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .insert(t)
+        .values({ orgId, templateId, ...changes })
+        .onConflictDoUpdate({
+          target: [t.orgId, t.templateId],
+          set: { ...changes, updatedAt: sql`now()` },
+          setWhere: ne(t.eventsHash, changes.eventsHash),
+        })
+        .returning({ templateId: t.templateId }),
+    );
     if (rows.length === 0) return 'unchanged';
     return existing.length === 0 ? 'inserted' : 'updated';
   }
@@ -101,20 +106,24 @@ export class PostgresTemplateStore implements TemplateStore {
     orgId: string,
     templateId: string,
   ): Promise<FixtureTemplate | null> {
-    const [row] = await this.db
-      .select({ ...summaryColumns, events: t.events })
-      .from(t)
-      .where(and(eq(t.orgId, orgId), eq(t.templateId, templateId)));
+    const [row] = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select({ ...summaryColumns, events: t.events })
+        .from(t)
+        .where(and(eq(t.orgId, orgId), eq(t.templateId, templateId))),
+    );
     if (!row) return null;
     return { ...toSummary(row), fixture: row.fixture, events: row.events };
   }
 
   async list(orgId: string): Promise<FixtureTemplateSummary[]> {
-    const rows = await this.db
-      .select(summaryColumns)
-      .from(t)
-      .where(eq(t.orgId, orgId))
-      .orderBy(asc(t.templateId));
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select(summaryColumns)
+        .from(t)
+        .where(eq(t.orgId, orgId))
+        .orderBy(asc(t.templateId)),
+    );
     return rows.map(toSummary);
   }
 }

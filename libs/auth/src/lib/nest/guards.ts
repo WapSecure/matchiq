@@ -11,6 +11,7 @@ import { PUBLIC_ROUTE_METADATA, requestIdOf } from '@matchiq/server-kit';
 import { AuthUnavailableError } from '../access-token-verifier';
 import { Authenticator, type Credentials } from '../authenticator';
 import {
+  ANY_PRINCIPAL,
   HEADERS,
   METADATA,
   PRINCIPAL_PROPERTY,
@@ -109,7 +110,7 @@ export class PermissionGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     if (isPublic(this.reflector, context)) return true;
-    const permission = metadata<Permission>(
+    const permission = metadata<Permission | typeof ANY_PRINCIPAL>(
       this.reflector,
       METADATA.permission,
       context,
@@ -117,7 +118,7 @@ export class PermissionGuard implements CanActivate {
     if (permission === undefined) throw undeclaredRouteProblem();
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const principal = principalOf(request);
-    if (can(principal, permission)) return true;
+    if (permission === ANY_PRINCIPAL || can(principal, permission)) return true;
     this.listener?.onDenied({
       principal,
       permission,

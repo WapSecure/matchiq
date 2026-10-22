@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Permission, Principal } from '@matchiq/access';
 import type { Request } from 'express';
-import { METADATA, PRINCIPAL_PROPERTY } from '../constants';
+import { ANY_PRINCIPAL, METADATA, PRINCIPAL_PROPERTY } from '../constants';
 
 export type AuthenticatedRequest = Request & {
   [PRINCIPAL_PROPERTY]?: Principal;
@@ -14,6 +14,10 @@ export type AuthenticatedRequest = Request & {
 /** Every non-public route declares exactly one permission (ADR-0015). */
 export const RequirePermission = (permission: Permission) =>
   SetMetadata(METADATA.permission, permission);
+
+/** For routes about the caller itself (`/me`): no permission, but a principal. */
+export const RequireAuthenticated = () =>
+  SetMetadata(METADATA.permission, ANY_PRINCIPAL);
 
 /** Lets the route authenticate with `?ticket=` bound to this path parameter. */
 export const AcceptsStreamTicket = (fixtureParam: string) =>

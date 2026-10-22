@@ -118,7 +118,15 @@ services:
       REPLAY_MAX_ACTIVE_SESSIONS: ${REPLAY_MAX_ACTIVE_SESSIONS:-10}
       REPLAY_IDLE_TIMEOUT_MS: ${REPLAY_IDLE_TIMEOUT_MS:-600000}
       TRUST_PROXY: ${TRUST_PROXY:-false}
-      OPERATOR_API_KEY: ${OPERATOR_API_KEY:-local_only_operator_api_key_change_me}
+      # ADR-0015. The issuer is the host-facing Keycloak URL (tokens carry it);
+      # keys are fetched over the compose network. Sign-in needs `--profile infra`.
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:-http://localhost:8180/realms/matchiq}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:-matchiq-api}
+      OIDC_JWKS_URL: ${OIDC_JWKS_URL:-http://keycloak:8080/realms/matchiq/protocol/openid-connect/certs}
+      AUTH_ANONYMOUS_DEMO_ENABLED: ${AUTH_ANONYMOUS_DEMO_ENABLED:-true}
+      AUTH_OPERATOR_KEY_ENABLED: ${AUTH_OPERATOR_KEY_ENABLED:-false}
+      OPERATOR_API_KEY: ${OPERATOR_API_KEY:-}
+      STREAM_TICKET_SECRET: ${STREAM_TICKET_SECRET:-local_only_stream_ticket_secret_change_me}
       OTEL_SERVICE_NAME: matchiq-api
       OTEL_EXPORTER_OTLP_ENDPOINT: ${COMPOSE_OTEL_EXPORTER_OTLP_ENDPOINT:-}
       LOG_FORMAT: ${LOG_FORMAT:-json}

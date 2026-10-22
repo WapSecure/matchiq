@@ -40,7 +40,8 @@ export const ACCESS_LOG = {
 /** Routes whose access lines drop to debug: probes and scrapes are noise. */
 export const QUIET_ROUTE_PATTERN = /\/health(\/|$)|\/metrics$/;
 
-export const ACTOR_REQUEST_FIELD = 'matchiqActor';
+/** Mirrors `PRINCIPAL_PROPERTY` in libs/auth, which server-kit (type:util) cannot import. */
+export const ACTOR_REQUEST_FIELD = 'matchiqPrincipal';
 export const FIXTURE_ROUTE_PARAM = 'fixtureId';
 export const UNMATCHED_ROUTE = 'unmatched';
 
