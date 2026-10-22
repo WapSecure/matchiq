@@ -125,6 +125,25 @@ describe('boot recovery of PENDING insights (integration)', () => {
     }
   });
 
+  it('rebuilds the recap for a late agent publication after the completed session left memory', async () => {
+    const session = await replayToEnd(t, TEMPLATE);
+    const [first] = await t.reader.insights(session);
+    if (!first) throw new Error('no insight');
+    t.sessions.release(session.fixtureId);
+    expect(t.sessions.isLoaded(session.fixtureId)).toBe(false);
+
+    const outcome = await t.pipeline.process(
+      { ...session, insightId: first.insightId, revision: 1 },
+      { attemptsMade: 0, maxAttempts: 3 },
+    );
+    expect(outcome).toBe('written');
+    const moment = (await t.reader.recap(session))?.keyMoments.find(
+      (m) => m.insightId === first.insightId,
+    );
+    expect(moment?.narratives).toHaveLength(12);
+    expect(moment?.narratives.every((n) => n.source === 'AGENT')).toBe(true);
+  });
+
   it('publishes templates straight away when the worker restarts with AI disabled', async () => {
     const other = await startTestWorker({
       env: {

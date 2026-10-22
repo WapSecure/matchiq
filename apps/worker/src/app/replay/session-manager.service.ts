@@ -229,11 +229,11 @@ export class SessionManager
     this.runtime.outbox.notify();
     this.registry.touch(key.fixtureId);
     for (const record of batch.insights) this.enqueuePending(key, record);
-    const sessionCompleted =
-      this.registry.runner(key.fixtureId)?.status.state === 'COMPLETED';
+    // An unloaded session may have completed: rebuild is a no-op unless the match ended.
+    const state = this.registry.runner(key.fixtureId)?.status.state;
     if (
       batch.matchEnded ||
-      (sessionCompleted && batch.completions.length > 0)
+      ((state ?? 'COMPLETED') === 'COMPLETED' && batch.completions.length > 0)
     ) {
       await this.recaps.rebuild(key);
     }
