@@ -2,6 +2,19 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-22 — MQ-025 (1/3): Identity foundation — ADR-0015, access and auth libraries, Keycloak
+
+| Area                                                                                                                                                                                                                                          | Status | Evidence                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| ADR-0015: OIDC resource server, spec §40 roles, deny-by-default permissions, org from the principal, Postgres RLS, stream tickets, anonymous demo tenant, operator key as a dev/CI-only fallback                                              | Done   | `docs/adr/0015-identity-authorisation-and-tenant-isolation.md`                                                  |
+| `libs/access` (`scope:shared`, `type:domain`): roles, 17 permissions, role → permission matrix, scope narrowing, claim mapping for Keycloak and Entra shapes                                                                                  | Done   | 25 Vitest tests                                                                                                 |
+| `libs/auth`: JWKS-backed access-token verifier (`jose` 6.2.12), stream tickets, authenticator (bearer, ticket, anonymous, operator key), Nest guards, `@RequirePermission`, 401/403/503 problems                                              | Done   | 32 Jest tests against a local test issuer                                                                       |
+| `AuthEnv` in `libs/config` with cross-field rules (issuer + audience, operator key refused in prod, https issuer in prod, at least one way in)                                                                                                | Done   | 8 Vitest tests                                                                                                  |
+| Keycloak 26.7.5 (digest-pinned) under the `infra` compose profile with a committed `matchiq` realm: PKCE web client, bearer-only API client with the six roles, `org`/`org_name`/`roles` mappers, 8 seeded users in 3 synthetic organisations | Done   | `pnpm infra:up` healthy; a scripted PKCE login returned an access token with `aud: matchiq-api`, `org`, `roles` |
+| Health routes marked `@PublicRoute`; problem `instance` no longer echoes the query string (it can carry a stream ticket)                                                                                                                      | Done   | `guards.spec.ts` (stream ticket case)                                                                           |
+
+Not yet wired: the API still uses the operator key and `DEMO_ORG_ID` until the enforcement stage lands. See `docs/security/IDENTITY_AND_ACCESS.md`.
+
 ## 2026-10-22 — MQ-022: Honest session capacity, idempotent replay commands and data retention
 
 Fixes audit items P0-2 and P0-3. Decision record: ADR-0015. Policy: `docs/operations/DATA_RETENTION.md`.

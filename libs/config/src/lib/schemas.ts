@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import {
-  CSV_SEPARATOR,
   DEFAULT_APP_VERSION,
   DEFAULT_DEMO_ORG_ID,
   DEFAULT_PORTS,
@@ -10,42 +9,20 @@ import {
   ENV_PATTERNS,
 } from './constants.js';
 import {
+  booleanFlag,
+  boundedInt,
+  csv,
+  flag,
+  optionalString,
+  port,
+  secret,
+} from './fields.js';
+import {
   ReplayCapacityEnv,
   RetentionEnv,
   TrustProxyEnv,
 } from './operations-env.js';
 
-const flag = (fallback: 'true' | 'false') =>
-  z
-    .enum(['true', 'false'])
-    .default(fallback)
-    .transform((v) => v === 'true');
-
-const booleanFlag = flag('false');
-
-/** Blank values (e.g. `KEY=` copied from .env.example) mean "not set". */
-const optionalString = z.preprocess(
-  (v) => (v === '' ? undefined : v),
-  z.string().min(1).optional(),
-);
-
-const boundedInt = (min: number, max: number, fallback: number) =>
-  z.coerce.number().int().min(min).max(max).default(fallback);
-
-const port = (fallback: number) =>
-  z.coerce.number().int().min(1).max(ENV_LIMITS.portMax).default(fallback);
-
-const csv = z
-  .string()
-  .default('')
-  .transform((v) =>
-    v
-      .split(CSV_SEPARATOR)
-      .map((s) => s.trim())
-      .filter(Boolean),
-  );
-
-const secret = z.string().min(ENV_LIMITS.secretMinLength);
 const postgresUrl = z.url({ protocol: ENV_PATTERNS.postgresProtocol });
 const redisUrl = z.url({ protocol: ENV_PATTERNS.redisProtocol });
 

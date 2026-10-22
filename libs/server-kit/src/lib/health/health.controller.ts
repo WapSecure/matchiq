@@ -2,8 +2,10 @@ import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import type { HealthStatus } from '@matchiq/contracts';
 import type { Response } from 'express';
 import { HEALTH_ROUTE } from '../constants';
+import { PublicRoute } from '../http/public-route';
 import { HealthService } from './health.service';
 
+@PublicRoute()
 @Controller(HEALTH_ROUTE)
 export class HealthController {
   constructor(private readonly health: HealthService) {}
