@@ -7,6 +7,7 @@ and `AgentResponse.value`, as documented on Microsoft Learn and guarded by
 runner counts as a failed attempt.
 """
 
+from collections.abc import Mapping
 from typing import Any, Final
 
 from agent_framework import Agent, SupportsChatGetResponse
@@ -15,13 +16,13 @@ from pydantic import BaseModel, ValidationError
 from matchiq_agents.clock import Deadline
 from matchiq_agents.contracts.types import AgentName, RunProvider
 from matchiq_agents.guard.data_block import render_prompt
+from matchiq_agents.limits import MAX_OUTPUT_TOKENS
 from matchiq_agents.models.port import ModelOutputError, ModelUsage
 
 USER_TASK: Final = (
     "Process the data block according to your instructions. Answer only with JSON that matches "
     "the required response schema."
 )
-MAX_OUTPUT_TOKENS: Final = 900
 EMPTY_OUTPUT: Final = "model returned no structured output"
 WRONG_TYPE: Final = "model returned {actual}, expected {expected}"
 UNPARSEABLE: Final = "model output does not match {expected}"
@@ -33,8 +34,10 @@ class AgentFrameworkModel:
         client: SupportsChatGetResponse[Any],
         provider: RunProvider,
         deployment: str,
+        run_options: Mapping[str, object] | None = None,
     ) -> None:
         self._client = client
+        self._run_options = dict(run_options or {})
         self._provider = provider
         self._deployment = deployment
         self._agents: dict[tuple[AgentName, str], Agent[Any]] = {}
@@ -66,7 +69,11 @@ class AgentFrameworkModel:
         agent = self._agent(agent_name, instructions)
         response = await agent.run(
             render_prompt(USER_TASK, payload),
-            options={"response_format": response_model, "max_tokens": MAX_OUTPUT_TOKENS},
+            options={
+                **self._run_options,
+                "response_format": response_model,
+                "max_tokens": MAX_OUTPUT_TOKENS[agent_name],
+            },
         )
         try:
             value = response.value

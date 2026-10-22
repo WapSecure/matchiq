@@ -34,7 +34,8 @@ export const LIMITS = {
   startersPerTeam: 11,
   maxShotSpeedKph: 200,
   maxPlayerSpeedMps: 13,
-  maxAgentDeadlineMs: 30_000,
+  /** Local inference (Ollama, ADR-0011 addendum) needs minutes; cloud keeps its short AGENT_TIMEOUT_MS. */
+  maxAgentDeadlineMs: 180_000,
   maxAgentRetries: 2,
   overlayMinDisplayMs: 2_000,
   overlayMaxDisplayMs: 15_000,

@@ -34,6 +34,7 @@ class FactView:
     rationale: str
     counter_evidence: tuple[str, ...]
     entity_names: frozenset[str]
+    team_names: frozenset[str]
     unsafe_entity_names: frozenset[str]
     personas: tuple[Persona, ...]
     locales: tuple[Locale, ...]
@@ -42,6 +43,17 @@ class FactView:
     @property
     def allowed_name_tokens(self) -> frozenset[str]:
         return frozenset(token for name in self.entity_names for token in name_tokens(name))
+
+    @property
+    def prompt_entities(self) -> list[str]:
+        """Names a model may need: both teams and the subject player, not the whole squad list.
+
+        The full allowlist still applies to every check; a real packet lists about 38 names.
+        """
+        names = set(self.team_names)
+        if self.player_name is not None:
+            names.add(self.player_name)
+        return sorted(names)
 
     @property
     def has_metrics(self) -> bool:
@@ -76,6 +88,7 @@ def build_fact_view(request: PipelineRequest) -> FactView:
         rationale=insight.evidence.rationale,
         counter_evidence=tuple(item.description for item in insight.evidence.counterEvidence),
         entity_names=safe,
+        team_names=frozenset(name for name in teams.values() if name in safe),
         unsafe_entity_names=frozenset(names) - safe,
         personas=_ordered_unique([Persona(p.value) for p in request.personas]),
         locales=_ordered_unique([Locale(loc.value) for loc in request.locales]),

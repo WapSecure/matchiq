@@ -135,7 +135,7 @@ export const AGENTS_HTTP = {
   bearerPrefix: 'Bearer ',
   contentType: 'application/json',
   probeTimeoutMs: 1_500,
-  /** The service works within `deadlineMs` and adds 1 s grace before answering FALLBACK. */
+  /** The service answers within `deadlineMs` (its model work stops early); this covers transport. */
   deadlineGraceMs: 1_500,
 } as const;
 

@@ -22,6 +22,8 @@ Covers both the product's runtime agents and the coding agents that build the re
 
 **Providers (ADR-0012).** `mock` (tests), `ollama` (real local inference through Agent Framework's OpenAI-compatible client) and `foundry` (target Azure integration). `AgentRun.provider` always records the real source. **Honesty:** mock or template output is never described as model output, and Ollama output is never described as Foundry. `/health/ready` reports `degraded` for `mock`, or when the configured model endpoint is unreachable.
 
+**Local slow lane (ADR-0011 addendum).** `AGENT_TIMEOUT_MS` may be up to 180 s for local inference, and cloud providers keep short deadlines. On `ollama` the AI critique is off by default, timeouts have their own breaker threshold, and rejected output is not retried. Templates are always on air first. A late agent narrative replaces them only after the deterministic checks and the worker's gate pass.
+
 **Evaluation (M2).** 30 golden insight cases plus adversarial inputs. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled.
 
 ## Coding agents (Claude Code and others)

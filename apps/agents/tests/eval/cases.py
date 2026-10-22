@@ -84,6 +84,14 @@ GOLDEN: tuple[EvalCase, ...] = (
     _case("tight_deadline", deadline_ms=1500),
     _case("zero_coverage_sparse", "sparse", coverage=0.0, metrics={}),
     _case("single_event", event_ids=("ev_00500",)),
+    # Shape of a real comeback packet: 28 metrics (two windows, both teams) and 38 names.
+    _case("real_packet_shape", "rich", kind="SHOT_BURST", team_id=AWAY, squad_players=36,
+          coverage=0.83, confidence="high", counter_evidence=(),
+          metrics={f"{family}.{side}.{window}": value
+                   for family, value in (("shots", 3), ("shotsOnTarget", 2), ("pressures", 4),
+                                         ("recoveries", 2), ("highRecoveries", 2),
+                                         ("finalThirdEntries", 0), ("momentum", 0.49))
+                   for side in ("home", "away") for window in ("rolling5m", "previous5m")}),
 )  # fmt: skip
 
 ADVERSARIAL_INPUTS: tuple[EvalCase, ...] = (

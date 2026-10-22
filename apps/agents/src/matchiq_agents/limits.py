@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Final
 
-from matchiq_agents.contracts.types import InsightPriority, Persona
+from matchiq_agents.contracts.types import AgentName, InsightPriority, Persona
 
 NARRATIVE_HEADLINE_MAX: Final = 80
 NARRATIVE_BODY_MAX: Final = 600
@@ -42,4 +42,15 @@ OVERLAY_PRIORITY: Final[dict[InsightPriority, int]] = {
     InsightPriority.P0: 90,
     InsightPriority.P1: 70,
     InsightPriority.P2: 50,
+}
+
+# Output-token caps per call. Truncated JSON fails to parse, so each cap leaves headroom over
+# the measured output (ADR-0011 addendum); the batched Localization call writes up to
+# 3 locales x 3 personas.
+MAX_OUTPUT_TOKENS: Final[dict[AgentName, int]] = {
+    AgentName.MATCH_ANALYST: 900,
+    AgentName.NARRATIVE_WRITER: 900,
+    AgentName.FACT_CHECKER: 300,
+    AgentName.LOCALIZATION: 2_400,
+    AgentName.BROADCAST_PRODUCER: 300,
 }
