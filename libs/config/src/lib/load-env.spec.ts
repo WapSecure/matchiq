@@ -12,11 +12,27 @@ describe('loadEnv', () => {
     const env = loadEnv(ApiEnv, {
       ...validApi,
       API_PORT: '4100',
-      CORS_ALLOWED_ORIGINS: 'a.com, b.com',
+      CORS_ALLOWED_ORIGINS: 'https://a.com, http://localhost:4200',
     });
     expect(env.API_PORT).toBe(4100);
     expect(env.APP_ENV).toBe('local');
-    expect(env.CORS_ALLOWED_ORIGINS).toEqual(['a.com', 'b.com']);
+    expect(env.CORS_ALLOWED_ORIGINS).toEqual([
+      'https://a.com',
+      'http://localhost:4200',
+    ]);
+  });
+
+  it.each(['*', 'a.com', 'https://a.com/', 'https://*.a.com', 'null'])(
+    'rejects the CORS origin %s',
+    (origin) => {
+      expect(() =>
+        loadEnv(ApiEnv, { ...validApi, CORS_ALLOWED_ORIGINS: origin }),
+      ).toThrow(ConfigError);
+    },
+  );
+
+  it('keeps an empty CORS allowlist (deny all)', () => {
+    expect(loadEnv(ApiEnv, validApi).CORS_ALLOWED_ORIGINS).toEqual([]);
   });
 
   it('defaults the ledger, relay and stream settings', () => {

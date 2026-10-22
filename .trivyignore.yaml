@@ -1,0 +1,14 @@
+# Trivy exceptions. Policy (docs/engineering/SECURITY_STANDARDS.md#container-and-iac-scanning):
+# - Only for a finding that is not exploitable here or has no fix yet worth taking.
+# - Every entry names the finding id, the paths or image it applies to, a
+#   `statement` saying why it is safe, and an `expired_at` no more than 90 days out.
+# - Expired entries stop matching, so the finding fails CI again until re-reviewed.
+# Example:
+# vulnerabilities:
+#   - id: CVE-0000-00000
+#     paths: ['usr/local/lib/node_modules/npm/package.json']
+#     statement: npm is not invoked at runtime; the image runs node directly.
+#     expired_at: 2027-01-15
+vulnerabilities: []
+misconfigurations: []
+secrets: []

@@ -10,8 +10,8 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
+# Deny by default; each job asks for what it needs.
+permissions: {}
 
 env:
   NX_NO_CLOUD: 'true'
@@ -23,6 +23,7 @@ jobs:
     name: PR title
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Enforce Conventional Commits title
         env:
@@ -38,6 +39,7 @@ jobs:
     name: Promotion path
     if: github.event_name == 'pull_request' && (github.base_ref == 'stage' || github.base_ref == 'main')
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Enforce dev -> stage -> main
         env:
@@ -55,6 +57,8 @@ jobs:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    permissions:
+      contents: read
     # Integration tests (libs/db, apps/api) need real Postgres and Redis. Ports and
     # credentials match docker-compose.yml and .env.example; tests create and drop
     # their own databases on this server.
@@ -115,6 +119,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: verify
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
@@ -135,7 +141,9 @@ jobs:
   container:
     name: Container image (${{ matrix.app }})
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -148,21 +156,116 @@ jobs:
             args: -f apps/web/Dockerfile .
           - app: agents
             args: apps/agents
+    env:
+      IMAGE: matchiq-${{ matrix.app }}:ci
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build image
         env:
-          APP: ${{ matrix.app }}
           ARGS: ${{ matrix.args }}
         run: |
           # shellcheck disable=SC2086
-          DOCKER_BUILDKIT=1 docker build -t "matchiq-$APP:ci" $ARGS
-          docker image ls "matchiq-$APP:ci" --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+          DOCKER_BUILDKIT=1 docker build -t "$IMAGE" $ARGS
+          docker image ls "$IMAGE" --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+      - name: Install Trivy
+        run: .github/scripts/install-trivy.sh
+      - name: CycloneDX SBOM
+        env:
+          APP: ${{ matrix.app }}
+        run: trivy image --quiet --format cyclonedx --output "sbom-$APP.cdx.json" "$IMAGE"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sbom-${{ matrix.app }}
+          path: sbom-${{ matrix.app }}.cdx.json
+          retention-days: 30
+      - name: Vulnerability scan (fail on fixable high or critical)
+        run: >-
+          trivy image --quiet --scanners vuln --severity HIGH,CRITICAL
+          --ignore-unfixed --ignorefile .trivyignore.yaml --exit-code 1 "$IMAGE"
+
+  iac:
+    name: IaC and filesystem scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install Trivy
+        run: .github/scripts/install-trivy.sh
+      - name: Compile Bicep to ARM for scanning
+        env:
+          POSTGRES_ADMIN_PASSWORD: x
+          OPERATOR_API_KEY: x
+          AGENTS_SERVICE_TOKEN: x
+          FOUNDRY_MODEL_NAME: x
+          FOUNDRY_MODEL_VERSION: x
+        run: |
+          az bicep install --version v0.48.1
+          mkdir -p "$RUNNER_TEMP/arm"
+          az bicep build --file infra/azure/main.bicep --outfile "$RUNNER_TEMP/arm/main.json"
+      - name: Misconfiguration scan (infra, compose, Dockerfiles, ARM)
+        run: >-
+          trivy fs --quiet --scanners misconfig --severity HIGH,CRITICAL
+          --ignorefile .trivyignore.yaml --exit-code 1
+          --skip-dirs node_modules --skip-dirs apps/agents/.venv
+          . "$RUNNER_TEMP/arm"
+      - name: Lockfile vulnerability scan (fail on fixable high or critical)
+        run: >-
+          trivy fs --quiet --scanners vuln --severity HIGH,CRITICAL
+          --ignore-unfixed --ignorefile .trivyignore.yaml --exit-code 1
+          --skip-dirs node_modules --skip-dirs apps/agents/.venv .
+
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+          config: |
+            paths-ignore:
+              - '**/generated/**'
+              - '**/node_modules/**'
+              - '**/.next/**'
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: /language:${{ matrix.language }}
+          output: ${{ runner.temp }}/codeql
+      - name: Fail on high or critical results
+        run: .github/scripts/codeql-gate.sh "$RUNNER_TEMP/codeql"
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime, development
 
   infra:
     name: Bicep build and lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build and lint
@@ -184,6 +287,8 @@ jobs:
     name: Secrets and dependency audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     env:
       GITLEAKS_VERSION: 8.30.1
     steps:

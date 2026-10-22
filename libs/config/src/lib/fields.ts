@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { CSV_SEPARATOR, ENV_LIMITS, ENV_PATTERNS } from './constants.js';
+import {
+  CSV_SEPARATOR,
+  ENV_LIMITS,
+  ENV_MESSAGES,
+  ENV_PATTERNS,
+} from './constants.js';
 
 export const flag = (fallback: 'true' | 'false') =>
   z
@@ -40,6 +45,14 @@ export const csv = z
       .map((s) => s.trim())
       .filter(Boolean),
   );
+
+/**
+ * Exact browser origins (`scheme://host[:port]`). Wildcards, paths and
+ * schemes other than http(s) are rejected so a typo cannot widen CORS.
+ */
+export const originList = csv.pipe(
+  z.array(z.string().regex(ENV_PATTERNS.origin, ENV_MESSAGES.origin)),
+);
 
 export const secret = z.string().min(ENV_LIMITS.secretMinLength);
 export const orgIdField = (fallback: string) =>
