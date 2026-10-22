@@ -7,6 +7,7 @@ import {
   InsightId,
   MatchClockMs,
   MetricRef,
+  Period,
   PlayerId,
   SchemaVersion,
   SemVer,
@@ -70,6 +71,8 @@ export const Insight = z.strictObject({
   fixtureId: FixtureId,
   kind: InsightKind,
   priority: InsightPriority,
+  /** `matchClockMs` restarts each period, so a moment is only placed by both. */
+  period: Period,
   matchClockMs: MatchClockMs,
   teamId: TeamId.optional(),
   playerId: PlayerId.optional(),

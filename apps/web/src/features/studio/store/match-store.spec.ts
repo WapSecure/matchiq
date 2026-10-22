@@ -217,6 +217,34 @@ describe('match store', () => {
     ]);
   });
 
+  it('orders insights by period before the period-relative clock', () => {
+    const store = createMatchStore(FX);
+    store.getState().applyHydration({
+      insights: [
+        insight({
+          insightId: 'in_h1_late',
+          period: 1,
+          matchClockMs: 41 * 60_000,
+        }),
+        insight({
+          insightId: 'in_h2_early',
+          period: 2,
+          matchClockMs: 19 * 60_000,
+        }),
+        insight({
+          insightId: 'in_h1_early',
+          period: 1,
+          matchClockMs: 22 * 60_000,
+        }),
+      ],
+    });
+    expect(store.getState().insights.map((i) => i.insightId)).toEqual([
+      'in_h2_early',
+      'in_h1_late',
+      'in_h1_early',
+    ]);
+  });
+
   it('never rewinds derived state for a status behind the applied events', () => {
     const store = createMatchStore(FX);
     store.getState().applyEvents(Array.from({ length: 30 }, (_, i) => shot(i)));

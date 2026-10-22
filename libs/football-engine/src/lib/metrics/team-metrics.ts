@@ -6,7 +6,7 @@ import type {
 import { PERCENT, ROUNDING } from '../constants.js';
 import { possessionTotals } from '../projection/possession.js';
 import type { DerivedState, Side, TeamTally } from '../types.js';
-import { roundTo } from '../util/numbers.js';
+import { largestRemainderShares, roundTo } from '../util/numbers.js';
 import { momentumFor } from './momentum.js';
 import { rollingWindow } from './windows.js';
 
@@ -27,6 +27,30 @@ export const percentOf = (
         denominator,
       };
 
+/** Complementary shares of one whole: each is `percentOf`, but the pair sums to exactly 100. */
+export const sharePair = (
+  home: number,
+  away: number,
+): Readonly<Record<Side, MetricValue>> => {
+  const denominator = home + away;
+  if (denominator === 0) {
+    return { home: percentOf(home, 0), away: percentOf(away, 0) };
+  }
+  const [homePct = 0, awayPct = 0] = largestRemainderShares(
+    [home, away],
+    PERCENT,
+    ROUNDING.percentDecimals,
+  );
+  const share = (value: number, numerator: number): MetricValue => ({
+    status: 'available',
+    value,
+    unit: 'percent',
+    numerator,
+    denominator,
+  });
+  return { home: share(homePct, home), away: share(awayPct, away) };
+};
+
 interface PossessionMetric {
   readonly basis: PossessionBasis;
   readonly value: Readonly<Record<Side, MetricValue>>;
@@ -37,27 +61,14 @@ export const possessionMetric = (derived: DerivedState): PossessionMetric => {
   if (derived.possession.changeEvents === 0) {
     const home = derived.tallies.home.passesAttempted;
     const away = derived.tallies.away.passesAttempted;
-    return {
-      basis: 'EVENT_SHARE_PROXY',
-      value: {
-        home: percentOf(home, home + away),
-        away: percentOf(away, home + away),
-      },
-    };
+    return { basis: 'EVENT_SHARE_PROXY', value: sharePair(home, away) };
   }
   const totals = possessionTotals(
     derived.possession,
     derived.period,
     derived.clockMs,
   );
-  const controlled = totals.home + totals.away;
-  return {
-    basis: 'TIME_WEIGHTED',
-    value: {
-      home: percentOf(totals.home, controlled),
-      away: percentOf(totals.away, controlled),
-    },
-  };
+  return { basis: 'TIME_WEIGHTED', value: sharePair(totals.home, totals.away) };
 };
 
 const momentumNow = (derived: DerivedState, side: Side): MetricValue =>
