@@ -13,8 +13,10 @@ from matchiq_agents.contracts.types import (
     VerificationResult,
 )
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, build_fact_view, integrity_problems
+from matchiq_agents.guard.safety import ContentSafetyScreen
 from matchiq_agents.models.port import ModelPort
-from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy
+from matchiq_agents.models.pricing import EMPTY_PRICES, PriceTable
+from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy, StageTimer
 from matchiq_agents.pipeline import reasons
 from matchiq_agents.pipeline.recorder import RunScope
 from matchiq_agents.pipeline.result import build_result, rejected_result
@@ -34,12 +36,20 @@ class PipelineConfig:
     retry: RetryPolicy
     critique_enabled: bool
     grace_ms: float
+    prices: PriceTable = EMPTY_PRICES
+    safety: ContentSafetyScreen | None = None
 
 
 class PipelineOrchestrator:
     def __init__(
-        self, model: ModelPort, breaker: CircuitBreaker, clock: Clock, config: PipelineConfig
+        self,
+        model: ModelPort,
+        breaker: CircuitBreaker,
+        clock: Clock,
+        config: PipelineConfig,
+        timer: StageTimer | None = None,
     ) -> None:
+        self._timer = timer or StageTimer()
         self._model = model
         self._breaker = breaker
         self._clock = clock
@@ -56,9 +66,22 @@ class PipelineOrchestrator:
         deadline = Deadline.after(self._clock, max(0.0, view.deadline_ms - self._config.grace_ms))
         scope = RunScope(run_id=view.run_id, correlation_id=view.correlation_id)
         runner = ModelRunner(
-            self._model, self._breaker, self._clock, self._config.retry, scope, deadline
+            self._model,
+            self._breaker,
+            self._clock,
+            self._config.retry,
+            scope,
+            deadline,
+            self._config.prices,
+            self._timer,
         )
-        return AgentContext(view, runner, TemplateFallback(view), self._config.critique_enabled)
+        return AgentContext(
+            view,
+            runner,
+            TemplateFallback(view),
+            self._config.critique_enabled,
+            self._config.safety,
+        )
 
     async def run(self, request: PipelineRequest) -> PipelineResult:
         agents = self._agents(request)

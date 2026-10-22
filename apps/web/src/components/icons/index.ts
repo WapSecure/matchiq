@@ -47,3 +47,5 @@ export { RetractIcon } from './retract-icon';
 export { SuppressIcon } from './suppress-icon';
 export { AuditIcon } from './audit-icon';
 export { LockIcon } from './lock-icon';
+export { UserIcon } from './user-icon';
+export { SignOutIcon } from './sign-out-icon';

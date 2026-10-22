@@ -196,7 +196,7 @@ export const EDITORIAL_PROBLEMS = {
       'This request clashed with an earlier attempt. Close the dialog and try again.',
   } as Record<string, string>,
   byStatus: {
-    401: 'The API needs a signed-in producer for this action. This browser has no producer credentials yet.',
+    401: 'Your session has ended or you are not signed in. Sign in as a producer to use editorial controls.',
     403: 'Your role does not allow this action. Ask a producer to make the change.',
     404: 'It no longer exists. It may have been removed with its session.',
     429: 'Too many requests. Wait a moment, then try again.',

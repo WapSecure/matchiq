@@ -135,7 +135,7 @@ describe('reason and problem copy', () => {
     });
     expect(
       describeEditorialProblem(problem(401, 'unauthorized')).message,
-    ).toMatch(/signed-in producer/);
+    ).toMatch(/Sign in as a producer/);
     expect(describeEditorialProblem(problem(403, 'forbidden')).message).toMatch(
       /role does not allow/,
     );

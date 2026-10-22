@@ -75,6 +75,29 @@ FORBIDDEN_REGEX: Final = tuple(
     for pattern in patterns
 )
 
+# Broadcast-safety blocklist (`guard/safety.py`): profanity, and abuse aimed at players, teams or
+# officials. Deliberately narrow and deterministic; hate speech and subtler toxicity are left to
+# the pluggable `ContentSafetyScreen` (Azure AI Content Safety when it is configured).
+SAFETY_PATTERNS: Final[dict[str, tuple[str, ...]]] = {
+    "profanity": (
+        r"fuck\w*", r"shit\w*", r"bullshit", r"bastard\w*", r"wank\w*", r"twat\w*", r"crap",
+        r"piss(?:ed)?", r"arse(?:hole)?s?", r"bollocks", r"merde", r"putain", r"connard\w*",
+        r"mierda", r"joder", r"cabr[oó]n\w*", r"gilipollas", r"pendejo\w*", r"hijo\s+de\s+puta",
+    ),
+    "abuse": (
+        r"idiot\w*", r"stupid\w*", r"moron\w*", r"clowns?", r"pathetic", r"disgrace\w*",
+        r"useless", r"rubbish", r"garbage", r"trash", r"shambolic", r"cowards?", r"lazy",
+        r"minable\w*", r"inútil\w*", r"est[úu]pid\w*", r"basura", r"vergüenza",
+        r"mumu", r"olodo", r"werey", r"ode", r"yeye", r"ashawo",
+    ),
+}  # fmt: skip
+
+SAFETY_REGEX: Final = tuple(
+    (category, re.compile(rf"(?<!\w){pattern}(?!\w)", re.IGNORECASE))
+    for category, patterns in SAFETY_PATTERNS.items()
+    for pattern in patterns
+)
+
 # "one"/"un"/"uno" are omitted: they double as articles and pronouns and would flag
 # ordinary prose; so is Pidgin "wan", which also means "want". Ordinals ("second half") are
 # omitted for the same reason. Pidgin uses English number words plus phonetic spellings; "fo"
@@ -123,3 +146,38 @@ SAFE_NAME_REGEX: Final = re.compile(r"^[^\W\d_]+(?:[ '\u2019.-]{1,2}[^\W\d_]+)*$
 SAFE_NAME_MAX_LENGTH: Final = 48
 SAFE_NAME_MAX_TOKENS: Final = 5
 NAME_TOKEN_REGEX: Final = re.compile(r"[^\W\d_]+")
+
+# Time windows named in metric refs (`rolling10m`, `previous5m`); see `guard/repair.py`.
+METRIC_WINDOW_REGEX: Final = re.compile(r"(?:rolling|previous)(\d+)m$")
+_EN_WINDOWS: Final = (
+    (r"\b(?:in|over|during|within|across)\s+(?:the\s+)?(?:last|past|previous|final|latest|rolling)\s+"
+     r"(?P<n>\d+)\s*(?:minutes?|mins?)\b", "recently"),
+    (r"\b(?:in|over|during|within)\s+(?P<n>\d+)\s*(?:minutes?|mins?)\b", "recently"),
+    (r"\bin\s+(?:a|the|this)\s+(?P<n>\d+)[-\s]min(?:ute)?\s+(?:spell|window|period|burst)\b",
+     "recently"),
+    (r"\b(?:a|the|this)\s+(?P<n>\d+)[-\s]min(?:ute)?\s+(?:spell|window|period|burst)\b",
+     "this spell"),
+)  # fmt: skip
+_WINDOWS: Final[dict[Locale, tuple[tuple[str, str], ...]]] = {
+    Locale.en_GB: _EN_WINDOWS,
+    Locale.fr_FR: (
+        (r"\b(?:au\s+cours\s+des|lors\s+des|durant\s+les|pendant\s+les|dans\s+les|sur\s+les|ces)"
+         r"\s+(?P<n>\d+)\s+(?:derni[eè]res\s+)?minutes(?:\s+derni[eè]res)?\b", "récemment"),
+        (r"\ben\s+(?P<n>\d+)\s+minutes\b", "récemment"),
+    ),
+    Locale.es_ES: (
+        (r"\b(?:en|durante)\s+los\s+(?:[úu]ltimos\s+)?(?P<n>\d+)\s+minutos(?:\s+[úu]ltimos)?\b",
+         "recientemente"),
+        (r"\ben\s+(?P<n>\d+)\s+minutos\b", "recientemente"),
+    ),
+    Locale.pcm_NG: (
+        (r"\b(?:for|inside|in)\s+(?:di|the)\s+(?:last|past)\s+(?P<n>\d+)\s*(?:minutes?|mins?)\b",
+         "recently"),
+        (r"\b(?:inside|in)\s+(?P<n>\d+)\s*(?:minutes?|mins?)\b", "recently"),
+        *_EN_WINDOWS,
+    ),
+}  # fmt: skip
+WINDOW_PHRASES: Final = {
+    locale: tuple((re.compile(pattern, re.IGNORECASE), word) for pattern, word in patterns)
+    for locale, patterns in _WINDOWS.items()
+}

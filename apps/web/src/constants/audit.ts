@@ -103,6 +103,5 @@ export const AUDIT_COPY = {
   loading: 'Loading the audit trail',
   error: 'The audit trail could not be loaded',
   empty: 'No audit events match these filters.',
-  denied: 'You do not have access to the audit trail',
   scrollRegion: 'Audit events table, scrolls horizontally',
 } as const;

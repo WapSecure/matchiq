@@ -4,8 +4,8 @@ import type { Permission } from '@matchiq/access';
 import { useId } from 'react';
 import { LockIcon } from '@/components/icons';
 import { Button, type ButtonProps } from '@/components/ui';
-import { deniedReason } from '@/constants/access';
-import { useCan } from '@/lib/access';
+import { requiresRoleText } from '@/components/auth/require-permission';
+import { useCan } from '@/lib/auth/session-store';
 import { cn } from '@/lib/cn';
 
 type GatedButtonProps = ButtonProps & { permission: Permission };
@@ -33,7 +33,7 @@ export function GatedButton({
       />
     );
   }
-  const reason = deniedReason(permission);
+  const reason = requiresRoleText(permission);
   return (
     <>
       <Button

@@ -2,7 +2,6 @@ import type { AuditEvent } from '@matchiq/contracts';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PermissionsProvider } from '@/lib/access';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { FX, fixture } from '@/test/factories';
 import { callsTo, stubApi } from '@/test/stub-api';
@@ -78,12 +77,10 @@ describe('audit filters', () => {
 describe('AuditView', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  const renderView = (can = () => true) =>
+  const renderView = () =>
     render(
       <QueryClientProvider client={createQueryClient()}>
-        <PermissionsProvider can={can}>
-          <AuditView fixture={fixture()} />
-        </PermissionsProvider>
+        <AuditView fixture={fixture()} />
       </QueryClientProvider>,
     );
 
@@ -127,14 +124,5 @@ describe('AuditView', () => {
         'SYSTEM',
       );
     });
-  });
-
-  it('explains missing permission instead of loading', () => {
-    const api = stubApi({});
-    renderView(() => false);
-    expect(
-      screen.getByText('You do not have access to the audit trail'),
-    ).toBeInTheDocument();
-    expect(callsTo(api, '/audit-events')).toHaveLength(0);
   });
 });

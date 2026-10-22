@@ -3,12 +3,10 @@
 import type { Fixture } from '@matchiq/contracts';
 import { useMemo, useState } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback';
-import { AuditIcon, LockIcon } from '@/components/icons';
+import { AuditIcon } from '@/components/icons';
 import { Button, Skeleton } from '@/components/ui';
-import { deniedReason } from '@/constants/access';
 import { AUDIT_COPY } from '@/constants/audit';
 import { MAIN_CONTENT_ID } from '@/constants/site';
-import { useCan } from '@/lib/access';
 import { AuditFilterBar } from './audit-filter-bar';
 import {
   type AuditFilterForm,
@@ -88,8 +86,8 @@ function AuditResults({
   );
 }
 
+/** Gated on `audit:read` by `AuditScreen`; the API enforces it too. */
 export function AuditView({ fixture }: { fixture: Fixture }) {
-  const allowed = useCan('audit:read');
   const [form, setForm] = useState<AuditFilterForm>(EMPTY_AUDIT_FILTERS);
   return (
     <main
@@ -105,18 +103,8 @@ export function AuditView({ fixture }: { fixture: Fixture }) {
           {copy.description}
         </p>
       </header>
-      {allowed ? (
-        <>
-          <AuditFilterBar applied={form} onApply={setForm} />
-          <AuditResults form={form} fixtureId={fixture.fixtureId} />
-        </>
-      ) : (
-        <EmptyState
-          Icon={LockIcon}
-          title={copy.denied}
-          description={deniedReason('audit:read')}
-        />
-      )}
+      <AuditFilterBar applied={form} onApply={setForm} />
+      <AuditResults form={form} fixtureId={fixture.fixtureId} />
     </main>
   );
 }

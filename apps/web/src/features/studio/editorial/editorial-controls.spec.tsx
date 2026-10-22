@@ -2,10 +2,10 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { PermissionsProvider } from '@/lib/access';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { FX } from '@/test/factories';
 import { callsTo, type Routes, stubApi } from '@/test/stub-api';
+import type * as SessionStore from '@/lib/auth/session-store';
 import { createMatchStore, MatchStoreProvider } from '../store';
 import { EditorialNotice } from './editorial-notice';
 import { FreezeControl } from './freeze-control';
@@ -21,20 +21,21 @@ const frozen = {
 };
 const AUDIT_ID = '0b9c8e43-8f3e-4c43-9a34-0a5f8c3a1d11';
 
-const renderControl = (
-  ui: ReactNode,
-  routes: Routes,
-  can: (p: string) => boolean = () => true,
-) => {
+const access = vi.hoisted(() => ({ allowed: true }));
+vi.mock('@/lib/auth/session-store', async (importOriginal) => ({
+  ...(await importOriginal<typeof SessionStore>()),
+  useCan: () => access.allowed,
+}));
+
+const renderControl = (ui: ReactNode, routes: Routes, allowed = true) => {
+  access.allowed = allowed;
   const api = stubApi(routes);
   const store = createMatchStore(FX);
   render(
     <QueryClientProvider client={createQueryClient()}>
       <MatchStoreProvider fixtureId={FX} store={store}>
-        <PermissionsProvider can={can}>
-          {ui}
-          <EditorialNotice />
-        </PermissionsProvider>
+        {ui}
+        <EditorialNotice />
       </MatchStoreProvider>
     </QueryClientProvider>,
   );
@@ -119,7 +120,7 @@ describe('editorial controls', () => {
     await user.type(screen.getByLabelText('Reason'), 'Wrong scorer');
     await user.click(screen.getByRole('button', { name: 'Freeze' }));
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent(/signed-in producer/);
+    expect(alert).toHaveTextContent(/Sign in as a producer/);
     expect(alert).toHaveTextContent('Reference req_9');
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
@@ -160,10 +161,10 @@ describe('editorial controls', () => {
   });
 
   it('disables controls without permission and says why', async () => {
-    const { user } = renderControl(<FreezeControl />, {}, () => false);
+    const { user } = renderControl(<FreezeControl />, {}, false);
     const button = screen.getByRole('button', { name: 'Freeze auto-publish' });
     expect(button).toHaveAttribute('aria-disabled', 'true');
-    expect(button).toHaveAccessibleDescription(/producer role/);
+    expect(button).toHaveAccessibleDescription(/Producer/);
     await user.click(button);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

@@ -6,10 +6,14 @@ import {
 import { mockApi } from './support/mock-api';
 import { FIXTURE_ID } from './support/mock-fixture';
 import { OVERLAY_ID } from './support/mock-match';
+import { signIn } from './support/sign-in';
 
+const STUDIO = `/studio/${FIXTURE_ID}`;
+
+/** Editorial commands need a producer; requests then go through the BFF. */
 const openStudio = async (page: Page) => {
   const api = await mockApi(page);
-  await page.goto(`/studio/${FIXTURE_ID}`);
+  await signIn(page, 'harbour.producer', STUDIO);
   await expect(
     page.getByText('Pressure building on the left').first(),
   ).toBeVisible();
@@ -104,7 +108,7 @@ test.describe('editorial controls', () => {
 
   test('lists the audit trail with load more', async ({ page }) => {
     await mockApi(page);
-    await page.goto(`/studio/${FIXTURE_ID}/audit`);
+    await signIn(page, 'harbour.producer', `${STUDIO}/audit`);
     const table = page.getByRole('table', {
       name: /Audit events: 2 shown, more/,
     });
@@ -120,5 +124,19 @@ test.describe('editorial controls', () => {
     await page.evaluate(() => window.scrollTo(0, 0));
     await expectNoBlockingA11yViolations(page);
     await expectNoHorizontalOverflow(page);
+  });
+
+  test('explains locked controls on the signed-out public demo', async ({
+    page,
+  }) => {
+    await mockApi(page);
+    await page.goto(STUDIO);
+    const freeze = page.getByRole('button', { name: 'Freeze auto-publish' });
+    await expect(freeze).toHaveAttribute('aria-disabled', 'true');
+    await expect(freeze).toHaveAccessibleDescription(/Producer/);
+    await freeze.click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.goto(`${STUDIO}/audit`);
+    await expect(page.getByTestId('access-denied')).toBeVisible();
   });
 });

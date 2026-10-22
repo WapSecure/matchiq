@@ -29,7 +29,10 @@ export const API_PATHS = {
   killSwitchActivate: '/editorial/kill-switch/activate',
   killSwitchRelease: '/editorial/kill-switch/release',
   auditEvents: '/audit-events',
+  streamTicket: (fixtureId: string) => `${fx(fixtureId)}/stream-tickets`,
 } as const;
+
+export const STREAM_TICKET_PARAM = 'ticket';
 
 export const HTTP_HEADERS = {
   accept: 'Accept',

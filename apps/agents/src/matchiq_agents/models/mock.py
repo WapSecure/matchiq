@@ -15,9 +15,9 @@ from matchiq_agents.contracts.types import AgentName, Locale, Persona, RunProvid
 from matchiq_agents.guard.data_block import encode_data
 from matchiq_agents.models.port import ModelOutputError, ModelUsage
 from matchiq_agents.roster.schemas import (
+    AnalystInput,
     AnalystOutput,
     CritiqueOutput,
-    FactsPayload,
     LocalizationInput,
     LocalizationOutput,
     LocalizedOut,
@@ -36,8 +36,8 @@ def payload_variant(payload: BaseModel) -> int:
     return hashlib.sha256(encode_data(payload).encode()).digest()[0]
 
 
-def _analyse(payload: FactsPayload, variant: int) -> AnalystOutput:
-    return analyst_output(payload, variant)
+def _analyse(payload: AnalystInput, variant: int) -> AnalystOutput:
+    return analyst_output(payload.facts, variant)
 
 
 def _write(payload: WriterInput, variant: int) -> WriterOutput:
@@ -82,7 +82,7 @@ def _critique(_payload: BaseModel, _variant: int) -> CritiqueOutput:
 
 
 _HANDLERS: Final[dict[type[BaseModel], tuple[type[BaseModel], Callable[..., BaseModel]]]] = {
-    AnalystOutput: (FactsPayload, _analyse),
+    AnalystOutput: (AnalystInput, _analyse),
     WriterOutput: (WriterInput, _write),
     LocalizationOutput: (LocalizationInput, _localise),
     ProducerOutput: (ProducerInput, _produce),

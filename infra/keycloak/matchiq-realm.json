@@ -89,16 +89,18 @@
       "redirectUris": [
         "http://localhost:4200/auth/callback",
         "http://localhost:4318/auth/callback",
+        "http://localhost:4328/auth/callback",
         "http://127.0.0.1:4318/auth/callback"
       ],
       "webOrigins": [
         "http://localhost:4200",
         "http://localhost:4318",
+        "http://localhost:4328",
         "http://127.0.0.1:4318"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:4200/*##http://localhost:4318/*##http://127.0.0.1:4318/*",
+        "post.logout.redirect.uris": "http://localhost:4200/*##http://localhost:4318/*##http://localhost:4328/*##http://127.0.0.1:4318/*",
         "access.token.lifespan": "300"
       },
       "fullScopeAllowed": false,
