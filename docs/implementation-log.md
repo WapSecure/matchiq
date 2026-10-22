@@ -2,6 +2,24 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-22 — MQ-021: Installable progressive web app (web)
+
+| Area                                                                                                                                                                                                                                           | Status | Evidence                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Manifest from `app/manifest.ts` (`/manifest.webmanifest`): standalone, start URL `/fixtures`, scope `/`, dark canvas colours, synthetic-data description, categories, Fixture lobby shortcut                                                   | Done   | `manifest.spec.ts`; e2e `pwa.spec.ts` checks fields and icon sizes                                                             |
+| Icons generated from `LogoMark` (192, 512, maskable 512, apple-touch 180, SVG, favicon 16/32/48) by `pnpm --filter @matchiq/web icons:generate`, using jiti and Playwright Chromium (no new dependency)                                        | Done   | Outputs committed in `apps/web/public`                                                                                         |
+| Hand-written `public/sw.js`: precached `/offline` shell with its assets, stale-while-revalidate `/_next/static`, network-only for the API origin, `/stream`, `/api/`, SSE and non-GET; versioned caches cleaned on activate; served `no-cache` | Done   | e2e: worker controls the page, API responses never come from or enter the cache, offline reload shows the fallback (axe clean) |
+| Update flow: new worker waits; "Update available — Reload" toast sends `SKIP_WAITING` and reloads on controller change. Registration is production-only (`PWA_ENABLED`)                                                                        | Done   | `service-worker.spec.ts` (8 tests)                                                                                             |
+| "Install app" button on `beforeinstallprompt`, iOS "Share → Add to Home Screen" hint, dismissible; hidden when standalone                                                                                                                      | Done   | `use-install-prompt.spec.ts` (8), `pwa-prompts.spec.tsx` (2)                                                                   |
+| `theme-color` for dark and light schemes, apple-touch-icon, `appleWebApp` metadata                                                                                                                                                             | Done   | `layout.tsx`                                                                                                                   |
+| Install and offline guide                                                                                                                                                                                                                      | Done   | `docs/deployment/PWA.md`                                                                                                       |
+
+### Limits
+
+- No match data is available offline by design. The offline page needs one prior online visit.
+- iOS has no install prompt API, so installation there is manual. Light-theme `theme-color` (`#f6f8fb`) is a placeholder until the light theme lands.
+- Not yet installed on a physical Android or iOS device; verified in Chromium (desktop and Pixel 7 emulation).
+
 ## 2026-10-21 — Broadcast preview standby state and cue hold
 
 | Area                                                                                                                                                                                                                                    | Status | Evidence                    |
