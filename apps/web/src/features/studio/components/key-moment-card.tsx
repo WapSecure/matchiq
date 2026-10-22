@@ -27,6 +27,12 @@ export type KeyMomentCardProps = {
 
 const METRIC_DECIMALS = 1;
 
+const PRIORITY_RAIL: Record<Insight['priority'], string> = {
+  P0: 'shadow-[inset_3px_0_0_var(--mq-accent)]',
+  P1: 'shadow-[inset_3px_0_0_var(--mq-line-strong)]',
+  P2: '',
+};
+
 function AnalystFacts({ insight }: { insight: Insight }) {
   const metrics = Object.entries(insight.evidence.computedMetrics);
   return (
@@ -64,9 +70,8 @@ export const KeyMomentCard = memo(function KeyMomentCard({
     <article
       aria-label={headline}
       className={cn(
-        'flex flex-col gap-3 border-b border-line px-4 py-3 last:border-0',
-        insight.priority === 'P0' &&
-          'shadow-[inset_2px_0_0_var(--color-accent)]',
+        'flex flex-col gap-2.5 border-b border-line px-4 py-3.5 transition-colors last:border-0 hover:bg-surface-raised/50',
+        PRIORITY_RAIL[insight.priority],
       )}
     >
       <header className="flex flex-wrap items-center gap-2">
@@ -77,7 +82,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
           {INSIGHT_KIND_LABELS[insight.kind]}
         </span>
         {team ? (
-          <span className="inline-flex items-center gap-1 text-micro font-semibold text-ink-muted">
+          <span className="inline-flex items-center gap-1 font-mono text-micro font-semibold text-ink-muted">
             <TeamSwatch side={team.side} className="size-2" />
             {team.shortName}
           </span>

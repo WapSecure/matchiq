@@ -16,6 +16,9 @@ const toRow = (
   const described = describeEvent(event, roster);
   return {
     id: event.eventId,
+    type: event.type,
+    period: event.period,
+    card: event.type === 'CARD' ? event.card : null,
     minute: formatMinute(event.period, event.matchClockMs),
     label: described.label,
     detail: described.detail,

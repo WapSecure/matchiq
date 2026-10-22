@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ChevronLeftIcon, LogoMark } from '@/components/icons';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Badge } from '@/components/ui';
 import {
   ROUTES,
@@ -42,10 +43,11 @@ function StudioTabs({
             href={tab.href(fixtureId)}
             aria-current={current ? 'page' : undefined}
             className={cn(
-              'whitespace-nowrap border-b-2 px-3 py-2 text-xs font-medium transition-colors',
+              'relative whitespace-nowrap rounded-t-md px-3 py-2.5 text-[13px] font-medium transition-colors',
+              'after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full',
               current
-                ? 'border-accent text-ink'
-                : 'border-transparent text-ink-muted hover:text-ink',
+                ? 'text-ink after:bg-accent'
+                : 'text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-line-strong',
             )}
           >
             {tab.label}
@@ -64,17 +66,21 @@ export function StudioHeader({
   status,
 }: StudioHeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur">
-      <div className="mx-auto flex h-12 max-w-[1920px] items-center gap-3 px-4 lg:px-6">
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-md backdrop-saturate-150">
+      <div className="mx-auto flex h-14 max-w-[1920px] items-center gap-2 px-4 sm:gap-3 lg:px-6">
         <Link
           href={ROUTES.fixtures}
-          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-ink-muted hover:bg-surface-raised hover:text-ink"
+          className="press flex h-8 items-center gap-1 rounded-md px-1.5 text-xs font-medium text-ink-muted hover:bg-surface-raised hover:text-ink"
         >
-          <ChevronLeftIcon size={14} />
-          {STUDIO_COPY.backToLobby}
+          <ChevronLeftIcon size={16} />
+          <span className="sr-only sm:not-sr-only">
+            {STUDIO_COPY.backToLobby}
+          </span>
         </Link>
-        <span aria-hidden className="h-5 w-px bg-line" />
-        <LogoMark size={18} className="hidden shrink-0 text-accent sm:block" />
+        <span aria-hidden className="h-5 w-px shrink-0 bg-line" />
+        <span className="hidden size-7 shrink-0 items-center justify-center rounded-md bg-accent text-accent-ink shadow-panel sm:flex">
+          <LogoMark size={17} />
+        </span>
         <div className="min-w-0 flex-1">
           <h1 className="sr-only truncate text-sm font-semibold tracking-tight text-ink sm:not-sr-only">
             {title ?? STUDIO_COPY.title}
@@ -89,6 +95,7 @@ export function StudioHeader({
           {WATERMARK}
         </Badge>
         {status}
+        <ThemeToggle />
       </div>
       <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
         <StudioTabs fixtureId={fixtureId} view={view} />

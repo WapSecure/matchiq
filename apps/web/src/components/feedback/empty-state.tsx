@@ -24,16 +24,26 @@ export function EmptyState({
       className={cn(
         'flex flex-col items-center justify-center text-center',
         compact
-          ? 'gap-1.5 py-6'
-          : 'gap-3 rounded-lg border border-dashed border-line-strong px-6 py-12',
+          ? 'gap-2 px-4 py-8'
+          : 'gap-3 rounded-lg border border-dashed border-line-strong bg-surface/60 px-6 py-14',
         className,
       )}
     >
       {Icon ? (
-        <Icon size={compact ? 18 : 22} className="text-ink-subtle" />
+        <span
+          className={cn(
+            'flex items-center justify-center rounded-full border border-line bg-surface-raised text-ink-subtle',
+            compact ? 'size-8' : 'size-11',
+          )}
+        >
+          <Icon size={compact ? 15 : 20} />
+        </span>
       ) : null}
       <p
-        className={cn('font-medium text-ink', compact ? 'text-xs' : 'text-sm')}
+        className={cn(
+          'font-medium text-ink',
+          compact ? 'text-[13px]' : 'text-sm',
+        )}
       >
         {title}
       </p>
