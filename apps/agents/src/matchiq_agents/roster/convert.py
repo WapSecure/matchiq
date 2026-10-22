@@ -5,7 +5,7 @@ raises `ValueError` and counts as a failed attempt.
 """
 
 import re
-from collections.abc import Collection, Iterable, Sequence
+from collections.abc import Callable, Collection, Iterable, Sequence
 from typing import Final
 
 from pydantic import ValidationError
@@ -25,6 +25,7 @@ from matchiq_agents.contracts.types import (
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
 from matchiq_agents.guard.text import restore_names
 from matchiq_agents.limits import OVERLAY_DURATION_MS, OVERLAY_PRIORITY
+from matchiq_agents.pipeline.diagnostics import OutputRejectedError
 from matchiq_agents.roster.schemas import (
     AnalystOutput,
     CitedValueOut,
@@ -129,7 +130,11 @@ def named(draft: DraftOut, names: Iterable[str]) -> DraftOut:
 
 
 def to_drafts(
-    drafts: Sequence[DraftOut], personas: Sequence[Persona], locale: Locale, source: NarrativeSource
+    drafts: Sequence[DraftOut],
+    personas: Sequence[Persona],
+    locale: Locale,
+    source: NarrativeSource,
+    on_invalid: Callable[[Persona], None] | None = None,
 ) -> list[NarrativeDraft]:
     """Contract-valid drafts for the requested personas, in request order.
 
@@ -144,9 +149,12 @@ def to_drafts(
         try:
             by_persona[persona] = make_draft(draft, locale, source)
         except ValidationError:
+            if on_invalid is not None:
+                on_invalid(persona)
             continue
     if not by_persona:
-        raise ValueError(NO_USABLE_DRAFT.format(personas=", ".join(p.value for p in personas)))
+        names = ", ".join(p.value for p in personas)
+        raise OutputRejectedError(NO_USABLE_DRAFT.format(personas=names))
     return [by_persona[persona] for persona in personas if persona in by_persona]
 
 

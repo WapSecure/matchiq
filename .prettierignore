@@ -10,3 +10,4 @@ libs/contracts/generated/
 apps/agents/src/matchiq_agents/contracts/generated/
 docs/product/
 libs/db/migrations/meta
+apps/agents/tests/eval/baselines/

@@ -5,6 +5,7 @@ from typing import Final
 
 from matchiq_agents.contracts.types import AgentName, AgentRun, Persona, RunOutcome, RunProvider
 from matchiq_agents.domain.facts import FactView
+from matchiq_agents.guard.safety import ContentSafetyScreen
 from matchiq_agents.pipeline.recorder import RunRecord
 from matchiq_agents.pipeline.runner import ModelRunner
 from matchiq_agents.templates.fallback import TEMPLATE_VERSION, TemplateFallback
@@ -18,6 +19,7 @@ class AgentContext:
     runner: ModelRunner
     fallback: TemplateFallback
     critique_enabled: bool
+    safety: ContentSafetyScreen | None = None
 
     @property
     def canonical_personas(self) -> tuple[Persona, ...]:

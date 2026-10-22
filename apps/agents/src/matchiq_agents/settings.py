@@ -15,6 +15,7 @@ from matchiq_agents.constants import (
     SECRET_MIN_LENGTH,
 )
 from matchiq_agents.limits import MAX_AGENT_RETRIES
+from matchiq_agents.models.pricing import Price
 
 
 class ModelProvider(StrEnum):
@@ -54,6 +55,9 @@ class Settings(BaseSettings):
     # Unset: on for cloud providers, off for ollama (ADR-0011 addendum). The deterministic Fact
     # Checker always runs.
     agent_critique_enabled: bool | None = None
+    # JSON: {"<deployment>": {"inputPerMTok": 0.15, "outputPerMTok": 0.6}} in USD. Local
+    # inference costs 0; a cloud deployment missing here gets no estimate (docs/ai/EVALUATION.md).
+    agent_price_table: dict[str, Price] = Field(default_factory=dict[str, Price])
 
     @property
     def is_local(self) -> bool:
