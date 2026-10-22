@@ -1,5 +1,6 @@
 'use client';
 
+import { RequirePermission } from '@/components/auth/require-permission';
 import type { Fixture } from '@matchiq/contracts';
 import { useEffect, useMemo } from 'react';
 import { MAIN_CONTENT_ID } from '@/constants/site';
@@ -56,7 +57,9 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
               awayShort={fixture.away.shortName}
               footer={
                 <div className="mt-4 border-t border-line pt-4">
-                  <ReplayControls sessionId={fixture.fixtureId} />
+                  <RequirePermission permission="replay:control">
+                    <ReplayControls sessionId={fixture.fixtureId} />
+                  </RequirePermission>
                 </div>
               }
             />

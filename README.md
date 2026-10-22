@@ -43,7 +43,13 @@ pnpm e2e                      # Playwright + axe
 
 Run services individually with `pnpm nx serve api`, `pnpm nx serve worker`, `pnpm nx serve agents` and `pnpm nx dev web` (port 4200).
 
-Keycloak is the local OpenID Connect provider (realm `matchiq`, demo accounts in [`docs/security/IDENTITY_AND_ACCESS.md`](docs/security/IDENTITY_AND_ACCESS.md), dev-only password `matchiq-dev-only`).
+Keycloak is the local OpenID Connect provider (realm `matchiq`, demo accounts in [`docs/security/IDENTITY_AND_ACCESS.md`](docs/security/IDENTITY_AND_ACCESS.md), dev-only password `matchiq-dev-only`). To sign in locally:
+
+1. In `.env`, fill `STREAM_TICKET_SECRET` and `WEB_SESSION_SECRET` (`openssl rand -hex 32`); the OIDC values already point at the local realm.
+2. `pnpm seed:fixtures` (templates for `org_demo` and `org_northbank`), then `pnpm nx serve api`, `pnpm nx serve worker` and `pnpm nx dev web`.
+3. Open <http://localhost:4200/sign-in>, pick a demo account (for example `harbour.producer` or `harbour.viewer`) and enter the dev-only password.
+
+Without signing in, the app runs as the read-only public demo, as before.
 
 ## Branching
 

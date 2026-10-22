@@ -1,5 +1,7 @@
+import { AccessDenied } from '@/components/auth/access-denied';
 import { AlertIcon, RefreshIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
+import { HTTP_STATUS } from '@/constants/api';
 import { FEEDBACK_COPY } from '@/constants/feedback';
 import { isApiError } from '@/lib/api/api-error';
 import { cn } from '@/lib/cn';
@@ -28,6 +30,8 @@ export function ErrorState({
   onRetry,
   className,
 }: ErrorStateProps) {
+  if (isApiError(error) && error.status === HTTP_STATUS.forbidden)
+    return <AccessDenied className={className} />;
   const { detail, ref } = describe(error);
   return (
     <div

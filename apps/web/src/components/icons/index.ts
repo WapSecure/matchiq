@@ -41,3 +41,6 @@ export { PeriodIcon } from './period-icon';
 export { UndoIcon } from './undo-icon';
 export { InterceptIcon } from './intercept-icon';
 export { PitchIcon } from './pitch-icon';
+export { UserIcon } from './user-icon';
+export { LockIcon } from './lock-icon';
+export { SignOutIcon } from './sign-out-icon';
