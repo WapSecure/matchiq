@@ -97,7 +97,10 @@ export function StudioHeader({
         </Badge>
         {status}
         <ThemeToggle />
-        <UserMenu />
+        {/* At phone width the studio header has no room; the lobby header keeps the account menu. */}
+        <div className="hidden sm:block">
+          <UserMenu />
+        </div>
       </div>
       <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
         <StudioTabs fixtureId={fixtureId} view={view} />
