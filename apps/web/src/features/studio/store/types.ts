@@ -1,4 +1,5 @@
 import type {
+  EditorialStatus,
   Insight,
   MatchEvent,
   MatchSnapshot,
@@ -40,6 +41,8 @@ export type MatchData = {
   fixtureId: string;
   snapshot: MatchSnapshot | null;
   replay: ReplayStatus | null;
+  /** Latest `editorial.status`; null until a freeze or kill switch is announced. */
+  editorial: EditorialStatus | null;
   clock: MatchClock;
   timeline: MatchEvent[];
   lastEventSequence: number;
