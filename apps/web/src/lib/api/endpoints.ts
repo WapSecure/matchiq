@@ -8,6 +8,7 @@ import {
   type FaultPlanInput,
   type ReplaySpeed,
   ReplayStatus,
+  StreamTicket,
 } from '@matchiq/contracts';
 import { API_LIMITS, API_PATHS, HTTP_HEADERS } from '@/constants/api';
 import { requestJson } from './http-client';
@@ -103,3 +104,9 @@ export const fetchRecap = (fixtureId: string, signal?: AbortSignal) =>
 
 export const fetchAgentRuns = (fixtureId: string, signal?: AbortSignal) =>
   requestJson(API_PATHS.agentRuns(fixtureId), TraceList, { signal });
+
+/** Via the BFF for signed-in users; the ticket then opens the stream on the API directly. */
+export const fetchStreamTicket = (fixtureId: string) =>
+  requestJson(API_PATHS.streamTicket(fixtureId), StreamTicket, {
+    method: 'POST',
+  });

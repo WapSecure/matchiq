@@ -18,7 +18,10 @@ export const API_PATHS = {
     `/fixtures/${encodeURIComponent(fixtureId)}/stream`,
   replay: (fixtureId: string) =>
     `/fixtures/${encodeURIComponent(fixtureId)}/replay`,
+  streamTicket: (fixtureId: string) => `${fx(fixtureId)}/stream-tickets`,
 } as const;
+
+export const STREAM_TICKET_PARAM = 'ticket';
 
 export const HTTP_HEADERS = {
   accept: 'Accept',
@@ -77,6 +80,8 @@ export const POLL_MS = {
 } as const;
 
 export const HTTP_STATUS = {
+  unauthorized: 401,
+  forbidden: 403,
   notFound: 404,
   conflict: 409,
   tooManyRequests: 429,

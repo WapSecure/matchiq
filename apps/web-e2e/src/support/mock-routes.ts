@@ -16,6 +16,9 @@ import {
 } from './mock-session';
 import { mockFaultTraces } from './mock-faults';
 
+/** The public API and the signed-in BFF share one mock. */
+const API_PREFIX = /^\/(api\/v1|bff)/;
+
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers': '*',
@@ -50,7 +53,7 @@ export const preflight = (route: Route) =>
   route.fulfill({ status: 204, headers: CORS });
 
 export type MockApiOptions = {
-  templates?: 'ok' | 'empty' | 'error';
+  templates?: 'ok' | 'empty' | 'error' | 'forbidden';
   start?: 'ok' | 'rateLimited';
   recap?: 'ready' | 'notReady';
   /** Serve insights, narratives and cues from the read models (late join). */
@@ -95,6 +98,11 @@ const handlePost = (
   options: MockApiOptions,
   recorder: Recorder,
 ) => {
+  if (path.endsWith('/stream-tickets'))
+    return json(route, {
+      ticket: 'e2e-ticket',
+      expiresAt: '2026-10-24T15:08:12Z',
+    });
   const body = route.request().postDataJSON() as Record<string, unknown>;
   if (path.endsWith('/sessions')) {
     recorder.sessionStarts.push(body);
@@ -141,6 +149,8 @@ const handleRead = (
 const handleLobby = (route: Route, path: string, options: MockApiOptions) => {
   if (path === '/replay-sessions')
     return json(route, { items: mockSessions() });
+  if (options.templates === 'forbidden')
+    return problem(route, 403, 'You do not have permission', 'forbidden');
   if (options.templates === 'error')
     return problem(route, 503, 'Template service unavailable');
   return json(route, {
@@ -155,7 +165,7 @@ export const handleRoute = (
 ) => {
   const request = route.request();
   const url = new URL(request.url());
-  const path = url.pathname.replace('/api/v1', '');
+  const path = url.pathname.replace(API_PREFIX, '');
   if (request.method() === 'OPTIONS') return preflight(route);
   if (path === '/fixture-templates' || path === '/replay-sessions')
     return handleLobby(route, path, options);

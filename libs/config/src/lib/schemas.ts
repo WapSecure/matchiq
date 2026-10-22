@@ -14,6 +14,7 @@ import {
   csv,
   flag,
   optionalString,
+  optionalUrl,
   port,
   secret,
 } from './fields.js';
@@ -168,6 +169,8 @@ export const WorkerEnv = CommonEnv.extend({
 export const WebPublicEnv = z.object({
   NEXT_PUBLIC_API_BASE_URL: z.url().default(DEFAULT_URLS.apiBase),
   NEXT_PUBLIC_DEMO_MODE: booleanFlag,
+  /** The OIDC issuer as the browser reaches it (sign-in redirects, CSP); not a secret. */
+  NEXT_PUBLIC_OIDC_ISSUER_URL: optionalUrl,
 });
 
 export type LogLevel = z.infer<typeof LogLevel>;
