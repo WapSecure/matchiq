@@ -6,6 +6,7 @@ import type {
   Narrative,
   OverlayCue,
 } from '@matchiq/contracts';
+import { sql } from 'drizzle-orm';
 import {
   foreignKey,
   index,
@@ -94,6 +95,8 @@ export const replaySessions = pgTable(
       foreignColumns: [fixtureTemplates.orgId, fixtureTemplates.templateId],
     }),
     index('replay_sessions_created_idx').on(t.orgId, t.createdAt),
+    index('replay_sessions_activity_idx').on(t.orgId, t.state, t.updatedAt),
+    index('replay_sessions_updated_idx').on(t.updatedAt),
   ],
 );
 
@@ -127,6 +130,9 @@ export const insights = pgTable(
     fixtureFk('insights_fixture_fk', t),
     index('insights_order_idx').on(t.orgId, t.fixtureId, t.detectedSequence),
     index('insights_id_idx').on(t.orgId, t.insightId),
+    index('insights_pending_idx')
+      .on(t.orgId, t.createdAt)
+      .where(sql`${t.publication} = 'PENDING'`),
   ],
 );
 

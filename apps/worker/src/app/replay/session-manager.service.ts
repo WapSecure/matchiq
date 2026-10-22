@@ -6,18 +6,13 @@ import {
   type OnApplicationShutdown,
 } from '@nestjs/common';
 import type { WorkerEnv } from '@matchiq/config';
-import type { Fixture, Insight } from '@matchiq/contracts';
-import {
-  DB_LIMITS,
-  type FixtureKey,
-  type InsightRecord,
-  type ReplayCommandJob,
-} from '@matchiq/db';
+import type { Insight, ReplayCommand } from '@matchiq/contracts';
+import type { FixtureKey, InsightRecord, ReplayCommandJob } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
 import { FALLBACK_REASONS, LOG_MESSAGES, REPLAY_RUNTIME } from '../constants';
 import type { SessionRuntime } from '../infrastructure/bundles';
 import { SESSION_RUNTIME, SESSION_SOURCES } from '../infrastructure/tokens';
-import { MatchPipeline } from '../pipeline/match-pipeline';
+import { createRunner } from './runner-factory';
 import {
   appendPublication,
   emptyBatch,
@@ -25,14 +20,20 @@ import {
 } from '../pipeline/pipeline-batch';
 import { templatePublication, type Publication } from '../pipeline/publication';
 import { RecapService } from '../recap/recap.service';
+import { recordCapacityRejection } from './capacity-rejection';
 import { PipelineWriter, type WriteOutcome } from './pipeline-writer';
+import {
+  CAPACITY_LOG,
+  SESSION_LIFECYCLE,
+  SLOT_ACTIONS,
+  sweepIntervalMs,
+} from './replay.constants';
 import { loadSession, type SessionSources } from './session-loader';
-import { SessionRunner } from './session-runner';
+import { SessionRegistry } from './session-registry';
+import type { SessionRunner } from './session-runner';
 
 const describe = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
-
-const RESUMABLE = new Set(['PLAYING', 'PAUSED']);
 
 export interface PublishInput {
   readonly insight: Insight;
@@ -41,18 +42,21 @@ export interface PublishInput {
 }
 
 /**
- * Owns every active replay session in this worker (one worker replica, see
+ * Owns every loaded replay session in this worker (one worker replica, see
  * ADR-0013). Commands arrive from the API through the command queue, agent
  * publications from the pipeline jobs; both are serialised per session.
+ * Capacity (ADR-0015): only PLAYING or about-to-start runners hold a slot;
+ * untouched non-playing runners leave memory after `REPLAY_IDLE_TIMEOUT_MS`
+ * and reload from the ledger on their next command.
  */
 @Injectable()
 export class SessionManager
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
   private readonly logger = new Logger(SessionManager.name);
-  private readonly runners = new Map<string, SessionRunner>();
-  private readonly fixtures = new Map<string, Fixture>();
+  private readonly registry: SessionRegistry;
   private readonly writer: PipelineWriter;
+  private sweep: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     @Inject(APP_ENV) private readonly env: WorkerEnv,
@@ -61,10 +65,12 @@ export class SessionManager
     private readonly recaps: RecapService,
   ) {
     this.writer = new PipelineWriter(sources.uow);
+    this.registry = new SessionRegistry(() => runtime.scheduler.now());
   }
 
-  /** Resumes sessions that were playing or paused when the worker last stopped. */
   async onApplicationBootstrap(): Promise<void> {
+    const period = sweepIntervalMs(this.env.REPLAY_IDLE_TIMEOUT_MS);
+    this.sweep = setInterval(() => this.evictIdle(), period).unref();
     try {
       await this.resumeSessions();
     } catch (error) {
@@ -73,28 +79,49 @@ export class SessionManager
     }
   }
 
+  /**
+   * Resumes the sessions that were PLAYING when the worker stopped, up to the
+   * slot limit; the rest are paused durably. PAUSED sessions load on demand.
+   */
   private async resumeSessions(): Promise<void> {
-    const orgId = this.env.DEMO_ORG_ID;
-    const sessions = await this.sources.sessions.list(
-      orgId,
-      DB_LIMITS.sessionListMax,
+    const max = this.env.REPLAY_MAX_ACTIVE_SESSIONS;
+    const playing = await this.sources.sessions.listInState(
+      this.env.DEMO_ORG_ID,
+      'PLAYING',
+      SESSION_LIFECYCLE.resumeScanLimit,
     );
-    for (const session of sessions) {
-      if (!RESUMABLE.has(session.status.state)) continue;
-      const key = { orgId, fixtureId: session.sessionId };
+    for (const key of playing) {
       const runner = await this.runnerFor(key);
       if (runner === null) continue;
-      // A rebuilt controller starts at the default speed; restore the session's own.
-      runner.command({ action: 'setSpeed', speed: session.status.speed });
-      if (session.status.state === 'PLAYING') {
+      if (this.registry.activeCount(key.fixtureId) < max) {
         runner.command({ action: 'resume' });
+      } else {
+        runner.announce();
+        this.logger.warn(CAPACITY_LOG.pausedAtBoot(key.fixtureId, max));
       }
     }
   }
 
   onApplicationShutdown(): void {
-    for (const runner of this.runners.values()) runner.dispose();
-    this.runners.clear();
+    if (this.sweep !== null) clearInterval(this.sweep);
+    this.registry.clear();
+  }
+
+  /** Releases idle, non-playing runners; their state stays in the database. */
+  evictIdle(): number {
+    const idle = this.registry.idle(this.env.REPLAY_IDLE_TIMEOUT_MS);
+    for (const fixtureId of idle) this.registry.remove(fixtureId);
+    if (idle.length > 0) this.logger.log(CAPACITY_LOG.evicted(idle.length));
+    return idle.length;
+  }
+
+  /** Drops a runner without waiting for the idle timeout (retention purges). */
+  release(fixtureId: string): void {
+    this.registry.remove(fixtureId);
+  }
+
+  isLoaded(fixtureId: string): boolean {
+    return this.registry.runner(fixtureId) !== undefined;
   }
 
   async handle(job: ReplayCommandJob): Promise<void> {
@@ -104,6 +131,8 @@ export class SessionManager
       this.logger.warn(LOG_MESSAGES.unknownSession(key.fixtureId));
       return;
     }
+    this.registry.touch(key.fixtureId);
+    if (await this.refusedForCapacity(key, runner, job.command)) return;
     const result = runner.command(job.command);
     if (!result.ok) {
       this.logger.warn(
@@ -112,9 +141,35 @@ export class SessionManager
     }
   }
 
+  private async refusedForCapacity(
+    key: FixtureKey,
+    runner: SessionRunner,
+    command: ReplayCommand,
+  ): Promise<boolean> {
+    if (!SLOT_ACTIONS.has(command.action) || runner.status.state === 'PLAYING')
+      return false;
+    const max = this.env.REPLAY_MAX_ACTIVE_SESSIONS;
+    const active = this.registry.activeCount(key.fixtureId);
+    if (active < max) return false;
+    this.logger.warn(
+      CAPACITY_LOG.rejected(key.fixtureId, command.action, active, max),
+    );
+    await runner.whenIdle();
+    await recordCapacityRejection(this.sources.uow, {
+      key,
+      status: runner.status,
+      command,
+      active,
+      max,
+      emittedAt: this.now(),
+    });
+    this.runtime.outbox.notify();
+    return true;
+  }
+
   /** Routes a gated publication through the session's serial queue while it is loaded. */
   async publish(key: FixtureKey, input: PublishInput): Promise<WriteOutcome> {
-    const runner = this.runners.get(key.fixtureId);
+    const runner = this.registry.runner(key.fixtureId);
     if (runner && !runner.isFailed) return runner.submitPublication(input);
     const batch = emptyBatch();
     batch.claims.push({
@@ -132,35 +187,25 @@ export class SessionManager
 
   /** Resolves when the session has written everything queued so far. */
   async whenIdle(fixtureId: string): Promise<void> {
-    await this.runners.get(fixtureId)?.whenIdle();
+    await this.registry.runner(fixtureId)?.whenIdle();
   }
 
   private now(): string {
     return this.runtime.clock.now().toISOString();
   }
 
-  private activeCount(): number {
-    return [...this.runners.values()].filter(
-      (r) => r.status.state !== 'COMPLETED',
-    ).length;
-  }
-
   private async runnerFor(key: FixtureKey): Promise<SessionRunner | null> {
-    const existing = this.runners.get(key.fixtureId);
+    const existing = this.registry.runner(key.fixtureId);
     if (existing) return existing;
-    if (this.activeCount() >= this.env.REPLAY_MAX_ACTIVE_SESSIONS) return null;
     const loaded = await loadSession(this.sources, key);
     if (loaded === null) return null;
-    const runner = new SessionRunner({
+    const runner = createRunner({
       key,
-      events: loaded.events,
-      pipeline: new MatchPipeline({
-        fixture: loaded.fixture,
-        aiEnabled: this.env.AI_ENABLED,
-        now: () => this.now(),
-      }),
+      loaded,
+      aiEnabled: this.env.AI_ENABLED,
       writer: this.writer,
       scheduler: this.runtime.scheduler,
+      now: () => this.now(),
       hooks: {
         afterWrite: (k, batch) => this.afterWrite(k, batch),
         onFailure: (k, error) => this.onFailure(k, error),
@@ -171,11 +216,9 @@ export class SessionManager
       },
     });
     if (loaded.ledgerHead >= 0) {
-      runner.rehydrate(loaded.ledgerHead);
       this.logger.log(LOG_MESSAGES.resumed(key.fixtureId, loaded.ledgerHead));
     }
-    this.runners.set(key.fixtureId, runner);
-    this.fixtures.set(key.fixtureId, loaded.fixture);
+    this.registry.add(key.fixtureId, runner, loaded.fixture);
     return runner;
   }
 
@@ -184,12 +227,13 @@ export class SessionManager
     batch: PipelineBatch,
   ): Promise<void> {
     this.runtime.outbox.notify();
+    this.registry.touch(key.fixtureId);
     for (const record of batch.insights) this.enqueuePending(key, record);
-    const sessionCompleted =
-      this.runners.get(key.fixtureId)?.status.state === 'COMPLETED';
+    // An unloaded session may have completed: rebuild is a no-op unless the match ended.
+    const state = this.registry.runner(key.fixtureId)?.status.state;
     if (
       batch.matchEnded ||
-      (sessionCompleted && batch.completions.length > 0)
+      ((state ?? 'COMPLETED') === 'COMPLETED' && batch.completions.length > 0)
     ) {
       await this.recaps.rebuild(key);
     }
@@ -211,7 +255,7 @@ export class SessionManager
   }
 
   private publishFallback(key: FixtureKey, insight: Insight): void {
-    const fixture = this.fixtures.get(key.fixtureId);
+    const fixture = this.registry.fixture(key.fixtureId);
     if (fixture === undefined) return;
     const publication = templatePublication({
       insight,
@@ -229,11 +273,8 @@ export class SessionManager
 
   private scheduleEviction(fixtureId: string): void {
     setTimeout(() => {
-      const runner = this.runners.get(fixtureId);
-      if (runner?.status.state !== 'COMPLETED') return;
-      runner.dispose();
-      this.runners.delete(fixtureId);
-      this.fixtures.delete(fixtureId);
+      const runner = this.registry.runner(fixtureId);
+      if (runner?.status.state === 'COMPLETED') this.registry.remove(fixtureId);
     }, REPLAY_RUNTIME.completedRetentionMs).unref();
   }
 
@@ -241,7 +282,6 @@ export class SessionManager
     this.logger.error(
       LOG_MESSAGES.sessionFailed(key.fixtureId, describe(error)),
     );
-    this.runners.get(key.fixtureId)?.dispose();
-    this.runners.delete(key.fixtureId);
+    this.registry.remove(key.fixtureId);
   }
 }

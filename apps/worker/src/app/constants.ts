@@ -185,7 +185,7 @@ export const REDIS_CONNECTION_NAMES = {
   queues: 'matchiq-worker-queues',
 } as const;
 
-/** Reasons the editorial policy records when it keeps a cue off air (ADR-0015). */
+/** Reasons the editorial policy records when it keeps a cue off air (ADR-0016). */
 export const EDITORIAL_REASONS = {
   FROZEN: 'EDITORIAL_FREEZE',
   KILLED: 'KILL_SWITCH',

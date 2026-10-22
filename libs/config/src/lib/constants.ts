@@ -35,8 +35,6 @@ export const ENV_LIMITS = {
   agentCircuitCooldownMinMs: 1_000,
   agentCircuitCooldownMaxMs: 600_000,
   agentCircuitCooldownDefaultMs: 30_000,
-  replayActiveSessionsMax: 50,
-  replayActiveSessionsDefault: 10,
 } as const;
 
 export const ENV_PATTERNS = {

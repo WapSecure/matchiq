@@ -16,6 +16,7 @@ export const REPLAY_COMMAND_BUS = Symbol('REPLAY_COMMAND_BUS');
 export const EDITORIAL_UOW = Symbol('EDITORIAL_UOW');
 export const EDITORIAL_READER = Symbol('EDITORIAL_READER');
 export const AUDIT_READER = Symbol('AUDIT_READER');
+export const REPLAY_STORES = Symbol('REPLAY_STORES');
 
 export interface Clock {
   now(): Date;

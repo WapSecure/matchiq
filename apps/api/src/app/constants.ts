@@ -45,6 +45,7 @@ export const HEADERS = {
   wwwAuthenticate: 'WWW-Authenticate',
   idempotencyKey: 'idempotency-key',
   idempotentReplay: 'Idempotent-Replayed',
+  retryAfter: 'Retry-After',
   lastEventId: 'last-event-id',
   requestId: 'x-request-id',
   correlationId: 'x-correlation-id',
@@ -77,6 +78,8 @@ export const API_LIMITS = {
   shutdownGraceMs: 5_000,
   sessionListDefault: 20,
   sessionListMax: 100,
+  /** Seconds a client should wait after a replay-capacity 503. */
+  replayCapacityRetryAfterS: 30,
 } as const;
 
 export const PATTERNS = {
@@ -96,6 +99,8 @@ export const IDEMPOTENCY_SCOPES = {
   resume: 'POST /fixtures/editorial/resume',
   killSwitchActivate: 'POST /editorial/kill-switch/activate',
   killSwitchRelease: 'POST /editorial/kill-switch/release',
+  createSession: 'POST /fixtures/sessions',
+  replayCommand: 'POST /fixtures/replay',
 } as const;
 
 export const AUDIT_TARGETS = {
@@ -154,6 +159,10 @@ export const PROBLEMS = {
     title: 'Replay control is temporarily unavailable',
     slug: 'replay-unavailable',
   },
+  replayCapacity: {
+    title: 'Every replay slot is in use',
+    slug: 'replay-capacity',
+  },
   stateNotFound: {
     title: 'No match state has been projected yet',
     slug: 'state-not-found',
@@ -192,6 +201,13 @@ export const RETRACT_REASONS = {
 export const EDITORIAL_DETAILS = {
   overlayState: (status: string) => `the cue is ${status}`,
   insightState: (publication: string) => `publication is ${publication}`,
+} as const;
+
+export const REPLAY_CAPACITY = {
+  detail: (active: number, max: number) =>
+    `${active} of ${max} replay sessions are playing; try again shortly or join a running session`,
+  /** Commands that move a session into PLAYING and so need a free slot. */
+  slotActions: ['start', 'resume'],
 } as const;
 
 export const REPLAY_CONFLICTS = {

@@ -9,4 +9,4 @@ export const fixtureFk = (
     name,
     columns: [t.orgId, t.fixtureId],
     foreignColumns: [fixtures.orgId, fixtures.fixtureId],
-  });
+  }).onDelete('cascade');

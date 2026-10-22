@@ -26,6 +26,8 @@ services:
       APP_ENV: stage
       API_PUBLIC_URL: https://${MATCHIQ_DOMAIN}
       CORS_ALLOWED_ORIGINS: https://${MATCHIQ_DOMAIN}
+      # Caddy is the one hop in front of the API; req.ip (rate limits) is the client it saw.
+      TRUST_PROXY: '1'
       OPERATOR_API_KEY: ${OPERATOR_API_KEY:?set OPERATOR_API_KEY (openssl rand -hex 32)}
 
   worker:

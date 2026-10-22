@@ -12,6 +12,8 @@ import {
   PostgresIntelligenceReader,
   PostgresSessionStore,
   PostgresTemplateStore,
+  type SessionStore,
+  type TemplateStore,
 } from '@matchiq/db';
 import { Redis } from 'ioredis';
 import { QUEUE_CONNECTION_NAME } from '../constants';
@@ -19,6 +21,7 @@ import {
   DATABASE,
   INTELLIGENCE_READER,
   REPLAY_COMMAND_BUS,
+  REPLAY_STORES,
   SESSION_STORE,
   TEMPLATE_STORE,
 } from './tokens';
@@ -31,6 +34,12 @@ const QUEUE_REDIS_OPTIONS = {
 } as const;
 
 const QUEUE_CONNECTION = Symbol('QUEUE_CONNECTION');
+
+/** The stores behind replay control, grouped to keep its constructor small. */
+export interface ReplayStores {
+  readonly templates: TemplateStore;
+  readonly sessions: SessionStore;
+}
 
 /** Closes the command-queue producer and its connection with the app. */
 @Injectable()
@@ -59,6 +68,14 @@ export const replayProviders = (env: ApiEnv): Provider[] => [
     INTELLIGENCE_READER,
     (h) => new PostgresIntelligenceReader(h.db),
   ),
+  {
+    provide: REPLAY_STORES,
+    useFactory: (templates: TemplateStore, sessions: SessionStore) => ({
+      templates,
+      sessions,
+    }),
+    inject: [TEMPLATE_STORE, SESSION_STORE],
+  },
   {
     provide: QUEUE_CONNECTION,
     useFactory: () => {

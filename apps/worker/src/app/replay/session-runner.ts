@@ -93,6 +93,21 @@ export class SessionRunner {
     return this.failed !== null;
   }
 
+  /** True while queued items are still being written. */
+  get isBusy(): boolean {
+    return this.draining !== null;
+  }
+
+  /** Applies the persisted speed to a rebuilt controller without emitting a status. */
+  restoreSpeed(speed: ReplayStatus['speed']): void {
+    this.controller.execute({ action: 'setSpeed', speed });
+  }
+
+  /** Writes the current status, e.g. after the worker changed it on its own. */
+  announce(): void {
+    this.push({ kind: 'status', status: this.controller.status });
+  }
+
   /**
    * Rebuilds pipeline state from events already in the ledger without writing
    * anything, then parks the controller after them (PAUSED).

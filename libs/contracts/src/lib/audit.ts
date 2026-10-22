@@ -6,6 +6,9 @@ export const AUDIT_ACTIONS = {
   fixtureCreated: 'fixture.created',
   eventsIngested: 'events.ingested',
   sessionCreated: 'replay.session.created',
+  commandRejected: 'replay.command.rejected',
+  sessionsPurged: 'retention.sessions.purged',
+  retentionRun: 'retention.run',
   overlayRetracted: 'overlay.retracted',
   overlayHeld: 'overlay.held',
   overlayBlocked: 'overlay.blocked',
@@ -27,6 +30,7 @@ export const AuditTargetType = z.enum([
   'overlay',
   'insight',
   'organization',
+  'retention',
 ]);
 
 const identifier = z.string().min(1).max(LIMITS.auditIdentifierMax);

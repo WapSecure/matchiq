@@ -78,7 +78,7 @@ export const matchEvents = pgTable(
       name: 'match_events_fixture_fk',
       columns: [t.orgId, t.fixtureId],
       foreignColumns: [fixtures.orgId, fixtures.fixtureId],
-    }),
+    }).onDelete('cascade'),
     check('match_events_sequence_nonnegative', sql`${t.sequence} >= 0`),
     check('match_events_clock_nonnegative', sql`${t.matchClockMs} >= 0`),
   ],
@@ -109,7 +109,7 @@ export const streamMessages = pgTable(
       name: 'stream_messages_fixture_fk',
       columns: [t.orgId, t.fixtureId],
       foreignColumns: [fixtures.orgId, fixtures.fixtureId],
-    }),
+    }).onDelete('cascade'),
     check('stream_messages_sequence_positive', sql`${t.streamSequence} > 0`),
   ],
 );
@@ -182,5 +182,6 @@ export const idempotencyKeys = pgTable(
       name: 'idempotency_keys_pk',
       columns: [t.orgId, t.scope, t.key],
     }),
+    index('idempotency_keys_created_idx').on(t.createdAt),
   ],
 );

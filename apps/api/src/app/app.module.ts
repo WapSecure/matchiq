@@ -14,6 +14,7 @@ import {
 } from './editorial/editorial.controller';
 import { EditorialEffects } from './editorial/editorial-writes';
 import { EditorialService } from './editorial/editorial.service';
+import { IdempotencyService } from './http/idempotency.service';
 import { API_LIMITS, SERVICE_NAME, THROTTLERS } from './constants';
 import { FixturesController } from './fixtures/fixtures.controller';
 import { FixturesService } from './fixtures/fixtures.service';
@@ -77,6 +78,7 @@ export class AppModule {
         EditorialEffects,
         EditorialService,
         EditorialControlsService,
+        IdempotencyService,
         FixturesService,
         IngestService,
         StreamService,

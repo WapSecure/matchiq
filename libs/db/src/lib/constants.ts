@@ -39,17 +39,26 @@ export const AUDIT_ACTORS = {
   anonymousViewer: 'anonymous-viewer',
   publishGate: 'publish-gate',
   overlayScheduler: 'overlay-scheduler',
+  retention: 'system:retention',
+  worker: 'system:worker',
 } as const;
 export const AUDIT_TARGET_TYPES = {
   fixture: 'fixture',
   overlay: 'overlay',
   insight: 'insight',
   organization: 'organization',
+  retention: 'retention',
 } as const;
 
 export const AUDIT_CURSOR = {
   encoding: 'base64url',
   idPattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+} as const;
+
+export const RETENTION = {
+  advisoryLockName: 'matchiq:retention',
+  capacityLockPrefix: 'matchiq:replay-capacity:',
+  sessionsTarget: 'replay_sessions',
 } as const;
 
 /** Session fixtures are `<templateId>_s<n>` (ADR-0013). */

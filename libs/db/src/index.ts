@@ -22,3 +22,5 @@ export * from './lib/editorial-types.js';
 export * as editorialSchema from './lib/schema/editorial-tables.js';
 export * from './lib/postgres/editorial-transaction.js';
 export * from './lib/postgres/audit-reader.js';
+export * from './lib/operations-types.js';
+export * from './lib/postgres/retention-store.js';

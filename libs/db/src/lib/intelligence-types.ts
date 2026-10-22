@@ -21,6 +21,7 @@ import type {
   InsightEditorialState,
   OverlayEditorialState,
 } from './editorial-types.js';
+import type { SessionActivity, SessionCapacity } from './operations-types.js';
 import type { FixtureKey, LedgerTransaction } from './ports.js';
 
 /**
@@ -257,9 +258,11 @@ export interface CreateSessionCommand {
   readonly orgId: string;
   readonly templateId: string;
   readonly speed: ReplayStatus['speed'];
+  /** When set, creation fails with `SessionCapacityExceeded` at the limit. */
+  readonly capacity?: SessionCapacity;
 }
 
-export interface SessionStore {
+export interface SessionStore extends SessionActivity {
   /** Null when the template does not exist. */
   create(command: CreateSessionCommand): Promise<CreatedSession | null>;
   get(key: FixtureKey): Promise<ReplaySessionView | null>;

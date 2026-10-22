@@ -27,6 +27,7 @@ CREATE INDEX "insights_id_idx" ON "insights" USING btree ("org_id","insight_id")
 CREATE INDEX "overlay_cues_id_idx" ON "overlay_cues" USING btree ("org_id","overlay_id");--> statement-breakpoint
 ALTER TABLE "audit_events" ADD CONSTRAINT "audit_events_actor_type_valid" CHECK ("audit_events"."actor_type" in ('OPERATOR', 'SYSTEM', 'ANONYMOUS'));--> statement-breakpoint
 UPDATE "audit_events" SET "actor_type" = 'ANONYMOUS' WHERE "actor" = 'anonymous-viewer';--> statement-breakpoint
+UPDATE "audit_events" SET "actor_type" = 'SYSTEM' WHERE "actor" LIKE 'system:%';--> statement-breakpoint
 UPDATE "audit_events" SET "fixture_id" = "target_id" WHERE "target_type" = 'fixture';--> statement-breakpoint
 CREATE FUNCTION "audit_events_append_only"() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN

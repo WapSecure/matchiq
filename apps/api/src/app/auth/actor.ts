@@ -19,7 +19,7 @@ export type ActorResolution =
   | { readonly kind: 'actor'; readonly actor: Actor };
 
 /**
- * The seam real identity replaces (ADR-0015): an OIDC resolver validates a
+ * The seam real identity replaces (ADR-0016): an OIDC resolver validates a
  * token and maps memberships to permissions; guards and controllers stay as
  * they are.
  */

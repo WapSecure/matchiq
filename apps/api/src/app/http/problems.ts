@@ -17,6 +17,7 @@ const STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   sessionNotFound: HttpStatus.NOT_FOUND,
   replayConflict: HttpStatus.CONFLICT,
   replayUnavailable: HttpStatus.SERVICE_UNAVAILABLE,
+  replayCapacity: HttpStatus.SERVICE_UNAVAILABLE,
   stateNotFound: HttpStatus.NOT_FOUND,
   recapNotReady: HttpStatus.NOT_FOUND,
   forbidden: HttpStatus.FORBIDDEN,
@@ -29,6 +30,10 @@ const STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
 
 export const problem = (
   kind: ProblemKind,
-  extra: { detail?: string; errors?: readonly FieldError[] } = {},
+  extra: {
+    detail?: string;
+    errors?: readonly FieldError[];
+    headers?: Readonly<Record<string, string>>;
+  } = {},
 ): ProblemException =>
   new ProblemException({ status: STATUS[kind], ...PROBLEMS[kind], ...extra });
