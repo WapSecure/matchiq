@@ -12,11 +12,20 @@ import {
 } from './api-error';
 import { describeIssues } from './http-client';
 
-/** Reads `globalThis.fetch` per call, with the same timeout and error mapping as `requestJson`. */
+const BODYLESS = new Set(['GET', 'HEAD']);
+
+/**
+ * Same call shape, timeout and error mapping as `requestJson`: a URL string
+ * and init, read from `globalThis.fetch` per call.
+ */
 const timedFetch = async (request: Request): Promise<Response> => {
   const timeout = AbortSignal.timeout(API_LIMITS.requestTimeoutMs);
+  const body = BODYLESS.has(request.method) ? undefined : await request.text();
   try {
-    return await fetch(request, {
+    return await fetch(request.url, {
+      method: request.method,
+      headers: Object.fromEntries(request.headers),
+      body,
       signal: AbortSignal.any([request.signal, timeout]),
     });
   } catch (error) {
