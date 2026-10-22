@@ -16,6 +16,8 @@ The source of truth for product behaviour is `docs/product/MatchIQ_Enterprise_Ma
 | config         | `libs/config`         | `scope:shared` `type:util`        | Validated environment loading.                                                                            |
 | server-kit     | `libs/server-kit`     | `scope:server` `type:util`        | Nest HTTP baseline: health, problem details, request IDs, env module.                                     |
 | db             | `libs/db`             | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters.                      |
+| access         | `libs/access`         | `scope:shared` `type:domain`      | Roles, permissions, the role → permission matrix and claim mapping (ADR-0015). Framework-free.            |
+| auth           | `libs/auth`           | `scope:server` `type:data-access` | OIDC access-token verification (JWKS), stream tickets, Nest guards and `@RequirePermission`.              |
 
 Planned for M1 (created by their owning stream with these tags):
 

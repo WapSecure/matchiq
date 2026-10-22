@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { ApiEnv } from '@matchiq/config';
-import { Permission, type AuditActorType } from '@matchiq/contracts';
+import { ROLE_PERMISSIONS, type Permission } from '@matchiq/access';
+import type { AuditActorType } from '@matchiq/contracts';
 import { APP_ENV } from '@matchiq/server-kit';
 import { AUTH, HEADERS } from '../constants';
 import { operatorKeyMatches } from './operator-auth.guard';
@@ -31,7 +32,10 @@ export interface ActorResolver {
 
 export const ACTOR_RESOLVER = Symbol('ACTOR_RESOLVER');
 
-/** ADR-0010: the shared operator key stands for one operator with every permission. */
+/**
+ * The shared operator key carries the developer and producer permissions,
+ * the same mapping ADR-0015 gives it behind `AUTH_OPERATOR_KEY_ENABLED`.
+ */
 @Injectable()
 export class OperatorKeyActorResolver implements ActorResolver {
   private readonly operator: Actor;
@@ -41,7 +45,10 @@ export class OperatorKeyActorResolver implements ActorResolver {
       type: 'OPERATOR',
       id: AUTH.operatorActor,
       orgId: env.DEMO_ORG_ID,
-      permissions: new Set(Permission.options),
+      permissions: new Set<Permission>([
+        ...ROLE_PERMISSIONS.developer,
+        ...ROLE_PERMISSIONS.producer,
+      ]),
     };
   }
 

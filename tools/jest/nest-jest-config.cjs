@@ -17,6 +17,8 @@ module.exports = function createNestJestConfig(displayName) {
     preset: '../../jest.preset.js',
     testEnvironment: 'node',
     transform: { '^.+\\.[tj]s$': ['@swc/jest', swcOptions] },
+    // jose ships ESM only; transpile it like source so Jest can require it.
+    transformIgnorePatterns: ['/node_modules/(?!(\\.pnpm/jose@|jose/))'],
     moduleFileExtensions: ['ts', 'js'],
     coverageDirectory: 'test-output/jest/coverage',
   };

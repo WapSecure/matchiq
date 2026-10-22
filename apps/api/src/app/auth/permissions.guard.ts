@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Permission } from '@matchiq/contracts';
+import type { Permission } from '@matchiq/access';
 import { ProblemException } from '@matchiq/server-kit';
 import type { Request } from 'express';
 import { AUTH, AUTH_DETAILS, HEADERS, PROBLEMS } from '../constants';

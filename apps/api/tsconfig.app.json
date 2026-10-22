@@ -24,9 +24,6 @@
   ],
   "references": [
     {
-      "path": "../../libs/football-engine/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/server-kit/tsconfig.lib.json"
     },
     {
@@ -37,6 +34,12 @@
     },
     {
       "path": "../../libs/config/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/access/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/football-engine/tsconfig.lib.json"
     }
   ]
 }

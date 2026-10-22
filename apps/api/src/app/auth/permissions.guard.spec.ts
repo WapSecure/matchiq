@@ -1,7 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { ApiEnv } from '@matchiq/config';
-import type { Permission } from '@matchiq/contracts';
+import type { Permission } from '@matchiq/access';
 import { ProblemException } from '@matchiq/server-kit';
 import {
   type Actor,
@@ -87,7 +87,7 @@ describe('OperatorKeyActorResolver', () => {
       name === 'authorization' ? authorization : undefined,
   });
 
-  it('maps the shared key to the operator with every permission', () => {
+  it('maps the shared key to the developer and producer permissions', () => {
     const resolution = resolver.resolve(headers(`Bearer ${KEY}`));
     expect(resolution.kind).toBe('actor');
     if (resolution.kind === 'actor') {
@@ -95,7 +95,8 @@ describe('OperatorKeyActorResolver', () => {
         id: 'operator',
         orgId: 'org_demo',
       });
-      expect(resolution.actor.permissions.has('editorial:admin')).toBe(true);
+      expect(resolution.actor.permissions.has('editorial:publish')).toBe(true);
+      expect(resolution.actor.permissions.has('members:manage')).toBe(false);
     }
   });
 

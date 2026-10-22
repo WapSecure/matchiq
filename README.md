@@ -36,12 +36,14 @@ Prerequisites: Node 22 (`.nvmrc`), pnpm 10, [uv](https://docs.astral.sh/uv/), Do
 pnpm install
 (cd apps/agents && uv sync)
 cp .env.example .env          # fill in the generated secrets
-pnpm infra:up                 # Postgres :54320, Redis :63790
+pnpm infra:up                 # Postgres :54320, Redis :63790, Keycloak :8180
 pnpm verify                   # format, lint, typecheck, test, build
 pnpm e2e                      # Playwright + axe
 ```
 
 Run services individually with `pnpm nx serve api`, `pnpm nx serve worker`, `pnpm nx serve agents` and `pnpm nx dev web` (port 4200).
+
+Keycloak is the local OpenID Connect provider (realm `matchiq`, demo accounts in [`docs/security/IDENTITY_AND_ACCESS.md`](docs/security/IDENTITY_AND_ACCESS.md), dev-only password `matchiq-dev-only`).
 
 ## Branching
 

@@ -102,7 +102,7 @@ export class EditorialControlsController {
 
   @Post(ROUTES.killSwitchActivate)
   @HttpCode(HttpStatus.OK)
-  @RequirePermission('editorial:admin')
+  @RequirePermission('editorial:publish')
   async activate(
     @EditorialContext() ctx: CommandContext,
     @Res({ passthrough: true }) res: Response,
@@ -112,7 +112,7 @@ export class EditorialControlsController {
 
   @Post(ROUTES.killSwitchRelease)
   @HttpCode(HttpStatus.OK)
-  @RequirePermission('editorial:admin')
+  @RequirePermission('editorial:publish')
   async release(
     @EditorialContext() ctx: CommandContext,
     @Res({ passthrough: true }) res: Response,

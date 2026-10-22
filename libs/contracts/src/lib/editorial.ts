@@ -2,16 +2,6 @@ import { z } from 'zod';
 import { LIMITS } from './constants.js';
 import { FixtureId, InsightId, OverlayId, UtcTimestamp } from './primitives.js';
 
-/** Spec §40 and §45 scopes. The shared operator key holds all of them until RBAC lands. */
-export const Permission = z.enum([
-  'fixtures:write',
-  'events:ingest',
-  'editorial:approve',
-  'editorial:publish',
-  'editorial:admin',
-  'audit:read',
-]);
-
 /** Free-text justification recorded in the audit trail; never shown to viewers. */
 export const EditorialReason = z
   .string()
@@ -91,7 +81,6 @@ export const SuppressInsightResult = z.strictObject({
   retractedOverlayId: OverlayId.nullable(),
 });
 
-export type Permission = z.infer<typeof Permission>;
 export type EditorialReason = z.infer<typeof EditorialReason>;
 export type EditorialCommand = z.infer<typeof EditorialCommand>;
 export type OverlayRetractCause = z.infer<typeof OverlayRetractCause>;
