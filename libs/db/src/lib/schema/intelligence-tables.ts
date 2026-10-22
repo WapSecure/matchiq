@@ -3,13 +3,10 @@ import type {
   Fixture,
   Insight,
   MatchEvent,
-  MatchSnapshot,
   Narrative,
   OverlayCue,
 } from '@matchiq/contracts';
-import { sql } from 'drizzle-orm';
 import {
-  check,
   foreignKey,
   index,
   integer,
@@ -20,23 +17,22 @@ import {
   text,
   unique,
   uuid,
-  type PgColumn,
 } from 'drizzle-orm/pg-core';
 import { TABLES } from '../constants.js';
+import type { GateReport, InsightPublication } from '../intelligence-types.js';
 import type {
-  GateReport,
-  InsightPublication,
-  RecapDocument,
-} from '../intelligence-types.js';
-import { createdAt, fixtureId, orgId, sha256, utc } from './columns.js';
-import { fixtures } from './tables.js';
-
-const fixtureFk = (name: string, t: { orgId: PgColumn; fixtureId: PgColumn }) =>
-  foreignKey({
-    name,
-    columns: [t.orgId, t.fixtureId],
-    foreignColumns: [fixtures.orgId, fixtures.fixtureId],
-  });
+  InsightEditorialState,
+  OverlayEditorialState,
+} from '../editorial-types.js';
+import {
+  createdAt,
+  editorialColumns,
+  fixtureId,
+  orgId,
+  sha256,
+  utc,
+} from './columns.js';
+import { fixtureFk } from './fixture-fk.js';
 
 /** Golden fixture files loaded by `pnpm seed:fixtures`; replay sessions copy from these. */
 export const fixtureTemplates = pgTable(
@@ -118,6 +114,7 @@ export const insights = pgTable(
     payload: jsonb('payload').$type<Insight>().notNull(),
     gateReport: jsonb('gate_report').$type<GateReport>(),
     fallbackReason: text('fallback_reason'),
+    ...editorialColumns<InsightEditorialState>(),
     detectedSequence: integer('detected_sequence').notNull(),
     createdAt: createdAt(),
     updatedAt: utc('updated_at').notNull().defaultNow(),
@@ -129,6 +126,7 @@ export const insights = pgTable(
     }),
     fixtureFk('insights_fixture_fk', t),
     index('insights_order_idx').on(t.orgId, t.fixtureId, t.detectedSequence),
+    index('insights_id_idx').on(t.orgId, t.insightId),
   ],
 );
 
@@ -178,6 +176,7 @@ export const overlayCues = pgTable(
     clockEndMs: integer('clock_end_ms').notNull(),
     payload: jsonb('payload').$type<OverlayCue>().notNull(),
     endReason: text('end_reason'),
+    ...editorialColumns<OverlayEditorialState>(),
     publishedSequence: integer('published_sequence').notNull(),
     createdAt: createdAt(),
     updatedAt: utc('updated_at').notNull().defaultNow(),
@@ -194,6 +193,7 @@ export const overlayCues = pgTable(
       t.period,
       t.clockStartMs,
     ),
+    index('overlay_cues_id_idx').on(t.orgId, t.overlayId),
   ],
 );
 
@@ -220,38 +220,4 @@ export const agentRuns = pgTable(
   ],
 );
 
-/** Latest projection per fixture, for `GET /fixtures/:id/state`. */
-export const matchSnapshots = pgTable(
-  TABLES.matchSnapshots,
-  {
-    orgId: orgId(),
-    fixtureId: fixtureId(),
-    throughSequence: integer('through_sequence').notNull(),
-    payload: jsonb('payload').$type<MatchSnapshot>().notNull(),
-    updatedAt: utc('updated_at').notNull().defaultNow(),
-  },
-  (t) => [
-    primaryKey({
-      name: 'match_snapshots_pk',
-      columns: [t.orgId, t.fixtureId],
-    }),
-    fixtureFk('match_snapshots_fixture_fk', t),
-    check('match_snapshots_sequence_valid', sql`${t.throughSequence} >= -1`),
-  ],
-);
-
-export const matchRecaps = pgTable(
-  TABLES.matchRecaps,
-  {
-    orgId: orgId(),
-    fixtureId: fixtureId(),
-    payload: jsonb('payload').$type<RecapDocument>().notNull(),
-    payloadHash: sha256('payload_hash').notNull(),
-    createdAt: createdAt(),
-    updatedAt: utc('updated_at').notNull().defaultNow(),
-  },
-  (t) => [
-    primaryKey({ name: 'match_recaps_pk', columns: [t.orgId, t.fixtureId] }),
-    fixtureFk('match_recaps_fixture_fk', t),
-  ],
-);
+export { matchRecaps, matchSnapshots } from './read-model-tables.js';

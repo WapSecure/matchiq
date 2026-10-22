@@ -31,6 +31,22 @@ const eventsOf = (key: FixtureKey) =>
     eq(matchEvents.fixtureId, key.fixtureId),
   );
 
+const auditValues = (entry: AuditEntry) => ({
+  orgId: entry.orgId,
+  actor: entry.actor,
+  actorType: entry.actorType ?? 'OPERATOR',
+  action: entry.action,
+  targetType: entry.targetType,
+  targetId: entry.targetId,
+  fixtureId: entry.fixtureId ?? null,
+  reason: entry.reason ?? null,
+  correlationId: entry.correlationId ?? null,
+  requestId: entry.requestId ?? null,
+  before: entry.before ?? null,
+  after: entry.after ?? null,
+  details: entry.details,
+});
+
 /** Extended by the worker's pipeline transaction (see pipeline-transaction.ts). */
 export class PostgresLedgerTransaction implements LedgerTransaction {
   constructor(protected readonly tx: Transaction) {}
@@ -141,11 +157,18 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
     return messages;
   }
 
-  async appendAudit(entry: AuditEntry): Promise<void> {
-    await this.tx.insert(auditEvents).values({
-      ...entry,
-      requestId: entry.requestId ?? null,
-    });
+  async appendAudit(entry: AuditEntry): Promise<string> {
+    const [row] = await this.tx
+      .insert(auditEvents)
+      .values(auditValues(entry))
+      .returning({ id: auditEvents.id });
+    if (!row) throw new Error('audit insert returned no row');
+    return row.id;
+  }
+
+  async appendAudits(entries: readonly AuditEntry[]): Promise<void> {
+    if (entries.length === 0) return;
+    await this.tx.insert(auditEvents).values(entries.map(auditValues));
   }
 
   claimIdempotencyKey(request: IdempotencyRequest): Promise<IdempotencyClaim> {

@@ -7,7 +7,7 @@ import {
   type Narrative,
   type OverlayCue,
 } from '@matchiq/contracts';
-import { and, asc, eq, type SQL } from 'drizzle-orm';
+import { and, asc, eq, isNull, notInArray, or, type SQL } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
 import type { Database } from '../client.js';
 import type {
@@ -17,6 +17,7 @@ import type {
   NarrativeFilter,
   RecapDocument,
 } from '../intelligence-types.js';
+import type { OverlayEditorialState } from '../editorial-types.js';
 import type { FixtureKey } from '../ports.js';
 import {
   agentRuns,
@@ -38,6 +39,8 @@ const withInsightStatus = (row: { payload: Insight; status: string }) => ({
   ...row.payload,
   status: PipelineStatus.parse(row.status),
 });
+
+const NEVER_AIRED: OverlayEditorialState[] = ['HELD', 'SUPPRESSED'];
 
 const groupRuns = (rows: { insightId: string; payload: AgentRun }[]) => {
   const byInsight = new Map<string, AgentRun[]>();
@@ -97,6 +100,7 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
           scoped(insights, key),
           eq(insights.insightId, insightId),
           eq(insights.publication, 'PENDING'),
+          isNull(insights.editorialState),
         ),
       );
     return row ? withInsightStatus(row) : null;
@@ -140,7 +144,16 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
     const rows = await this.db
       .select({ payload: overlayCues.payload, status: overlayCues.status })
       .from(overlayCues)
-      .where(scoped(overlayCues, key))
+      .where(
+        and(
+          scoped(overlayCues, key),
+          // Held and suppressed cues never aired; viewers see only what went on air.
+          or(
+            isNull(overlayCues.editorialState),
+            notInArray(overlayCues.editorialState, NEVER_AIRED),
+          ),
+        ),
+      )
       .orderBy(asc(overlayCues.publishedSequence), asc(overlayCues.overlayId));
     return rows.map((r) => ({
       ...r.payload,
@@ -166,8 +179,20 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
         fallbackReason: insights.fallbackReason,
         gate: insights.gateReport,
         payload: insights.payload,
+        insightState: insights.editorialState,
+        insightReason: insights.editorialReason,
+        overlayState: overlayCues.editorialState,
+        overlayReason: overlayCues.editorialReason,
       })
       .from(insights)
+      .leftJoin(
+        overlayCues,
+        and(
+          eq(overlayCues.orgId, insights.orgId),
+          eq(overlayCues.fixtureId, insights.fixtureId),
+          eq(overlayCues.insightId, insights.insightId),
+        ),
+      )
       .where(scoped(insights, key))
       .orderBy(asc(insights.detectedSequence));
     const runRows = await this.db
@@ -185,6 +210,12 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
       fallbackReason: row.fallbackReason,
       gate: row.gate,
       runs: runs.get(row.insightId) ?? [],
+      editorial: {
+        insight: row.insightState,
+        insightReason: row.insightReason,
+        overlay: row.overlayState,
+        overlayReason: row.overlayReason,
+      },
     }));
   }
 }

@@ -8,3 +8,9 @@ export const sha256 = (name: string) =>
 export const utc = (name: string) =>
   timestamp(name, { withTimezone: true, mode: 'date', precision: 3 });
 export const createdAt = () => utc('created_at').notNull().defaultNow();
+
+/** Producer or policy state; null while the item follows the automatic pipeline. */
+export const editorialColumns = <T extends string>() => ({
+  editorialState: text('editorial_state').$type<T>(),
+  editorialReason: text('editorial_reason'),
+});

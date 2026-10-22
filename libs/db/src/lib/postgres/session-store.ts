@@ -167,9 +167,11 @@ export class PostgresSessionStore implements SessionStore {
     await ledger.appendAudit({
       orgId: command.orgId,
       actor: AUDIT_ACTORS.anonymousViewer,
+      actorType: 'ANONYMOUS',
       action: AUDIT_ACTIONS.sessionCreated,
       targetType: AUDIT_TARGET_TYPES.fixture,
       targetId: fixture.fixtureId,
+      fixtureId: fixture.fixtureId,
       details: { templateId: command.templateId, speed: command.speed },
     });
   }

@@ -15,6 +15,13 @@
       "when": 1792599063893,
       "tag": "0001_replay_intelligence",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792664987378,
+      "tag": "0002_editorial_control_audit",
+      "breakpoints": true
     }
   ]
 }
