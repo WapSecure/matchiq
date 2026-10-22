@@ -18,6 +18,17 @@ export const API_PATHS = {
     `/fixtures/${encodeURIComponent(fixtureId)}/stream`,
   replay: (fixtureId: string) =>
     `/fixtures/${encodeURIComponent(fixtureId)}/replay`,
+  editorial: (fixtureId: string) => `${fx(fixtureId)}/editorial`,
+  freeze: (fixtureId: string) => `${fx(fixtureId)}/editorial/freeze`,
+  resume: (fixtureId: string) => `${fx(fixtureId)}/editorial/resume`,
+  retract: (overlayId: string) =>
+    `/overlays/${encodeURIComponent(overlayId)}/retract`,
+  suppress: (insightId: string) =>
+    `/insights/${encodeURIComponent(insightId)}/suppress`,
+  killSwitch: '/editorial/kill-switch',
+  killSwitchActivate: '/editorial/kill-switch/activate',
+  killSwitchRelease: '/editorial/kill-switch/release',
+  auditEvents: '/audit-events',
   streamTicket: (fixtureId: string) => `${fx(fixtureId)}/stream-tickets`,
 } as const;
 
@@ -46,6 +57,7 @@ export const API_LIMITS = {
   sessionListLimit: 8,
   queryStaleMs: 15_000,
   queryRetries: 2,
+  auditPageSize: 50,
 } as const;
 
 export const STREAM_TIMING = {
@@ -75,15 +87,19 @@ export const POLL_MS = {
   sessions: 10_000,
   recap: 5_000,
   agentRuns: 4_000,
+  /** Editorial marks on the insight feed (held and suppressed cues). */
+  editorialMarks: 8_000,
   /** How long a 202 prediction waits for the worker's `replay.status`. */
   replayConfirm: 4_000,
 } as const;
 
 export const HTTP_STATUS = {
+  badRequest: 400,
   unauthorized: 401,
   forbidden: 403,
   notFound: 404,
   conflict: 409,
+  unprocessable: 422,
   tooManyRequests: 429,
   unavailable: 503,
 } as const;
@@ -93,6 +109,10 @@ export const PROBLEM_SLUGS = {
   recapNotReady: 'recap-not-ready',
   stateNotFound: 'state-not-found',
   replayConflict: 'replay-state-conflict',
+  overlayNotOnAir: 'overlay-not-on-air',
+  insightPublished: 'insight-already-published',
+  idempotencyReused: 'idempotency-key-reused',
+  invalidCursor: 'invalid-cursor',
 } as const;
 
 export const PROBLEM_FALLBACK = {

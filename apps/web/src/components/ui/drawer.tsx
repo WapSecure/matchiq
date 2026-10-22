@@ -1,14 +1,9 @@
 'use client';
 
-import {
-  type ReactNode,
-  type SyntheticEvent,
-  useEffect,
-  useId,
-  useRef,
-} from 'react';
+import { type ReactNode, type SyntheticEvent, useId } from 'react';
 import { CloseIcon } from '@/components/icons';
 import { Button } from './button';
+import { useNativeDialog } from './use-native-dialog';
 
 type DrawerProps = {
   open: boolean;
@@ -19,10 +14,7 @@ type DrawerProps = {
   children: ReactNode;
 };
 
-/**
- * Modal side sheet on native `<dialog>`: the browser supplies the focus trap,
- * inert background and Escape handling; focus returns to the opener on close.
- */
+/** Modal side sheet on native `<dialog>` (see `useNativeDialog`). */
 export function Drawer({
   open,
   onClose,
@@ -31,26 +23,8 @@ export function Drawer({
   closeLabel,
   children,
 }: DrawerProps) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const opener = useRef<HTMLElement | null>(null);
+  const ref = useNativeDialog(open);
   const titleId = useId();
-
-  useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    if (open && !dialog.open) {
-      opener.current =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : null;
-      if (typeof dialog.showModal === 'function') dialog.showModal();
-      else dialog.setAttribute('open', '');
-    } else if (!open && dialog.open) {
-      if (typeof dialog.close === 'function') dialog.close();
-      else dialog.removeAttribute('open');
-      opener.current?.focus();
-    }
-  }, [open]);
 
   const onCancel = (event: SyntheticEvent) => {
     event.preventDefault();
