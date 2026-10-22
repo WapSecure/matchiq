@@ -28,7 +28,9 @@ services:
       CORS_ALLOWED_ORIGINS: https://${MATCHIQ_DOMAIN}
       # Caddy is the one hop in front of the API; req.ip (rate limits) is the client it saw.
       TRUST_PROXY: '1'
-      OPERATOR_API_KEY: ${OPERATOR_API_KEY:?set OPERATOR_API_KEY (openssl rand -hex 32)}
+      STREAM_TICKET_SECRET: ${STREAM_TICKET_SECRET:?set STREAM_TICKET_SECRET (openssl rand -hex 32)}
+      # ADR-0015: the public demo tenant. Add OIDC_ISSUER_URL and OIDC_AUDIENCE to enable sign-in.
+      AUTH_ANONYMOUS_DEMO_ENABLED: 'true'
 
   worker:
     restart: unless-stopped

@@ -14,10 +14,10 @@ import {
   type StreamMessageDraft,
   type UnitOfWork,
 } from '@matchiq/db';
+import type { Principal } from '@matchiq/access';
 import type { FieldError } from '@matchiq/server-kit';
 import {
   AUDIT_TARGETS,
-  AUTH,
   FIELD_MESSAGES,
   ID_PREFIXES,
   IDEMPOTENCY_SCOPES,
@@ -31,11 +31,15 @@ import {
   type OutboxNotifier,
   UNIT_OF_WORK,
 } from '../infrastructure/tokens';
+import { actorTypeOf } from '../auth/actor';
+import { actorDetails } from '../auth/audit-trail.service';
 import { classifyBatch } from './classify-batch';
 
 export interface IngestCommand {
+  /** `key.orgId` is the principal's organisation (ADR-0015). */
   readonly key: FixtureKey;
   readonly batch: IngestBatchRequest;
+  readonly principal: Principal;
   readonly requestId?: string;
   readonly idempotencyKey?: string;
 }
@@ -124,13 +128,14 @@ export class IngestService {
     };
     await tx.appendAudit({
       orgId: key.orgId,
-      actor: AUTH.operatorActor,
+      actor: command.principal.userId,
+      actorType: actorTypeOf(command.principal),
       action: AUDIT_ACTIONS.eventsIngested,
       targetType: AUDIT_TARGETS.fixture,
       targetId: key.fixtureId,
       fixtureId: key.fixtureId,
       requestId: command.requestId,
-      details: { ...body },
+      details: { ...actorDetails(command.principal), ...body },
     });
     return { status: HttpStatus.ACCEPTED, body };
   }

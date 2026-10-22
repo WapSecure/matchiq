@@ -1,5 +1,5 @@
 import { PipelineStatus } from '@matchiq/contracts';
-import { and, asc, eq, lt, sql, type SQL } from 'drizzle-orm';
+import { asc, eq, lt, sql, type SQL } from 'drizzle-orm';
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import type { DatabaseHandle, Transaction } from '../client.js';
 import {
@@ -151,16 +151,11 @@ export class PostgresRetentionStore implements RetentionStore {
     return result.rowCount ?? 0;
   }
 
-  async pendingInsights(
-    orgId: string,
-    limit: number,
-  ): Promise<PendingInsightRef[]> {
+  async systemPendingInsights(limit: number): Promise<PendingInsightRef[]> {
     const rows = await this.handle.db
       .select()
       .from(insights)
-      .where(
-        and(eq(insights.orgId, orgId), eq(insights.publication, 'PENDING')),
-      )
+      .where(eq(insights.publication, 'PENDING'))
       .orderBy(asc(insights.createdAt))
       .limit(limit);
     return rows.map((row) => ({

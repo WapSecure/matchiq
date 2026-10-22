@@ -85,8 +85,7 @@ export class SessionManager
    */
   private async resumeSessions(): Promise<void> {
     const max = this.env.REPLAY_MAX_ACTIVE_SESSIONS;
-    const playing = await this.sources.sessions.listInState(
-      this.env.DEMO_ORG_ID,
+    const playing = await this.sources.sessions.systemListInState(
       'PLAYING',
       SESSION_LIFECYCLE.resumeScanLimit,
     );

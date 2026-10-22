@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import type { ApiEnv } from '@matchiq/config';
 import { Fixture, type MatchEvent } from '@matchiq/contracts';
 import {
   AUDIT_ACTIONS,
@@ -9,8 +8,10 @@ import {
   sha256Hex,
   type UnitOfWork,
 } from '@matchiq/db';
-import { APP_ENV } from '@matchiq/server-kit';
-import { AUDIT_TARGETS, AUTH, IDEMPOTENCY_SCOPES } from '../constants';
+import { actorTypeOf } from '../auth/actor';
+import { actorDetails } from '../auth/audit-trail.service';
+import { AUDIT_TARGETS, IDEMPOTENCY_SCOPES } from '../constants';
+import type { CallerContext } from '../http/caller-context';
 import { type IdempotentResult, withIdempotency } from '../http/idempotency';
 import { problem } from '../http/problems';
 import {
@@ -30,29 +31,22 @@ export interface EventPage {
   readonly nextAfterSequence: number | null;
 }
 
-export interface CreateFixtureCommand {
+export type CreateFixtureCommand = CallerContext & {
   readonly fixture: Fixture;
-  readonly requestId?: string;
-  readonly idempotencyKey?: string;
-}
+};
 
+/** The organisation always comes from the caller's principal (ADR-0015). */
 @Injectable()
 export class FixturesService {
   constructor(
-    @Inject(APP_ENV) private readonly env: ApiEnv,
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(FIXTURE_READER) private readonly fixtures: FixtureReader,
     @Inject(EVENT_READER) private readonly events: EventReader,
   ) {}
 
-  /** Tenant identity comes from configuration, never from the client (ADR-0007). */
-  keyOf(fixtureId: string): FixtureKey {
-    return { orgId: this.env.DEMO_ORG_ID, fixtureId };
-  }
-
   create(command: CreateFixtureCommand): Promise<IdempotentResult<Fixture>> {
-    const { fixture } = command;
-    const { orgId } = this.keyOf(fixture.fixtureId);
+    const { fixture, principal } = command;
+    const { orgId } = principal;
     return this.uow.transaction((tx) =>
       withIdempotency(
         tx,
@@ -69,13 +63,18 @@ export class FixturesService {
           }
           await tx.appendAudit({
             orgId,
-            actor: AUTH.operatorActor,
+            actor: principal.userId,
+            actorType: actorTypeOf(principal),
             action: AUDIT_ACTIONS.fixtureCreated,
             targetType: AUDIT_TARGETS.fixture,
             targetId: fixture.fixtureId,
             fixtureId: fixture.fixtureId,
             requestId: command.requestId,
-            details: { title: fixture.title, provenance: fixture.provenance },
+            details: {
+              ...actorDetails(principal),
+              title: fixture.title,
+              provenance: fixture.provenance,
+            },
           });
           return { status: HttpStatus.CREATED, body: fixture };
         },
@@ -83,23 +82,21 @@ export class FixturesService {
     );
   }
 
-  async get(fixtureId: string): Promise<Fixture> {
-    const fixture = await this.fixtures.get(this.keyOf(fixtureId));
-    if (!fixture) throw problem('fixtureNotFound', { detail: fixtureId });
+  /** Another organisation's fixture answers the same 404 as a missing one. */
+  async get(key: FixtureKey): Promise<Fixture> {
+    const fixture = await this.fixtures.get(key);
+    if (!fixture) throw problem('fixtureNotFound', { detail: key.fixtureId });
     return fixture;
   }
 
-  async list({ limit }: FixtureListQuery): Promise<FixtureList> {
-    return { items: await this.fixtures.list(this.env.DEMO_ORG_ID, limit) };
+  async list(orgId: string, { limit }: FixtureListQuery): Promise<FixtureList> {
+    return { items: await this.fixtures.list(orgId, limit) };
   }
 
-  async listEvents(
-    fixtureId: string,
-    query: EventPageQuery,
-  ): Promise<EventPage> {
-    await this.get(fixtureId);
+  async listEvents(key: FixtureKey, query: EventPageQuery): Promise<EventPage> {
+    await this.get(key);
     const items = await this.events.listAfter(
-      this.keyOf(fixtureId),
+      key,
       query.afterSequence,
       query.limit,
     );

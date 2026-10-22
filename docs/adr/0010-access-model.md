@@ -1,6 +1,6 @@
 # ADR-0010: Public demo access and operator protection
 
-- Status: Accepted (2026-10-21)
+- Status: Superseded by ADR-0015 (2026-10-22). Accepted 2026-10-21.
 
 ## Decision
 

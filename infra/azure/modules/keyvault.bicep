@@ -14,8 +14,8 @@ param enablePurgeProtection bool = false
 
 @secure()
 @minLength(32)
-@description('Bearer secret for operator endpoints (OPERATOR_API_KEY).')
-param operatorApiKey string
+@description('Signs short-lived SSE stream tickets (STREAM_TICKET_SECRET, ADR-0015).')
+param streamTicketSecret string
 
 @secure()
 @minLength(32)
@@ -52,10 +52,10 @@ resource secretsUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-resource operatorKeySecret 'Microsoft.KeyVault/vaults/secrets@2026-02-01' = {
+resource streamTicketSecretValue 'Microsoft.KeyVault/vaults/secrets@2026-02-01' = {
   parent: vault
-  name: 'operator-api-key'
-  properties: { value: operatorApiKey }
+  name: 'stream-ticket-secret'
+  properties: { value: streamTicketSecret }
 }
 
 resource agentsTokenSecret 'Microsoft.KeyVault/vaults/secrets@2026-02-01' = {

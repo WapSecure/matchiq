@@ -1,11 +1,16 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import {
+  ACCESS_DENIED_LISTENER,
+  AuthenticationGuard,
+  AuthModule,
+  PermissionGuard,
+} from '@matchiq/auth';
 import type { ApiEnv } from '@matchiq/config';
 import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
-import { ACTOR_RESOLVER, OperatorKeyActorResolver } from './auth/actor';
-import { OperatorAuthGuard } from './auth/operator-auth.guard';
-import { PermissionsGuard } from './auth/permissions.guard';
+import { AuditTrail } from './auth/audit-trail.service';
+import { PrincipalThrottlerGuard } from './auth/principal-throttler.guard';
 import { AuditController } from './editorial/audit.controller';
 import { EditorialControlsService } from './editorial/editorial-controls.service';
 import {
@@ -25,6 +30,7 @@ import {
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { OUTBOX_NOTIFIER } from './infrastructure/tokens';
 import { IngestService } from './ingest/ingest.service';
+import { MeController } from './me/me.controller';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
@@ -34,6 +40,18 @@ import { ReplayService } from './replay/replay.service';
 import { StreamController } from './stream/stream.controller';
 import { StreamService } from './stream/stream.service';
 
+export const API_CONTROLLERS = [
+  FixturesController,
+  StreamController,
+  ReplayController,
+  LobbyController,
+  IntelligenceController,
+  EditorialController,
+  EditorialControlsController,
+  AuditController,
+  MeController,
+];
+
 @Module({})
 export class AppModule {
   static forRoot(env: ApiEnv): DynamicModule {
@@ -42,6 +60,7 @@ export class AppModule {
       imports: [
         EnvModule.forRoot(env),
         HttpKitModule,
+        AuthModule.forRoot(env),
         InfrastructureModule.forRoot(env),
         ThrottlerModule.forRoot([
           {
@@ -60,21 +79,14 @@ export class AppModule {
           indicators: [PostgresHealthIndicator, RedisHealthIndicator],
         }),
       ],
-      controllers: [
-        FixturesController,
-        StreamController,
-        ReplayController,
-        LobbyController,
-        IntelligenceController,
-        EditorialController,
-        EditorialControlsController,
-        AuditController,
-      ],
+      controllers: API_CONTROLLERS,
       providers: [
-        { provide: APP_GUARD, useClass: ThrottlerGuard },
-        OperatorAuthGuard,
-        PermissionsGuard,
-        { provide: ACTOR_RESOLVER, useClass: OperatorKeyActorResolver },
+        // Order matters (ADR-0015): who is calling, then their budget, then what they may do.
+        { provide: APP_GUARD, useClass: AuthenticationGuard },
+        { provide: APP_GUARD, useClass: PrincipalThrottlerGuard },
+        { provide: APP_GUARD, useClass: PermissionGuard },
+        AuditTrail,
+        { provide: ACCESS_DENIED_LISTENER, useExisting: AuditTrail },
         EditorialEffects,
         EditorialService,
         EditorialControlsService,

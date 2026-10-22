@@ -34,6 +34,7 @@ import {
   listSessionsInState,
   reserveSlot,
 } from './session-activity.js';
+import { enterTenant, withTenant } from './tenant-scope.js';
 
 const s = replaySessions;
 
@@ -104,6 +105,7 @@ export class PostgresSessionStore implements SessionStore {
    */
   create(command: CreateSessionCommand): Promise<CreatedSession | null> {
     return this.db.transaction(async (tx) => {
+      await enterTenant(tx, command.orgId);
       if (command.capacity !== undefined) {
         await reserveSlot(tx, command.orgId, command.capacity);
       }
@@ -142,27 +144,29 @@ export class PostgresSessionStore implements SessionStore {
   }
 
   async get(key: FixtureKey): Promise<ReplaySessionView | null> {
-    const [row] = await sessionSelect(this.db).where(sessionMatch(key));
+    const [row] = await withTenant(this.db, key.orgId, (tx) =>
+      sessionSelect(tx).where(sessionMatch(key)),
+    );
     return row ? toView(row) : null;
   }
 
   countActive(query: ActiveSessionQuery): Promise<number> {
-    return countActiveSessions(this.db, query);
+    return withTenant(this.db, query.orgId, (tx) =>
+      countActiveSessions(tx, query),
+    );
   }
 
-  listInState(
-    orgId: string,
-    state: ReplayState,
-    limit: number,
-  ): Promise<FixtureKey[]> {
-    return listSessionsInState(this.db, { orgId, state, limit });
+  systemListInState(state: ReplayState, limit: number): Promise<FixtureKey[]> {
+    return listSessionsInState(this.db, { state, limit });
   }
 
   async list(orgId: string, limit: number): Promise<ReplaySessionView[]> {
-    const rows = await sessionSelect(this.db)
-      .where(eq(s.orgId, orgId))
-      .orderBy(desc(s.createdAt), desc(s.fixtureId))
-      .limit(Math.min(limit, DB_LIMITS.sessionListMax));
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      sessionSelect(tx)
+        .where(eq(s.orgId, orgId))
+        .orderBy(desc(s.createdAt), desc(s.fixtureId))
+        .limit(Math.min(limit, DB_LIMITS.sessionListMax)),
+    );
     return rows.map(toView);
   }
 
@@ -187,13 +191,17 @@ export class PostgresSessionStore implements SessionStore {
     });
     await ledger.appendAudit({
       orgId: command.orgId,
-      actor: AUDIT_ACTORS.anonymousViewer,
-      actorType: 'ANONYMOUS',
+      actor: command.actor?.id ?? AUDIT_ACTORS.anonymousViewer,
+      actorType: command.actor?.type ?? 'ANONYMOUS',
       action: AUDIT_ACTIONS.sessionCreated,
       targetType: AUDIT_TARGET_TYPES.fixture,
       targetId: fixture.fixtureId,
       fixtureId: fixture.fixtureId,
-      details: { templateId: command.templateId, speed: command.speed },
+      details: {
+        ...command.actor?.details,
+        templateId: command.templateId,
+        speed: command.speed,
+      },
     });
   }
 }

@@ -16,7 +16,7 @@ param foundryModelName = readEnvironmentVariable('FOUNDRY_MODEL_NAME', '')
 param foundryModelVersion = readEnvironmentVariable('FOUNDRY_MODEL_VERSION', '')
 
 param postgresAdminPassword = readEnvironmentVariable('POSTGRES_ADMIN_PASSWORD')
-param operatorApiKey = readEnvironmentVariable('OPERATOR_API_KEY')
+param streamTicketSecret = readEnvironmentVariable('STREAM_TICKET_SECRET')
 param agentsServiceToken = readEnvironmentVariable('AGENTS_SERVICE_TOKEN')
 
 param budgetAmount = 75

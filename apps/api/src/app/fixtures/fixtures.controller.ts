@@ -1,13 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  Param,
-  Post,
-  Query,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import type { Principal } from '@matchiq/access';
+import { CurrentPrincipal, RequirePermission } from '@matchiq/auth';
 import {
   Fixture,
   IngestBatchRequest,
@@ -15,9 +8,8 @@ import {
 } from '@matchiq/contracts';
 import { ZodValidationPipe } from '@matchiq/server-kit';
 import type { Response } from 'express';
-import { OperatorOnly } from '../auth/operator-auth.guard';
-import { HEADERS, ROUTE_PARAMS, ROUTES } from '../constants';
-import { parseIdempotencyKey } from '../http/idempotency';
+import { ROUTE_PARAMS, ROUTES } from '../constants';
+import { Caller, type CallerContext } from '../http/caller-context';
 import { respond } from '../http/respond';
 import { IngestService } from '../ingest/ingest.service';
 import {
@@ -41,56 +33,64 @@ export class FixturesController {
   ) {}
 
   @Post()
-  @OperatorOnly()
+  @RequirePermission('fixtures:write')
   async create(
     @Body(new ZodValidationPipe(Fixture)) fixture: Fixture,
-    @Headers(HEADERS.idempotencyKey) idempotencyKey: string | undefined,
-    @Headers(HEADERS.requestId) requestId: string | undefined,
+    @Caller() caller: CallerContext,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Fixture> {
-    const result = await this.fixtures.create({
-      fixture,
-      requestId,
-      idempotencyKey: parseIdempotencyKey(idempotencyKey),
-    });
-    return respond(res, result);
+    return respond(res, await this.fixtures.create({ ...caller, fixture }));
   }
 
   @Get()
+  @RequirePermission('fixtures:read')
   list(
     @Query(new ZodValidationPipe(FixtureListQuery)) query: FixtureListQuery,
+    @CurrentPrincipal() principal: Principal,
   ): Promise<FixtureList> {
-    return this.fixtures.list(query);
+    return this.fixtures.list(principal.orgId, query);
   }
 
   @Get(ROUTES.fixture)
+  @RequirePermission('fixtures:read')
   get(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
+    @CurrentPrincipal() principal: Principal,
   ): Promise<Fixture> {
-    return this.fixtures.get(fixtureId);
+    return this.fixtures.get({ orgId: principal.orgId, fixtureId });
   }
 
   @Get(ROUTES.events)
+  @RequirePermission('fixtures:read')
   events(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
     @Query(new ZodValidationPipe(EventPageQuery)) query: EventPageQuery,
+    @CurrentPrincipal() principal: Principal,
   ): Promise<EventPage> {
-    return this.fixtures.listEvents(fixtureId, query);
+    return this.fixtures.listEvents(
+      { orgId: principal.orgId, fixtureId },
+      query,
+    );
   }
 
   @Post(ROUTES.eventsBatch)
-  @OperatorOnly()
+  @RequirePermission('events:ingest')
   async ingest(
     @Param(ROUTE_PARAMS.fixtureId, fixtureIdPipe) fixtureId: string,
     @Body(new ZodValidationPipe(IngestBatchRequest)) batch: IngestBatchRequest,
-    @Headers() headers: Record<string, string | undefined>,
+    @Caller() caller: CallerContext,
     @Res({ passthrough: true }) res: Response,
   ): Promise<IngestBatchResponse> {
     const result = await this.ingestion.ingest({
-      key: this.fixtures.keyOf(fixtureId),
+      key: { orgId: caller.principal.orgId, fixtureId },
       batch,
-      requestId: headers[HEADERS.requestId],
-      idempotencyKey: parseIdempotencyKey(headers[HEADERS.idempotencyKey]),
+      principal: caller.principal,
+      ...(caller.requestId === undefined
+        ? {}
+        : { requestId: caller.requestId }),
+      ...(caller.idempotencyKey === undefined
+        ? {}
+        : { idempotencyKey: caller.idempotencyKey }),
     });
     return respond(res, result);
   }

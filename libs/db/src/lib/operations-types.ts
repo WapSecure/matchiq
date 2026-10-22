@@ -31,9 +31,11 @@ export class SessionCapacityExceeded extends Error {
 
 export interface SessionActivity {
   countActive(query: ActiveSessionQuery): Promise<number>;
-  /** Most recently updated first. */
-  listInState(
-    orgId: string,
+  /**
+   * Every organisation's sessions in `state`, most recently updated first.
+   * System scope (ADR-0015): only the worker's boot scan calls it.
+   */
+  systemListInState(
     state: ReplayState,
     limit: number,
   ): Promise<readonly FixtureKey[]>;
@@ -70,6 +72,7 @@ export interface RetentionStore {
   /** Deletes the session fixtures and, by cascade, every row that depends on them. */
   deleteSessions(keys: readonly FixtureKey[]): Promise<RetentionCounts>;
   pruneIdempotencyKeys(cutoff: Date, limit: number): Promise<number>;
-  pendingInsights(orgId: string, limit: number): Promise<PendingInsightRef[]>;
+  /** Every organisation's pending insights, oldest first (system scope, ADR-0015). */
+  systemPendingInsights(limit: number): Promise<PendingInsightRef[]>;
   audit(entry: AuditEntry): Promise<void>;
 }

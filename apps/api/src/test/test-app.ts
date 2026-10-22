@@ -8,13 +8,21 @@ import {
   uniqueTestToken,
   type TestDatabase,
 } from '@matchiq/db/testing';
+import type { AnyRole } from '@matchiq/access';
+import {
+  type MintOptions,
+  startTestIssuer,
+  type TestIssuer,
+} from '@matchiq/auth/testing';
 import pg from 'pg';
 import type { AddressInfo } from 'node:net';
 import { AppModule } from '../app/app.module';
 import { configureApiApp } from '../app/configure-api-app';
 
+/** The dev/CI operator-key fallback (ADR-0015): a developer + producer in `org_demo`. */
 export const OPERATOR_KEY = 'operator-test-key-'.padEnd(48, 'x');
 export const AUTH_HEADER = { authorization: `Bearer ${OPERATOR_KEY}` };
+export const DEMO_ORG = 'org_demo';
 
 export interface TestApp {
   readonly app: NestExpressApplication;
@@ -22,6 +30,13 @@ export interface TestApp {
   readonly baseUrl: string;
   /** Direct SQL access for asserting on stored rows. */
   readonly sql: pg.Pool;
+  /** A local OIDC issuer the API trusts; mints access tokens for any role and org. */
+  readonly issuer: TestIssuer;
+  bearer(
+    roles: readonly AnyRole[],
+    orgId: string,
+    options?: MintOptions,
+  ): Promise<Record<string, string>>;
   close(): Promise<void>;
 }
 
@@ -33,7 +48,14 @@ export const startTestApp = async (
   overrides: Record<string, string> = {},
 ): Promise<TestApp> => {
   const database: TestDatabase = await createTestDatabase();
+  const issuer = await startTestIssuer();
   const env = loadEnv(ApiEnv, {
+    OIDC_ISSUER_URL: issuer.issuer,
+    OIDC_AUDIENCE: issuer.audience,
+    AUTH_ANONYMOUS_DEMO_ENABLED: 'true',
+    AUTH_ANONYMOUS_ORG_ID: DEMO_ORG,
+    AUTH_OPERATOR_KEY_ENABLED: 'true',
+    STREAM_TICKET_SECRET: 'stream-ticket-test-secret-'.padEnd(40, 'x'),
     APP_VERSION: '1.2.3',
     DATABASE_URL: database.url,
     REDIS_URL: testRedisUrl(),
@@ -59,9 +81,14 @@ export const startTestApp = async (
     env,
     baseUrl: `http://127.0.0.1:${port}/api/v1`,
     sql,
+    issuer,
+    bearer: async (roles, orgId, options) => ({
+      authorization: `Bearer ${await issuer.tokenFor(roles, orgId, options)}`,
+    }),
     close: async () => {
       await app.close();
       await sql.end();
+      await issuer.close();
       await database.drop();
     },
   };

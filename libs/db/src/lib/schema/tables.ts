@@ -161,7 +161,7 @@ export const auditEvents = pgTable(
     ),
     check(
       'audit_events_actor_type_valid',
-      sql`${t.actorType} in ('OPERATOR', 'SYSTEM', 'ANONYMOUS')`,
+      sql`${t.actorType} in ('USER', 'SERVICE', 'OPERATOR', 'SYSTEM', 'ANONYMOUS')`,
     ),
   ],
 );
