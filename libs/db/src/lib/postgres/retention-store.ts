@@ -165,7 +165,12 @@ export class PostgresRetentionStore implements RetentionStore {
     return rows.map((row) => ({
       key: { orgId: row.orgId, fixtureId: row.fixtureId },
       createdAt: row.createdAt,
-      insight: { ...row.payload, status: PipelineStatus.parse(row.status) },
+      // Columns are authoritative; payloads stored before MQ-024 have no period.
+      insight: {
+        ...row.payload,
+        period: row.period,
+        status: PipelineStatus.parse(row.status),
+      },
       revision: row.revision,
     }));
   }
