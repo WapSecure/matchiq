@@ -23,3 +23,5 @@ export const PROBLEM_SLUGS: Readonly<Record<number, string>> = {
   500: 'internal-error',
   503: 'dependency-unavailable',
 };
+
+export const EXPRESS_SETTINGS = { trustProxy: 'trust proxy' } as const;

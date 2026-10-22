@@ -18,3 +18,5 @@ export * from './lib/postgres/session-store.js';
 export * from './lib/postgres/intelligence-reader.js';
 export * from './lib/messaging/job-queues.js';
 export * from './lib/seed/seed-templates.js';
+export * from './lib/operations-types.js';
+export * from './lib/postgres/retention-store.js';

@@ -34,10 +34,26 @@ export const AUDIT_ACTIONS = {
   fixtureCreated: 'fixture.created',
   eventsIngested: 'events.ingested',
   sessionCreated: 'replay.session.created',
+  commandRejected: 'replay.command.rejected',
+  sessionsPurged: 'retention.sessions.purged',
+  retentionRun: 'retention.run',
 } as const;
 
-export const AUDIT_ACTORS = { anonymousViewer: 'anonymous-viewer' } as const;
-export const AUDIT_TARGET_TYPES = { fixture: 'fixture' } as const;
+export const AUDIT_ACTORS = {
+  anonymousViewer: 'anonymous-viewer',
+  retention: 'system:retention',
+  worker: 'system:worker',
+} as const;
+export const AUDIT_TARGET_TYPES = {
+  fixture: 'fixture',
+  retention: 'retention',
+} as const;
+
+export const RETENTION = {
+  advisoryLockName: 'matchiq:retention',
+  capacityLockPrefix: 'matchiq:replay-capacity:',
+  sessionsTarget: 'replay_sessions',
+} as const;
 
 /** Session fixtures are `<templateId>_s<n>` (ADR-0013). */
 export const SESSION_ID_SEPARATOR = '_s';

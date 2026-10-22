@@ -25,6 +25,8 @@ import type { ReplaySpeed, StreamMessage } from '@matchiq/contracts';
 import type { AgentsClient } from '../app/agents/agents-client';
 import { InsightPipelineService } from '../app/agents/insight-pipeline.service';
 import { AppModule } from '../app/app.module';
+import { InsightRecoveryService } from '../app/maintenance/insight-recovery.service';
+import { RetentionService } from '../app/maintenance/retention.service';
 import { SessionManager } from '../app/replay/session-manager.service';
 
 export const AGENTS_TOKEN = 'agents-test-token-'.padEnd(48, 'x');
@@ -36,6 +38,8 @@ export interface TestWorker {
   readonly scheduler: ManualScheduler;
   readonly sessions: SessionManager;
   readonly pipeline: InsightPipelineService;
+  readonly recovery: InsightRecoveryService;
+  readonly retention: RetentionService;
   readonly db: DatabaseHandle;
   readonly store: PostgresSessionStore;
   readonly reader: PostgresIntelligenceReader;
@@ -92,6 +96,8 @@ export const startTestWorker = async (
     scheduler,
     sessions: app.get(SessionManager),
     pipeline: app.get(InsightPipelineService),
+    recovery: app.get(InsightRecoveryService),
+    retention: app.get(RetentionService),
     db,
     store: new PostgresSessionStore(db.db),
     reader: new PostgresIntelligenceReader(db.db),

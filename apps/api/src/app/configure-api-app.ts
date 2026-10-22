@@ -9,5 +9,8 @@ export const configureApiApp = (
   env: ApiEnv,
 ): void => {
   app.useBodyParser('json', { limit: API_LIMITS.jsonBodyLimit });
-  configureHttpApp(app, { corsOrigins: env.CORS_ALLOWED_ORIGINS });
+  configureHttpApp(app, {
+    corsOrigins: env.CORS_ALLOWED_ORIGINS,
+    trustProxy: env.TRUST_PROXY,
+  });
 };

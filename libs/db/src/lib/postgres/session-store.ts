@@ -5,6 +5,7 @@ import {
   SCHEMA_VERSION,
   type ReplayStatus,
 } from '@matchiq/contracts';
+import type { ActiveSessionQuery } from '../operations-types.js';
 import { and, desc, eq, max } from 'drizzle-orm';
 import type { Database, Transaction } from '../client.js';
 import {
@@ -28,6 +29,11 @@ import {
 } from '../schema/intelligence-tables.js';
 import { fixtures } from '../schema/tables.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
+import {
+  countActiveSessions,
+  listSessionsInState,
+  reserveSlot,
+} from './session-activity.js';
 
 const s = replaySessions;
 
@@ -98,6 +104,9 @@ export class PostgresSessionStore implements SessionStore {
    */
   create(command: CreateSessionCommand): Promise<CreatedSession | null> {
     return this.db.transaction(async (tx) => {
+      if (command.capacity !== undefined) {
+        await reserveSlot(tx, command.orgId, command.capacity);
+      }
       const [template] = await tx
         .select({ fixture: fixtureTemplates.fixture })
         .from(fixtureTemplates)
@@ -135,6 +144,18 @@ export class PostgresSessionStore implements SessionStore {
   async get(key: FixtureKey): Promise<ReplaySessionView | null> {
     const [row] = await sessionSelect(this.db).where(sessionMatch(key));
     return row ? toView(row) : null;
+  }
+
+  countActive(query: ActiveSessionQuery): Promise<number> {
+    return countActiveSessions(this.db, query);
+  }
+
+  listInState(
+    orgId: string,
+    state: ReplayState,
+    limit: number,
+  ): Promise<FixtureKey[]> {
+    return listSessionsInState(this.db, { orgId, state, limit });
   }
 
   async list(orgId: string, limit: number): Promise<ReplaySessionView[]> {

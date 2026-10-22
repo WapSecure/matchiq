@@ -1,4 +1,10 @@
-import { ReplaySpeed } from '@matchiq/contracts';
+import {
+  Fixture,
+  FixtureId,
+  ReplaySpeed,
+  ReplayStatus,
+  UtcTimestamp,
+} from '@matchiq/contracts';
 import { z } from 'zod';
 import { API_LIMITS } from '../constants';
 
@@ -11,6 +17,20 @@ export const SessionListQuery = z.strictObject({
     .min(1)
     .max(API_LIMITS.sessionListMax)
     .default(API_LIMITS.sessionListDefault),
+});
+
+/** Re-validates a stored `201` before an idempotent replay returns it. */
+export const CreatedSessionResponse = z.strictObject({
+  fixture: Fixture,
+  session: z.strictObject({
+    sessionId: FixtureId,
+    templateId: FixtureId,
+    sessionNumber: z.int().positive(),
+    title: z.string().min(1),
+    status: ReplayStatus,
+    createdAt: UtcTimestamp,
+    updatedAt: UtcTimestamp,
+  }),
 });
 
 export type CreateSessionBody = z.infer<typeof CreateSessionBody>;
