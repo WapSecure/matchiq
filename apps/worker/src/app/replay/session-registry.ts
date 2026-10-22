@@ -9,6 +9,7 @@ interface Entry {
 
 /** A loaded runner holds a replay slot while it plays or is about to start. */
 const SLOT_STATES: ReadonlySet<ReplayState> = new Set(['PLAYING', 'IDLE']);
+const FAILED_STATE = 'FAILED';
 
 /**
  * The runners this worker has in memory, with the last time each was used.
@@ -48,6 +49,16 @@ export class SessionRegistry {
       if (SLOT_STATES.has(runner.status.state)) count += 1;
     }
     return count;
+  }
+
+  /** Loaded runners by state; failed runners count as FAILED. */
+  countByState(): Map<string, number> {
+    const counts = new Map<string, number>();
+    for (const { runner } of this.entries.values()) {
+      const state = runner.isFailed ? FAILED_STATE : runner.status.state;
+      counts.set(state, (counts.get(state) ?? 0) + 1);
+    }
+    return counts;
   }
 
   /** Runners that are not playing, not writing and unused for `idleMs`. */

@@ -49,6 +49,14 @@ export const ENV_MESSAGES = {
   origin: 'must be an exact origin such as https://app.example.com',
 } as const;
 
+/** Prometheus scrape listeners; internal only (docs/operations/OBSERVABILITY.md). */
+export const DEFAULT_METRICS = {
+  host: '127.0.0.1',
+  apiPort: 9464,
+  workerPort: 9465,
+  portMax: 65_535,
+} as const;
+
 export const DEFAULT_DEMO_ORG_ID = 'org_demo';
 export const DEFAULT_APP_VERSION = '0.0.0-dev';
 export const REQUIRED_MESSAGE = 'is required';

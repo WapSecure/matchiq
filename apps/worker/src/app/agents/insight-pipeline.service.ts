@@ -15,6 +15,10 @@ import {
 import { SessionManager } from '../replay/session-manager.service';
 import type { WriteOutcome } from '../replay/pipeline-writer';
 import { AgentsCallError } from './agents-client';
+import {
+  type PipelineCallOutcome,
+  WorkerMetrics,
+} from '../telemetry/worker-metrics';
 import { CircuitBreaker } from './circuit-breaker';
 
 export interface JobAttempt {
@@ -24,6 +28,13 @@ export interface JobAttempt {
 }
 
 export type JobOutcome = WriteOutcome | 'skipped';
+
+type SkipOutcome = Extract<PipelineCallOutcome, 'ai-disabled' | 'circuit-open'>;
+
+const SKIP_REASONS: Readonly<Record<SkipOutcome, string>> = {
+  'ai-disabled': FALLBACK_REASONS.aiDisabled,
+  'circuit-open': FALLBACK_REASONS.circuitOpen,
+};
 
 interface Decided {
   readonly publication: Publication;
@@ -45,6 +56,7 @@ export class InsightPipelineService {
     @Inject(APP_ENV) private readonly env: WorkerEnv,
     @Inject(AGENT_PIPELINE_DEPS) private readonly deps: AgentPipelineDeps,
     private readonly sessions: SessionManager,
+    private readonly metrics: WorkerMetrics,
   ) {
     this.breaker = new CircuitBreaker({
       failureThreshold: env.AGENT_CIRCUIT_FAILURE_THRESHOLD,
@@ -76,6 +88,11 @@ export class InsightPipelineService {
     return this.sessions.publish(key, { insight: pending, ...decided });
   }
 
+  private skipReason(): SkipOutcome | null {
+    if (!this.env.AI_ENABLED) return 'ai-disabled';
+    return this.breaker.tryAcquire() ? null : 'circuit-open';
+  }
+
   private async decide(input: {
     insight: Insight;
     fixture: Fixture;
@@ -94,9 +111,13 @@ export class InsightPipelineService {
         retries: attempt.attemptsMade,
       }),
     });
-    if (!this.env.AI_ENABLED) return fallback(FALLBACK_REASONS.aiDisabled);
-    if (!this.breaker.tryAcquire())
-      return fallback(FALLBACK_REASONS.circuitOpen);
+    const skipped = this.skipReason();
+    if (skipped !== null) {
+      this.metrics.pipelineCall(skipped, 0);
+      return fallback(SKIP_REASONS[skipped]);
+    }
+    const started = performance.now();
+    const elapsed = () => (performance.now() - started) / 1_000;
     try {
       const result = await this.deps.client.run(
         buildPipelineRequest({
@@ -108,6 +129,7 @@ export class InsightPipelineService {
         }),
       );
       this.breaker.recordSuccess();
+      this.metrics.pipelineCall('success', elapsed());
       const publication = agentPublication({
         insight,
         fixture,
@@ -122,6 +144,7 @@ export class InsightPipelineService {
     } catch (error) {
       this.breaker.recordFailure();
       const call = error instanceof AgentsCallError ? error : null;
+      this.metrics.pipelineCall(call?.kind ?? 'unreachable', elapsed());
       const lastAttempt = attempt.attemptsMade + 1 >= attempt.maxAttempts;
       if (call?.retriable === true && !lastAttempt) throw error;
       return fallback(call?.message ?? FALLBACK_REASONS.unreachable);
