@@ -13,6 +13,7 @@ export const TEMPLATE_STORE = Symbol('TEMPLATE_STORE');
 export const SESSION_STORE = Symbol('SESSION_STORE');
 export const INTELLIGENCE_READER = Symbol('INTELLIGENCE_READER');
 export const REPLAY_COMMAND_BUS = Symbol('REPLAY_COMMAND_BUS');
+export const REPLAY_STORES = Symbol('REPLAY_STORES');
 
 export interface Clock {
   now(): Date;

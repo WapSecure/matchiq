@@ -4,6 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import type { ApiEnv } from '@matchiq/config';
 import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
 import { OperatorAuthGuard } from './auth/operator-auth.guard';
+import { IdempotencyService } from './http/idempotency.service';
 import { API_LIMITS, SERVICE_NAME, THROTTLERS } from './constants';
 import { FixturesController } from './fixtures/fixtures.controller';
 import { FixturesService } from './fixtures/fixtures.service';
@@ -59,6 +60,7 @@ export class AppModule {
       providers: [
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         OperatorAuthGuard,
+        IdempotencyService,
         FixturesService,
         IngestService,
         StreamService,
