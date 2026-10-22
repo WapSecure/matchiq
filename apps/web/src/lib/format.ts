@@ -75,6 +75,43 @@ export const formatMetric = (metric: MetricValue): string | null =>
     ? formatNumber(metric.value, metric.unit)
     : null;
 
+const TENTHS = 10;
+
+/** Largest-remainder split of 100 into whole shares of integer `parts`. */
+const wholeShares = (parts: readonly number[]): number[] => {
+  const sum = parts.reduce((acc, p) => acc + p, 0);
+  const scaled = parts.map((p) => p * PERCENT);
+  const shares = scaled.map((v) => Math.floor(v / sum));
+  let left = PERCENT - shares.reduce((acc, v) => acc + v, 0);
+  const byRemainder = scaled
+    .map((v, index) => ({ index, remainder: v % sum }))
+    .sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+  for (const { index } of byRemainder) {
+    if (left === 0) break;
+    shares[index] = (shares[index] ?? 0) + 1;
+    left -= 1;
+  }
+  return shares;
+};
+
+/**
+ * Whole-percent labels for two shares of one whole (possession), summing to
+ * 100%. Rounding each engine value on its own can show 49% and 52%.
+ */
+export const formatSharePair = (
+  home: MetricValue,
+  away: MetricValue,
+): [string, string] | null => {
+  if (home.status !== 'available' || away.status !== 'available') return null;
+  const exact = home.numerator !== undefined && away.numerator !== undefined;
+  const parts = exact
+    ? [home.numerator ?? 0, away.numerator ?? 0]
+    : [Math.round(home.value * TENTHS), Math.round(away.value * TENTHS)];
+  if (parts[0] === 0 && parts[1] === 0) return null;
+  const [h = 0, a = 0] = wholeShares(parts);
+  return [`${h}${UNIT_SUFFIX.percent}`, `${a}${UNIT_SUFFIX.percent}`];
+};
+
 export const formatFraction = (fraction: number): string =>
   `${Math.round(fraction * PERCENT)}%`;
 
