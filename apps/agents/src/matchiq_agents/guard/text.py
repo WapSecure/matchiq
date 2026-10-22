@@ -1,5 +1,7 @@
 """Pure text analysis used by the deterministic checks. No model calls."""
 
+import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from matchiq_agents.contracts.types import Locale
@@ -81,3 +83,15 @@ def unknown_capitalised(text: str, allowed_tokens: frozenset[str]) -> list[str]:
             if part[0].isupper() and part not in allowed_tokens and part not in CAPITALISED_ALLOWED
         )
     return unknown
+
+
+def restore_names(text: str, names: Iterable[str]) -> str:
+    """Writes allowlisted names with their canonical capitals ('harbour city' → 'Harbour City').
+
+    Small models often lower-case names. Only exact, case-insensitive matches of allowlisted
+    names change, so no other word's casing (and no unknown-entity signal) is touched.
+    """
+    for name in sorted(names, key=len, reverse=True):
+        pattern = re.compile(rf"(?<!\w){re.escape(name)}(?!\w)", re.IGNORECASE)
+        text = pattern.sub(name, text)
+    return text

@@ -1,9 +1,12 @@
 """Fact Checker (spec §28): deterministic checks first, then an optional AI critique.
 
-The critique can only add concerns; it can never overturn a deterministic failure.
+Deterministic checks are attributed per persona, so a failing persona is revised or replaced by
+its template without discarding the drafts that passed. The critique can only add concerns; they
+apply to the whole set, and it can never overturn a deterministic failure.
 """
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Final
 
 from matchiq_agents.contracts.types import (
@@ -12,12 +15,13 @@ from matchiq_agents.contracts.types import (
     Issue,
     IssueCode,
     NarrativeDraft,
+    Persona,
     RunOutcome,
     Verdict,
     VerificationResult,
 )
 from matchiq_agents.guard import messages
-from matchiq_agents.guard.checks import check_analysis, check_drafts, issue
+from matchiq_agents.guard.checks import check_analysis, check_draft, check_drafts, issue
 from matchiq_agents.limits import MAX_DRAFT_ATTEMPTS
 from matchiq_agents.pipeline.runner import ModelCall
 from matchiq_agents.roster.context import DETERMINISTIC_CHECKS_VERSION, AgentContext
@@ -29,6 +33,58 @@ from matchiq_agents.roster.schemas import CritiqueInput, CritiqueOutput
 # by the cited evidence"). See the proposed contract change in the implementation log.
 CRITIQUE_CODE: Final = IssueCode.UNCITED_EVIDENCE
 ALWAYS_REJECT: Final = frozenset({IssueCode.FORBIDDEN_CLAIM})
+REVISION_NOTE: Final = "{persona}: {detail}"
+
+
+@dataclass(frozen=True, slots=True)
+class Verification:
+    by_persona: dict[Persona, list[Issue]]
+    # Issues that concern every draft at once: the analysis or the AI critique.
+    shared: list[Issue]
+    attempt: int
+    runs: tuple[AgentRun, ...]
+
+    @property
+    def verdict(self) -> Verdict:
+        if not self.failing:
+            return Verdict.PASS
+        if self.attempt < MAX_DRAFT_ATTEMPTS and self.revisable:
+            return Verdict.REVISE
+        return Verdict.REJECT
+
+    @property
+    def result(self) -> VerificationResult:
+        issues = [*self.shared, *(found for listed in self.by_persona.values() for found in listed)]
+        return VerificationResult(verdict=self.verdict, issues=issues)
+
+    @property
+    def failing(self) -> frozenset[Persona]:
+        if self.shared:
+            return frozenset(self.by_persona)
+        return frozenset(persona for persona, found in self.by_persona.items() if found)
+
+    @property
+    def revisable(self) -> tuple[Persona, ...]:
+        """Failing personas that may be rewritten: a forbidden claim is never revised."""
+        if any(found.code in ALWAYS_REJECT for found in self.shared):
+            return ()
+        return tuple(
+            persona
+            for persona in self.by_persona
+            if persona in self.failing
+            and not any(found.code in ALWAYS_REJECT for found in self.by_persona[persona])
+        )
+
+    def notes(self) -> tuple[str, ...]:
+        personal = [
+            REVISION_NOTE.format(persona=persona.value, detail=found.detail)
+            for persona in self.revisable
+            for found in self.by_persona[persona]
+        ]
+        return (*personal, *(found.detail for found in self.shared))
+
+    def passing(self, drafts: Sequence[NarrativeDraft]) -> tuple[NarrativeDraft, ...]:
+        return tuple(draft for draft in drafts if draft.persona not in self.failing)
 
 
 def decide(issues: Sequence[Issue], attempt: int) -> Verdict:
@@ -44,6 +100,20 @@ def deterministic_issues(
 ) -> list[Issue]:
     found = check_analysis(analysis, ctx.view) if analysis is not None else []
     return found + check_drafts(drafts, ctx.view)
+
+
+def _per_persona(ctx: AgentContext, drafts: Sequence[NarrativeDraft]) -> dict[Persona, list[Issue]]:
+    by_persona: dict[Persona, list[Issue]] = {
+        persona: [
+            issue(
+                IssueCode.SCHEMA_VIOLATION, messages.MISSING_PERSONA.format(persona=persona.value)
+            )
+        ]
+        for persona in ctx.canonical_personas
+    }
+    for index, draft in enumerate(drafts):
+        by_persona[draft.persona] = check_draft(draft, ctx.view, index)
+    return by_persona
 
 
 async def _critique(
@@ -71,16 +141,17 @@ async def verify(
     attempt: int,
     *,
     critique: bool = True,
-) -> tuple[VerificationResult, tuple[AgentRun, ...]]:
+) -> Verification:
     started_ms = ctx.runner.clock.monotonic_ms()
-    issues = deterministic_issues(ctx, analysis, drafts)
+    shared = check_analysis(analysis, ctx.view) if analysis is not None else []
+    by_persona = _per_persona(ctx, drafts)
     runs = [
         ctx.local_run(
             FACT_CHECKER.agent, RunOutcome.SUCCEEDED, DETERMINISTIC_CHECKS_VERSION, started_ms
         )
     ]
-    if not issues and critique and ctx.critique_enabled:
-        issues, critique_run = await _critique(ctx, drafts)
+    clean = not shared and not any(by_persona.values())
+    if clean and critique and ctx.critique_enabled:
+        shared, critique_run = await _critique(ctx, drafts)
         runs.append(critique_run)
-    verdict = decide(issues, attempt)
-    return VerificationResult(verdict=verdict, issues=list(issues)), tuple(runs)
+    return Verification(by_persona, shared, attempt, tuple(runs))

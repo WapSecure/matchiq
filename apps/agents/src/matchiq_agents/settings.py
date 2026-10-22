@@ -11,6 +11,7 @@ from matchiq_agents.constants import (
     DEFAULT_OLLAMA_ENDPOINT,
     DEFAULT_OLLAMA_MODEL,
     DEFAULT_PORT,
+    LOCAL_CIRCUIT_TIMEOUT_THRESHOLD,
     SECRET_MIN_LENGTH,
 )
 from matchiq_agents.limits import MAX_AGENT_RETRIES
@@ -49,7 +50,27 @@ class Settings(BaseSettings):
     agent_max_retries: int = Field(default=MAX_AGENT_RETRIES, ge=0, le=MAX_AGENT_RETRIES)
     agent_circuit_failure_threshold: int = Field(default=DEFAULT_CIRCUIT_FAILURE_THRESHOLD, ge=1)
     agent_circuit_reset_ms: int = Field(default=DEFAULT_CIRCUIT_RESET_MS, ge=1)
-    agent_critique_enabled: bool = True
+    agent_circuit_timeout_threshold: int | None = Field(default=None, ge=1)
+    # Unset: on for cloud providers, off for ollama (ADR-0011 addendum). The deterministic Fact
+    # Checker always runs.
+    agent_critique_enabled: bool | None = None
+
+    @property
+    def is_local(self) -> bool:
+        return self.model_provider is ModelProvider.OLLAMA
+
+    @property
+    def critique_enabled(self) -> bool:
+        if self.agent_critique_enabled is not None:
+            return self.agent_critique_enabled
+        return not self.is_local
+
+    @property
+    def circuit_timeout_threshold(self) -> int | None:
+        """None: timeouts count as ordinary failures (cloud providers)."""
+        if self.agent_circuit_timeout_threshold is not None:
+            return self.agent_circuit_timeout_threshold
+        return LOCAL_CIRCUIT_TIMEOUT_THRESHOLD if self.is_local else None
 
     @model_validator(mode="after")
     def _require_provider_config(self) -> Self:

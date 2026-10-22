@@ -13,6 +13,8 @@ from pydantic.alias_generators import to_camel
 from matchiq_agents.contracts.types import ConfidenceLabel, InsightKind, Locale, Persona
 
 PersonaName = Literal["CASUAL", "ANALYST", "BROADCAST"]
+# Every `Locale` except the canonical en-GB; `tests/test_providers.py` pins the parity.
+TargetLocaleName = Literal["fr-FR", "es-ES", "pcm-NG"]
 
 
 class StrictModel(BaseModel):
@@ -62,6 +64,7 @@ class AnalystOutput(StrictModel):
 class WriterInput(StrictModel):
     facts: FactsPayload
     claims: list[ClaimOut]
+    limitations: list[str]
     personas: list[Persona]
     locale: Locale
     revision_notes: list[str]
@@ -96,14 +99,17 @@ class CritiqueOutput(StrictModel):
 
 
 class LocalizationInput(StrictModel):
+    """One batched call: every source draft into every target locale."""
+
     facts: FactsPayload
     source_locale: Locale
-    target_locale: Locale
+    target_locales: list[Locale]
     drafts: list[TextPair]
     protected_terms: list[str]
 
 
 class LocalizedOut(StrictModel):
+    locale: TargetLocaleName
     persona: PersonaName
     headline: str
     body: str

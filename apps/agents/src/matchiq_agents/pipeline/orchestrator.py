@@ -6,8 +6,6 @@ from dataclasses import dataclass
 
 from matchiq_agents.clock import MS_PER_SECOND, Clock, Deadline
 from matchiq_agents.contracts.types import (
-    AgentRun,
-    NarrativeDraft,
     PipelineRequest,
     PipelineResult,
     PipelineStatus,
@@ -25,7 +23,7 @@ from matchiq_agents.pipeline.state import PipelineState, Route
 from matchiq_agents.pipeline.workflow import build_workflow
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.fact_checker import decide, deterministic_issues
-from matchiq_agents.roster.localization import localise
+from matchiq_agents.roster.localization import localise_all
 from matchiq_agents.templates.fallback import TemplateFallback
 
 logger = logging.getLogger(__name__)
@@ -53,7 +51,9 @@ class PipelineOrchestrator:
 
     def _agents(self, request: PipelineRequest) -> AgentContext:
         view = build_fact_view(request)
-        deadline = Deadline.after(self._clock, view.deadline_ms)
+        # Model work stops `grace_ms` early so cancellation and templates still fit inside
+        # `deadlineMs`; the worker's HTTP timeout is only slightly longer than the deadline.
+        deadline = Deadline.after(self._clock, max(0.0, view.deadline_ms - self._config.grace_ms))
         scope = RunScope(run_id=view.run_id, correlation_id=view.correlation_id)
         runner = ModelRunner(
             self._model, self._breaker, self._clock, self._config.retry, scope, deadline
@@ -65,7 +65,7 @@ class PipelineOrchestrator:
         problems = integrity_problems(request)
         if problems:
             return rejected_result(agents.view, problems)
-        budget_s = (agents.view.deadline_ms + self._config.grace_ms) / MS_PER_SECOND
+        budget_s = agents.view.deadline_ms / MS_PER_SECOND
         try:
             async with asyncio.timeout(budget_s):
                 outcome = await build_workflow(agents).run(PipelineState())
@@ -92,12 +92,7 @@ async def emergency_result(agents: AgentContext) -> PipelineResult:
     )
     if verification.verdict is not Verdict.PASS:
         return build_result(agents.view, state.advance(PipelineStatus.REJECTED, Route.FINALISE))
-    localised: list[NarrativeDraft] = []
-    runs: list[AgentRun] = []
-    for locale in agents.view.locales:
-        drafts, locale_runs = await localise(agents, canonical, locale, use_template=True)
-        localised += drafts
-        runs += locale_runs
+    localised, runs = await localise_all(agents, canonical, agents.view.locales)
     final = PipelineState(
         status=state.status,
         route=state.route,
@@ -106,6 +101,6 @@ async def emergency_result(agents: AgentContext) -> PipelineResult:
         localised=tuple(localised),
         overlay=fallback.overlay(),
         fallback_reasons=state.fallback_reasons,
-        runs=tuple(runs),
+        runs=runs,
     )
     return build_result(agents.view, final)
