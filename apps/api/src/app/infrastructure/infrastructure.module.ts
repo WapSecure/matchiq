@@ -12,6 +12,9 @@ import type { ApiEnv } from '@matchiq/config';
 import {
   createDatabase,
   type DatabaseHandle,
+  PostgresAuditReader,
+  PostgresEditorialReader,
+  PostgresEditorialUnitOfWork,
   PostgresEventReader,
   PostgresFixtureReader,
   PostgresOutboxStore,
@@ -25,9 +28,12 @@ import {
   type RedisConnections,
 } from './redis-connections';
 import {
+  AUDIT_READER,
   CLOCK,
   type Clock,
   DATABASE,
+  EDITORIAL_READER,
+  EDITORIAL_UOW,
   EVENT_READER,
   FIXTURE_READER,
   OUTBOX_STORE,
@@ -94,6 +100,9 @@ export class InfrastructureModule {
       fromDatabase(EVENT_READER, (h) => new PostgresEventReader(h.db)),
       fromDatabase(STREAM_HISTORY, (h) => new PostgresStreamHistory(h.db)),
       fromDatabase(OUTBOX_STORE, (h) => new PostgresOutboxStore(h.db)),
+      fromDatabase(EDITORIAL_UOW, (h) => new PostgresEditorialUnitOfWork(h.db)),
+      fromDatabase(EDITORIAL_READER, (h) => new PostgresEditorialReader(h.db)),
+      fromDatabase(AUDIT_READER, (h) => new PostgresAuditReader(h.db)),
       fromRedis(STREAM_PUBLISHER),
       fromRedis(STREAM_SUBSCRIBER),
       { provide: CLOCK, useValue: systemClock },

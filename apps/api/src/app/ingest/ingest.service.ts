@@ -128,6 +128,7 @@ export class IngestService {
       action: AUDIT_ACTIONS.eventsIngested,
       targetType: AUDIT_TARGETS.fixture,
       targetId: key.fixtureId,
+      fixtureId: key.fixtureId,
       requestId: command.requestId,
       details: { ...body },
     });

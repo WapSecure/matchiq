@@ -17,13 +17,28 @@ export const ROUTES = {
   agentRuns: ':fixtureId/agent-runs',
   fixtureTemplates: 'fixture-templates',
   replaySessions: 'replay-sessions',
+  overlayResource: 'overlays',
+  overlayRetract: ':overlayId/retract',
+  insightResource: 'insights',
+  insightSuppress: ':insightId/suppress',
+  editorial: ':fixtureId/editorial',
+  editorialFreeze: ':fixtureId/editorial/freeze',
+  editorialResume: ':fixtureId/editorial/resume',
+  killSwitch: 'editorial/kill-switch',
+  killSwitchActivate: 'editorial/kill-switch/activate',
+  killSwitchRelease: 'editorial/kill-switch/release',
+  auditEvents: 'audit-events',
 } as const;
 
 /** Named throttlers: `default` covers every route, `replay` only replay controls (ADR-0010). */
 export const THROTTLERS = { default: 'default', replay: 'replay' } as const;
 export const REPLAY_THROTTLE_KEY = 'matchiq:replay-throttle';
 
-export const ROUTE_PARAMS = { fixtureId: 'fixtureId' } as const;
+export const ROUTE_PARAMS = {
+  fixtureId: 'fixtureId',
+  overlayId: 'overlayId',
+  insightId: 'insightId',
+} as const;
 
 export const HEADERS = {
   authorization: 'authorization',
@@ -32,7 +47,11 @@ export const HEADERS = {
   idempotentReplay: 'Idempotent-Replayed',
   lastEventId: 'last-event-id',
   requestId: 'x-request-id',
+  correlationId: 'x-correlation-id',
 } as const;
+
+export const HEADER_NAMES = { cacheControl: 'Cache-Control' } as const;
+export const CACHE_CONTROL = { noStore: 'no-store' } as const;
 
 export const AUTH = {
   bearerPrefix: 'Bearer ',
@@ -43,6 +62,8 @@ export const AUTH = {
 export const AUTH_DETAILS = {
   missing: 'Send Authorization: Bearer <operator key>',
   invalid: 'The operator key is not valid',
+  missingPermission: (permission: string) =>
+    `This action requires the ${permission} permission`,
 } as const;
 
 export const API_LIMITS = {
@@ -69,9 +90,20 @@ export const ID_PREFIXES = { ingestion: 'ing_' } as const;
 export const IDEMPOTENCY_SCOPES = {
   createFixture: 'POST /fixtures',
   ingestBatch: 'POST /fixtures/events:batch',
+  retractOverlay: 'POST /overlays/retract',
+  suppressInsight: 'POST /insights/suppress',
+  freeze: 'POST /fixtures/editorial/freeze',
+  resume: 'POST /fixtures/editorial/resume',
+  killSwitchActivate: 'POST /editorial/kill-switch/activate',
+  killSwitchRelease: 'POST /editorial/kill-switch/release',
 } as const;
 
-export const AUDIT_TARGETS = { fixture: 'fixture' } as const;
+export const AUDIT_TARGETS = {
+  fixture: 'fixture',
+  overlay: 'overlay',
+  insight: 'insight',
+  organization: 'organization',
+} as const;
 
 export const SSE = {
   contentType: 'text/event-stream; charset=utf-8',
@@ -130,6 +162,36 @@ export const PROBLEMS = {
     title: 'The recap is available once the match has ended',
     slug: 'recap-not-ready',
   },
+  forbidden: {
+    title: 'The caller lacks the required permission',
+    slug: 'forbidden',
+  },
+  overlayNotFound: {
+    title: 'Overlay cue not found',
+    slug: 'overlay-not-found',
+  },
+  overlayNotOnAir: {
+    title: 'Only a cue that is on air can be retracted',
+    slug: 'overlay-not-on-air',
+  },
+  insightNotFound: { title: 'Insight not found', slug: 'insight-not-found' },
+  insightPublished: {
+    title: 'The insight is already published; retract its cue instead',
+    slug: 'insight-already-published',
+  },
+  invalidCursor: { title: 'Invalid pagination cursor', slug: 'invalid-cursor' },
+} as const;
+
+/** Stream copy for `overlay.retract.reason`; the operator's own reason stays in the audit row. */
+export const RETRACT_REASONS = {
+  PRODUCER: 'retracted by producer',
+  INSIGHT_SUPPRESSED: 'insight suppressed by producer',
+  KILL_SWITCH: 'editorial kill switch activated',
+} as const;
+
+export const EDITORIAL_DETAILS = {
+  overlayState: (status: string) => `the cue is ${status}`,
+  insightState: (publication: string) => `publication is ${publication}`,
 } as const;
 
 export const REPLAY_CONFLICTS = {

@@ -73,6 +73,7 @@ export class FixturesService {
             action: AUDIT_ACTIONS.fixtureCreated,
             targetType: AUDIT_TARGETS.fixture,
             targetId: fixture.fixtureId,
+            fixtureId: fixture.fixtureId,
             requestId: command.requestId,
             details: { title: fixture.title, provenance: fixture.provenance },
           });

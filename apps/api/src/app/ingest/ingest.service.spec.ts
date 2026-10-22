@@ -39,6 +39,7 @@ class FakeLedger implements Partial<LedgerTransaction> {
   };
   appendAudit = async () => {
     this.audits += 1;
+    return `audit-${this.audits}`;
   };
 }
 

@@ -13,6 +13,9 @@ export const TEMPLATE_STORE = Symbol('TEMPLATE_STORE');
 export const SESSION_STORE = Symbol('SESSION_STORE');
 export const INTELLIGENCE_READER = Symbol('INTELLIGENCE_READER');
 export const REPLAY_COMMAND_BUS = Symbol('REPLAY_COMMAND_BUS');
+export const EDITORIAL_UOW = Symbol('EDITORIAL_UOW');
+export const EDITORIAL_READER = Symbol('EDITORIAL_READER');
+export const AUDIT_READER = Symbol('AUDIT_READER');
 
 export interface Clock {
   now(): Date;
