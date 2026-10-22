@@ -306,6 +306,37 @@
                   "TIMED_OUT",
                   "FALLBACK"
                 ]
+              },
+              "promptHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "costEstimateUsd": {
+                "type": "number",
+                "minimum": 0
+              },
+              "repairs": {
+                "maxItems": 16,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+                    },
+                    "detail": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "detail"
+                  ],
+                  "additionalProperties": false
+                }
               }
             },
             "required": [
