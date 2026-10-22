@@ -61,7 +61,7 @@ const send = async (path: string, options: RequestOptions) => {
   }
 };
 
-const describeIssues = (error: z.ZodError): string =>
+export const describeIssues = (error: z.ZodError): string =>
   error.issues
     .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
     .join('; ');

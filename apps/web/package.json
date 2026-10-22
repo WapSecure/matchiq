@@ -41,6 +41,7 @@
     }
   },
   "dependencies": {
+    "@matchiq/api-client": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
     "@tanstack/react-query": "5.103.3",

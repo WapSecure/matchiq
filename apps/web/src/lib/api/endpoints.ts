@@ -21,6 +21,7 @@ import {
   TemplateList,
 } from './session-schemas';
 import { TraceList } from './trace-schemas';
+import { apiClient, validated } from './typed-client';
 
 export type EventsQuery = { afterSequence?: number; limit?: number };
 export type NarrativeQuery = { persona: Persona; locale: Locale };
@@ -29,8 +30,12 @@ const idempotent = () => ({
   [HTTP_HEADERS.idempotencyKey]: crypto.randomUUID(),
 });
 
+/** Proof of the generated client (`@matchiq/api-client`); the rest still use `requestJson`. */
 export const fetchTemplates = (signal?: AbortSignal) =>
-  requestJson(API_PATHS.templates, TemplateList, { signal });
+  validated(
+    () => apiClient.GET('/fixture-templates', { signal }),
+    TemplateList,
+  );
 
 export const fetchSessions = (
   limit: number = API_LIMITS.sessionListLimit,
