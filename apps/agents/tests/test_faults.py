@@ -139,12 +139,16 @@ def test_corruption_adds_an_ungrounded_citation_to_the_first_draft_only() -> Non
     assert "casual" in note
 
 
+class _Empty(BaseModel):
+    pass
+
+
 async def test_timeout_decorator_never_calls_the_wrapped_model() -> None:
     inner = ScriptedModel()
     model = FaultInjectingModel(inner, FaultScenario.MODEL_TIMEOUT)
     with pytest.raises(TimeoutError):
         await model.generate(
-            AgentName.MATCH_ANALYST, "", BaseModel(), BaseModel, Deadline.after(FakeClock(), 1_000)
+            AgentName.MATCH_ANALYST, "", _Empty(), _Empty, Deadline.after(FakeClock(), 1_000)
         )
     assert inner.calls == {}
     assert model.calls[AgentName.MATCH_ANALYST] == 1

@@ -5,6 +5,8 @@ const base = {
   REDIS_URL: 'redis://localhost:6379',
   OPERATOR_API_KEY: 'k'.repeat(32),
   AGENTS_SERVICE_TOKEN: 't'.repeat(32),
+  STREAM_TICKET_SECRET: 's'.repeat(32),
+  AUTH_ANONYMOUS_DEMO_ENABLED: 'true',
 };
 
 describe('DEMO_FAULTS_ENABLED', () => {

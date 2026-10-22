@@ -41,13 +41,23 @@ const timeoutChain = (r: PipelineRequest, fixture: Fixture): PipelineResult => {
     overlay: null,
     fallbackReason: 'circuit breaker opened after simulated timeouts',
     runs: [
-      step({ agent: 'MATCH_ANALYST', outcome: 'TIMED_OUT', retries: 2 }),
+      step({
+        agent: 'MATCH_ANALYST',
+        outcome: 'TIMED_OUT',
+        retries: 2,
+        startedAt: '2026-10-24T15:00:00.000Z',
+      }),
       step({
         agent: 'MATCH_ANALYST',
         provider: 'template',
         outcome: 'FALLBACK',
+        startedAt: '2026-10-24T15:00:01.000Z',
       }),
-      step({ agent: 'NARRATIVE_WRITER', outcome: 'FAILED' }),
+      step({
+        agent: 'NARRATIVE_WRITER',
+        outcome: 'FAILED',
+        startedAt: '2026-10-24T15:00:02.000Z',
+      }),
     ],
   };
 };
@@ -124,7 +134,11 @@ describe('demo fault plans through the worker (integration, ADR-0017)', () => {
       status: 'FALLBACK',
       publication: 'TEMPLATE',
     });
-    expect(faulted?.runs.map((r) => r.outcome)).toEqual([
+    // Rows of one insight share createdAt; the Observatory orders them by startedAt.
+    const ordered = [...(faulted?.runs ?? [])].sort((a, b) =>
+      a.startedAt.localeCompare(b.startedAt),
+    );
+    expect(ordered.map((r) => r.outcome)).toEqual([
       'TIMED_OUT',
       'FALLBACK',
       'FAILED',
