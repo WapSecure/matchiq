@@ -33,6 +33,7 @@ class ModelCall[T: BaseModel, R]:
 class _Attempts:
     started_ms: float
     count: int = 0
+    rejected: int = 0
     tokens_in: int | None = None
     tokens_out: int | None = None
     outcome: RunOutcome = RunOutcome.FAILED
@@ -75,7 +76,7 @@ class ModelRunner:
         return min(remaining, max(self._call_cap_ms, self._policy.min_call_ms))
 
     async def _attempt[T: BaseModel, R](self, call: ModelCall[T, R], state: _Attempts) -> R | None:
-        """One call. Transport faults and timeouts trip the breaker; rejected output does not."""
+        """One call. Transport faults and timeouts count toward the breaker; bad output does not."""
         budget_ms = self._call_budget_ms()
         if budget_ms < self._policy.min_call_ms:
             state.outcome = RunOutcome.TIMED_OUT
@@ -92,7 +93,7 @@ class ModelRunner:
                 )
         except TimeoutError:
             state.outcome = RunOutcome.TIMED_OUT
-            self._breaker.record_failure()
+            self._breaker.record_timeout()
             return None
         except Exception:
             logger.warning("model call failed", extra={"agent": call.prompt.agent.value})
@@ -111,6 +112,7 @@ class ModelRunner:
         except Exception:
             logger.info("model output rejected", extra={"agent": call.prompt.agent.value})
             state.outcome = RunOutcome.FAILED
+            state.rejected += 1
             return None
         state.outcome = RunOutcome.SUCCEEDED
         return value
@@ -128,6 +130,8 @@ class ModelRunner:
             state.count = attempt + 1
             value = await self._attempt(call, state)
             if value is not None or self._deadline.expired:
+                break
+            if state.rejected > self._policy.output_retries:
                 break
         return value, self._scope.record(self._record(call, state, started_at))
 

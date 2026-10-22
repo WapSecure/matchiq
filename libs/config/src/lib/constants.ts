@@ -11,7 +11,8 @@ export const ENV_LIMITS = {
   secretMinLength: 32,
   rateLimitPerMinute: 300,
   agentTimeoutMinMs: 500,
-  agentTimeoutMaxMs: 30_000,
+  /** Mirrors LIMITS.maxAgentDeadlineMs: the slow lane for local inference. */
+  agentTimeoutMaxMs: 180_000,
   agentTimeoutDefaultMs: 8_000,
   agentMaxRetries: 2,
   agentCircuitFailureThreshold: 5,

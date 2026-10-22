@@ -62,7 +62,11 @@ def check_text(
     values = list(supported)
     found: list[Issue] = []
     for numeral in extract_numerals(text, locale):
-        if not any(numeral.represents(value) for value in values):
+        # Digits only (prompt rule 6): a spelled number cannot be audited against the metric.
+        if not numeral.raw[0].isdigit():
+            detail = messages.SPELLED_NUMBER.format(raw=numeral.raw)
+            found.append(issue(IssueCode.UNSUPPORTED_NUMBER, detail, index))
+        elif not any(numeral.represents(value) for value in values):
             detail = messages.UNSUPPORTED_NUMERAL.format(raw=numeral.raw)
             found.append(issue(IssueCode.UNSUPPORTED_NUMBER, detail, index))
     for name in unknown_capitalised(text, view.allowed_name_tokens):

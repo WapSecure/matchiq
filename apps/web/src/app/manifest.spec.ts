@@ -14,8 +14,8 @@ describe('web app manifest', () => {
       display: 'standalone',
       start_url: '/fixtures',
       scope: '/',
-      background_color: '#07090d',
-      theme_color: '#07090d',
+      background_color: '#080a0e',
+      theme_color: '#080a0e',
     });
     expect(m.description).toMatch(/synthetic/i);
     expect(m.shortcuts?.[0]).toMatchObject({ url: '/fixtures' });

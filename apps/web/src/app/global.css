@@ -1,46 +1,115 @@
 @import 'tailwindcss';
 
-@theme {
+/*
+ * Two complete semantic token sets, written as light-dark(light, dark) pairs.
+ * The pair resolves against the element's `color-scheme`, so:
+ * - the document follows the OS until the user picks a theme (`data-theme`);
+ * - any subtree can pin a scheme with `scheme-dark`, which is how the 16:9
+ *   broadcast preview stays on-air dark in both themes.
+ * Contrast for every text token on every surface is audited in
+ * docs/design/theme-contrast.md (WCAG 2.2 AA).
+ */
+@theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-
-  --color-canvas: #07090d;
-  --color-surface: #0d1117;
-  --color-surface-raised: #131922;
-  --color-surface-sunken: #090c11;
-  --color-line: #1e2632;
-  --color-line-strong: #2b3544;
-
-  --color-ink: #e8edf4;
-  --color-ink-muted: #9aa6b5;
-  --color-ink-subtle: #788494;
-
-  --color-accent: #22c7e6;
-  --color-accent-strong: #5ad8f0;
-  --color-accent-ink: #04161b;
-  --color-accent-soft: rgb(34 199 230 / 0.12);
-
-  --color-home: #3b82f6;
-  --color-away: #f59e0b;
-
-  --color-positive: #34d399;
-  --color-warning: #fbbf24;
-  --color-critical: #f87171;
-  --color-synthetic: #c4b5fd;
-  --color-synthetic-soft: rgb(196 181 253 / 0.1);
-
+  --color-canvas: var(--mq-canvas);
+  --color-surface: var(--mq-surface);
+  --color-surface-raised: var(--mq-surface-raised);
+  --color-surface-sunken: var(--mq-surface-sunken);
+  --color-line: var(--mq-line);
+  --color-line-strong: var(--mq-line-strong);
+  --color-control: var(--mq-control);
+  --color-selected: var(--mq-selected);
+  --color-ink: var(--mq-ink);
+  --color-ink-muted: var(--mq-ink-muted);
+  --color-ink-subtle: var(--mq-ink-subtle);
+  --color-accent: var(--mq-accent);
+  --color-accent-strong: var(--mq-accent-strong);
+  --color-accent-ink: var(--mq-accent-ink);
+  --color-accent-soft: var(--mq-accent-soft);
+  --color-home: var(--mq-home);
+  --color-away: var(--mq-away);
+  --color-positive: var(--mq-positive);
+  --color-warning: var(--mq-warning);
+  --color-critical: var(--mq-critical);
+  --color-synthetic: var(--mq-synthetic);
+  --color-synthetic-soft: var(--mq-synthetic-soft);
+  --color-onair: var(--mq-onair);
+  --color-card-yellow: var(--mq-card-yellow);
+  --color-card-red: var(--mq-card-red);
+  --color-chart-grid: var(--mq-chart-grid);
+  --color-pitch: var(--mq-pitch);
+  --color-pitch-stripe: var(--mq-pitch-stripe);
+  --color-pitch-line: var(--mq-pitch-line);
+  --color-highlight: var(--mq-highlight);
+  --color-shade: var(--mq-shade);
+  --shadow-panel: var(--mq-shadow-panel);
+  --shadow-float: var(--mq-shadow-float);
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-
   --text-micro: 0.6875rem;
   --text-micro--line-height: 1rem;
-  --text-micro--letter-spacing: 0.08em;
+  --text-micro--letter-spacing: 0.06em;
+  --ease-broadcast: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Declared per scope so a pinned subtree re-resolves every pair. */
+:root,
+.scheme-dark,
+.scheme-light {
+  --mq-canvas: light-dark(#f3f5f8, #080a0e);
+  --mq-surface: light-dark(#ffffff, #0e1218);
+  --mq-surface-raised: light-dark(#f6f8fa, #151b24);
+  --mq-surface-sunken: light-dark(#eaedf1, #05070a);
+  --mq-line: light-dark(#e2e6ec, #1a212b);
+  --mq-line-strong: light-dark(#cdd3dc, #2a3341);
+  --mq-control: light-dark(#7b8697, #5f6b7c);
+  --mq-selected: light-dark(#ffffff, #1c2430);
+  --mq-ink: light-dark(#0c1320, #eaeef4);
+  --mq-ink-muted: light-dark(#465163, #a4afbd);
+  --mq-ink-subtle: light-dark(#5b6779, #828e9e);
+  --mq-accent: light-dark(#08738b, #2ccbe8);
+  --mq-accent-strong: light-dark(#05667d, #6fdcf2);
+  --mq-accent-ink: light-dark(#ffffff, #03161b);
+  --mq-accent-soft: light-dark(rgb(8 115 139 / 0.1), rgb(44 203 232 / 0.12));
+  --mq-home: light-dark(#2563eb, #4d8dff);
+  --mq-away: light-dark(#b45a09, #c98500);
+  --mq-positive: light-dark(#0b6e45, #4ade9b);
+  --mq-warning: light-dark(#875400, #f5c451);
+  --mq-critical: light-dark(#b4232c, #ff8a8a);
+  --mq-synthetic: light-dark(#5b3fc4, #c8b9ff);
+  --mq-synthetic-soft: light-dark(
+    rgb(91 63 196 / 0.08),
+    rgb(200 185 255 / 0.1)
+  );
+  --mq-onair: light-dark(#c81e2b, #ff4d5a);
+  --mq-card-yellow: #f5c518;
+  --mq-card-red: #e5383b;
+  --mq-chart-grid: light-dark(#e6e9ee, #1c232d);
+  --mq-pitch: light-dark(#eef4f0, #0a1310);
+  --mq-pitch-stripe: light-dark(#e6eee9, #0d1813);
+  --mq-pitch-line: light-dark(#b3c5b9, #2a4034);
+  --mq-highlight: light-dark(rgb(255 255 255 / 0), rgb(255 255 255 / 0.04));
+  --mq-shade: light-dark(rgb(15 23 42 / 0.06), rgb(0 0 0 / 0.35));
+  --mq-shadow-panel:
+    inset 0 1px 0 0 var(--mq-highlight), 0 1px 2px 0 var(--mq-shade);
+  --mq-shadow-float:
+    inset 0 1px 0 0 var(--mq-highlight), 0 12px 32px -8px var(--mq-shade),
+    0 2px 6px -2px var(--mq-shade);
 }
 
 @layer base {
   :root {
+    color-scheme: light dark;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
     color-scheme: dark;
   }
 
@@ -74,14 +143,36 @@
   }
 }
 
-@keyframes cue-in {
+/* Lower third: the bar wipes in, then the copy settles. */
+@keyframes cue-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes cue-copy {
   from {
     opacity: 0;
-    transform: translateY(8%);
+    transform: translateX(-0.6cqw);
   }
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes tally {
+  50% {
+    opacity: 0.45;
   }
 }
 
@@ -91,4 +182,8 @@
 
 @utility eyebrow {
   @apply text-micro font-medium uppercase text-ink-subtle;
+}
+
+@utility press {
+  @apply transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out active:translate-y-px;
 }

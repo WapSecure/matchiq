@@ -69,3 +69,21 @@ def test_env_example_loads_as_an_env_file(tmp_path: Path) -> None:
     settings = Settings(_env_file=env_file)  # pyright: ignore[reportCallIssue]
     assert settings.foundry_project_endpoint is None
     assert str(settings.ollama_endpoint) == "http://localhost:11434/v1/"
+
+
+def _provider(provider: ModelProvider, **extra: object) -> Settings:
+    return Settings(agents_service_token=SecretStr(TOKEN), model_provider=provider, **extra)  # pyright: ignore[reportArgumentType]
+
+
+def test_critique_defaults_off_for_local_inference_only() -> None:
+    assert _provider(ModelProvider.MOCK).critique_enabled
+    assert not _provider(ModelProvider.OLLAMA).critique_enabled
+    assert _provider(ModelProvider.OLLAMA, agent_critique_enabled=True).critique_enabled
+    assert not _provider(ModelProvider.MOCK, agent_critique_enabled=False).critique_enabled
+
+
+def test_timeouts_have_their_own_breaker_threshold_only_for_local_inference() -> None:
+    assert _provider(ModelProvider.MOCK).circuit_timeout_threshold is None
+    assert _provider(ModelProvider.OLLAMA).circuit_timeout_threshold == 8
+    tuned = _provider(ModelProvider.OLLAMA, agent_circuit_timeout_threshold=3)
+    assert tuned.circuit_timeout_threshold == 3

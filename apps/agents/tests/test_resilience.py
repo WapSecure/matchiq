@@ -19,7 +19,12 @@ from tests.support.builders import build_request
 from tests.support.models import FailingModel, FakeClock, HangingModel
 
 POLICY = RetryPolicy(
-    max_retries=2, backoff_base_ms=100, per_call_share=0.5, reserve_ms=50, min_call_ms=200
+    max_retries=2,
+    output_retries=2,
+    backoff_base_ms=100,
+    per_call_share=0.5,
+    reserve_ms=50,
+    min_call_ms=200,
 )
 VIEW = build_fact_view(build_request())
 
@@ -139,3 +144,58 @@ def test_fsm_allows_only_spec_transitions() -> None:
     assert not can_transition(s.VERIFIED, s.SCHEDULED)
     with pytest.raises(IllegalTransitionError):
         ensure_transition(s.REJECTED, s.VERIFIED)
+
+
+def test_without_a_timeout_threshold_a_timeout_is_an_ordinary_failure() -> None:
+    clock = FakeClock()
+    breaker = CircuitBreaker(clock, failure_threshold=2, reset_ms=1000)
+    breaker.record_timeout()
+    breaker.record_failure()
+    assert breaker.state is BreakerState.OPEN
+
+
+def test_local_breaker_tolerates_slow_calls_until_the_timeout_threshold() -> None:
+    clock = FakeClock()
+    breaker = CircuitBreaker(clock, failure_threshold=2, reset_ms=1000, timeout_threshold=3)
+    breaker.record_timeout()
+    breaker.record_timeout()
+    breaker.record_failure()
+    assert breaker.state is BreakerState.CLOSED
+    breaker.record_success()
+    for _ in range(2):
+        breaker.record_timeout()
+    assert breaker.state is BreakerState.CLOSED
+    breaker.record_timeout()
+    assert breaker.state is BreakerState.OPEN
+    clock.advance(1000)
+    assert breaker.allow()
+    breaker.record_timeout()
+    assert breaker.state is BreakerState.OPEN
+
+
+async def test_local_runner_timeout_does_not_open_the_breaker() -> None:
+    clock = SystemClock()
+    breaker = CircuitBreaker(clock, failure_threshold=1, reset_ms=1000, timeout_threshold=5)
+    value, run = await _runner(HangingModel(), clock, breaker, budget=600).run(_call())
+    assert value is None
+    assert run.outcome is RunOutcome.TIMED_OUT
+    assert breaker.state is BreakerState.CLOSED
+
+
+async def test_local_policy_does_not_retry_rejected_output() -> None:
+    clock = FakeClock()
+    policy = RetryPolicy(
+        max_retries=2, output_retries=0, backoff_base_ms=100, per_call_share=0.75,
+        reserve_ms=50, min_call_ms=200,
+    )  # fmt: skip
+    scope = RunScope(run_id=VIEW.run_id, correlation_id=VIEW.correlation_id)
+    breaker = CircuitBreaker(clock, failure_threshold=5, reset_ms=1000)
+    runner = ModelRunner(MockModel(), breaker, clock, policy, scope, Deadline.after(clock, 8000))
+
+    def reject(_out: AnalystOutput) -> BaseModel:
+        raise ValueError("ungrounded")
+
+    value, run = await runner.run(_call(reject))
+    assert value is None
+    assert run.retries == 0
+    assert run.outcome is RunOutcome.FAILED

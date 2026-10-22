@@ -5,7 +5,10 @@ Follows Microsoft Learn, "Ollama" provider page (updated 2026-10-15), OpenAI Com
 `agent-framework-ollama` package is deliberately not used.
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
+from typing import Final
 from urllib.parse import urlsplit, urlunsplit
 
 import httpx
@@ -20,6 +23,13 @@ from matchiq_agents.constants import (
 from matchiq_agents.settings import ModelProvider, Settings
 
 LATEST_TAG = ":latest"
+# Ollama's OpenAI-compatible `/v1/responses` honours `temperature` and `max_output_tokens` but
+# ignores `keep_alive` and `options` (num_ctx, num_predict), measured on Ollama 0.40.7. Those
+# are server settings: OLLAMA_KEEP_ALIVE, OLLAMA_CONTEXT_LENGTH (see `.env.example`).
+OLLAMA_TEMPERATURE: Final = 0.2
+OLLAMA_RUN_OPTIONS: Final[Mapping[str, object]] = MappingProxyType(
+    {"temperature": OLLAMA_TEMPERATURE}
+)
 
 
 class OllamaNotConfiguredError(RuntimeError):

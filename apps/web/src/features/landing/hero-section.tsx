@@ -1,7 +1,28 @@
-import { ArrowRightIcon, GithubIcon } from '@/components/icons';
+import { ArrowRightIcon, GithubIcon, ShieldIcon } from '@/components/icons';
 import { Badge, ButtonLink, Container } from '@/components/ui';
 import { HERO } from '@/constants/landing';
 import { SITE } from '@/constants/site';
+import { HeroPreview } from './hero-preview';
+
+function HeroFacts() {
+  return (
+    <dl className="mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-lg border border-line bg-line">
+      {HERO.facts.map((fact) => (
+        <div
+          key={fact.label}
+          className="flex flex-col gap-1 bg-surface p-3 sm:p-4"
+        >
+          <dt className="order-2 text-xs leading-snug text-ink-subtle">
+            {fact.label}
+          </dt>
+          <dd className="tabular font-mono text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+            {fact.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
 export function HeroSection() {
   return (
@@ -11,38 +32,46 @@ export function HeroSection() {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--color-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-line)_1px,transparent_1px)] bg-[size:48px_48px] opacity-40 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--mq-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--mq-line)_1px,transparent_1px)] bg-[size:56px_56px] opacity-50 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black_20%,transparent_75%)]"
       />
-      <Container className="relative py-20 sm:py-28">
-        <Badge tone="accent">{HERO.eyebrow}</Badge>
-        <h1
-          id="hero-title"
-          className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl"
-        >
-          {HERO.title}
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">
-          {HERO.description}
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <ButtonLink
-            href={HERO.primaryCta.href}
-            trailingIcon={<ArrowRightIcon size={16} />}
+      <Container className="relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-24">
+        <div className="min-w-0">
+          <Badge tone="accent">{HERO.eyebrow}</Badge>
+          <h1
+            id="hero-title"
+            className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.025em] text-ink sm:text-5xl xl:text-[3.5rem]"
           >
-            {HERO.primaryCta.label}
-          </ButtonLink>
-          <ButtonLink href={HERO.howItWorks.href} variant="secondary">
-            {HERO.howItWorks.label}
-          </ButtonLink>
-          <ButtonLink
-            href={SITE.repositoryUrl}
-            variant="secondary"
-            external
-            leadingIcon={<GithubIcon size={16} />}
-          >
-            {HERO.secondaryCta.label}
-          </ButtonLink>
+            {HERO.title}
+          </h1>
+          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
+            {HERO.description}
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <ButtonLink
+              href={HERO.primaryCta.href}
+              trailingIcon={<ArrowRightIcon size={16} />}
+            >
+              {HERO.primaryCta.label}
+            </ButtonLink>
+            <ButtonLink href={HERO.howItWorks.href} variant="secondary">
+              {HERO.howItWorks.label}
+            </ButtonLink>
+            <ButtonLink
+              href={SITE.repositoryUrl}
+              variant="ghost"
+              external
+              leadingIcon={<GithubIcon size={16} />}
+            >
+              {HERO.secondaryCta.label}
+            </ButtonLink>
+          </div>
+          <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-ink-subtle">
+            <ShieldIcon size={14} className="mt-px shrink-0 text-synthetic" />
+            {HERO.disclosure}
+          </p>
+          <HeroFacts />
         </div>
+        <HeroPreview />
       </Container>
     </section>
   );

@@ -2,7 +2,7 @@
 
 import inspect
 import json
-from typing import Any, ClassVar
+from typing import Any, ClassVar, get_args
 
 import httpx
 import pytest
@@ -13,12 +13,14 @@ from pydantic import HttpUrl, SecretStr, ValidationError
 from matchiq_agents import health
 from matchiq_agents.app import create_app
 from matchiq_agents.clock import Deadline
-from matchiq_agents.contracts.types import AgentName, RunProvider
+from matchiq_agents.contracts.types import AgentName, Locale, RunProvider
+from matchiq_agents.domain.facts import CANONICAL_LOCALE
+from matchiq_agents.limits import MAX_OUTPUT_TOKENS
 from matchiq_agents.models import agent_framework as af_module
 from matchiq_agents.models.agent_framework import AgentFrameworkModel
 from matchiq_agents.models.port import ModelOutputError
 from matchiq_agents.providers.ollama import OllamaProbe, probe_ollama, tags_url
-from matchiq_agents.roster.schemas import CritiqueOutput
+from matchiq_agents.roster.schemas import CritiqueOutput, TargetLocaleName
 from matchiq_agents.settings import ModelProvider, Settings
 from matchiq_agents.wiring import build_model
 from tests.conftest import TOKEN
@@ -161,3 +163,29 @@ def test_workflow_api_surface_is_available() -> None:
     assert hasattr(WorkflowContext, "send_message")
     assert hasattr(WorkflowContext, "yield_output")
     assert issubclass(Executor, object)
+
+
+@pytest.mark.parametrize(
+    ("settings", "temperature"), [(OLLAMA, 0.2), (FOUNDRY, None)], ids=["ollama", "foundry"]
+)
+async def test_run_options_are_provider_specific_and_budgets_per_agent(
+    settings: Settings, temperature: float | None, fake_agent: type[FakeAgent]
+) -> None:
+    model = build_model(settings)
+    fake_agent.replies.append(json.dumps({"verdict": "PASS", "concerns": []}))
+    payload = CritiqueOutput(verdict="PASS", concerns=[])
+    await model.generate(AgentName.LOCALIZATION, "rules", payload, CritiqueOutput, _deadline())
+    options = fake_agent.calls[0]["options"]
+    assert options.get("temperature") == temperature
+    assert options["max_tokens"] == MAX_OUTPUT_TOKENS[AgentName.LOCALIZATION]
+    assert "extra_body" not in options
+
+
+def test_every_agent_has_an_output_budget() -> None:
+    assert set(MAX_OUTPUT_TOKENS) == set(AgentName)
+    assert MAX_OUTPUT_TOKENS[AgentName.LOCALIZATION] > MAX_OUTPUT_TOKENS[AgentName.NARRATIVE_WRITER]
+
+
+def test_localization_target_locales_mirror_the_contract() -> None:
+    targets = set(get_args(TargetLocaleName))
+    assert targets == {locale.value for locale in Locale} - {CANONICAL_LOCALE.value}
