@@ -73,6 +73,41 @@ In production the API and worker connect as a role that may `SET ROLE matchiq_ap
 
 Rows carry the real actor id (the token `sub`), `actor_type` (`USER`, `SERVICE`, `OPERATOR`, `ANONYMOUS`, `SYSTEM`; migration `0005_audit_actor_types`) and the actor's roles: fixture creation, ingest, replay sessions and commands, editorial actions, sign-in and sign-out, and every 403 for a signed-in caller (`auth.access-denied`).
 
+## Web sign-in
+
+The web app is the OIDC relying party, using `openid-client` 6.8.8, an OpenID-certified library by the author of `jose`.
+
+**Sign-in and sign-out routes**
+
+- `GET /auth/sign-in` starts Authorization Code + PKCE (S256). It accepts an optional `login_hint` and a same-origin `returnTo`. The verifier, `state` and `nonce` sit in a sealed cookie that lives for 10 minutes.
+- `GET /auth/callback` checks `state`, PKCE, `nonce`, the issuer and the ID token. It then stores the session and records `auth.signed-in` through the API.
+- `POST /auth/sign-out` is same-origin only. It clears the session, records `auth.signed-out` and redirects to the provider's end-session endpoint with `id_token_hint`.
+
+**Session storage**
+
+- The session lives in an encrypted (JWE `dir` + A256GCM), httpOnly, `SameSite=Lax` cookie. It is `Secure` with a `__Host-` prefix on https.
+- It is split into chunks when it outgrows the 4 KiB cookie limit.
+- Access tokens are refreshed 30 s before they expire. Browser JavaScript never sees a token.
+
+**API calls**
+
+- Signed-in calls go through the same-origin backend-for-frontend `/bff/*`.
+- The BFF adds the bearer token, refuses cross-origin writes and refuses `.` / `..` path segments.
+- Signed-out calls go straight to the API as the public demo.
+
+**Streams.** Each (re)connection asks the BFF for a stream ticket, then opens the API stream directly with `?ticket=`.
+
+**Role-aware UI**
+
+- `GET /auth/session` returns the user's name, organisation, roles and effective permissions. It never returns tokens.
+- `useCan(permission)` and `<RequirePermission>` hide controls the role lacks and name the roles that would grant them.
+- An API 403, or a screen the role cannot use (e.g. the agent observatory for a viewer), renders an accessible 403 region.
+- The user menu shows the name, organisation and role.
+
+**Demo accounts.** The sign-in page lists them only when `NEXT_PUBLIC_DEMO_MODE=true` and sign-in is configured. Each account opens the normal provider login with `login_hint`; the password is shown, never submitted. Judges can still use the public demo without signing in.
+
+To run sign-in locally, set `OIDC_ISSUER_URL`, `OIDC_WEB_CLIENT_ID=matchiq-web` and `WEB_SESSION_SECRET` (`openssl rand -hex 32`) in `.env`. Then run the web app natively (`pnpm nx dev web`). The compose `web` container runs the public demo only, because `localhost:8180` is not Keycloak from inside a container.
+
 ## Local setup
 
 ```bash
@@ -153,3 +188,6 @@ Literal claim names win over dotted paths, so Entra's `extn.org` works as a name
 - `apps/api` route declarations: every route declares a permission.
 
 Exercised against the real local Keycloak realm: a PKCE login as `harbour.producer` produced a token the API accepted (`GET /me` returned `org_demo`, role `producer`); a `northbank.viewer` token was refused `POST /fixtures` with 403; the producer started a replay session.
+
+- `apps/web`: session sealing and tampering, safe `returnTo`, ticketed stream transport (fresh ticket per connection), role-aware components (hidden controls, 403 region, user menu), `WebServerEnv` rules.
+- `apps/web-e2e` (`auth.spec.ts`): sign-in as producer, viewer, analyst, tenant owner and a second-organisation producer; wrong password; sign-out; viewer 403 on the observatory; producer replay controls; platform operator 403; axe in light and dark. The suite runs against the bundled test issuer in CI and against the real Keycloak realm with `E2E_OIDC_ISSUER=http://localhost:8180/realms/matchiq E2E_PORT=4328` (22/22 passed locally, desktop light and dark).
