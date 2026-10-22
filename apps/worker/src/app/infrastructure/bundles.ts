@@ -41,6 +41,8 @@ export interface AgentPipelineDeps {
   readonly reader: IntelligenceReader;
   readonly fixtures: FixtureReader;
   readonly clock: Clock;
+  /** Read for the session's demo fault plan (ADR-0017). */
+  readonly sessions: SessionStore;
 }
 
 export const BUNDLE_PROVIDERS: Provider[] = [
@@ -69,9 +71,15 @@ export const BUNDLE_PROVIDERS: Provider[] = [
     useFactory: (
       client: AgentsClient,
       reader: IntelligenceReader,
-      fixtures: FixtureReader,
+      sources: SessionSources,
       clock: Clock,
-    ): AgentPipelineDeps => ({ client, reader, fixtures, clock }),
-    inject: [AGENTS_CLIENT, INTELLIGENCE_READER, FIXTURE_READER, CLOCK],
+    ): AgentPipelineDeps => ({
+      client,
+      reader,
+      fixtures: sources.fixtures,
+      clock,
+      sessions: sources.sessions,
+    }),
+    inject: [AGENTS_CLIENT, INTELLIGENCE_READER, SESSION_SOURCES, CLOCK],
   },
 ];

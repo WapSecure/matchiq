@@ -14,6 +14,7 @@ import {
 } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
 import { SessionManager } from '../replay/session-manager.service';
+import { WorkerMetrics } from '../telemetry/worker-metrics';
 import {
   MAINTENANCE_LOG,
   MS_PER_DAY,
@@ -76,6 +77,7 @@ export class RetentionService
     @Inject(APP_ENV) private readonly env: WorkerEnv,
     @Inject(MAINTENANCE_DEPS) private readonly deps: MaintenanceDeps,
     private readonly sessions: SessionManager,
+    private readonly metrics: WorkerMetrics,
   ) {}
 
   onApplicationBootstrap(): void {
@@ -105,6 +107,10 @@ export class RetentionService
       this.logger.log(MAINTENANCE_LOG.retentionSkipped);
       return null;
     }
+    this.metrics.retained({
+      ...report.removed,
+      idempotencyKeys: report.idempotencyKeys,
+    });
     if (report.removed.sessions + report.idempotencyKeys > 0) {
       this.logger.log(
         MAINTENANCE_LOG.retentionDone(

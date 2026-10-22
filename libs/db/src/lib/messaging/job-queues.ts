@@ -1,5 +1,5 @@
 import { FixtureId, InsightId, OrgId, ReplayCommand } from '@matchiq/contracts';
-import { Queue, type ConnectionOptions } from 'bullmq';
+import { Queue, type ConnectionOptions, type Telemetry } from 'bullmq';
 import { z } from 'zod';
 import {
   JOB_ID_SEPARATOR,
@@ -47,6 +47,8 @@ export interface QueueConnection {
   readonly connection: ConnectionOptions;
   /** BullMQ key prefix; reuse REDIS_KEY_PREFIX so environments stay apart. */
   readonly prefix: string;
+  /** Set when tracing is on: producer and consumer spans carry W3C context in job options. */
+  readonly telemetry?: Telemetry;
 }
 
 const retention = {

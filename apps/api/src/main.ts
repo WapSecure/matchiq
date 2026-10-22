@@ -1,31 +1,23 @@
 import 'reflect-metadata';
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiEnv, loadEnv } from '@matchiq/config';
-import { AppModule } from './app/app.module';
-import { configureApiApp } from './app/configure-api-app';
+import { startTracing } from '@matchiq/server-kit/tracing';
 import { SERVICE_NAME } from './app/constants';
 
-const bootstrap = async (): Promise<void> => {
+// Tracing starts before the app module graph loads, so instrumentations patch it.
+const main = async (): Promise<void> => {
   const env = loadEnv(ApiEnv);
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule.forRoot(env),
-    {
-      logger: [
-        env.LOG_LEVEL === 'debug' ? 'debug' : 'log',
-        'warn',
-        'error',
-        'fatal',
-      ],
-    },
-  );
-  configureApiApp(app, env);
-  await app.listen(env.API_PORT);
-  Logger.log(`${SERVICE_NAME} listening on port ${env.API_PORT}`, 'Bootstrap');
+  const tracing = await startTracing({
+    serviceName: env.OTEL_SERVICE_NAME ?? SERVICE_NAME,
+    version: env.APP_VERSION,
+    environment: env.APP_ENV,
+    endpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    azureConnectionString: env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+  });
+  const { bootstrap } = await import('./bootstrap.js');
+  await bootstrap(env, tracing);
 };
 
-bootstrap().catch((error: unknown) => {
+main().catch((error: unknown) => {
   console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 });

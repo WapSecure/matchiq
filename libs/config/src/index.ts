@@ -6,4 +6,5 @@ export * from './lib/auth-env.js';
 export * from './lib/demo-faults-env.js';
 export * from './lib/operations-constants.js';
 export * from './lib/operations-env.js';
+export * from './lib/telemetry-env.js';
 export * from './lib/web-server-env.js';

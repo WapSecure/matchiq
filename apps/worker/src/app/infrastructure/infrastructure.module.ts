@@ -23,6 +23,8 @@ import {
 import { createSystemScheduler, type Scheduler } from '@matchiq/replay';
 import { type AgentsClient, HttpAgentsClient } from '../agents/agents-client';
 import { AGENTS_HTTP, SERVICE_NAME } from '../constants';
+import { meteredUnitOfWork } from '../telemetry/metered-unit-of-work';
+import { WorkerMetrics } from '../telemetry/worker-metrics';
 import { BUNDLE_PROVIDERS } from './bundles';
 import { createWorkerRedis, type WorkerRedis } from './redis-connections';
 import {
@@ -129,7 +131,13 @@ export class InfrastructureModule {
         useFactory: () =>
           createWorkerRedis(env.REDIS_URL, env.REDIS_KEY_PREFIX),
       },
-      fromDatabase(PIPELINE_UOW, (h) => new PostgresPipelineUnitOfWork(h.db)),
+      WorkerMetrics,
+      {
+        provide: PIPELINE_UOW,
+        useFactory: (handle: DatabaseHandle, metrics: WorkerMetrics) =>
+          meteredUnitOfWork(new PostgresPipelineUnitOfWork(handle.db), metrics),
+        inject: [DATABASE, WorkerMetrics],
+      },
       fromDatabase(FIXTURE_READER, (h) => new PostgresFixtureReader(h.db)),
       fromDatabase(TEMPLATE_STORE, (h) => new PostgresTemplateStore(h.db)),
       fromDatabase(SESSION_STORE, (h) => new PostgresSessionStore(h.db)),

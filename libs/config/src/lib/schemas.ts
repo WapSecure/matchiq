@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   DEFAULT_APP_VERSION,
   DEFAULT_DEMO_ORG_ID,
+  DEFAULT_METRICS,
   DEFAULT_PORTS,
   DEFAULT_REDIS_KEY_PREFIX,
   DEFAULT_URLS,
@@ -28,6 +29,7 @@ import {
   RetentionEnv,
   TrustProxyEnv,
 } from './operations-env.js';
+import { TelemetryEnv, metricsPort } from './telemetry-env.js';
 
 const postgresUrl = z.url({ protocol: ENV_PATTERNS.postgresProtocol });
 const redisUrl = z.url({ protocol: ENV_PATTERNS.redisProtocol });
@@ -52,6 +54,7 @@ export const CommonEnv = z.object({
     .default(DEFAULT_DEMO_ORG_ID),
   OTEL_SERVICE_NAME: optionalString,
   APPLICATIONINSIGHTS_CONNECTION_STRING: optionalString,
+  ...TelemetryEnv.shape,
 });
 
 /** `pnpm seed:fixtures` loads templates for `DEMO_ORG_ID` plus these organisations. */
@@ -103,6 +106,7 @@ export const ApiEnv = CommonEnv.extend({
     ENV_LIMITS.sseHeartbeatDefaultMs,
   ),
   API_PORT: port(DEFAULT_PORTS.api),
+  METRICS_PORT: metricsPort(DEFAULT_METRICS.apiPort),
   API_PUBLIC_URL: z.url().default(DEFAULT_URLS.apiPublic),
   CORS_ALLOWED_ORIGINS: originList,
   RATE_LIMIT_PER_MINUTE: z.coerce
@@ -129,6 +133,7 @@ export const WorkerEnv = CommonEnv.extend({
   ...ReplayCapacityEnv.shape,
   ...RetentionEnv.shape,
   WORKER_PORT: port(DEFAULT_PORTS.worker),
+  METRICS_PORT: metricsPort(DEFAULT_METRICS.workerPort),
   AGENTS_SERVICE_URL: z.url().default(DEFAULT_URLS.agentsService),
   AGENTS_SERVICE_TOKEN: secret,
   AGENT_TIMEOUT_MS: z.coerce

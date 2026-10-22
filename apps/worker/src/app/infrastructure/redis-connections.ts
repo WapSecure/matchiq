@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { RedisStreamBus, type QueueConnection } from '@matchiq/db';
+import { queueTelemetry } from '@matchiq/server-kit';
 import { Redis, type RedisOptions } from 'ioredis';
 import { REDIS_CONNECTION_NAMES } from '../constants';
 
@@ -42,7 +43,11 @@ export const createWorkerRedis = (
   const queueConnection = connect(REDIS_CONNECTION_NAMES.queues, QUEUE_OPTIONS);
   return {
     bus: new RedisStreamBus({ publisher, subscriber, keyPrefix }),
-    queues: { connection: queueConnection, prefix: keyPrefix },
+    queues: {
+      connection: queueConnection,
+      prefix: keyPrefix,
+      telemetry: queueTelemetry(),
+    },
     close: async () => {
       publisher.disconnect();
       subscriber.disconnect();

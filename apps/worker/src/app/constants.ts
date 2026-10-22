@@ -144,6 +144,8 @@ export const AGENTS_HTTP = {
   probeTimeoutMs: 1_500,
   /** The service answers within `deadlineMs` (its model work stops early); this covers transport. */
   deadlineGraceMs: 1_500,
+  spanName: 'agents.pipeline',
+  correlationAttribute: 'matchiq.correlation_id',
 } as const;
 
 export const REPLAY_RUNTIME = {
