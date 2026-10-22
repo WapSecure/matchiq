@@ -97,6 +97,9 @@ Owner for every row: the platform team (`.github/CODEOWNERS`). Review this docum
 - CodeQL and Trivy gate only on high or critical findings; medium findings are visible in code scanning and logs but do not block a merge.
 - SBOMs are CI artifacts only. They are not signed or attached to releases yet, and images are not signed (no provenance attestation).
 - Runtime images run `apt-get upgrade` at build time, so two builds of one commit can differ in OS patch level. The SBOM records what shipped.
+- The Key Vault allows public network access (Trivy AZU-0013, an expiring exception in `.trivyignore.yaml`) until the Container Apps environment gets a VNet and private endpoints. Access is RBAC-only through the apps' managed identity.
+- Trivy reads the compiled `apps` module as CloudFormation, so the Container Apps template gets no Azure-specific checks. Trivy does not parse Docker Compose files.
+- Next's built-in `global-error` page uses inline styles that the CSP blocks. It renders only after a root-layout crash, so the page may appear unstyled.
 - No DAST against staging and no penetration test (spec §48 expects both before a commercial launch).
 - The worker → agents service token is a shared secret, not workload identity. It is rotated manually.
 - Redis has no authentication on the private compose network. Isolation depends on the network.
