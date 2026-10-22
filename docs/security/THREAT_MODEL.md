@@ -96,6 +96,7 @@ Owner for every row: the platform team (`.github/CODEOWNERS`). Review this docum
 - No CSP reporting endpoint. Violations are caught by the e2e suite, not in production.
 - CodeQL and Trivy gate only on high or critical findings; medium findings are visible in code scanning and logs but do not block a merge.
 - SBOMs are CI artifacts only. They are not signed or attached to releases yet, and images are not signed (no provenance attestation).
+- Runtime images run `apt-get upgrade` at build time, so two builds of one commit can differ in OS patch level. The SBOM records what shipped.
 - No DAST against staging and no penetration test (spec §48 expects both before a commercial launch).
 - The worker → agents service token is a shared secret, not workload identity. It is rotated manually.
 - Redis has no authentication on the private compose network. Isolation depends on the network.

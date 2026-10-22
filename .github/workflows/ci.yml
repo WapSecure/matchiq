@@ -204,13 +204,20 @@ jobs:
           az bicep install --version v0.48.1
           mkdir -p "$RUNNER_TEMP/arm"
           az bicep build --file infra/azure/main.bicep --outfile "$RUNNER_TEMP/arm/main.json"
-      - name: Misconfiguration scan (infra, compose, Dockerfiles, ARM)
+      - name: Misconfiguration scan (infra, compose, Dockerfiles)
         run: >-
-          trivy fs --quiet --scanners misconfig --severity HIGH,CRITICAL
+          trivy config --quiet --severity HIGH,CRITICAL
           --ignorefile .trivyignore.yaml --exit-code 1
-          --skip-dirs node_modules --skip-dirs apps/agents/.venv
-          . "$RUNNER_TEMP/arm"
+          --skip-dirs node_modules --skip-dirs apps/agents/.venv .
+      - name: Misconfiguration scan (Bicep compiled to ARM)
+        # Report every scanner's findings even when an earlier one fails.
+        if: success() || failure()
+        run: >-
+          trivy config --quiet --severity HIGH,CRITICAL
+          --ignorefile .trivyignore.yaml --exit-code 1 "$RUNNER_TEMP/arm"
       - name: Lockfile vulnerability scan (fail on fixable high or critical)
+        # Report every scanner's findings even when an earlier one fails.
+        if: success() || failure()
         run: >-
           trivy fs --quiet --scanners vuln --severity HIGH,CRITICAL
           --ignore-unfixed --ignorefile .trivyignore.yaml --exit-code 1

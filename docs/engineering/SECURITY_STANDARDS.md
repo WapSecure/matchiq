@@ -70,6 +70,7 @@ base-uri 'none'; form-action 'self' [<OIDC issuer origin>]; frame-ancestors 'non
 
 ### Container and IaC scanning
 
+- Node runtime images apply Debian security updates (`apt-get upgrade`) on top of the digest-pinned base, and drop npm, npx, corepack and yarn, which the containers never run. The first Trivy run found 11 fixable OS CVEs (pcre2, perl) and 13 in npm's bundled dependencies (tar, brace-expansion, sigstore and others) in each Node image; this change removes both sets.
 - Exceptions go in `.trivyignore.yaml` only. Each entry needs the finding id, the narrowest paths, a `statement` explaining why it is not exploitable here, and an `expired_at` no more than 90 days out, so it fails again when it expires. A PR that adds an entry needs owner review.
 - Never lower a severity threshold, drop `--exit-code 1`, or skip a directory to get a build green. Fix the finding, upgrade the base image, or record a justified, expiring exception.
 - SBOMs are kept for 30 days as workflow artifacts. Attaching them to GitHub releases, and signing images and SBOMs, is planned for when release tagging starts.
