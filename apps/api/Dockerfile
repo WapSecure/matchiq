@@ -20,6 +20,8 @@ FROM ${NODE_IMAGE} AS runtime
 ENV NODE_ENV=production API_PORT=3000
 WORKDIR /app
 COPY --from=build --chown=node:node /repo/apps/api/dist/ ./
+# Golden templates for the compose `migrate` job's seed step.
+COPY --from=build --chown=node:node /repo/fixtures/*.json ./fixtures/
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=3 \
