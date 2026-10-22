@@ -20,6 +20,12 @@ const STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   replayCapacity: HttpStatus.SERVICE_UNAVAILABLE,
   stateNotFound: HttpStatus.NOT_FOUND,
   recapNotReady: HttpStatus.NOT_FOUND,
+  forbidden: HttpStatus.FORBIDDEN,
+  overlayNotFound: HttpStatus.NOT_FOUND,
+  overlayNotOnAir: HttpStatus.CONFLICT,
+  insightNotFound: HttpStatus.NOT_FOUND,
+  insightPublished: HttpStatus.CONFLICT,
+  invalidCursor: HttpStatus.BAD_REQUEST,
 };
 
 export const problem = (

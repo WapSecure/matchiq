@@ -114,16 +114,23 @@ export const streamMessages = pgTable(
   ],
 );
 
+/** Append-only (spec §48): a trigger rejects UPDATE and DELETE. */
 export const auditEvents = pgTable(
   TABLES.auditEvents,
   {
     id: uuid('id').primaryKey().defaultRandom(),
     orgId: orgId(),
     actor: text('actor').notNull(),
+    actorType: text('actor_type').notNull().default('OPERATOR'),
     action: text('action').notNull(),
     targetType: text('target_type').notNull(),
     targetId: text('target_id').notNull(),
+    fixtureId: text('fixture_id'),
+    reason: text('reason'),
+    correlationId: text('correlation_id'),
     requestId: text('request_id'),
+    before: jsonb('before').$type<Record<string, unknown>>(),
+    after: jsonb('after').$type<Record<string, unknown>>(),
     details: jsonb('details').$type<Record<string, unknown>>().notNull(),
     createdAt: createdAt(),
   },
@@ -133,6 +140,28 @@ export const auditEvents = pgTable(
       t.targetType,
       t.targetId,
       t.createdAt,
+    ),
+    // Keyset pagination is newest first on (created_at, id).
+    index('audit_events_recent_idx').on(
+      t.orgId,
+      t.createdAt.desc(),
+      t.id.desc(),
+    ),
+    index('audit_events_fixture_idx').on(
+      t.orgId,
+      t.fixtureId,
+      t.createdAt.desc(),
+      t.id.desc(),
+    ),
+    index('audit_events_action_idx').on(
+      t.orgId,
+      t.action,
+      t.createdAt.desc(),
+      t.id.desc(),
+    ),
+    check(
+      'audit_events_actor_type_valid',
+      sql`${t.actorType} in ('OPERATOR', 'SYSTEM', 'ANONYMOUS')`,
     ),
   ],
 );

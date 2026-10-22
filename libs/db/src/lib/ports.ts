@@ -1,4 +1,9 @@
-import type { Fixture, MatchEvent, StreamMessage } from '@matchiq/contracts';
+import type {
+  AuditActorType,
+  Fixture,
+  MatchEvent,
+  StreamMessage,
+} from '@matchiq/contracts';
 
 export interface FixtureKey {
   readonly orgId: string;
@@ -30,10 +35,17 @@ export type StreamMessageDraft = DistributiveOmit<
 export interface AuditEntry {
   readonly orgId: string;
   readonly actor: string;
+  /** Defaults to OPERATOR. */
+  readonly actorType?: AuditActorType;
   readonly action: string;
   readonly targetType: string;
   readonly targetId: string;
+  readonly fixtureId?: string;
+  readonly reason?: string;
+  readonly correlationId?: string;
   readonly requestId?: string;
+  readonly before?: Record<string, unknown>;
+  readonly after?: Record<string, unknown>;
   readonly details: Record<string, unknown>;
 }
 
@@ -78,7 +90,9 @@ export interface LedgerTransaction {
     key: FixtureKey,
     drafts: readonly StreamMessageDraft[],
   ): Promise<StreamMessage[]>;
-  appendAudit(entry: AuditEntry): Promise<void>;
+  /** Returns the audit row id. */
+  appendAudit(entry: AuditEntry): Promise<string>;
+  appendAudits(entries: readonly AuditEntry[]): Promise<void>;
   claimIdempotencyKey(request: IdempotencyRequest): Promise<IdempotencyClaim>;
   completeIdempotencyKey(
     request: IdempotencyRequest,

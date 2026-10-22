@@ -1,10 +1,11 @@
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import type { Pool } from 'pg';
+import * as editorial from './schema/editorial-tables.js';
 import * as intelligence from './schema/intelligence-tables.js';
 import * as ledger from './schema/tables.js';
 
-const schema = { ...ledger, ...intelligence };
+const schema = { ...ledger, ...intelligence, ...editorial };
 
 export type Schema = typeof schema;
 export type Database = NodePgDatabase<Schema>;

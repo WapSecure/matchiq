@@ -1,10 +1,16 @@
 import {
   appendReplayedEvents,
   REPLAY_INGESTION_PREFIX,
+  type AuditEntry,
   type FixtureKey,
   type PipelineTransaction,
   type PipelineUnitOfWork,
 } from '@matchiq/db';
+import {
+  applyEditorialPolicy,
+  editorialIds,
+  gateAudits,
+} from '../pipeline/editorial-policy';
 import type { PipelineBatch } from '../pipeline/pipeline-batch';
 
 export type WriteOutcome = 'written' | 'already-applied' | 'already-published';
@@ -74,11 +80,26 @@ const writeArtifacts = async (
   }
 };
 
+/** Applies producer state read under the fixture lock; batches with no cue skip the reads. */
+const editorialBatch = async (
+  tx: PipelineTransaction,
+  key: FixtureKey,
+  batch: PipelineBatch,
+): Promise<{ batch: PipelineBatch; audits: AuditEntry[] }> => {
+  const ids = editorialIds(batch);
+  const gated = gateAudits(key, batch);
+  if (ids.overlayIds.length === 0) return { batch, audits: gated };
+  const view = await tx.editorialView(key, ids.overlayIds, ids.insightIds);
+  const outcome = applyEditorialPolicy(key, view, batch);
+  return { batch: outcome.batch, audits: [...outcome.audits, ...gated] };
+};
+
 /**
  * Commits one pipeline batch atomically: ledger events with their
  * `match.event` messages (ADR-0006), every derived stream message, and the
- * read models behind the REST endpoints. The fixture row lock serialises it
- * with other writers of the same stream.
+ * read models behind the REST endpoints, filtered by editorial policy, plus
+ * the audit rows for every block. The fixture row lock serialises it with
+ * other writers of the same stream, including producer commands.
  */
 export class PipelineWriter {
   constructor(private readonly uow: PipelineUnitOfWork) {}
@@ -91,8 +112,10 @@ export class PipelineWriter {
         }
         await claimAll(tx, key, batch);
         await appendEvents(tx, key, batch);
-        await tx.appendStreamMessages(key, batch.drafts);
-        await writeArtifacts(tx, key, batch);
+        const effective = await editorialBatch(tx, key, batch);
+        await tx.appendStreamMessages(key, effective.batch.drafts);
+        await writeArtifacts(tx, key, effective.batch);
+        await tx.appendAudits(effective.audits);
       });
     } catch (error) {
       if (error instanceof SkipBatch) return error.outcome;

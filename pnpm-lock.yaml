@@ -195,6 +195,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@matchiq/access':
+        specifier: workspace:*
+        version: link:../../libs/access
       '@matchiq/config':
         specifier: workspace:*
         version: link:../../libs/config

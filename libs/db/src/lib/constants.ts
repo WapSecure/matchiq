@@ -12,6 +12,7 @@ export const TABLES = {
   agentRuns: 'agent_runs',
   matchSnapshots: 'match_snapshots',
   matchRecaps: 'match_recaps',
+  editorialControls: 'editorial_controls',
 } as const;
 
 export const DB_LIMITS = {
@@ -19,6 +20,8 @@ export const DB_LIMITS = {
   idempotencyKeyMaxLength: 255,
   streamReadPageMax: 1_000,
   sessionListMax: 100,
+  /** Upper bound on sessions a kill switch locks and notifies in one transaction. */
+  killSwitchFixturesMax: 100,
 } as const;
 
 export const PG_ERROR_CODES = { uniqueViolation: '23505' } as const;
@@ -30,23 +33,26 @@ export const REDIS_CHANNEL_SEGMENT = 'stream';
 export const REDIS_CHANNEL_SEPARATOR = ':';
 export const REDIS_PONG = 'PONG';
 
-export const AUDIT_ACTIONS = {
-  fixtureCreated: 'fixture.created',
-  eventsIngested: 'events.ingested',
-  sessionCreated: 'replay.session.created',
-  commandRejected: 'replay.command.rejected',
-  sessionsPurged: 'retention.sessions.purged',
-  retentionRun: 'retention.run',
-} as const;
+export { AUDIT_ACTIONS } from '@matchiq/contracts';
 
 export const AUDIT_ACTORS = {
   anonymousViewer: 'anonymous-viewer',
+  publishGate: 'publish-gate',
+  overlayScheduler: 'overlay-scheduler',
   retention: 'system:retention',
   worker: 'system:worker',
 } as const;
 export const AUDIT_TARGET_TYPES = {
   fixture: 'fixture',
+  overlay: 'overlay',
+  insight: 'insight',
+  organization: 'organization',
   retention: 'retention',
+} as const;
+
+export const AUDIT_CURSOR = {
+  encoding: 'base64url',
+  idPattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
 } as const;
 
 export const RETENTION = {

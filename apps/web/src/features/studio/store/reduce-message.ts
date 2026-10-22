@@ -10,6 +10,7 @@ export const initialMatchData = (fixtureId: string): MatchData => ({
   fixtureId,
   snapshot: null,
   replay: null,
+  editorial: null,
   clock: { period: null, ms: 0 },
   timeline: [],
   lastEventSequence: -1,
@@ -74,6 +75,8 @@ export const reduceMessage = (
       return reduceRetract(state, message.payload);
     case 'replay.status':
       return reduceReplay(state, message.payload);
+    case 'editorial.status':
+      return { editorial: message.payload };
     case 'heartbeat':
       return {};
   }

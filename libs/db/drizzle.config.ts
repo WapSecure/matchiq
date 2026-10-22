@@ -5,6 +5,7 @@ export default defineConfig({
   schema: [
     './src/lib/schema/tables.ts',
     './src/lib/schema/intelligence-tables.ts',
+    './src/lib/schema/editorial-tables.ts',
   ],
   out: './migrations',
   strict: true,

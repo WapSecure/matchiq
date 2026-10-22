@@ -5,7 +5,7 @@ import type {
   OverlayCue,
   ReplayStatus,
 } from '@matchiq/contracts';
-import { and, eq, max, sql } from 'drizzle-orm';
+import { and, eq, isNull, max, sql } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
 import type { Database } from '../client.js';
 import type {
@@ -18,6 +18,7 @@ import type {
   RecapDocument,
   SessionProgress,
 } from '../intelligence-types.js';
+import type { EditorialView } from '../editorial-types.js';
 import type { FixtureKey } from '../ports.js';
 import {
   agentRuns,
@@ -26,6 +27,7 @@ import {
   overlayCues,
 } from '../schema/intelligence-tables.js';
 import { matchEvents } from '../schema/tables.js';
+import { readEditorialView } from './editorial-queries.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
 import * as writes from './read-model-writes.js';
 
@@ -90,6 +92,7 @@ class PostgresPipelineTransaction
           scoped(insights, key),
           eq(insights.insightId, insightId),
           eq(insights.publication, 'PENDING'),
+          isNull(insights.editorialState),
         ),
       )
       .returning({ insightId: insights.insightId });
@@ -146,6 +149,8 @@ class PostgresPipelineTransaction
       clockEndMs: cue.clockEndMs,
       payload: cue,
       publishedSequence: record.publishedSequence,
+      editorialState: record.editorial?.state ?? null,
+      editorialReason: record.editorial?.reason ?? null,
     };
     await this.tx
       .insert(overlayCues)
@@ -177,6 +182,14 @@ class PostgresPipelineTransaction
       .where(
         and(scoped(overlayCues, key), eq(overlayCues.overlayId, overlayId)),
       );
+  }
+
+  editorialView(
+    key: FixtureKey,
+    overlayIds: readonly string[],
+    insightIds: readonly string[],
+  ): Promise<EditorialView> {
+    return readEditorialView(this.tx, key, { overlayIds, insightIds });
   }
 
   async insertAgentRuns(

@@ -3,7 +3,17 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import type { ApiEnv } from '@matchiq/config';
 import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
+import { ACTOR_RESOLVER, OperatorKeyActorResolver } from './auth/actor';
 import { OperatorAuthGuard } from './auth/operator-auth.guard';
+import { PermissionsGuard } from './auth/permissions.guard';
+import { AuditController } from './editorial/audit.controller';
+import { EditorialControlsService } from './editorial/editorial-controls.service';
+import {
+  EditorialController,
+  EditorialControlsController,
+} from './editorial/editorial.controller';
+import { EditorialEffects } from './editorial/editorial-writes';
+import { EditorialService } from './editorial/editorial.service';
 import { IdempotencyService } from './http/idempotency.service';
 import { API_LIMITS, SERVICE_NAME, THROTTLERS } from './constants';
 import { FixturesController } from './fixtures/fixtures.controller';
@@ -56,10 +66,18 @@ export class AppModule {
         ReplayController,
         LobbyController,
         IntelligenceController,
+        EditorialController,
+        EditorialControlsController,
+        AuditController,
       ],
       providers: [
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         OperatorAuthGuard,
+        PermissionsGuard,
+        { provide: ACTOR_RESOLVER, useClass: OperatorKeyActorResolver },
+        EditorialEffects,
+        EditorialService,
+        EditorialControlsService,
         IdempotencyService,
         FixturesService,
         IngestService,

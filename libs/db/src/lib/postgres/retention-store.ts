@@ -125,6 +125,7 @@ export class PostgresRetentionStore implements RetentionStore {
         await tx.insert(auditEvents).values({
           orgId,
           actor: AUDIT_ACTORS.retention,
+          actorType: 'SYSTEM',
           action: AUDIT_ACTIONS.sessionsPurged,
           targetType: AUDIT_TARGET_TYPES.retention,
           targetId: RETENTION.sessionsTarget,
@@ -178,6 +179,7 @@ export class PostgresRetentionStore implements RetentionStore {
   async audit(entry: AuditEntry): Promise<void> {
     await this.handle.db.insert(auditEvents).values({
       ...entry,
+      actorType: entry.actorType ?? 'SYSTEM',
       requestId: entry.requestId ?? null,
     });
   }

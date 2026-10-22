@@ -47,6 +47,8 @@ export const recordCapacityRejection = (
     await tx.appendAudit({
       orgId: key.orgId,
       actor: AUDIT_ACTORS.worker,
+      actorType: 'SYSTEM',
+      fixtureId: key.fixtureId,
       action: AUDIT_ACTIONS.commandRejected,
       targetType: AUDIT_TARGET_TYPES.fixture,
       targetId: key.fixtureId,

@@ -16,6 +16,11 @@ import type {
   Team,
   VerificationIssueCode,
 } from '@matchiq/contracts';
+import type {
+  EditorialView,
+  InsightEditorialState,
+  OverlayEditorialState,
+} from './editorial-types.js';
 import type { SessionActivity, SessionCapacity } from './operations-types.js';
 import type { FixtureKey, LedgerTransaction } from './ports.js';
 
@@ -129,6 +134,15 @@ export interface InsightTrace {
   readonly fallbackReason: string | null;
   readonly gate: GateReport | null;
   readonly runs: readonly AgentRun[];
+  /** Producer and policy decisions, for the observatory. */
+  readonly editorial: InsightEditorialTrace;
+}
+
+export interface InsightEditorialTrace {
+  readonly insight: InsightEditorialState | null;
+  readonly insightReason: string | null;
+  readonly overlay: OverlayEditorialState | null;
+  readonly overlayReason: string | null;
 }
 
 export interface InsightRecord {
@@ -145,6 +159,11 @@ export interface OverlayRecord {
   readonly status: OverlayCue['status'];
   readonly period: number;
   readonly publishedSequence: number;
+  /** Set when editorial policy keeps the cue off air. */
+  readonly editorial?: {
+    readonly state: OverlayEditorialState;
+    readonly reason: string;
+  };
 }
 
 export interface InsightWithPeriod {
@@ -176,7 +195,13 @@ export interface PipelineTransaction extends LedgerTransaction {
     key: FixtureKey,
     rows: readonly InsightRecord[],
   ): Promise<void>;
-  /** True only for the caller that moves the insight out of PENDING. */
+  /** Editorial state for the overlays and insights a batch touches. */
+  editorialView(
+    key: FixtureKey,
+    overlayIds: readonly string[],
+    insightIds: readonly string[],
+  ): Promise<EditorialView>;
+  /** True only for the caller that moves an unsuppressed insight out of PENDING. */
   claimPublication(
     key: FixtureKey,
     insightId: string,
