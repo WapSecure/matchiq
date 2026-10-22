@@ -17,7 +17,6 @@ export function InsightFeed({
 }) {
   const insights = useMatchStore((s) => s.insights);
   const narratives = useMatchStore((s) => s.narratives);
-  const period = useMatchStore((s) => s.clock.period);
   const persona = useStudioUi((s) => s.persona);
   const locale = useStudioUi((s) => s.locale);
   const openEvidence = useStudioUi((s) => s.openEvidence);
@@ -49,7 +48,6 @@ export function InsightFeed({
               persona={persona}
               locale={locale}
               team={roster.team(insight.teamId)}
-              period={period}
               onOpenEvidence={openEvidence}
             />
           ))}

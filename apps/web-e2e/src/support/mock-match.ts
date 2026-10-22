@@ -92,6 +92,7 @@ export const mockInsight = (): Insight => ({
   fixtureId: FIXTURE_ID,
   kind: 'MOMENTUM_SHIFT',
   priority: 'P1',
+  period: SECOND_HALF,
   matchClockMs: 20 * MINUTE + 30_000,
   teamId: HOME_ID,
   reasonCode: 'MOMENTUM_SWING_HOME',

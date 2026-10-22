@@ -35,7 +35,6 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
   const ids = insight?.evidence.eventIds ?? NO_IDS;
   const fixtureId = useMatchStore((s) => s.fixtureId);
   const { events, resolving } = useEvidenceEvents(fixtureId, ids);
-  const period = useMatchStore((s) => s.clock.period);
   const title =
     view?.narrative.headline ??
     (insight ? INSIGHT_KIND_LABELS[insight.kind] : EVIDENCE_COPY.title);
@@ -59,7 +58,7 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
             ) : null}
           </EvidenceSection>
           <EvidenceSection title={EVIDENCE_COPY.sections.window}>
-            <EvidenceSummary insight={insight} period={period} />
+            <EvidenceSummary insight={insight} />
           </EvidenceSection>
           <EvidenceSection title={EVIDENCE_COPY.sections.metrics}>
             <EvidenceMetrics evidence={insight.evidence} />

@@ -34,9 +34,23 @@ const scoped = (
 ): SQL | undefined =>
   and(eq(table.orgId, key.orgId), eq(table.fixtureId, key.fixtureId));
 
-/** Status columns are authoritative; payloads keep the values first published. */
-const withInsightStatus = (row: { payload: Insight; status: string }) => ({
+const insightColumns = {
+  payload: insights.payload,
+  status: insights.status,
+  period: insights.period,
+};
+
+/**
+ * Status and period columns are authoritative; payloads keep the values first
+ * published, and those stored before MQ-024 have no `period`.
+ */
+const withInsightStatus = (row: {
+  payload: Insight;
+  status: string;
+  period: number;
+}): Insight => ({
   ...row.payload,
+  period: row.period,
   status: PipelineStatus.parse(row.status),
 });
 
@@ -65,7 +79,7 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
 
   async insights(key: FixtureKey): Promise<Insight[]> {
     const rows = await this.db
-      .select({ payload: insights.payload, status: insights.status })
+      .select(insightColumns)
       .from(insights)
       .where(scoped(insights, key))
       .orderBy(asc(insights.detectedSequence), asc(insights.createdAt));
@@ -74,11 +88,7 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
 
   async insightsWithPeriod(key: FixtureKey): Promise<InsightWithPeriod[]> {
     const rows = await this.db
-      .select({
-        payload: insights.payload,
-        status: insights.status,
-        period: insights.period,
-      })
+      .select(insightColumns)
       .from(insights)
       .where(scoped(insights, key))
       .orderBy(asc(insights.detectedSequence), asc(insights.createdAt));
@@ -93,7 +103,7 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
     insightId: string,
   ): Promise<Insight | null> {
     const [row] = await this.db
-      .select({ payload: insights.payload, status: insights.status })
+      .select(insightColumns)
       .from(insights)
       .where(
         and(

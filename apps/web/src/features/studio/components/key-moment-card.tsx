@@ -21,7 +21,6 @@ export type KeyMomentCardProps = {
   persona: Persona;
   locale: string;
   team: RosterTeam | null;
-  period: number | null;
   onOpenEvidence: (insightId: string) => void;
 };
 
@@ -61,7 +60,6 @@ export const KeyMomentCard = memo(function KeyMomentCard({
   persona,
   locale,
   team,
-  period,
   onOpenEvidence,
 }: KeyMomentCardProps) {
   const headline =
@@ -88,7 +86,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
           </span>
         ) : null}
         <span className="tabular ml-auto font-mono text-xs text-ink-subtle">
-          {formatMinute(period, insight.matchClockMs)}
+          {formatMinute(insight.period, insight.matchClockMs)}
         </span>
       </header>
       <NarrativePanel

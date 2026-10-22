@@ -71,7 +71,7 @@ export const MATCH_METRICS: readonly BaseMetricDefinition[] = [
     formula:
       'TIME_WEIGHTED: team controlled ms / (home + away controlled ms) * 100; EVENT_SHARE_PROXY: team passesAttempted / all passesAttempted * 100',
     description:
-      'Time-weighted from POSSESSION_CHANGED segments within a period; contested (teamId null) and dead time are excluded from the denominator. Falls back to a labelled pass-share proxy only when no possession events exist. Rounded to 1 decimal.',
+      'Time-weighted from POSSESSION_CHANGED segments within a period; contested (teamId null) and dead time are excluded from the denominator. Falls back to a labelled pass-share proxy only when no possession events exist. Rounded to 1 decimal by largest remainder, so home + away is exactly 100.',
     unit: 'percent',
     heuristic: false,
   },

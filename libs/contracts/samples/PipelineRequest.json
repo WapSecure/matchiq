@@ -12,6 +12,7 @@
       "fixtureId": "fx_comeback_42",
       "kind": "HIGH_REGAINS",
       "priority": "P1",
+      "period": 2,
       "matchClockMs": 3742000,
       "teamId": "tm_harbour",
       "reasonCode": "HIGH_REGAINS_5M",

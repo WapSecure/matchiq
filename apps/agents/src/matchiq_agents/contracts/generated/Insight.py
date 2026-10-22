@@ -82,6 +82,7 @@ class Insight(BaseModel):
     fixtureId: Annotated[str, Field(pattern="^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
     kind: Kind
     priority: Priority
+    period: Annotated[int, Field(ge=1, le=5)]
     matchClockMs: Annotated[int, Field(ge=0, le=9007199254740991)]
     teamId: Annotated[str | None, Field(pattern="^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
     playerId: Annotated[str | None, Field(pattern="^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
