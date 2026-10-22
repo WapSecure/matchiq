@@ -1,18 +1,21 @@
 import type {
-  AuditEvent,
+  AuditEventPage,
   AuditEventQuery,
   EditorialMode,
   EditorialStatus,
+  InsightEditorialState,
+  InsightPublication,
+  OverlayEditorialState,
   OverlayStatus,
 } from '@matchiq/contracts';
-import type { InsightPublication } from './intelligence-types.js';
 import type { FixtureKey, LedgerTransaction } from './ports.js';
 
 export type EditorialScope = 'ORG' | 'FIXTURE';
 
-/** RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its insight was suppressed. */
-export type OverlayEditorialState = 'RETRACTED' | 'HELD' | 'SUPPRESSED';
-export type InsightEditorialState = 'SUPPRESSED';
+export type {
+  InsightEditorialState,
+  OverlayEditorialState,
+} from '@matchiq/contracts';
 
 export interface EditorialControlRow {
   readonly active: boolean;
@@ -110,10 +113,7 @@ export interface EditorialView {
   readonly suppressedInsights: ReadonlySet<string>;
 }
 
-export interface AuditPage {
-  readonly items: AuditEvent[];
-  readonly nextCursor: string | null;
-}
+export type AuditPage = AuditEventPage;
 
 export interface AuditReader {
   list(orgId: string, query: AuditEventQuery): Promise<AuditPage>;

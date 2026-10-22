@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Fixture, type MatchEvent } from '@matchiq/contracts';
+import { type EventPage, Fixture, type FixtureList } from '@matchiq/contracts';
 import {
   AUDIT_ACTIONS,
   type EventReader,
@@ -21,15 +21,7 @@ import {
 } from '../infrastructure/tokens';
 import type { EventPageQuery, FixtureListQuery } from './fixtures.schemas';
 
-export interface FixtureList {
-  readonly items: Fixture[];
-}
-
-export interface EventPage {
-  readonly items: MatchEvent[];
-  /** Pass as `afterSequence` for the next page; null when this page is the last. */
-  readonly nextAfterSequence: number | null;
-}
+export type { EventPage, FixtureList } from '@matchiq/contracts';
 
 export type CreateFixtureCommand = CallerContext & {
   readonly fixture: Fixture;
