@@ -134,7 +134,8 @@ test.describe('editorial controls', () => {
     const freeze = page.getByRole('button', { name: 'Freeze auto-publish' });
     await expect(freeze).toHaveAttribute('aria-disabled', 'true');
     await expect(freeze).toHaveAccessibleDescription(/Producer/);
-    await freeze.click();
+    // aria-disabled keeps it focusable; force the click to prove it stays inert.
+    await freeze.click({ force: true });
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await page.goto(`${STUDIO}/audit`);
     await expect(page.getByTestId('access-denied')).toBeVisible();
