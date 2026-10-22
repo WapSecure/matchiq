@@ -15,6 +15,7 @@ import {
 import { SessionManager } from '../replay/session-manager.service';
 import type { WriteOutcome } from '../replay/pipeline-writer';
 import { AgentsCallError } from './agents-client';
+import { WorkerMetrics } from '../telemetry/worker-metrics';
 import { CircuitBreaker } from './circuit-breaker';
 
 export interface JobAttempt {
@@ -45,6 +46,7 @@ export class InsightPipelineService {
     @Inject(APP_ENV) private readonly env: WorkerEnv,
     @Inject(AGENT_PIPELINE_DEPS) private readonly deps: AgentPipelineDeps,
     private readonly sessions: SessionManager,
+    private readonly metrics: WorkerMetrics,
   ) {
     this.breaker = new CircuitBreaker({
       failureThreshold: env.AGENT_CIRCUIT_FAILURE_THRESHOLD,
@@ -94,9 +96,16 @@ export class InsightPipelineService {
         retries: attempt.attemptsMade,
       }),
     });
-    if (!this.env.AI_ENABLED) return fallback(FALLBACK_REASONS.aiDisabled);
-    if (!this.breaker.tryAcquire())
+    if (!this.env.AI_ENABLED) {
+      this.metrics.pipelineCall('ai-disabled', 0);
+      return fallback(FALLBACK_REASONS.aiDisabled);
+    }
+    if (!this.breaker.tryAcquire()) {
+      this.metrics.pipelineCall('circuit-open', 0);
       return fallback(FALLBACK_REASONS.circuitOpen);
+    }
+    const started = performance.now();
+    const elapsed = () => (performance.now() - started) / 1_000;
     try {
       const result = await this.deps.client.run(
         buildPipelineRequest({
@@ -108,6 +117,7 @@ export class InsightPipelineService {
         }),
       );
       this.breaker.recordSuccess();
+      this.metrics.pipelineCall('success', elapsed());
       const publication = agentPublication({
         insight,
         fixture,
@@ -122,6 +132,7 @@ export class InsightPipelineService {
     } catch (error) {
       this.breaker.recordFailure();
       const call = error instanceof AgentsCallError ? error : null;
+      this.metrics.pipelineCall(call?.kind ?? 'unreachable', elapsed());
       const lastAttempt = attempt.attemptsMade + 1 >= attempt.maxAttempts;
       if (call?.retriable === true && !lastAttempt) throw error;
       return fallback(call?.message ?? FALLBACK_REASONS.unreachable);

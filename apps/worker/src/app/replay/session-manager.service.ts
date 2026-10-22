@@ -120,6 +120,11 @@ export class SessionManager
     this.registry.remove(fixtureId);
   }
 
+  /** Loaded runners by replay state, for the sessions gauge. */
+  sessionStates(): ReadonlyMap<string, number> {
+    return this.registry.countByState();
+  }
+
   isLoaded(fixtureId: string): boolean {
     return this.registry.runner(fixtureId) !== undefined;
   }

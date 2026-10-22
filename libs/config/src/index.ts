@@ -5,3 +5,4 @@ export * from './lib/auth-constants.js';
 export * from './lib/auth-env.js';
 export * from './lib/operations-constants.js';
 export * from './lib/operations-env.js';
+export * from './lib/telemetry-env.js';

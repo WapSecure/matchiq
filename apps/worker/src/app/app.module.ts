@@ -1,7 +1,12 @@
 import { type DynamicModule, Module, type Provider } from '@nestjs/common';
 import type { WorkerEnv } from '@matchiq/config';
 import type { Scheduler } from '@matchiq/replay';
-import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
+import {
+  EnvModule,
+  HealthModule,
+  HttpKitModule,
+  TelemetryModule,
+} from '@matchiq/server-kit';
 import type { AgentsClient } from './agents/agents-client';
 import { InsightPipelineService } from './agents/insight-pipeline.service';
 import { SERVICE_NAME } from './constants';
@@ -21,6 +26,8 @@ import {
 } from './queues/queue-consumers';
 import { RecapService } from './recap/recap.service';
 import { SessionManager } from './replay/session-manager.service';
+import { WorkerGauges } from './telemetry/worker-gauges';
+import { WorkerMetrics } from './telemetry/worker-metrics';
 
 /** Test seams: a virtual-time scheduler, a fake agents client, no queue consumers. */
 export interface WorkerOverrides {
@@ -38,16 +45,19 @@ export class AppModule {
     const seams: Provider[] = [
       {
         provide: QUEUE_CONSUMERS,
-        useValue: {
+        useFactory: (metrics: WorkerMetrics): QueueConsumerConfig => ({
           enabled: overrides.consumeQueues ?? true,
           insightConcurrency: env.AGENT_JOB_CONCURRENCY,
-        } satisfies QueueConsumerConfig,
+          metrics,
+        }),
+        inject: [WorkerMetrics],
       },
     ];
     return {
       module: AppModule,
       imports: [
         EnvModule.forRoot(env),
+        TelemetryModule.forRoot({ service: SERVICE_NAME }),
         HttpKitModule,
         InfrastructureModule.forRoot(env, overrides),
         HealthModule.forRoot({
@@ -69,6 +79,7 @@ export class AppModule {
         ...MAINTENANCE_PROVIDERS,
         InsightRecoveryService,
         RetentionService,
+        WorkerGauges,
       ],
       exports: [
         SessionManager,

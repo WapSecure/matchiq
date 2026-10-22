@@ -1,23 +1,23 @@
 import 'reflect-metadata';
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
 import { WorkerEnv, loadEnv } from '@matchiq/config';
-import { configureHttpApp } from '@matchiq/server-kit';
-import { AppModule } from './app/app.module';
+import { startTracing } from '@matchiq/server-kit/tracing';
 import { SERVICE_NAME } from './app/constants';
 
-const bootstrap = async (): Promise<void> => {
+// Tracing starts before the app module graph loads, so instrumentations patch it.
+const main = async (): Promise<void> => {
   const env = loadEnv(WorkerEnv);
-  const app = await NestFactory.create(AppModule.forRoot(env));
-  configureHttpApp(app, { corsOrigins: [] });
-  await app.listen(env.WORKER_PORT);
-  Logger.log(
-    `${SERVICE_NAME} listening on port ${env.WORKER_PORT}`,
-    'Bootstrap',
-  );
+  const tracing = await startTracing({
+    serviceName: env.OTEL_SERVICE_NAME ?? SERVICE_NAME,
+    version: env.APP_VERSION,
+    environment: env.APP_ENV,
+    endpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    azureConnectionString: env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+  });
+  const { bootstrap } = await import('./bootstrap.js');
+  await bootstrap(env, tracing);
 };
 
-bootstrap().catch((error: unknown) => {
+main().catch((error: unknown) => {
   console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 });

@@ -2,7 +2,12 @@ import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import type { ApiEnv } from '@matchiq/config';
-import { EnvModule, HealthModule, HttpKitModule } from '@matchiq/server-kit';
+import {
+  EnvModule,
+  HealthModule,
+  HttpKitModule,
+  TelemetryModule,
+} from '@matchiq/server-kit';
 import { ACTOR_RESOLVER, OperatorKeyActorResolver } from './auth/actor';
 import { OperatorAuthGuard } from './auth/operator-auth.guard';
 import { PermissionsGuard } from './auth/permissions.guard';
@@ -33,6 +38,7 @@ import { replayThrottler } from './replay/replay-throttle';
 import { ReplayService } from './replay/replay.service';
 import { StreamController } from './stream/stream.controller';
 import { StreamService } from './stream/stream.service';
+import { StreamGauges } from './telemetry/stream-gauges';
 
 @Module({})
 export class AppModule {
@@ -41,6 +47,7 @@ export class AppModule {
       module: AppModule,
       imports: [
         EnvModule.forRoot(env),
+        TelemetryModule.forRoot({ service: SERVICE_NAME }),
         HttpKitModule,
         InfrastructureModule.forRoot(env),
         ThrottlerModule.forRoot([
@@ -85,6 +92,7 @@ export class AppModule {
         OutboxRelayService,
         ReplayService,
         IntelligenceService,
+        StreamGauges,
         { provide: OUTBOX_NOTIFIER, useExisting: OutboxRelayService },
       ],
     };

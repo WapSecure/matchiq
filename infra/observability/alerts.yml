@@ -1,0 +1,113 @@
+# Alert rules for the proposed SLOs (spec §14, §44, §50). Targets are proposals to
+# validate under the documented load, not measured guarantees. Runbooks:
+# docs/operations/OBSERVABILITY.md#runbooks
+groups:
+  - name: matchiq-availability
+    rules:
+      - alert: MatchiqServiceDown
+        expr: max by (job) (up{job=~"matchiq-.*"}) == 0
+        for: 2m
+        labels: { severity: critical, slo: availability }
+        annotations:
+          summary: '{{ $labels.job }} has no healthy scrape target'
+          runbook: docs/operations/OBSERVABILITY.md#unhealthy-endpoint
+
+      - alert: MatchiqApiErrorBudgetFastBurn
+        # 99.9% monthly availability: a 14.4x burn exhausts 2% of the budget in 1h.
+        expr: |
+          (
+            sum(rate(matchiq_http_requests_total{service="matchiq-api",status=~"5.."}[5m]))
+            / clamp_min(sum(rate(matchiq_http_requests_total{service="matchiq-api"}[5m])), 1e-9)
+          ) > (14.4 * 0.001)
+          and
+          (
+            sum(rate(matchiq_http_requests_total{service="matchiq-api",status=~"5.."}[1h]))
+            / clamp_min(sum(rate(matchiq_http_requests_total{service="matchiq-api"}[1h])), 1e-9)
+          ) > (14.4 * 0.001)
+        for: 2m
+        labels: { severity: critical, slo: availability }
+        annotations:
+          summary: API 5xx ratio is burning the 99.9% error budget 14x too fast
+          runbook: docs/operations/OBSERVABILITY.md#api-errors
+
+  - name: matchiq-freshness
+    rules:
+      - alert: MatchiqStateUpdateSlow
+        # Event-to-state p95 < 500 ms locally (§14); commit latency is the proxy.
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(matchiq_pipeline_commit_duration_seconds_bucket[5m]))) > 0.5
+        for: 10m
+        labels: { severity: warning, slo: freshness }
+        annotations:
+          summary: p95 pipeline commit latency is above 500 ms
+          runbook: docs/operations/OBSERVABILITY.md#stream-stalled
+
+      - alert: MatchiqStatFreshnessBreached
+        # P95 stat freshness <= 2 s (§50).
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(matchiq_pipeline_commit_duration_seconds_bucket[5m]))) > 2
+        for: 5m
+        labels: { severity: critical, slo: freshness }
+        annotations:
+          summary: p95 pipeline commit latency is above 2 s
+          runbook: docs/operations/OBSERVABILITY.md#stream-stalled
+
+      - alert: MatchiqOutboxLagging
+        expr: max(matchiq_outbox_oldest_age_seconds) > 5
+        for: 2m
+        labels: { severity: warning, slo: freshness }
+        annotations:
+          summary: The oldest unpublished outbox row is {{ $value | humanizeDuration }} old
+          runbook: docs/operations/OBSERVABILITY.md#stream-stalled
+
+      - alert: MatchiqQueueBacklog
+        expr: max by (queue) (matchiq_queue_jobs{state="waiting"}) > 50
+        for: 5m
+        labels: { severity: warning, slo: freshness }
+        annotations:
+          summary: '{{ $labels.queue }} has {{ $value }} waiting jobs'
+          runbook: docs/operations/OBSERVABILITY.md#queue-backlog
+
+  - name: matchiq-intelligence
+    rules:
+      - alert: MatchiqAgentFailuresRepeated
+        # Repeated model failures (§14): more than half of AI calls fall back.
+        expr: |
+          (
+            sum(rate(matchiq_agent_pipeline_call_duration_seconds_count{outcome!~"success|ai-disabled"}[10m]))
+            / clamp_min(sum(rate(matchiq_agent_pipeline_call_duration_seconds_count{outcome!="ai-disabled"}[10m])), 1e-9)
+          ) > 0.5
+        for: 10m
+        labels: { severity: warning, slo: overlay-latency }
+        annotations:
+          summary: More than half of agents pipeline calls fail; templates are on air
+          runbook: docs/operations/OBSERVABILITY.md#model-throttled
+
+      - alert: MatchiqAgentLatencyHigh
+        # Eligible insight-to-overlay <= 4 s with AI (§44).
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(matchiq_agent_pipeline_call_duration_seconds_bucket{outcome="success"}[10m]))) > 4
+        for: 15m
+        labels: { severity: warning, slo: overlay-latency }
+        annotations:
+          summary: p95 successful agents pipeline call is above 4 s
+          runbook: docs/operations/OBSERVABILITY.md#model-throttled
+
+      - alert: MatchiqTemplateFailedGate
+        # 100% of published numerical claims evidence-linked (§50): deterministic
+        # templates must always pass the gate, so any rejection is a defect.
+        expr: sum(increase(matchiq_gate_rejections_total{source="TEMPLATE"}[15m])) > 0
+        labels: { severity: critical, slo: claims }
+        annotations:
+          summary: The publish gate rejected deterministic template copy
+          runbook: docs/operations/OBSERVABILITY.md#invalid-overlay
+
+      - alert: MatchiqJobsFailing
+        expr: sum by (queue) (increase(matchiq_queue_job_duration_seconds_count{outcome="failed"}[15m])) > 10
+        labels: { severity: warning, slo: overlay-delivery }
+        annotations:
+          summary: '{{ $labels.queue }} failed {{ $value }} job attempts in 15 minutes'
+          runbook: docs/operations/OBSERVABILITY.md#queue-backlog
