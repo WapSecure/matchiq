@@ -19,6 +19,9 @@ import { ReplayControls } from './components/replay-controls';
 import { ScoreboardStrip } from './components/scoreboard-strip';
 import { SessionFrame } from './components/session-frame';
 import { TimelinePanel } from './components/timeline-panel';
+import { ProducerControlBar } from './editorial/control-bar';
+import { EditorialNotice } from './editorial/editorial-notice';
+import { EditorialBanner, EditorialChip } from './editorial/editorial-status';
 import { useMatchStream } from './hooks/use-match-stream';
 import { useStudioHydration } from './hooks/use-studio-hydration';
 import { buildRoster } from './lib/roster';
@@ -47,6 +50,7 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
         id={MAIN_CONTENT_ID}
         className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-4 lg:px-6"
       >
+        <ProducerControlBar />
         <AudienceBar />
         <div className={GRID}>
           <div className={COLUMN}>
@@ -78,6 +82,7 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
       </main>
       <EvidenceDrawer roster={roster} />
       <LiveAnnouncer />
+      <EditorialNotice />
     </>
   );
 }
@@ -94,8 +99,18 @@ function StudioScreen({
     <SessionFrame
       fixtureId={fixtureId}
       view="live"
-      status={<LiveConnection />}
-      banner={<ConnectionBanner />}
+      status={
+        <>
+          <EditorialChip />
+          <LiveConnection />
+        </>
+      }
+      banner={
+        <>
+          <ConnectionBanner />
+          <EditorialBanner />
+        </>
+      }
     >
       {(fixture) => <StudioGrid fixture={fixture} />}
     </SessionFrame>

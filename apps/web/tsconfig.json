@@ -67,6 +67,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/access"
+    },
+    {
       "path": "../../libs/contracts"
     },
     {

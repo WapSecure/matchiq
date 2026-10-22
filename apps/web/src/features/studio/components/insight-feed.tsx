@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/feedback';
 import { SparkIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { STUDIO_COPY } from '@/constants/studio';
+import { useInsightMarks } from '../editorial/use-insight-marks';
 import type { Roster } from '../lib/roster';
 import { selectNarrative, useMatchStore, useStudioUi } from '../store';
 import { KeyMomentCard } from './key-moment-card';
@@ -20,6 +21,7 @@ export function InsightFeed({
   const persona = useStudioUi((s) => s.persona);
   const locale = useStudioUi((s) => s.locale);
   const openEvidence = useStudioUi((s) => s.openEvidence);
+  const markOf = useInsightMarks();
 
   return (
     <Panel
@@ -48,6 +50,7 @@ export function InsightFeed({
               persona={persona}
               locale={locale}
               team={roster.team(insight.teamId)}
+              mark={markOf(insight.insightId)}
               onOpenEvidence={openEvidence}
             />
           ))}

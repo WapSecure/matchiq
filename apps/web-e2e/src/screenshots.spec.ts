@@ -51,6 +51,11 @@ const SCREENS: Screen[] = [
     ready: (page) =>
       expect(page.getByRole('list', { name: 'Insight traces' })).toBeVisible(),
   },
+  {
+    name: 'audit',
+    path: `/studio/${FIXTURE_ID}/audit`,
+    ready: (page) => expect(page.getByRole('table').first()).toBeVisible(),
+  },
 ];
 
 /** Opt-in visual capture for PR review: `CAPTURE_SCREENSHOTS=1 pnpm e2e`. */

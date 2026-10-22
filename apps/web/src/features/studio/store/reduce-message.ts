@@ -1,5 +1,6 @@
 import type { ReplayStatus, StreamMessage } from '@matchiq/contracts';
 import { INITIAL_CONNECTION } from '@/lib/stream';
+import { reduceEditorial, type StatusSource } from './reduce-editorial';
 import { reduceEvents } from './reduce-events';
 import { reduceInsight, reduceNarrative } from './reduce-insights';
 import { reducePublish, reduceRetract } from './reduce-overlays';
@@ -19,13 +20,14 @@ export const initialMatchData = (fixtureId: string): MatchData => ({
   narratives: {},
   overlays: {},
   retractions: [],
+  suppressed: {},
   momentum: [],
   connection: INITIAL_CONNECTION,
   hydrationToken: 0,
   hydrated: false,
 });
 
-export type StatusSource = 'stream' | 'rest';
+export type { StatusSource };
 
 /**
  * The worker is the authority on replay status. Stream frames arrive in order
@@ -76,7 +78,7 @@ export const reduceMessage = (
     case 'replay.status':
       return reduceReplay(state, message.payload);
     case 'editorial.status':
-      return { editorial: message.payload };
+      return reduceEditorial(state, message.payload);
     case 'heartbeat':
       return {};
   }

@@ -59,7 +59,11 @@ export const mockApi = async (
   options: MockApiOptions & { stream?: StreamMessage[] } = {},
 ): Promise<MockApi> => {
   resetStreamSequence();
-  const recorder: Recorder = { replayCommands: [], sessionStarts: [] };
+  const recorder: Recorder = {
+    replayCommands: [],
+    sessionStarts: [],
+    editorialCommands: [],
+  };
   const stream = options.stream ?? initialStreamMessages();
 
   await page.addInitScript(installStreamMock, { frames: stream.map(toFrame) });
