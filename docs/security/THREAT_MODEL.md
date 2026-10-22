@@ -60,15 +60,15 @@ Owner for every row: the platform team (`.github/CODEOWNERS`). Review this docum
 
 ### Information disclosure
 
-| #   | Threat                                     | Mitigation                                                                                            | Evidence                                                     |
-| --- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| I1  | Cross-tenant reads (IDOR)                  | Organisation taken only from the token; tenant-scoped queries; Postgres RLS lands with MQ-025         | **[test]** `libs/access`; **[planned]** RLS suite (ADR-0015) |
-| I2  | Stack traces or secrets in errors and logs | RFC 9457 problems hide internals; env errors name variables, never values                             | **[test]** `http-kit.spec.ts`, `libs/config`                 |
-| I3  | Secrets committed to the public repository | gitleaks over reachable history; GitHub secret scanning and push protection                           | **[ci]** `security` job                                      |
-| I4  | Cross-origin reads of API data             | CORS allowlist of exact origins (wildcards and paths rejected at startup); CORP `same-origin`         | **[test]** `load-env.spec.ts`, `http-kit.spec.ts`            |
-| I5  | Exfiltration from an injected script       | `connect-src` limited to self, the API origin and the OIDC issuer; `form-action` likewise             | **[test]** `csp.spec.ts`, e2e                                |
-| I6  | Referrer or window-handle leaks            | `Referrer-Policy: strict-origin-when-cross-origin`; COOP `same-origin`                                | **[test]** e2e                                               |
-| I7  | Prompt data sent to an external model      | Local-first providers (mock, Ollama); Foundry only via managed identity and never claimed unexercised | ADR-0003, ADR-0012                                           |
+| #   | Threat                                     | Mitigation                                                                                                            | Evidence                                                                                                    |
+| --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| I1  | Cross-tenant reads (IDOR)                  | Organisation taken only from the token principal; tenant-pinned transactions and Postgres RLS on every `org_id` table | **[test]** `apps/api` `tenancy.integration.spec.ts`, `libs/db/tests/tenancy.integration.spec.ts` (ADR-0015) |
+| I2  | Stack traces or secrets in errors and logs | RFC 9457 problems hide internals; env errors name variables, never values                                             | **[test]** `http-kit.spec.ts`, `libs/config`                                                                |
+| I3  | Secrets committed to the public repository | gitleaks over reachable history; GitHub secret scanning and push protection                                           | **[ci]** `security` job                                                                                     |
+| I4  | Cross-origin reads of API data             | CORS allowlist of exact origins (wildcards and paths rejected at startup); CORP `same-origin`                         | **[test]** `load-env.spec.ts`, `http-kit.spec.ts`                                                           |
+| I5  | Exfiltration from an injected script       | `connect-src` limited to self, the API origin and the OIDC issuer; `form-action` likewise                             | **[test]** `csp.spec.ts`, e2e                                                                               |
+| I6  | Referrer or window-handle leaks            | `Referrer-Policy: strict-origin-when-cross-origin`; COOP `same-origin`                                                | **[test]** e2e                                                                                              |
+| I7  | Prompt data sent to an external model      | Local-first providers (mock, Ollama); Foundry only via managed identity and never claimed unexercised                 | ADR-0003, ADR-0012                                                                                          |
 
 ### Denial of service
 

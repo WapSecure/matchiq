@@ -278,7 +278,7 @@ jobs:
       - name: Build and lint
         env:
           POSTGRES_ADMIN_PASSWORD: x
-          OPERATOR_API_KEY: x
+          STREAM_TICKET_SECRET: x
           AGENTS_SERVICE_TOKEN: x
           FOUNDRY_MODEL_NAME: x
           FOUNDRY_MODEL_VERSION: x

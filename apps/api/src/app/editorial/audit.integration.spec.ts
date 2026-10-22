@@ -65,7 +65,7 @@ describe('Audit trail API (integration)', () => {
       'fixture.created',
     ]);
     expect(forA.items[0]).toMatchObject({
-      actor: { type: 'OPERATOR', id: 'operator' },
+      actor: { type: 'OPERATOR', id: 'operator-key' },
       reason: REASON.reason,
       before: { frozen: true },
       after: { frozen: false, mode: 'AUTO' },

@@ -41,7 +41,7 @@ Inside the compose network:
 - Services talk to each other by DNS name (`postgres:5432`, `redis:6379`, `http://agents:8000`).
 - The browser calls the API on `http://localhost:3000/api/v1`. That address is baked into the web bundle at build time (`NEXT_PUBLIC_API_BASE_URL`).
 
-The default `OPERATOR_API_KEY` and `AGENTS_SERVICE_TOKEN` values are placeholders for local use only. Set real ones in `.env` (`openssl rand -hex 32`) for anything shared. The VPS overlay (`infra/vps/compose.vps.yml`) refuses to start without them.
+The default `STREAM_TICKET_SECRET` and `AGENTS_SERVICE_TOKEN` values are placeholders for local use only. Set real ones in `.env` (`openssl rand -hex 32`) for anything shared. The VPS overlay (`infra/vps/compose.vps.yml`) refuses to start without them.
 
 If `pnpm dev` is already using ports 3000, 3001, 4200 or 8000, stop it first. Alternatively, override `API_PORT`, `WORKER_PORT`, `WEB_PORT` or `AGENTS_PORT` in `.env`.
 
@@ -75,7 +75,7 @@ pnpm validate:fixture fixtures/*.json
 
 The five golden fixtures are in `fixtures/` (see `fixtures/README.md`). The API exposes:
 
-- operator-only ingest: `POST /api/v1/fixtures` and `POST /api/v1/fixtures/:fixtureId/events:batch`, using `Authorization: Bearer $OPERATOR_API_KEY`
+- ingest for the `developer` role: `POST /api/v1/fixtures` and `POST /api/v1/fixtures/:fixtureId/events:batch`, with an OIDC access token (see `docs/security/IDENTITY_AND_ACCESS.md`; the operator key is a dev/CI-only fallback behind `AUTH_OPERATOR_KEY_ENABLED`)
 - the resumable SSE stream: `GET /api/v1/fixtures/:fixtureId/stream`
 
 There is no one-command seed or replay loader yet. Loading a golden fixture into a running stack, and replay controls, belong to the backend and data workstreams.

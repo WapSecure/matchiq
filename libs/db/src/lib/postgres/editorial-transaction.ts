@@ -56,6 +56,7 @@ class PostgresEditorialTransaction
     orgId: string,
     overlayId: string,
   ): Promise<string | null> {
+    await this.pin.to(orgId);
     const [row] = await this.tx
       .select({ fixtureId: overlayCues.fixtureId })
       .from(overlayCues)
@@ -70,6 +71,7 @@ class PostgresEditorialTransaction
     orgId: string,
     insightId: string,
   ): Promise<string | null> {
+    await this.pin.to(orgId);
     const [row] = await this.tx
       .select({ fixtureId: insights.fixtureId })
       .from(insights)
@@ -82,6 +84,7 @@ class PostgresEditorialTransaction
     key: FixtureKey,
     overlayId: string,
   ): Promise<OverlayRow | null> {
+    await this.pin.to(key.orgId);
     const [row] = await this.tx
       .select(overlayColumns)
       .from(overlayCues)
@@ -96,6 +99,7 @@ class PostgresEditorialTransaction
     key: FixtureKey,
     insightId: string,
   ): Promise<OverlayRow | null> {
+    await this.pin.to(key.orgId);
     const [row] = await this.tx
       .select(overlayColumns)
       .from(overlayCues)
@@ -110,6 +114,7 @@ class PostgresEditorialTransaction
     key: FixtureKey,
     insightId: string,
   ): Promise<InsightRow | null> {
+    await this.pin.to(key.orgId);
     const [row] = await this.tx
       .select({
         insightId: insights.insightId,
@@ -124,6 +129,7 @@ class PostgresEditorialTransaction
   }
 
   async liveOverlays(key: FixtureKey): Promise<OverlayRow[]> {
+    await this.pin.to(key.orgId);
     const rows = await this.tx
       .select(overlayColumns)
       .from(overlayCues)
@@ -138,6 +144,7 @@ class PostgresEditorialTransaction
     overlayId: string,
     write: OverlayEditorialWrite,
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     await this.tx
       .update(overlayCues)
       .set({
@@ -159,6 +166,7 @@ class PostgresEditorialTransaction
     insightId: string,
     reason: string,
   ): Promise<void> {
+    await this.pin.to(key.orgId);
     await this.tx
       .update(insights)
       .set({
@@ -175,6 +183,7 @@ class PostgresEditorialTransaction
     scope: EditorialScope,
     scopeId: string,
   ): Promise<EditorialControlRow | null> {
+    await this.pin.to(orgId);
     const [row] = await this.tx
       .select(controlColumns)
       .from(editorialControls)
@@ -186,6 +195,7 @@ class PostgresEditorialTransaction
   async saveControl(
     write: EditorialControlWrite,
   ): Promise<EditorialControlRow> {
+    await this.pin.to(write.orgId);
     const values = {
       active: write.active,
       reason: write.reason,
@@ -213,11 +223,13 @@ class PostgresEditorialTransaction
     return row;
   }
 
-  controls(key: FixtureKey): Promise<EditorialControls> {
+  async controls(key: FixtureKey): Promise<EditorialControls> {
+    await this.pin.to(key.orgId);
     return readControls(this.tx, key);
   }
 
   async activeSessionIds(orgId: string): Promise<string[]> {
+    await this.pin.to(orgId);
     const rows = await this.tx
       .select({ fixtureId: replaySessions.fixtureId })
       .from(replaySessions)

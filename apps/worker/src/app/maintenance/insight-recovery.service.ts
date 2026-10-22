@@ -72,8 +72,7 @@ export class InsightRecoveryService implements OnApplicationBootstrap {
   }
 
   async recover(): Promise<RecoveryReport> {
-    const pending = await this.deps.store.pendingInsights(
-      this.env.DEMO_ORG_ID,
+    const pending = await this.deps.store.systemPendingInsights(
       RECOVERY.scanLimit,
     );
     const now = this.deps.clock.now().getTime();

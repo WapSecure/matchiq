@@ -1,3 +1,4 @@
+import { operatorKeyPrincipal } from '@matchiq/access';
 import type { StreamMessage } from '@matchiq/contracts';
 import type {
   HashedEvent,
@@ -12,6 +13,7 @@ import { IngestService } from './ingest.service';
 
 const FX = 'fx_unit';
 const key = { orgId: 'org_demo', fixtureId: FX };
+const principal = operatorKeyPrincipal('org_demo');
 const NOW = new Date('2026-10-21T12:00:00.000Z');
 
 class FakeLedger implements Partial<LedgerTransaction> {
@@ -70,6 +72,7 @@ describe('IngestService', () => {
     const { ledger, notify, service } = setup();
     const result = await service.ingest({
       key,
+      principal,
       batch: batch([2, 1]),
       requestId: 'req-12345678',
     });
@@ -90,14 +93,14 @@ describe('IngestService', () => {
 
   it('does not nudge the relay when everything was a duplicate', async () => {
     const { ledger, notify, service } = setup();
-    const first = await service.ingest({ key, batch: batch([1]) });
+    const first = await service.ingest({ key, principal, batch: batch([1]) });
     ledger.stored = ledger.inserted.map((h) => ({
       eventId: h.event.eventId,
       sequence: h.event.sequence,
       payloadHash: h.payloadHash,
     }));
     notify.mockClear();
-    const again = await service.ingest({ key, batch: batch([1]) });
+    const again = await service.ingest({ key, principal, batch: batch([1]) });
     expect(first.body.accepted).toBe(1);
     expect(again.body).toMatchObject({ accepted: 0, duplicates: 1 });
     expect(notify).not.toHaveBeenCalled();
@@ -107,7 +110,9 @@ describe('IngestService', () => {
     const { ledger, service } = setup();
     const lock = jest.spyOn(ledger, 'lockFixture');
     expect(
-      await statusOf(service.ingest({ key, batch: batch([1], 'fx_other') })),
+      await statusOf(
+        service.ingest({ key, principal, batch: batch([1], 'fx_other') }),
+      ),
     ).toBe(422);
     expect(lock).not.toHaveBeenCalled();
   });
@@ -115,9 +120,9 @@ describe('IngestService', () => {
   it('answers 404 for an unknown fixture', async () => {
     const { ledger, service } = setup();
     ledger.fixtureExists = false;
-    expect(await statusOf(service.ingest({ key, batch: batch([1]) }))).toBe(
-      404,
-    );
+    expect(
+      await statusOf(service.ingest({ key, principal, batch: batch([1]) })),
+    ).toBe(404);
   });
 
   it('answers 409 on conflicts without writing', async () => {
@@ -125,9 +130,9 @@ describe('IngestService', () => {
     ledger.stored = [
       { eventId: 'ev_00001', sequence: 1, payloadHash: 'f'.repeat(64) },
     ];
-    expect(await statusOf(service.ingest({ key, batch: batch([1, 2]) }))).toBe(
-      409,
-    );
+    expect(
+      await statusOf(service.ingest({ key, principal, batch: batch([1, 2]) })),
+    ).toBe(409);
     expect(ledger.inserted).toEqual([]);
     expect(notify).not.toHaveBeenCalled();
   });

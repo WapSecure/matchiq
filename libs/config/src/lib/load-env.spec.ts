@@ -5,6 +5,8 @@ const validApi = {
   DATABASE_URL: 'postgresql://matchiq:matchiq@localhost:5432/matchiq',
   REDIS_URL: 'redis://localhost:6379',
   OPERATOR_API_KEY: OPERATOR_KEY,
+  STREAM_TICKET_SECRET: 's'.repeat(32),
+  AUTH_ANONYMOUS_DEMO_ENABLED: 'true',
 };
 
 describe('loadEnv', () => {
@@ -70,7 +72,7 @@ describe('loadEnv', () => {
         expect.arrayContaining([
           'DATABASE_URL: is required',
           'REDIS_URL: is required',
-          'OPERATOR_API_KEY: is required',
+          'STREAM_TICKET_SECRET: is required',
         ]),
       );
     }

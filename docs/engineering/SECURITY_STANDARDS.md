@@ -4,14 +4,15 @@ Reference: OWASP ASVS 5.0. MatchIQ makes **no compliance or certification claims
 
 ## Access model
 
-| Surface                                                                      | Access                                                                     |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Demo read APIs, SSE stream, web UI                                           | Anonymous, read-only, scoped to the synthetic demo organisation            |
-| Replay controls exposed to judges                                            | Anonymous, rate-limited, idempotent                                        |
-| Operator and admin actions (fixture creation, approvals, retraction, config) | `Authorization: Bearer <OPERATOR_API_KEY>`. Entra ID is planned (ADR-0010) |
-| Worker → agents                                                              | Shared service token (`AGENTS_SERVICE_TOKEN`) and internal ingress only    |
+| Surface                                                      | Access                                                                                                                                  |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Demo read APIs, SSE stream, replay controls                  | Anonymous demo principal (`AUTH_ANONYMOUS_DEMO_ENABLED`): read-only apart from rate-limited replay controls, in `AUTH_ANONYMOUS_ORG_ID` |
+| Everything else (fixture creation, ingest, editorial, audit) | OIDC access token (`Authorization: Bearer`), role permissions per `docs/security/IDENTITY_AND_ACCESS.md`                                |
+| SSE without headers                                          | Short-lived signed stream ticket (`?ticket=`), bound to one fixture and organisation                                                    |
+| Dev/CI fallback                                              | `OPERATOR_API_KEY` behind `AUTH_OPERATOR_KEY_ENABLED`, refused when `APP_ENV=prod`                                                      |
+| Worker → agents                                              | Shared service token (`AGENTS_SERVICE_TOKEN`) and internal ingress only                                                                 |
 
-Authorization is deny-by-default and enforced server-side. New operator routes declare a permission scope with `RequirePermission` (401 without valid credentials, 403 without the scope). The shared key resolves to an operator holding every scope until OIDC replaces the resolver (ADR-0016). Editorial actions and every automated block are recorded in the append-only `audit_events` table. Tenant identity comes from the auth context, never from client input. See ADR-0007 for what tenancy is and is not claimed.
+Authorization is deny-by-default and enforced server-side (ADR-0015): every route declares one permission with `RequirePermission` or is `@PublicRoute` (health), and a test fails otherwise. 401 for missing or invalid credentials, 403 without the permission, non-disclosing 404 across tenants. The organisation comes only from the verified principal. Postgres row-level security backs every tenant table (a test fails if a table with `org_id` has no policy). Privileged actions, denials, sign-in and sign-out are recorded with the real actor in the append-only `audit_events` table.
 
 ## Baseline controls (implemented)
 

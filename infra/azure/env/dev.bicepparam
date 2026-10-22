@@ -14,7 +14,7 @@ param modelProvider = 'mock'
 param deployFoundry = false
 
 param postgresAdminPassword = readEnvironmentVariable('POSTGRES_ADMIN_PASSWORD')
-param operatorApiKey = readEnvironmentVariable('OPERATOR_API_KEY')
+param streamTicketSecret = readEnvironmentVariable('STREAM_TICKET_SECRET')
 param agentsServiceToken = readEnvironmentVariable('AGENTS_SERVICE_TOKEN')
 
 param budgetAmount = 50

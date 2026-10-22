@@ -14,6 +14,7 @@ import type {
   StreamHistory,
   StreamRange,
 } from '../ports.js';
+import { withTenant } from './tenant-scope.js';
 import { fixtures, matchEvents, streamMessages } from '../schema/tables.js';
 import { fixtureMatch } from './ledger-transaction.js';
 
@@ -27,20 +28,24 @@ export class PostgresFixtureReader implements FixtureReader {
   constructor(private readonly db: Database) {}
 
   async get(key: FixtureKey): Promise<Fixture | null> {
-    const [row] = await this.db
-      .select({ payload: fixtures.payload, status: fixtures.status })
-      .from(fixtures)
-      .where(fixtureMatch(key));
+    const [row] = await withTenant(this.db, key.orgId, (tx) =>
+      tx
+        .select({ payload: fixtures.payload, status: fixtures.status })
+        .from(fixtures)
+        .where(fixtureMatch(key)),
+    );
     return row ? withStatus(row) : null;
   }
 
   async list(orgId: string, limit: number): Promise<Fixture[]> {
-    const rows = await this.db
-      .select({ payload: fixtures.payload, status: fixtures.status })
-      .from(fixtures)
-      .where(eq(fixtures.orgId, orgId))
-      .orderBy(asc(fixtures.kickoffUtc), asc(fixtures.fixtureId))
-      .limit(limit);
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select({ payload: fixtures.payload, status: fixtures.status })
+        .from(fixtures)
+        .where(eq(fixtures.orgId, orgId))
+        .orderBy(asc(fixtures.kickoffUtc), asc(fixtures.fixtureId))
+        .limit(limit),
+    );
     return rows.map(withStatus);
   }
 }
@@ -53,18 +58,20 @@ export class PostgresEventReader implements EventReader {
     afterSequence: number,
     limit: number,
   ): Promise<MatchEvent[]> {
-    const rows = await this.db
-      .select({ payload: matchEvents.payload })
-      .from(matchEvents)
-      .where(
-        and(
-          eq(matchEvents.orgId, key.orgId),
-          eq(matchEvents.fixtureId, key.fixtureId),
-          gt(matchEvents.sequence, afterSequence),
-        ),
-      )
-      .orderBy(asc(matchEvents.sequence))
-      .limit(limit);
+    const rows = await withTenant(this.db, key.orgId, (tx) =>
+      tx
+        .select({ payload: matchEvents.payload })
+        .from(matchEvents)
+        .where(
+          and(
+            eq(matchEvents.orgId, key.orgId),
+            eq(matchEvents.fixtureId, key.fixtureId),
+            gt(matchEvents.sequence, afterSequence),
+          ),
+        )
+        .orderBy(asc(matchEvents.sequence))
+        .limit(limit),
+    );
     return rows.map((r) => r.payload);
   }
 }
@@ -73,29 +80,33 @@ export class PostgresStreamHistory implements StreamHistory {
   constructor(private readonly db: Database) {}
 
   async head(key: FixtureKey): Promise<number | null> {
-    const [row] = await this.db
-      .select({ head: fixtures.streamHead })
-      .from(fixtures)
-      .where(fixtureMatch(key));
+    const [row] = await withTenant(this.db, key.orgId, (tx) =>
+      tx
+        .select({ head: fixtures.streamHead })
+        .from(fixtures)
+        .where(fixtureMatch(key)),
+    );
     return row ? row.head : null;
   }
 
   async read(key: FixtureKey, range: StreamRange): Promise<StreamMessage[]> {
-    const rows = await this.db
-      .select({ message: streamMessages.message })
-      .from(streamMessages)
-      .where(
-        and(
-          eq(streamMessages.orgId, key.orgId),
-          eq(streamMessages.fixtureId, key.fixtureId),
-          gt(streamMessages.streamSequence, range.after),
-          range.upTo === undefined
-            ? undefined
-            : lte(streamMessages.streamSequence, range.upTo),
-        ),
-      )
-      .orderBy(asc(streamMessages.streamSequence))
-      .limit(Math.min(range.limit, DB_LIMITS.streamReadPageMax));
+    const rows = await withTenant(this.db, key.orgId, (tx) =>
+      tx
+        .select({ message: streamMessages.message })
+        .from(streamMessages)
+        .where(
+          and(
+            eq(streamMessages.orgId, key.orgId),
+            eq(streamMessages.fixtureId, key.fixtureId),
+            gt(streamMessages.streamSequence, range.after),
+            range.upTo === undefined
+              ? undefined
+              : lte(streamMessages.streamSequence, range.upTo),
+          ),
+        )
+        .orderBy(asc(streamMessages.streamSequence))
+        .limit(Math.min(range.limit, DB_LIMITS.streamReadPageMax)),
+    );
     return rows.map((r) => r.message);
   }
 }
