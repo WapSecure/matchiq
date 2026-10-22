@@ -66,8 +66,9 @@ describe('telemetry module', () => {
     expect(text).toContain(
       'matchiq_http_requests_total{method="GET",route="unmatched",status="404",service="matchiq-probe"} 1',
     );
+    // prom-client writes histogram default labels first.
     expect(text).toContain(
-      'matchiq_http_request_duration_seconds_count{method="GET",route="/api/v1/fixtures/:fixtureId/state",service="matchiq-probe"} 2',
+      'matchiq_http_request_duration_seconds_count{service="matchiq-probe",method="GET",route="/api/v1/fixtures/:fixtureId/state"} 2',
     );
     expect(text).not.toMatch(/fx_secret|nowhere\/123/);
   });
