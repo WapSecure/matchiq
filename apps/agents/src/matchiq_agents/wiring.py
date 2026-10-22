@@ -3,6 +3,8 @@
 from matchiq_agents.clock import Clock
 from matchiq_agents.constants import (
     DEADLINE_RESERVE_MS,
+    LOCAL_PER_CALL_DEADLINE_SHARE,
+    LOCAL_WORKFLOW_GRACE_MS,
     MIN_MODEL_CALL_MS,
     PER_CALL_DEADLINE_SHARE,
     RETRY_BACKOFF_BASE_MS,
@@ -15,7 +17,11 @@ from matchiq_agents.models.port import ModelPort
 from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy
 from matchiq_agents.pipeline.orchestrator import PipelineConfig, PipelineOrchestrator
 from matchiq_agents.providers.foundry import FoundryNotConfiguredError, build_chat_client
-from matchiq_agents.providers.ollama import OllamaNotConfiguredError, build_ollama_client
+from matchiq_agents.providers.ollama import (
+    OLLAMA_RUN_OPTIONS,
+    OllamaNotConfiguredError,
+    build_ollama_client,
+)
 from matchiq_agents.settings import ModelProvider, Settings
 
 
@@ -28,7 +34,10 @@ def build_model(settings: Settings) -> ModelPort:
                 raise OllamaNotConfiguredError("OLLAMA_MODEL must be configured")
             deployment = f"{ModelProvider.OLLAMA.value}/{settings.ollama_model}"
             return AgentFrameworkModel(
-                build_ollama_client(settings), RunProvider.ollama, deployment
+                build_ollama_client(settings),
+                RunProvider.ollama,
+                deployment,
+                run_options=OLLAMA_RUN_OPTIONS,
             )
         case ModelProvider.FOUNDRY:
             if settings.foundry_model is None:
@@ -41,13 +50,18 @@ def build_model(settings: Settings) -> ModelPort:
 def pipeline_config(settings: Settings) -> PipelineConfig:
     retry = RetryPolicy(
         max_retries=settings.agent_max_retries,
+        output_retries=0 if settings.is_local else settings.agent_max_retries,
         backoff_base_ms=RETRY_BACKOFF_BASE_MS,
-        per_call_share=PER_CALL_DEADLINE_SHARE,
+        per_call_share=(
+            LOCAL_PER_CALL_DEADLINE_SHARE if settings.is_local else PER_CALL_DEADLINE_SHARE
+        ),
         reserve_ms=DEADLINE_RESERVE_MS,
         min_call_ms=MIN_MODEL_CALL_MS,
     )
     return PipelineConfig(
-        retry=retry, critique_enabled=settings.agent_critique_enabled, grace_ms=WORKFLOW_GRACE_MS
+        retry=retry,
+        critique_enabled=settings.critique_enabled,
+        grace_ms=LOCAL_WORKFLOW_GRACE_MS if settings.is_local else WORKFLOW_GRACE_MS,
     )
 
 
@@ -55,7 +69,10 @@ def build_orchestrator(
     settings: Settings, clock: Clock, model: ModelPort | None = None
 ) -> PipelineOrchestrator:
     breaker = CircuitBreaker(
-        clock, settings.agent_circuit_failure_threshold, settings.agent_circuit_reset_ms
+        clock,
+        settings.agent_circuit_failure_threshold,
+        settings.agent_circuit_reset_ms,
+        settings.circuit_timeout_threshold,
     )
     return PipelineOrchestrator(
         model or build_model(settings), breaker, clock, pipeline_config(settings)

@@ -85,23 +85,32 @@ _ENGLISH: Final[dict[str, int]] = {
     "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
     "twenty": 20, "dozen": 12,
 }  # fmt: skip
+_PIDGIN_SPELLINGS: Final[dict[str, int]] = {
+    "tu": 2, "tri": 3, "fo": 4, "faiv": 5, "siks": 6, "sevin": 7, "et": 8, "nain": 9,
+}  # fmt: skip
+# One Localization call writes every locale, so English and the distinctive Pidgin spellings
+# are also checked in fr-FR and es-ES. "tu", "fo" and "et" are left out there: they are
+# ordinary French and Spanish words.
+_LEAKED: Final[dict[str, int]] = {
+    **_ENGLISH,
+    **{word: value for word, value in _PIDGIN_SPELLINGS.items() if word not in {"tu", "fo", "et"}},
+}
 NUMBER_WORDS: Final[dict[Locale, dict[str, int]]] = {
     Locale.en_GB: _ENGLISH,
     Locale.fr_FR: {
+        **_LEAKED,
         "deux": 2, "trois": 3, "quatre": 4, "cinq": 5, "six": 6, "sept": 7, "huit": 8,
         "neuf": 9, "dix": 10, "onze": 11, "douze": 12, "treize": 13, "quatorze": 14,
         "quinze": 15, "seize": 16, "vingt": 20,
     },
     Locale.es_ES: {
+        **_LEAKED,
         "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6, "siete": 7, "ocho": 8,
         "nueve": 9, "diez": 10, "once": 11, "doce": 12, "trece": 13, "catorce": 14,
         "quince": 15, "dieciséis": 16, "diecisiete": 17, "dieciocho": 18, "diecinueve": 19,
         "veinte": 20,
     },
-    Locale.pcm_NG: {
-        **_ENGLISH, "tu": 2, "tri": 3, "fo": 4, "faiv": 5, "siks": 6, "sevin": 7, "et": 8,
-        "nain": 9,
-    },
+    Locale.pcm_NG: {**_ENGLISH, **_PIDGIN_SPELLINGS},
 }  # fmt: skip
 
 # Capitalised words that are not entities: football terms and locale-specific forms.

@@ -8,6 +8,7 @@ from matchiq_agents.contracts.types import (
     AgentRun,
     NarrativeDraft,
     OverlayProposal,
+    Persona,
     PipelineStatus,
     VerificationResult,
 )
@@ -34,6 +35,8 @@ class PipelineState:
     overlay: OverlayProposal | None = None
     draft_attempts: int = 0
     revision_notes: tuple[str, ...] = ()
+    # Personas the Fact Checker sent back; empty means the writer drafts every persona.
+    revision_personas: tuple[Persona, ...] = ()
     fallback_reasons: tuple[str, ...] = ()
     runs: tuple[AgentRun, ...] = field(default=())
 
