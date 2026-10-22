@@ -5,6 +5,7 @@ import {
   OUTCOME_LABELS,
 } from '@/constants/observatory';
 import { cn } from '@/lib/cn';
+import { withUniqueKeys } from '@/lib/unique-keys';
 import { ProviderBadge } from './provider-badge';
 
 const copy = OBSERVATORY_COPY;
@@ -25,6 +26,10 @@ const OUTCOME_TONE: Record<AgentRun['outcome'], string> = {
   FALLBACK: 'text-ink-muted',
 };
 
+// runId is shared by every agent step of one insight's pipeline run.
+const runKey = (r: AgentRun) =>
+  `${r.runId}:${r.agent}:${r.provider}:${r.startedAt}`;
+
 /** AgentRun timeline in start order. Scrolls inside itself on narrow screens. */
 export function RunTable({
   runs,
@@ -35,8 +40,9 @@ export function RunTable({
 }) {
   if (runs.length === 0)
     return <p className="text-xs text-ink-subtle">{copy.noRuns}</p>;
-  const ordered = [...runs].sort((a, b) =>
-    a.startedAt.localeCompare(b.startedAt),
+  const ordered = withUniqueKeys(
+    [...runs].sort((a, b) => a.startedAt.localeCompare(b.startedAt)),
+    runKey,
   );
   return (
     <div
@@ -57,8 +63,8 @@ export function RunTable({
           </tr>
         </thead>
         <tbody>
-          {ordered.map((run) => (
-            <tr key={run.runId} className="border-t border-line/60">
+          {ordered.map(({ item: run, key }) => (
+            <tr key={key} className="border-t border-line/60">
               <th scope="row" className="py-1.5 pr-3 font-medium text-ink">
                 {AGENT_LABELS[run.agent]}
               </th>

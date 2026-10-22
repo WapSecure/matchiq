@@ -2,6 +2,13 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-22 — MQ-027: Unique row keys in the Agent Observatory
+
+| Area                                                                                                                                                                                                                                   | Status | Evidence                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------- |
+| Run table keyed on `runId` + agent + provider + `startedAt` (the `AgentRun` contract has no per-row id; `runId` is shared by every step of a run), so an ollama timeout and its template fallback for the same agent are both rendered | Done   | `run-table.spec.tsx`: three rows render with no duplicate-key `console.error`; fails on the old key |
+| `withUniqueKeys` helper (occurrence suffix for repeats) applied to other lists keyed on values the contracts do not guarantee unique: gate rejection codes and details, evidence event ids, counter-evidence descriptions              | Done   | `unique-keys.spec.ts`                                                                               |
+
 ## 2026-10-22 — MQ-025 (1/3): Identity foundation — ADR-0015, access and auth libraries, Keycloak
 
 | Area                                                                                                                                                                                                                                          | Status | Evidence                                                                                                        |

@@ -1,5 +1,6 @@
 import type { GateReport } from '@/lib/api/trace-schemas';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
+import { withUniqueKeys } from '@/lib/unique-keys';
 
 const copy = OBSERVATORY_COPY;
 
@@ -21,17 +22,17 @@ function Rejections({ report }: { report: GateReport }) {
             {r.locale ? (
               <span className="font-mono text-ink-muted">{r.locale}</span>
             ) : null}
-            {r.codes.map((code) => (
+            {withUniqueKeys(r.codes, String).map(({ item: code, key }) => (
               <code
-                key={code}
+                key={key}
                 className="rounded-sm border border-warning/40 px-1 font-mono text-micro text-warning"
               >
                 {code}
               </code>
             ))}
           </p>
-          {r.details.map((d) => (
-            <p key={d} className="mt-0.5 text-ink-muted">
+          {withUniqueKeys(r.details, String).map(({ item: d, key }) => (
+            <p key={key} className="mt-0.5 text-ink-muted">
               {d}
             </p>
           ))}
