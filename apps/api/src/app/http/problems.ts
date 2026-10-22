@@ -2,9 +2,9 @@ import { HttpStatus } from '@nestjs/common';
 import { type FieldError, ProblemException } from '@matchiq/server-kit';
 import { PROBLEMS } from '../constants';
 
-type ProblemKind = keyof typeof PROBLEMS;
+export type ProblemKind = keyof typeof PROBLEMS;
 
-const STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
+export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   fixtureNotFound: HttpStatus.NOT_FOUND,
   fixtureExists: HttpStatus.CONFLICT,
   fixtureMismatch: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -36,4 +36,8 @@ export const problem = (
     headers?: Readonly<Record<string, string>>;
   } = {},
 ): ProblemException =>
-  new ProblemException({ status: STATUS[kind], ...PROBLEMS[kind], ...extra });
+  new ProblemException({
+    status: PROBLEM_STATUS[kind],
+    ...PROBLEMS[kind],
+    ...extra,
+  });

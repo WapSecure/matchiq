@@ -22,6 +22,7 @@ import { checkDemoFaults, DemoFaultFields } from './demo-faults-env.js';
 import { AppEnvironment } from './environment.js';
 import { AuthFields, checkAuthEnv } from './auth-env.js';
 import {
+  ApiDocsEnv,
   ReplayCapacityEnv,
   RetentionEnv,
   TrustProxyEnv,
@@ -94,6 +95,7 @@ export const ApiEnv = CommonEnv.extend({
   ...OutboxRelayEnv.shape,
   ...ReplayCapacityEnv.shape,
   ...TrustProxyEnv.shape,
+  ...ApiDocsEnv.shape,
   SSE_HEARTBEAT_MS: boundedInt(
     ENV_LIMITS.sseHeartbeatMinMs,
     ENV_LIMITS.sseHeartbeatMaxMs,

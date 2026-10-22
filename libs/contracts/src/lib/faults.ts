@@ -18,7 +18,8 @@ export const FaultPlan = z
   .strictObject({
     scenario: FaultScenario,
     insightKinds: z.array(InsightKind).min(1).optional(),
-    everyNth: z.int().min(1).max(LIMITS.faultEveryNthMax).default(1),
+    /** Absent means 1: every insight of the plan's kinds. */
+    everyNth: z.int().min(1).max(LIMITS.faultEveryNthMax).optional(),
   })
   .meta({ id: 'FaultPlan' });
 
@@ -26,7 +27,7 @@ export const FaultPlan = z
 export const faultApplies = (
   plan: Pick<FaultPlan, 'everyNth'>,
   ordinal: number,
-): boolean => ordinal >= 1 && (ordinal - 1) % plan.everyNth === 0;
+): boolean => ordinal >= 1 && (ordinal - 1) % (plan.everyNth ?? 1) === 0;
 
 export type FaultScenario = z.infer<typeof FaultScenario>;
 export type FaultPlan = z.infer<typeof FaultPlan>;

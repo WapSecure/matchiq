@@ -67,14 +67,14 @@ describe('Demo fault plans on session create (integration, ADR-0017)', () => {
       const body = await jsonOf<{
         session: { sessionId: string; faultPlan: unknown };
       }>(res);
-      expect(body.session.faultPlan).toEqual({ ...PLAN, everyNth: 1 });
+      expect(body.session.faultPlan).toEqual(PLAN);
       const list = await jsonOf<{
         items: { sessionId: string; faultPlan?: unknown }[];
       }>(await fetch(`${t.baseUrl}/replay-sessions`));
       const listed = list.items.find(
         (s) => s.sessionId === body.session.sessionId,
       );
-      expect(listed?.faultPlan).toEqual({ ...PLAN, everyNth: 1 });
+      expect(listed?.faultPlan).toEqual(PLAN);
     });
 
     it('rejects an unknown scenario as a validation problem', async () => {

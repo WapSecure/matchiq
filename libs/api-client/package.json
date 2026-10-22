@@ -1,0 +1,54 @@
+{
+  "name": "@matchiq/api-client",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@matchiq/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "name": "api-client",
+    "tags": [
+      "scope:shared",
+      "type:util"
+    ],
+    "targets": {
+      "codegen": {
+        "dependsOn": [
+          {
+            "projects": [
+              "api"
+            ],
+            "target": "openapi"
+          }
+        ],
+        "command": "openapi-typescript ../../docs/api/openapi.json --output src/generated/schema.ts",
+        "options": {
+          "cwd": "{projectRoot}"
+        },
+        "inputs": [
+          {
+            "dependentTasksOutputFiles": "**/openapi.json"
+          }
+        ],
+        "outputs": [
+          "{projectRoot}/src/generated"
+        ],
+        "cache": true
+      }
+    }
+  },
+  "dependencies": {
+    "openapi-fetch": "0.17.0",
+    "tslib": "2.8.1"
+  }
+}
