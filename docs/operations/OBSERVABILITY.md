@@ -1,6 +1,6 @@
 # Observability
 
-Structured logs, OpenTelemetry traces and Prometheus metrics for the API and worker (ADR-0017). Everything is vendor neutral and local first. With no telemetry settings, the services run exactly as before: JSON logs, tracing off, and metrics on an internal listener.
+Structured logs, OpenTelemetry traces and Prometheus metrics for the API and worker, plus logs and traces for the agents service (ADR-0017). Everything is vendor neutral and local first. With no telemetry settings, the services run exactly as before: JSON logs, tracing off, and metrics on an internal listener.
 
 ## Configuration
 
@@ -174,6 +174,6 @@ Not exercised; do not claim it works (ADR-0003, ADR-0017). The services export O
 ## Limits
 
 - No trace context through the outbox and SSE (it would need a `stream_messages` column and an envelope field). Logs correlate those hops by `fixtureId` and `correlationId`.
-- The agents service has its own change (JSON logs, tracing that reads `traceparent`). Until it lands, the worker's `agents.pipeline` span is the end of the trace.
+- The agents service logs JSON and continues the worker's trace (`POST /api/v1/pipeline/runs` server span under `agents.pipeline`), but its model calls are not yet individual spans, and it has no `/metrics`: agent outcomes and latency are counted by the worker.
 - No log shipping (Loki) and no Alertmanager. Logs go to stdout for the platform to collect.
 - `matchiq_replay_sessions` counts the sessions loaded in this worker, not every row in the database.
