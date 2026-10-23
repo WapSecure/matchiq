@@ -27,7 +27,6 @@ import {
   auditEvents,
   fixtures,
   idempotencyKeys,
-  matchEvents,
   streamMessages,
 } from '../schema/tables.js';
 
@@ -46,6 +45,22 @@ const deleteFrom = async (
 ): Promise<number> =>
   (await tx.delete(table).where(keyIn(table, keys))).rowCount ?? 0;
 
+/** The ledger refuses ordinary DELETE (migration 0008); retention goes through the purge function. */
+const purgeLedger = async (
+  tx: Transaction,
+  keys: readonly FixtureKey[],
+): Promise<number> => {
+  const textArray = (values: readonly string[]): SQL =>
+    sql`array[${sql.join(
+      values.map((v) => sql`${v}`),
+      sql`, `,
+    )}]::text[]`;
+  const result = await tx.execute<{ removed: number }>(
+    sql`select purge_match_ledger(${textArray(keys.map((k) => k.orgId))}, ${textArray(keys.map((k) => k.fixtureId))}) as removed`,
+  );
+  return result.rows[0]?.removed ?? 0;
+};
+
 /**
  * Children are deleted explicitly, in dependency order, so the audit records
  * exact counts; the ON DELETE CASCADE foreign keys (migration 0002) are the
@@ -62,7 +77,7 @@ const deleteBatch = async (
   const snapshots = await deleteFrom(tx, matchSnapshots, keys);
   const recaps = await deleteFrom(tx, matchRecaps, keys);
   const streamDeleted = await deleteFrom(tx, streamMessages, keys);
-  const events = await deleteFrom(tx, matchEvents, keys);
+  const events = await purgeLedger(tx, keys);
   const sessions = await deleteFrom(tx, replaySessions, keys);
   const fixturesDeleted = await deleteFrom(tx, fixtures, keys);
   return {
