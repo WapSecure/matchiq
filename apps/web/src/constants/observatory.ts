@@ -6,14 +6,14 @@ import type {
 import type { FallbackGroup } from './fact-checks';
 
 export const OBSERVATORY_COPY = {
-  metaTitle: 'AI fact-checks',
-  eyebrow: 'AI fact-checks',
+  metaTitle: 'Fact-checks',
+  eyebrow: 'Fact-checks',
   title: 'How each key moment was written and checked',
   description:
-    'Key moments are spotted in the match data. AI writes them up, and a fact check compares every number, name and claim with the data before anything goes on air. If the AI wording fails, standard wording goes out instead.',
+    'Key moments are spotted in the match data. AI writes them up, and a fact check compares every number, name and claim with the data before anything goes on air. If the draft fails, standard wording goes out instead.',
   summary: {
     insights: 'Key moments',
-    agent: 'Written by AI',
+    agent: 'Auto-written',
     template: 'Standard wording',
     pending: 'Still being written',
     rejected: 'Caught by the fact check',
@@ -21,8 +21,8 @@ export const OBSERVATORY_COPY = {
   },
   listLabel: 'Key moments and their checks',
   empty: 'No key moments yet. They appear here as the replay runs.',
-  error: "We couldn't load the AI fact-checks",
-  loading: 'Loading the AI fact-checks',
+  error: "We couldn't load the fact-checks",
+  loading: 'Loading the fact-checks',
   secretsNote:
     'Prompts, keys and passwords are never shown here; only what happened.',
   story: {
@@ -58,7 +58,7 @@ export const OBSERVATORY_COPY = {
 } as const;
 
 export const PUBLICATION_LABELS = {
-  AGENT: 'AI wording',
+  AGENT: 'Auto-written',
   TEMPLATE: 'Standard wording',
   PENDING: 'Pending',
 } as const;
@@ -69,8 +69,8 @@ export const PROVIDER_LABELS: Record<
   { label: string; hint: string }
 > = {
   template: {
-    label: 'Standard wording (no AI)',
-    hint: 'Pre-written sentences filled in from the match data; no AI was used',
+    label: 'Standard wording',
+    hint: 'Pre-written sentences filled in from the match data',
   },
   mock: {
     label: 'Test stand-in (not real AI)',
@@ -118,18 +118,18 @@ export const FALLBACK_REASON_COPY: readonly {
   },
   {
     pattern: /circuit breaker/i,
-    text: 'AI writing paused briefly to recover.',
+    text: 'Auto-writing paused briefly to recover.',
     group: 'AI_TROUBLE',
   },
   {
     pattern: /time(d)? ?out/i,
-    text: 'The AI took too long.',
+    text: 'Took too long, so standard wording went out on time.',
     group: 'AI_TROUBLE',
   },
   {
     pattern:
       /unreachable|HTTP \d+|invalid PipelineResult|orchestration|enqueue|unavailable/i,
-    text: 'The AI service was unavailable.',
+    text: 'The writing service was unavailable.',
     group: 'AI_TROUBLE',
   },
   {
@@ -139,12 +139,12 @@ export const FALLBACK_REASON_COPY: readonly {
   },
   {
     pattern: /publish gate|fact checker|failed checks/i,
-    text: 'The fact check rejected the AI wording.',
+    text: 'The fact check rejected the draft.',
     group: 'FACT_CHECK',
   },
   {
     pattern: /skipped/i,
-    text: 'Part of the AI analysis was skipped to stay on time.',
+    text: 'Part of the analysis was skipped to stay on time.',
     group: 'AI_TROUBLE',
   },
 ];

@@ -1,20 +1,23 @@
 """Prompt builders: every few-shot example passes the deterministic checks of its golden case."""
 
 from dataclasses import replace
-from typing import get_args
+from typing import cast, get_args
 
 import pytest
 
 from matchiq_agents.contracts.types import AgentName, Locale, NarrativeSource, Persona
 from matchiq_agents.domain.facts import build_fact_view
 from matchiq_agents.guard.checks import check_analysis, check_draft, check_overlay
+from matchiq_agents.guard.editorial import editorial_issues, event_line
 from matchiq_agents.guard.locale_checks import check_localised
 from matchiq_agents.roster.convert import make_draft, to_analysis, to_overlay
 from matchiq_agents.roster.examples import (
     ANALYST_EXAMPLE,
+    EXAMPLE_PLAYER,
     EXAMPLE_TEAM,
     LOCALIZATION_EXAMPLE,
     LOCALIZATION_REQUIRED,
+    MOMENT_EXAMPLES,
     PRODUCER_EXAMPLE,
     WRITER_EXAMPLE,
     compact,
@@ -96,3 +99,20 @@ def test_writer_prompt_states_each_persona_limit() -> None:
     for persona in Persona:
         assert f"{persona.value}:" in instructions
     assert "exactly ONE sentence" in instructions
+
+
+@pytest.mark.parametrize("example", MOMENT_EXAMPLES, ids=lambda e: str(e["insightKind"]))
+@pytest.mark.parametrize("persona", [Persona.CASUAL, Persona.BROADCAST])
+def test_moment_examples_meet_the_editorial_rules(
+    example: dict[str, object], persona: Persona
+) -> None:
+    metrics = cast("dict[str, float]", example["computedMetrics"])
+    spec = replace(
+        CASE.spec, kind=str(example["insightKind"]), metrics=metrics, team_name=EXAMPLE_TEAM,
+        player_name=EXAMPLE_PLAYER, player_id="pl_harbour_9",
+    )  # fmt: skip
+    view = build_fact_view(build_request(spec))
+    headline, body = str(example["headline"]), str(example["body"])
+    cited = dict(metrics)
+    assert editorial_issues(headline, body, cited, persona, view) == []
+    assert example.get("eventLine") == event_line(view)

@@ -18,6 +18,7 @@ export const RECAP_COPY = {
     moments: (n: number) => plural(n, 'key moment'),
     possession: (home: string, away: string) => `Possession ${home}–${away}`,
     shots: (home: number, away: number) => `Shots ${home}–${away}`,
+    missing: '–',
   },
   momentsTitle: 'Key moments',
   momentsDescription: 'Every key moment of the match, with the plays behind it',
@@ -55,8 +56,9 @@ export const RECAP_COPY = {
     statLine: (label: string, home: string, away: string) =>
       `${label}: ${home}–${away}`,
     unavailable: 'not available',
-    footer:
-      'Simulated match. Every number comes from the match data, never from AI.',
+    footer: 'Simulated match. Every number comes from the match data.',
+    disclosure:
+      'Commentary auto-generated from the match data and fact-checked.',
   },
   notReady: {
     title: 'The recap is ready at full time',

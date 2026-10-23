@@ -34,6 +34,11 @@ class FactsPayload(StrictModel):
     insight_kind: InsightKind
     subject_team: str | None
     subject_player: str | None
+    # "home" or "away": which side of the metric refs (`goals.home`) is the subject team.
+    subject_side: str | None
+    opponent_team: str | None
+    # The engine's own headline for a goal or red card ("GOAL — Penbrook Town lead 3-2").
+    event_line: str | None
     computed_metrics: dict[str, float]
     event_ids: list[str]
     confidence_label: ConfidenceLabel

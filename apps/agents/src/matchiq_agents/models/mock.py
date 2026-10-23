@@ -26,8 +26,8 @@ from matchiq_agents.roster.schemas import (
     WriterInput,
     WriterOutput,
 )
+from matchiq_agents.templates.compose import render_text
 from matchiq_agents.templates.fallback import analyst_output, rendered_to_draft
-from matchiq_agents.templates.render import render_text
 
 UNSUPPORTED_PAYLOAD: Final = "mock model cannot answer {payload} as {response}"
 

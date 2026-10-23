@@ -6,7 +6,7 @@ Covers both the product's runtime agents and the coding agents that build the re
 
 **Stack.** Microsoft Agent Framework (`agent-framework-core`) and `agent-framework-foundry`, using `Agent(client=FoundryChatClient(project_endpoint, model, credential))`. Settings use the framework's variable names, `FOUNDRY_PROJECT_ENDPOINT` and `FOUNDRY_MODEL`. Before using any SDK API, verify it against Microsoft Learn. `tests/test_foundry_sdk.py` guards the API surface we depend on.
 
-**Roster (spec §28):** Match Analyst → Narrative Writer → Fact Checker → Localization → Broadcast Producer.
+**Roster (spec §28):** Match Analyst → Narrative Writer → Fact Checker → Localization → Broadcast Producer (the order the workflow runs them).
 
 **Contracts.** Agents receive an immutable `FactPacket` (insight, evidence envelope and entity allowlist) and return `AgentResult` or `VerificationResult`. Both are typed by the generated Pydantic models.
 
@@ -30,16 +30,16 @@ Covers both the product's runtime agents and the coding agents that build the re
 
 **Feedback retries.** A rejected Analyst or Producer answer gets one retry that feeds back each violation with its fix, only while at least 60% of the deadline is left. On `ollama` blind retries of rejected output stay off, and a timed-out call is not retried.
 
-**Content safety.** A deterministic blocklist (profanity and abuse aimed at players, teams or officials, in all four locales) runs inside every text check, so it covers drafts, translations, overlays and templates. A hit is a forbidden claim: the persona falls back to its template without revision. `ContentSafetyScreen` is the port for a hosted classifier such as Azure AI Content Safety; none is wired until Azure exists (ADR-0003), and a configured screen fails closed.
+**Content safety.** A deterministic blocklist (profanity, slurs, and abuse aimed at players, teams or officials, in all four locales) runs inside every text check, so it covers drafts, translations, overlays and templates. A hit is a forbidden claim: the persona falls back to its template without revision.
 
-**Handoff records and budget (ADR-0011 addendum 3).** Every stage transition is an `AgentStep` with its decision, reason, input checksum and cited evidence, stored per run and served by `GET /agents/traces/{correlationId}`. A central per-run budget (`AGENT_BUDGET_MAX_HOPS`, `AGENT_BUDGET_MAX_TOKENS`, `AGENT_BUDGET_MAX_COST_USD`) stops further model calls once reached and falls back with `BUDGET_EXCEEDED`.
+**Independent publish gate (MQ-065, ADR-0022).** The worker gate does not trust the Fact Checker's verdict. Besides schema, numbers, entities, evidence and length, it re-runs, in pure TypeScript (`libs/narrative-guard`), the forbidden-claim lexicon (`FORBIDDEN_CLAIM`), injection echoes such as "ignore previous instructions", prompt leakage, links and markup (`INJECTION_ECHO`), causal connectives in a sentence that names no cited value and no recorded event (`UNSUPPORTED_CAUSALITY`), repeated phrases within one text and agent drafts near-identical to a narrative published for the same variant in the last 10 match minutes (`REPETITION`), and the blocklist, shouting in capitals and repeated exclamation marks (`UNSAFE_TONE`). The forbidden and safety patterns have one source, `libs/narrative-guard/src/lib/lexicon.ts`. `pnpm codegen` writes them to JSON, which the Python guard loads, and CI fails if the two drift. A failing draft is rejected, never repaired: its variant airs the standard template, and the reason code is recorded on the gate report and shown on the fact-checks page. `ContentSafetyScreen` is the port for a hosted classifier such as Azure AI Content Safety; none is wired until Azure exists (ADR-0003), and a configured screen fails closed.
+
+**Handoff records and budget (ADR-0011 addendum 4).** Every stage transition is an `AgentStep` with its decision, reason, input checksum and cited evidence, stored per run and served by `GET /agents/traces/{correlationId}`. A central per-run budget (`AGENT_BUDGET_MAX_HOPS`, `AGENT_BUDGET_MAX_TOKENS`, `AGENT_BUDGET_MAX_COST_USD`) stops further model calls once reached and falls back with `BUDGET_EXCEEDED`.
 
 **Cost.** `AgentRun.costEstimateUsd` comes from the `AGENT_PRICE_TABLE` setting (USD per million tokens per deployment). Local inference and the mock record 0; a cloud deployment without a price records no estimate.
 
-**Evaluation (M2).** 38 golden insight cases plus 8 adversarial inputs and 10 scripted model attacks. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled. Methodology, failure taxonomy and the recorded baselines: `docs/ai/EVALUATION.md`.
+**Evaluation (M2).** 38 golden insight cases plus 8 adversarial inputs and 13 scripted model attacks. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled. Methodology, failure taxonomy and the recorded baselines: `docs/ai/EVALUATION.md`.
 **Demo fault scenarios (ADR-0020).** A session can be created with a fault plan (`WRITER_REVISE`, `MODEL_TIMEOUT`, `GATE_REJECT`) to show a failure and recovery chain on demand. This needs `DEMO_FAULTS_ENABLED=true`, which every service refuses at startup in prod. Each faulted run carries `faultInjected` and is shown as "Simulated failure (demo)". A faulted run uses its own circuit breaker, so it never degrades real sessions. A simulated failure is never described as a real outage.
-
-**Evaluation (M2).** 30 golden insight cases plus adversarial inputs. Release gate: zero unsupported numeric claims, zero unknown entities, and fallback verified with the model disabled.
 
 ## Coding agents (Claude Code and others)
 

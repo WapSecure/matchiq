@@ -19,7 +19,7 @@ export const EVIDENCE_COPY = {
   eventOutsideWindow: 'Details for this play are not available',
   resolving: 'Looking up this play…',
   caveat:
-    'Strength of evidence is a guide, not a guarantee. Every number comes from the match data; AI only quotes it.',
+    'Strength of evidence is a guide, not a guarantee. Every number comes from the match data.',
   technical: {
     insightId: 'Insight id',
     method: 'Method version',

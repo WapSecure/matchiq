@@ -252,3 +252,15 @@ Technical details never contain secrets, prompts or tokens.
 - [ ] Every loading surface has loading, empty and error states.
 - [ ] Accessible names describe the action and its object.
 - [ ] Tests assert on the new strings or on test ids.
+
+## 12. Talking about AI
+
+Disclose once and clearly. Lead with the fact check, which is what customers see.
+
+- **Moment cards** (studio, recap, overlays) carry the badge "Fact-checked". Its description reads "Auto-written from the match data. Every number was checked before it went out." The AI versus standard distinction stays in the data and under Technical details.
+- **Standard wording** is labelled only for the Analyst view and on the fact-checks page. Fan and Broadcast cards show no provenance label. Never write "(no AI)".
+- **Titles** use "Fact-checks", not "AI fact-checks". The route path does not change.
+- **Errors and recovery** describe the outcome, not the AI: "Took too long, so standard wording went out on time", "The writing service was unavailable", "The fact check rejected the draft". Demo-failure explanations may say "the writer", "the draft" or "the fact checker".
+- **Stats reassurance** appears once, on the landing page: "Every number comes straight from the match data." Elsewhere say "Every number comes from the match data", with no AI in the sentence.
+- **Keep AI explicit** for buyers, judges and settings: the landing hero and description, site metadata, the how-it-works explainer, Technical details, the intro line of the fact-checks page, and model or provider labels such as "AI (local model)" and "AI writing is switched off here".
+- **Downloads** (match report) carry one line: "Commentary auto-generated from the match data and fact-checked."
