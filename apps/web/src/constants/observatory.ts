@@ -144,7 +144,8 @@ export const FALLBACK_REASON_COPY: readonly {
     text: 'The AI took too long, so standard wording went out on time.',
   },
   {
-    pattern: /unreachable|HTTP \d+|invalid PipelineResult|orchestration|enqueue|unavailable/i,
+    pattern:
+      /unreachable|HTTP \d+|invalid PipelineResult|orchestration|enqueue|unavailable/i,
     text: 'The AI service had a problem, so standard wording was used.',
   },
   {

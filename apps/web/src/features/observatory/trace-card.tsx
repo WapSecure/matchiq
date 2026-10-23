@@ -6,7 +6,11 @@ import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { formatClock, formatMinute } from '@/lib/format';
 import { FaultChain, FaultNotes } from './fault-chain';
 import { GateReportView } from './gate-report';
-import { describeRejection, plainFallbackReasons, traceStory } from './plain-trace';
+import {
+  describeRejection,
+  plainFallbackReasons,
+  traceStory,
+} from './plain-trace';
 import { RunTable } from './run-table';
 
 const copy = OBSERVATORY_COPY;
@@ -47,7 +51,13 @@ function Notes({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function Technical({ trace, caption }: { trace: InsightTrace; caption: string }) {
+function Technical({
+  trace,
+  caption,
+}: {
+  trace: InsightTrace;
+  caption: string;
+}) {
   return (
     <TechnicalDetails>
       <dl className="grid gap-3 sm:grid-cols-3">

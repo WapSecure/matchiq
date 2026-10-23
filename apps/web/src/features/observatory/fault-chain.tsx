@@ -45,8 +45,7 @@ export function FaultChain({ runs, publication }: FaultChainProps) {
         <h4 className="eyebrow">{DEMO_FAULT_COPY.chainTitle}</h4>
       </div>
       <p className="text-sm text-ink">
-        {tale.setup}{' '}
-        {publication === 'AGENT' ? tale.recovered : tale.fallback}
+        {tale.setup} {publication === 'AGENT' ? tale.recovered : tale.fallback}
       </p>
       <p className="mt-1 text-xs text-ink-muted">
         <span className="font-medium">{DEMO_FAULT_COPY.finalSource}</span>

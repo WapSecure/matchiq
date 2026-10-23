@@ -37,12 +37,17 @@ function Facts({ template }: { template: FixtureTemplateSummary }) {
       <TechnicalDetails>
         <dl className="grid grid-cols-2 gap-2 font-mono">
           <div className="min-w-0">
-            <dt className="text-micro text-ink-subtle">{LOBBY_COPY.seedLabel}</dt>
+            <dt className="text-micro text-ink-subtle">
+              {LOBBY_COPY.seedLabel}
+            </dt>
             <dd className="tabular text-ink">{template.seed}</dd>
           </div>
           <div className="min-w-0">
             <dt className="text-micro text-ink-subtle">{LOBBY_COPY.hash}</dt>
-            <dd className="tabular truncate text-ink" title={template.eventsHash}>
+            <dd
+              className="tabular truncate text-ink"
+              title={template.eventsHash}
+            >
               {`${template.eventsHash.slice(0, HASH_PREVIEW_CHARS)}…`}
             </dd>
           </div>

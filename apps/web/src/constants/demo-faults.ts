@@ -12,7 +12,8 @@ export const DEMO_FAULT_COPY = {
 } as const;
 
 export const FAULT_SCENARIO_LABELS: Record<FaultScenario, string> = {
-  WRITER_REVISE: 'The fact checker catches a wrong number, then the writer fixes it',
+  WRITER_REVISE:
+    'The fact checker catches a wrong number, then the writer fixes it',
   MODEL_TIMEOUT: 'The AI times out, so standard wording goes out on time',
   GATE_REJECT: 'The final fact check blocks a wrong number before air',
 };
