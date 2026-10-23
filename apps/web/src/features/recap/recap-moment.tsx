@@ -74,9 +74,11 @@ function Meta({
         <span>{RECAP_COPY.evidence(moment.evidenceEventIds.length)}</span>
         <span>{RECAP_COPY.metricRefs(moment.metricRefs.length)}</span>
       </p>
-      {picked?.fallback ? (
+      {picked?.translationUnknown || picked?.fallback ? (
         <p lang={SITE.locale} className="mt-1 text-micro text-warning">
-          {RECAP_COPY.localeFallback(englishLanguageName(locale))}
+          {picked.translationUnknown
+            ? RECAP_COPY.translationUnknown
+            : RECAP_COPY.localeFallback(englishLanguageName(locale))}
         </p>
       ) : null}
     </>
@@ -125,7 +127,7 @@ export function RecapMomentItem({
           </span>
         </header>
         {picked ? (
-          <div className="mt-1.5" lang={picked.narrative.locale}>
+          <div className="mt-1.5" lang={picked.language}>
             <p className="text-[15px] font-semibold leading-snug text-ink">
               {picked.narrative.headline}
             </p>
