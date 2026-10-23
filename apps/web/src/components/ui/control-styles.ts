@@ -45,3 +45,29 @@ export const LABEL = 'eyebrow';
 export const HELP_TEXT = 'text-micro text-ink-subtle';
 export const ERROR_TEXT =
   'flex items-start gap-1 text-micro font-medium text-critical';
+
+/** Button-style field triggers (date pickers): an icon well, a summary and an end affordance. */
+export const TRIGGER =
+  'flex w-full min-w-0 items-center gap-2.5 rounded-md border bg-surface ps-1.5 text-start text-ink shadow-panel outline-none transition-[border-color,background-color,box-shadow] duration-150 ease-out data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent aria-expanded:border-accent aria-expanded:ring-3 aria-expanded:ring-accent/15 data-disabled:cursor-not-allowed data-disabled:bg-surface-raised data-disabled:text-ink-subtle data-disabled:shadow-none';
+
+export const TRIGGER_TONE = {
+  default: 'border-line-strong data-hovered:border-control',
+  invalid: 'border-critical ring-3 ring-critical/12',
+} as const;
+
+export const ICON_WELL_BASE =
+  'flex shrink-0 items-center justify-center border transition-colors duration-150';
+
+export const ICON_WELL: Record<ControlSize, string> = {
+  sm: 'size-6 rounded-[5px]',
+  md: 'size-7 rounded-md',
+};
+
+export const ICON_WELL_TONE = {
+  empty: 'border-line bg-surface-raised text-ink-subtle',
+  filled: 'border-accent/25 bg-accent-soft text-accent',
+} as const;
+
+/** Icon-only button inside a control (clear, step). */
+export const INLINE_ACTION =
+  'flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-subtle outline-none transition-colors duration-150 pointer-coarse:size-10 data-hovered:bg-surface-raised data-hovered:text-ink data-pressed:bg-surface-sunken data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent';
