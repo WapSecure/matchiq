@@ -686,3 +686,11 @@ Stream E, branch `fix/MQ-044-mobile-studio-polish` cut from `dev`. Screenshot re
 Validation: web lint and typecheck passed; 18 affected unit tests passed; 56 mobile studio/authentication/editorial browser checks passed, including axe and keyboard flows; all 24 producer screenshot captures passed and revised mobile studio/recap/observatory images were inspected. Formatting and diff whitespace checks passed. Webpack production compilation, type checking and page generation passed, with the same standalone tracing limitation from reused dependency symlinks. No deployment or real external integration was verified.
 
 Next three tickets: permanent mobile identity/account browser regression; full interface localization and native editorial review; licensed feed and operational qualification for a paid pilot.
+
+## MQ-045: Mobile identity regression (23 October 2026)
+
+Stream F, branch `test/MQ-045-mobile-studio-identity` cut from `dev`. Added browser coverage at 320px and 390px for a readable, viewport-contained fixture heading and an accessible producer account menu, including organisation, sign-out and Escape dismissal. Initial assertions used the wrong organisation display name; corrected them to the existing synthetic test account without changing application behavior or weakening the check.
+
+Validation: all 8 browser cases passed across the configured projects, QA TypeScript and new-file lint passed, and formatting/diff whitespace checks passed. No code comments were added. The local test issuer and mocked API remain test infrastructure, not production integration proof.
+
+Next three tickets: complete interface localization; obtain native editorial review for supported narrative languages; qualify licensed live data and production operations with a paid pilot.
