@@ -33,7 +33,7 @@ describe('recap', () => {
     stubApi({ 'GET /recap': NOT_READY });
     renderWith(<RecapView fixture={fixture()} />);
     expect(
-      await screen.findByText('Recap available at full time'),
+      await screen.findByText('The recap is ready at full time'),
     ).toBeInTheDocument();
   });
 
@@ -48,18 +48,22 @@ describe('recap', () => {
     expect(moments).toHaveTextContent("76'");
     expect(moments).toHaveTextContent('Home United level it');
     const metrics = screen.getByRole('region', {
-      name: 'Final metrics',
+      name: 'Final stats',
     }).textContent;
     await user.click(screen.getByRole('radio', { name: /Français/ }));
     expect(moments).toHaveTextContent('Home United égalise');
     await user.click(screen.getByRole('radio', { name: /Español/ }));
-    expect(moments).toHaveTextContent('es-ES variant unavailable');
-    await user.click(screen.getByRole('radio', { name: 'Casual' }));
-    expect(moments).toHaveTextContent('No narrative for this audience');
+    expect(moments).toHaveTextContent(
+      'Not yet available in Español, so this is in English.',
+    );
+    await user.click(screen.getByRole('radio', { name: 'Fan' }));
+    expect(moments).toHaveTextContent('No write-up for this audience');
     expect(
-      screen.getByRole('region', { name: 'Final metrics' }).textContent,
+      screen.getByRole('region', { name: 'Final stats' }).textContent,
     ).toBe(metrics);
-    expect(screen.getByRole('button', { name: 'Export JSON' })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: 'Download recap (JSON)' }),
+    ).toBeEnabled();
   });
 });
 
@@ -117,21 +121,46 @@ describe('agent observatory', () => {
       },
     });
     renderWith(<ObservatoryView fixture={fixture()} />);
-    const list = await screen.findByRole('list', { name: 'Insight traces' });
+    const list = await screen.findByRole('list', {
+      name: 'Key moments and their checks',
+    });
     const [first, second] = within(list).getAllByRole('article');
-    expect(first).toHaveTextContent('Published by: Template');
-    expect(first).toHaveTextContent('AI_ENABLED=false');
+    expect(first).toHaveTextContent('Standard wording');
+    expect(within(first).getByTestId('trace-story')).toHaveTextContent(
+      'Fact-checked ✓',
+    );
+    expect(first).toHaveTextContent(
+      'AI writing is switched off here, so standard wording was used.',
+    );
+    expect(within(first).getByTestId('technical-details')).toHaveTextContent(
+      'AI_ENABLED=false',
+    );
     expect(first).toHaveTextContent('Nothing rejected.');
-    expect(second).toHaveTextContent('Published by: Agent');
-    expect(second).toHaveTextContent('UNSUPPORTED_NUMBER');
+    const steps = within(within(second).getByTestId('trace-story'))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+    expect(steps.slice(1)).toEqual([
+      'Written by AI',
+      'Fact check caught 1 problem',
+      'Graphic updated with AI wording',
+      '12 versions',
+    ]);
+    expect(second).toHaveTextContent(
+      "Write-up for fans in Français: A number that doesn't match the match data",
+    );
+    expect(within(second).getByTestId('technical-details')).toHaveTextContent(
+      'UNSUPPORTED_NUMBER',
+    );
     expect(second).toHaveTextContent('Overlay revision 2');
     expect(second).toHaveTextContent('gpt-4o-mini');
     expect(second).toHaveTextContent('1,240 ms');
     expect(
-      within(second).getByText('Mock').closest('[data-provider]'),
+      within(second)
+        .getByText('Test stand-in (not real AI)')
+        .closest('[data-provider]'),
     ).toHaveTextContent('not a language model');
     expect(
-      screen.getByText('Gate rejections').nextElementSibling,
+      screen.getByText('Caught by the fact check').nextElementSibling,
     ).toHaveTextContent('1');
     expect(document.querySelectorAll('dd [data-provider]')).toHaveLength(3);
   });
@@ -143,7 +172,7 @@ describe('agent observatory', () => {
       'GET /agent-runs': { body: { items: [trace()] } },
     });
     renderWith(<ObservatoryView fixture={fixture()} />);
-    await screen.findByRole('list', { name: 'Insight traces' });
+    await screen.findByRole('list', { name: 'Key moments and their checks' });
     expect(callsTo(api, '/replay').length).toBeGreaterThan(0);
     expect(callsTo(api, '/recap')).toHaveLength(0);
   });
@@ -155,7 +184,7 @@ describe('agent observatory', () => {
       'GET /agent-runs': { body: { items: [trace()] } },
     });
     renderWith(<ObservatoryView fixture={fixture()} />);
-    await screen.findByRole('list', { name: 'Insight traces' });
+    await screen.findByRole('list', { name: 'Key moments and their checks' });
     await vi.waitFor(() => expect(callsTo(api, '/recap')).toHaveLength(1));
   });
 });

@@ -49,7 +49,9 @@ const SCREENS: Screen[] = [
     name: 'observatory',
     path: `/studio/${FIXTURE_ID}/observatory`,
     ready: (page) =>
-      expect(page.getByRole('list', { name: 'Insight traces' })).toBeVisible(),
+      expect(
+        page.getByRole('list', { name: 'Key moments and their checks' }),
+      ).toBeVisible(),
   },
   {
     name: 'audit',

@@ -60,7 +60,7 @@ export const FREEZE_COPY: CommandCopy = {
   title: 'Pause new graphics for this match',
   description:
     "New graphics for this match are held and won't go on air. The graphic on air now runs its course unless you take it off air. Written key moments still appear.",
-  submit: 'Pause graphics',
+  submit: 'Pause',
   pending: 'Pausing…',
   done: 'Graphics paused. New graphics are held.',
   noop: 'Graphics were already paused. Nothing changed.',
