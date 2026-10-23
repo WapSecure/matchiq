@@ -14,6 +14,8 @@ type SessionState = {
   /** Null until `/auth/session` has answered once. */
   view: SessionView | null;
   load: () => Promise<void>;
+  /** The BFF answered 401: the session ended server-side. */
+  markExpired: () => void;
 };
 
 const SIGNED_OUT: SessionView = { status: 'anonymous', ssoEnabled: false };
@@ -36,6 +38,12 @@ export const useSession = create<SessionState>()((set) => ({
     pending ??= fetchView().then((view) => set({ view }));
     return pending;
   },
+  markExpired: () =>
+    set(({ view }) =>
+      view?.status === 'authenticated'
+        ? { view: { status: 'expired', ssoEnabled: true } }
+        : {},
+    ),
 }));
 
 /**

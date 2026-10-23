@@ -67,3 +67,17 @@ The editorial `ACTOR_RESOLVER` seam of ADR-0016 is replaced by this principal: `
 - Every new tenant table needs an RLS policy in its migration (enforced by test), and every new route a permission (enforced by test).
 - Production must connect as a role that may `SET ROLE matchiq_app` (the migration grants it to the migrating role); connecting as a superuser still works because the role switch drops superuser privileges for the transaction.
 - Entra ID needs only environment changes; see `docs/security/IDENTITY_AND_ACCESS.md`.
+
+## Addendum (2026-10-23, MQ-036): concurrent refresh with rotating refresh tokens
+
+The realm rotates refresh tokens and allows no reuse (`revokeRefreshToken: true`, `refreshTokenMaxReuse: 0`). The studio polls several BFF routes in parallel, so near expiry several requests carried the same refresh token at once. One refresh won; the others got `invalid_token`, were treated as expired and cleared the cookie, which signed the user out about five minutes after sign-in.
+
+Decision:
+
+- **Single-flight refresh.** Concurrent refreshes of one refresh token share one grant. The key is a SHA-256 digest of the token; the token itself is never a key or logged.
+- **Grace window.** The rotated session is kept for 30 s (at most 1,000 entries, expired entries evicted on read, oldest evicted first). A request that still carries the just-rotated token receives the new session and cookie instead of failing.
+- **Only a definitive rejection ends a session.** `invalid_grant` or `invalid_token` from the token endpoint, or a session without a refresh token, ends a session whose access token has expired. A network or IdP error never does: while the access token is valid the request proceeds, and after it expires the BFF answers 503 and keeps the cookie. A failed refresh never clears a session whose access token is still valid.
+- **Client.** A 401 from the BFF switches the UI to an explicit "Your session expired" alert with a sign-in link, and further calls fall back to the public demo instead of repeating 401s.
+- Rotation stays on; raising `refreshTokenMaxReuse` is not the fix.
+
+Limit and follow-up: the in-flight map and grace store live in one Next.js process. With several web instances behind a load balancer without session affinity, two instances can still race on one token. The grace store is an interface (`RefreshGraceStore`); the follow-up is a Redis implementation plus a short Redis lock (`SET key NX PX`) around the grant, keyed by the same digest. Until then the hosted demo runs one web instance (or sticky sessions).

@@ -88,6 +88,8 @@ The web app is the OIDC relying party, using `openid-client` 6.8.8, an OpenID-ce
 - The session lives in an encrypted (JWE `dir` + A256GCM), httpOnly, `SameSite=Lax` cookie. It is `Secure` with a `__Host-` prefix on https.
 - It is split into chunks when it outgrows the 4 KiB cookie limit.
 - Access tokens are refreshed 30 s before they expire. Browser JavaScript never sees a token.
+- Refresh tokens rotate and are single-use. Parallel requests share one refresh, and a rotated session is reused for 30 s by requests that still carry the old token. Only a definitive `invalid_grant`/`invalid_token` ends a session, and only once its access token has expired; an unreachable IdP returns 503 and keeps the cookie (ADR-0018 addendum, MQ-036).
+- When the BFF answers 401, the UI shows "Your session expired" with a sign-in link.
 
 **API calls**
 
