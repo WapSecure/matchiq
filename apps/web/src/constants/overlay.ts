@@ -47,9 +47,9 @@ export const OVERLAY_COPY = {
   held: 'Kept on screen',
   heldHint: (seconds: number) =>
     `Its moment has passed, but it stays on screen for at least ${seconds} s so viewers can read it.`,
-  source: { AGENT: 'AI wording', TEMPLATE: 'Standard wording' },
+  source: { AGENT: 'Fact-checked', TEMPLATE: 'Standard wording' },
   sourceHint:
-    'Each graphic goes out first with standard wording, then switches to AI wording once that passes the fact check.',
+    'Each graphic goes out first with standard wording, then switches to the auto-written version once that passes the fact check.',
   localeFallback: 'English graphic',
   standby: 'Standing by',
   lastAired: (headline: string) => `Last on air: ${headline}`,

@@ -177,7 +177,7 @@ test.describe('friendly error states', () => {
     await expect(page.getByTestId('error-state')).toHaveCount(0);
   });
 
-  test('AI fact-checks: a failure is friendly and recoverable', async ({
+  test('Fact-checks: a failure is friendly and recoverable', async ({
     page,
   }) => {
     await mockApi(page);

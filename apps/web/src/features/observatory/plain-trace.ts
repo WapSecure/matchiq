@@ -9,6 +9,7 @@ import {
   ISSUE_LABELS,
   ITEM_LABELS,
 } from '@/constants/observatory';
+import { GUARD_ISSUE_LABELS } from '@/constants/gate-reasons';
 
 type PlainReason = { text: string; group: FallbackGroup };
 
@@ -32,7 +33,7 @@ export const fallbackGroup = (raw: string | null): FallbackGroup =>
     : FALLBACK_REASON_DEFAULT.group;
 
 export const issueLabel = (code: string): string =>
-  ISSUE_LABELS[code] ?? ISSUE_DEFAULT;
+  ISSUE_LABELS[code] ?? GUARD_ISSUE_LABELS[code] ?? ISSUE_DEFAULT;
 
 /** "Write-up for Fans in Français: A number that doesn't match the match data". */
 export const describeRejection = (r: GateRejection): string => {

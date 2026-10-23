@@ -1,10 +1,10 @@
 # Temporary public hosting (non-Azure)
 
-**Status: research only. Nothing has been provisioned or paid for. Every provisioning step below REQUIRES OWNER APPROVAL.**
+**Status: research only, deferred. Nothing has been provisioned or paid for. The owner decided not to host before the verdict; the local setup is the test build. Every provisioning step below would REQUIRE OWNER APPROVAL.**
 
 ## Requirements
 
-Judges must be able to reach the demo anonymously from submission (2026-10-27) through **2026-11-20**, which is about 5 weeks (1.17 months). The demo must never be asleep when a judge opens it.
+Judges must be able to reach the demo anonymously from submission (2026-10-27) through the judging window (shortlist about 2026-11-10, winners by 2026-11-20, spec §37), which is about 5 weeks (1.17 months). The demo must never be asleep when a judge opens it.
 
 The workload is web (Next.js standalone), api (NestJS with HTTP and SSE), worker (NestJS, background), agents (FastAPI), Postgres 17 and Redis 8. Traffic is low, a handful of judges. Azure remains the target architecture (`infra/azure`). This page covers the interim options while there is no subscription.
 
@@ -58,11 +58,11 @@ For the public demo:
 
 ## Recommendation
 
-**Primary (REQUIRES OWNER APPROVAL): a single VPS running the verified compose `app` profile behind Caddy.**
+**Primary (REQUIRES OWNER APPROVAL): a single VPS running the compose `app` profile behind Caddy (deferred).**
 
 Reasons:
 
-- It has exact parity with the stack verified locally on 2026-10-21. The images, compose file and health checks are identical.
+- It would run the same images, compose file and health checks as the local `app` profile. That profile was last exercised locally on 2026-10-21 (MQ-014, MQ-022) and has not been re-run since sign-in, RLS and Keycloak were added, so "verified" applies to that date only.
 - It never sleeps.
 - SSE works.
 - The cost is fixed and predictable: about $28 for 5 weeks on DigitalOcean 4 GB / 2 vCPU, or about €7 on Hetzner CX23 if that plan can be ordered.

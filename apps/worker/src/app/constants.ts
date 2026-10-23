@@ -113,6 +113,8 @@ export const GATE_DETAILS = {
   duplicate: (persona: string, locale: string) =>
     `${persona}/${locale} was proposed more than once`,
   metricRef: (ref: string) => `metricRef ${ref} is not in the envelope`,
+  guard: (reason: string, excerpt: string | null) =>
+    excerpt === null ? reason : `${reason}: "${excerpt}"`,
 } as const;
 
 /** Demo fault scenarios (ADR-0020); a metric the engine never computes. */

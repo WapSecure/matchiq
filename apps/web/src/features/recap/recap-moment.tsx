@@ -1,6 +1,5 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import { SparkIcon } from '@/components/icons';
-import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { SIDE_BG } from '@/components/match/team-swatch';
 import { Badge } from '@/components/ui';
 import {
@@ -11,11 +10,13 @@ import {
 import { RECAP_COPY } from '@/constants/recap';
 import { SITE } from '@/constants/site';
 import { STUDIO_COPY } from '@/constants/studio';
+import { showSource } from '@/features/studio/lib/show-source';
 import type { RosterTeam } from '@/features/studio/lib/roster';
 import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
+import { RecapMomentBody } from './recap-moment-body';
 import { momentAnchor } from './recap-order';
 import { RecapMomentTechnical } from './recap-moment-technical';
 import { recapTranslationNotice } from './recap-translation-notice';
@@ -49,10 +50,12 @@ function Meta({
   moment,
   picked,
   locale,
+  persona,
 }: {
   moment: Moment;
   picked: Picked;
   locale: Locale;
+  persona: Persona;
 }) {
   const ai = picked?.narrative.source === 'AGENT';
   const notice = recapTranslationNotice(picked, locale);
@@ -62,7 +65,7 @@ function Meta({
         lang={SITE.locale}
         className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-micro text-ink-subtle"
       >
-        {picked ? (
+        {picked && showSource(picked.narrative.source, persona) ? (
           <span
             className={cn(
               'inline-flex items-center gap-1 font-medium',
@@ -126,27 +129,13 @@ export function RecapMomentItem({
             {CONFIDENCE_LABELS[moment.confidenceLabel]}
           </span>
         </header>
-        {moment.retracted ? (
-          <RuledOutNote
-            kind={moment.kind}
-            reason={moment.retracted.reason}
-            className="mt-1.5"
-          />
-        ) : picked ? (
-          <div className="mt-1.5" lang={picked.language}>
-            <p className="text-[15px] font-semibold leading-snug text-ink">
-              {picked.narrative.headline}
-            </p>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
-              {picked.narrative.body}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-1.5 text-xs text-ink-subtle">
-            {RECAP_COPY.noNarrative}
-          </p>
-        )}
-        <Meta moment={moment} picked={picked} locale={locale} />
+        <RecapMomentBody moment={moment} picked={picked} />
+        <Meta
+          moment={moment}
+          picked={picked}
+          locale={locale}
+          persona={persona}
+        />
         <RecapMomentTechnical moment={moment} />
       </article>
     </li>

@@ -51,7 +51,12 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
       {insight ? (
         <>
           <EvidenceSection title={EVIDENCE_COPY.sections.claim}>
-            <NarrativePanel insight={insight} view={view} locale={locale} />
+            <NarrativePanel
+              insight={insight}
+              view={view}
+              locale={locale}
+              persona={persona}
+            />
             {view ? (
               <p className="mt-2 text-xs leading-relaxed text-ink-subtle">
                 {insight.evidence.rationale}

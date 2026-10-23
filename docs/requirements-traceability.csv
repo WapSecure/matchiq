@@ -1,0 +1,72 @@
+req_id,spec_section,requirement,status,story_or_ticket,code_paths,tests,adr,notes
+REQ-001,"§8, §25","Canonical Zod event schema rejects invalid actor, clock and type",DONE,MQ-002,libs/contracts/src/lib/events.ts,libs/contracts tests,ADR-0004,22 event types defined; at least 19 exercised by fixtures. PLAYER_POSITION and BALL_POSITION are never emitted
+REQ-002,"§8, §25",Corrections: append a CORRECTION event and recompute affected state,PARTIAL,MQ-063,libs/contracts/src/lib/events.ts; libs/football-engine,,ADR-0004,Type defined; end-to-end recompute in progress under MQ-063
+REQ-003,"§8, §41","Event ledger append-only with idempotent ingest, duplicate acknowledged and conflict rejected",DONE,MQ-004,apps/api/src/app/ingest; libs/db,apps/api ingest specs,ADR-0006,
+REQ-004,"§8, §41","Normalised teams and players tables, snapshot history, reversible migrations",DEFERRED-ADR,,libs/db/src/lib/schema/tables.ts; libs/db/src/lib/schema/read-model-tables.ts,,ADR-0034,Teams and players in fixture JSONB; latest snapshot only; forward-only migrations
+REQ-005,"§9, §43",Deterministic football metrics with registry and explainability,DONE,MQ-005,libs/football-engine/src/lib/metrics,libs/football-engine tests (golden fixtures),ADR-0002,Statistics come only from the engine
+REQ-006,"§9, §43",Metric windows and goal minutes across periods; possession shares sum to 100,DONE,MQ-024,libs/football-engine/src/lib/metrics/windows.ts,libs/football-engine tests,ADR-0002,
+REQ-007,"§9, §43","Metrics that need tracking data (pass distance, ball speed, player speed) not invented",PARTIAL,,libs/football-engine/src/lib/metrics/definitions.ts,,ADR-0002,"Pass distance and difficulty, shot speed and player-speed tagging not published (see SUBMISSION limitations)"
+REQ-008,"§9, §43",Key moment rules with evidence event ids,DONE,MQ-007,libs/football-engine/src/lib/moments,libs/football-engine tests,ADR-0002,
+REQ-009,"§9, §43",Evidence verification of cited metric refs and event ids,DONE,MQ-007,libs/football-engine/src/lib/evidence/verify.ts,libs/football-engine tests,ADR-0002,
+REQ-010,"§10, §28","Distinct agents (Analyst, Writer, Fact Checker, Localization, Producer) on Microsoft Agent Framework graph workflow",DONE,MQ-009,apps/agents/src/matchiq_agents/pipeline/workflow.py; roster,apps/agents/tests/test_pipeline.py,ADR-0011,"Order: analyst, writer, checker, localization, producer"
+REQ-011,"§10, §28","REVISE regenerates once; REJECT falls back to templates; timeouts, retries and circuit breaker",DONE,MQ-009,apps/agents/src/matchiq_agents/pipeline,apps/agents/tests/test_resilience.py; test_pipeline.py,ADR-0011,
+REQ-012,"§10, §28",Agent handoff log and trace visible without secrets,PARTIAL,MQ-064,apps/agents/src/matchiq_agents/pipeline; apps/web Agent Observatory,apps/agents/tests/test_pipeline.py,ADR-0011,Observatory shows runs; explicit handoffs in progress under MQ-064
+REQ-013,"§10, §46","Deterministic fact checker: cited values, entity allowlist, forbidden lexicon, lengths, content safety",DONE,"MQ-009, MQ-026",apps/agents/src/matchiq_agents/guard,apps/agents/tests/test_guard.py; test_repair.py,ADR-0011,
+REQ-014,"§10, §46",Prompt-injection defence: untrusted data as escaped blocks; 13 scripted compromised-model attacks,DONE,"MQ-009, MQ-026",apps/agents/src/matchiq_agents/guard/data_block.py; apps/agents/tests/eval/attacks.py,"apps/agents/tests/eval (CI, mock)",ADR-0011,
+REQ-015,"§10, §46",Versioned prompts with append-only registry and CI gate,DONE,MQ-026,apps/agents/src/matchiq_agents/roster/prompt_registry.json,apps/agents/tests/test_prompt_registry.py,ADR-0011,
+REQ-016,"§10, §46",Foundry adapter works against a real Foundry project,DEFERRED-OWNER,MQ-009,apps/agents/src/matchiq_agents/models/agent_framework.py,apps/agents/tests/test_foundry_sdk.py (API surface only),ADR-0003; ADR-0012,"Implemented, never exercised: no Azure subscription"
+REQ-017,"§10, §46",Local model provider (Ollama) with measured baseline,DONE,MQ-009,apps/agents/src/matchiq_agents/models; apps/agents/tests/eval/baselines,apps/agents/tests/test_providers.py; test_prompt_registry.py,ADR-0012,Baseline covers 10 cases; 0 violations
+REQ-018,"§11, §29, §45","REST API with RFC 9457 problems, X-Request-ID, Idempotency-Key and cursor pagination",DONE,"MQ-004, MQ-053, MQ-058",libs/server-kit; apps/api/src/app,apps/api integration specs,ADR-0005,
+REQ-019,"§11, §45",OpenAPI generated from Zod contracts and validated in CI,DONE,MQ-032,apps/api/src/app/openapi; docs/api/openapi.json,OpenAPI drift test,ADR-0017,
+REQ-020,"§11, §44",SSE with Last-Event-ID resume and snapshot fallback,DONE,MQ-006,apps/api/src/app/stream,apps/api stream specs,ADR-0005,At-least-once delivery; no exactly-once claim
+REQ-021,"§11, §45","PUT /v1/me/preferences (persona, locale, player focus)",PARTIAL,MQ-066,apps/api/src/app/me,,ADR-0010,preferences:write is in the matrix; player focus in progress under MQ-066
+REQ-022,"§11, §45",Review route: approve or reject an insight before publication,PARTIAL,MQ-062,apps/api/src/app/editorial,apps/api editorial specs,ADR-0016,"Retract, pause and kill switch done; approval in progress under MQ-062"
+REQ-023,"§12, §31, §47","Producer studio, fixture lobby, evidence drawer, recap and Agent Observatory",DONE,"MQ-011, MQ-056",apps/web/src/app/(console),"apps/web-e2e (studio, lobby, judge-flow specs)",,
+REQ-024,"§12, §31, §47","Operator console, Dataset lab, Org admin, Methodology pages, interface localization, half-time recap",DEFERRED-ADR,,,,ADR-0035,
+REQ-025,"§12, §47",Player focus and favourite-club mode,PARTIAL,MQ-066,apps/web,,,In progress under MQ-066. Personalisation is by persona and language until then
+REQ-026,"§12, §47",Editorial tooling: producer editing and review workflow in the studio,PARTIAL,MQ-060,apps/web/src/app/(console)/studio,apps/web-e2e/src/editorial.spec.ts,ADR-0016,"Kill switch, retract and audit view done; editorial polish in progress under MQ-060"
+REQ-027,"§12, §47","Premium UX: accessible components, no native controls, persona language, all states",DONE,"MQ-020, MQ-039, MQ-040, MQ-050",apps/web/src/components/ui,apps/web-e2e design-system and theme specs,ADR-0021,
+REQ-028,"§12, §31",Accessibility: automated axe checks on every route (serious and critical fail the build),PARTIAL,,apps/web-e2e/src/support/a11y.ts,apps/web-e2e specs,ADR-0021,No manual audit and no claim of WCAG conformance
+REQ-029,§13,"Seeded synthetic generator, same seed gives the same event hash",DONE,MQ-003,libs/synthetic-data,libs/synthetic-data tests,ADR-0008,
+REQ-030,"§13, §26","Replay controller with pacing, speed, pause, resume and determinism",DONE,"MQ-003, MQ-010",libs/replay; apps/worker/src/app/replay,libs/replay tests; replay.integration.spec.ts,ADR-0008; ADR-0013,
+REQ-031,§13,"Replay session capacity, idle eviction and idempotent commands",DONE,MQ-022,apps/worker/src/app/replay; apps/api/src/app/replay,session-capacity.integration.spec.ts,ADR-0015,
+REQ-032,"§14, §50","Structured logs, traces and metrics baseline with dashboards",PARTIAL,MQ-029,libs/server-kit; infra/observability,telemetry specs,ADR-0019,Dashboards validated statically; not run end to end
+REQ-033,"§14, §49",Local containers: compose infra and app profiles,PARTIAL,MQ-014,docker-compose.yml; docs/deployment/LOCAL_STACK.md,,,App profile last exercised during MQ-014 and MQ-022
+REQ-034,"§14, §30, §49",Azure reference deployment (Bicep) and Foundry,DEFERRED-OWNER,MQ-014,infra/azure; .github/workflows/deploy-azure.yml,bicep build in CI,ADR-0003; ADR-0007,No Azure subscription; nothing deployed
+REQ-035,"§14, §19",Hosted public demo,DEFERRED-OWNER,,infra/vps,,,Owner decided: no hosting before the verdict; local setup is the test build
+REQ-036,"§15, §52","Test pyramid: unit, integration, e2e, contract and golden fixtures run in CI",DONE,MQ-001,docs/engineering/TESTING_STRATEGY.md; .github/workflows/ci.yml,CI,,
+REQ-037,"§15, §33","Evaluation harness with independent oracle, 46 cases and failure taxonomy",DONE,"MQ-009, MQ-026",apps/agents/tests/eval; docs/ai/EVALUATION.md,apps/agents/tests/eval,ADR-0011,"38 golden, 8 adversarial inputs, 13 attacks"
+REQ-038,"§15, §52",Load tests and chaos tests beyond the replay smoke,MISSING,,,apps/worker/src/app/replay/replay.perf.spec.ts (smoke only),,No SLO burn-in
+REQ-039,"§19, §34","Submission package: README, write-up, judging map, checklist, demo script, deck outline",PARTIAL,MQ-035,README.md; docs/submission,,,Video not recorded; deck is a Slides deck owned by the owner
+REQ-040,"§24, §26",Overlay state machine and cue timing with expiry and retraction,DONE,MQ-010,apps/worker/src/app/pipeline/overlay-scheduler.ts,overlay-scheduler.spec.ts,ADR-0013,
+REQ-041,"§24, §44",Deterministic publish gate before any narrative airs,DONE,MQ-010,apps/worker/src/app/pipeline/gate,publish-gate.spec.ts,ADR-0013,
+REQ-042,"§24, §44",Publish gate safety: fail closed on malformed or unsafe agent output,PARTIAL,MQ-065,apps/worker/src/app/pipeline/gate,publish-gate.spec.ts,ADR-0013,Hardening in progress under MQ-065
+REQ-043,"§26, §44","Retract, pause and kill switch with audit trail",DONE,"MQ-023, MQ-028",apps/api/src/app/editorial; apps/worker/src/app/pipeline/editorial-policy.ts,editorial integration specs; apps/web-e2e/src/editorial.spec.ts,ADR-0016,
+REQ-044,§26,Producer approval (APPROVED vs AUTO_APPROVED) as a gate before air,PARTIAL,MQ-062,apps/worker/src/app/pipeline/editorial-policy.ts,editorial-policy.spec.ts,ADR-0016,In progress under MQ-062
+REQ-045,§27,"Audience personas and locales (en-GB, fr-FR, es-ES, pcm-NG) over the same facts",DONE,"MQ-012, MQ-034",apps/agents/src/matchiq_agents/roster; docs/localization/PIDGIN_GLOSSARY.md,apps/agents/tests; apps/web-e2e,ADR-0014,"Native-speaker review of fr, es and pcm pending"
+REQ-046,"§27, §47",Audience-aware recap with export and translation provenance,DONE,"MQ-013, MQ-054",apps/worker/src/app/recap; apps/worker/src/app/pipeline/recap-builder.ts,recap-builder.spec.ts,ADR-0014,
+REQ-047,"§29, §41",Tenant_id on every business table with Postgres row-level security,DONE,MQ-025,libs/db/migrations/0004_tenant_row_level_security.sql,apps/api/src/app/tenancy.integration.spec.ts,ADR-0018,Application and RLS isolation; no SCIM or self-service claim
+REQ-048,"§30, §48","Secure CSP, security headers and supply-chain scanning in CI",DONE,MQ-030,apps/web; .github/workflows/ci.yml,apps/web-e2e/src/security-headers.spec.ts,,Medium findings do not block merges (see THREAT_MODEL)
+REQ-049,§34,"Public repository, MIT licence, synthetic-only data, no Premier League marks, AI-use disclosure",DONE,MQ-035,LICENSE; NOTICE; README.md,,,Default branch is dev
+REQ-050,"§38, §39",Commercial market and buyer validation plan,DEFERRED-OWNER,,docs/product,,,Planning content in the spec; no customer validation done
+REQ-051,§40,"Roles, permissions and OIDC sign-in with deny-by-default routes",DONE,MQ-025,libs/access; libs/auth; apps/web/src/app/auth,libs/access matrix spec; apps/api nest-route-auth; apps/web-e2e/src/auth.spec.ts,ADR-0010; ADR-0018,"billing:read, members:manage, policy:configure, platform:diagnostics, platform:config and insights:write are reserved with no route"
+REQ-052,§40,"Organisation, workspace, membership, fixture entitlement and consent",DEFERRED-ADR,,libs/access,,ADR-0032,
+REQ-053,§40,Revoked membership invalidates access faster than the token lifetime,DEFERRED-ADR,,libs/auth,,ADR-0032,Bounded by the 5-minute access token
+REQ-054,"§40, §48","Audit log with actor, tenant, correlation id and before/after",DONE,MQ-023,libs/db/src/lib/schema/tables.ts (audit_events); apps/api/src/app/editorial/audit.controller.ts,audit.integration.spec.ts,ADR-0016,Actor identity stored since migration 0007
+REQ-055,§41,Idempotency keys and transactional outbox,DONE,MQ-004,libs/db; apps/api/src/app/outbox,apps/api integration specs,ADR-0006,
+REQ-056,§42,"Data provider adapter, licence and provenance chain, rights gate",DEFERRED-ADR,,libs/contracts/src/lib/events.ts (minimal provenance),,ADR-0033,Synthetic only
+REQ-057,"§42, §48",Synthetic flag propagated and visibly labelled in every surface,DONE,MQ-035,apps/web/src/constants/site.ts; apps/web/src/constants/studio.ts,apps/web-e2e,,Preview keeps the Simulated match watermark
+REQ-058,§44,Clock model with drift detection and resync notice,DEFERRED-ADR,,libs/replay,,ADR-0033,Match clock and sequence only
+REQ-059,§44,Failover: model outage gives deterministic template; ingestion never blocked by inference,DONE,"MQ-009, MQ-031",apps/agents/src/matchiq_agents/templates; apps/worker/src/app/agents,apps/agents/tests/test_resilience.py; apps/web-e2e/src/demo-faults.spec.ts,ADR-0020,
+REQ-060,§45,"Webhooks, typed SDK with retry and backoff, per-tenant rate limits, OAuth2 client credentials",DEFERRED-ADR,,,,ADR-0031,
+REQ-061,§45,Usage endpoint GET /v1/usage,DEFERRED-ADR,,,,ADR-0030,billing:read reserved
+REQ-062,§48,Threat model (STRIDE) with mitigations and residual risks,DONE,MQ-030,docs/security/THREAT_MODEL.md,,,"SSRF, request signing and token revocation recorded as residual risks"
+REQ-063,§48,"DAST, penetration test, image signing",MISSING,,,,,Listed as residual risks
+REQ-064,§48,"Privacy: subject access and deletion workflow, privacy notice, DPA",DEFERRED-ADR,,docs/operations/DATA_RETENTION.md,,ADR-0036,"Audit rows hold user id, roles and display name"
+REQ-065,§48,Retention enforced by job with audit,DONE,MQ-022,apps/worker/src/app/maintenance,worker retention specs,ADR-0015,Per-tenant schedules not built
+REQ-066,§49,Disaster recovery and restore drill,MISSING,,,,,Not rehearsed
+REQ-067,§50,SLOs and runbooks,PARTIAL,MQ-029,docs/operations/OBSERVABILITY.md,,ADR-0019,"Targets are objectives, not measured SLAs"
+REQ-068,§51,"Usage metering, immutable ledger, quotas and billing",DEFERRED-ADR,,libs/contracts/src/lib/agents.ts (costEstimateUsd only),,ADR-0030,Cost telemetry only
+REQ-069,"§53, §58",Requirements traceability maintained as requirement to story to code to test,PARTIAL,MQ-067,docs/requirements-traceability.csv,,,Created by MQ-067; demo evidence column not tracked
+REQ-070,§54,Demo video under 2 minutes and submission form,MISSING,,docs/submission/DEMO_SCRIPT.md,,,Owner action: record and upload
+REQ-071,§55,Commercial pilot program and enterprise acceptance criteria,DEFERRED-OWNER,,,,,Post-hackathon

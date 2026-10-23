@@ -129,7 +129,7 @@ export const RETRACT_COPY: CommandCopy & {
   label: (headline) => `Take off air: ${headline}`,
   title: 'Take this graphic off air',
   description:
-    'The graphic leaves the screen at once and never comes back, including later AI updates.',
+    'The graphic leaves the screen at once and never comes back, including later updates.',
   submit: 'Take off air',
   pending: 'Taking off air…',
   done: 'Graphic taken off air.',

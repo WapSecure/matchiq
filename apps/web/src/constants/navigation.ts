@@ -19,7 +19,7 @@ export const STUDIO_TABS: readonly {
 }[] = [
   { view: 'live', label: 'Live studio', href: ROUTES.studio },
   { view: 'recap', label: 'Recap', href: ROUTES.recap },
-  { view: 'observatory', label: 'AI fact-checks', href: ROUTES.observatory },
+  { view: 'observatory', label: 'Fact-checks', href: ROUTES.observatory },
   { view: 'audit', label: 'Activity log', href: ROUTES.audit },
 ];
 

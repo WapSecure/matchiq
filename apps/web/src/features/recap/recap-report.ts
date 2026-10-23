@@ -52,6 +52,7 @@ export const buildReport = ({
     ...stats,
     '',
     copy.footer,
+    copy.disclosure,
     '',
   ].join('\n');
 };

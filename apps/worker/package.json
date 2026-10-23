@@ -87,6 +87,7 @@
     "@matchiq/contracts": "workspace:*",
     "@matchiq/db": "workspace:*",
     "@matchiq/football-engine": "workspace:*",
+    "@matchiq/narrative-guard": "workspace:*",
     "@matchiq/replay": "workspace:*",
     "@matchiq/server-kit": "workspace:*",
     "@nestjs/common": "11.2.7",

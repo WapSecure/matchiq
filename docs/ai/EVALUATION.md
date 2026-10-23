@@ -22,9 +22,11 @@ Mock and template output are never counted as agent output. A narrative served i
 
 - **Golden** (`tests/eval/cases.py`, 38 cases): every insight kind, sparse and rich evidence, decimals, negative and zero values, accented, apostrophe and hyphenated names, every locale including Nigerian Pidgin, persona subsets, a tight deadline, and `real_packet_shape` (28 metrics over two windows and 38 allowlisted names, the shape the worker sends for a real fixture).
 - **Adversarial inputs** (8 cases): prompt injection in player and team names, rationale and counter-evidence (English and Pidgin), a forged data delimiter and a digit in a name.
-- **Compromised-model attacks** (`tests/eval/attacks.py`, 10 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
+- **Compromised-model attacks** (`tests/eval/attacks.py`, 13 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
 
-A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 46) plus `--case real_packet_shape`, or the full set.
+A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 46) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds 10 cases, the size of the run recorded after PR #40. A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
+
+The "28% to 87% fully localised" figure compares the run before and after commit `4d977d6` (PR #40). Only the after run is committed as a baseline; the before figure is historical, recorded in the implementation log, and has no artifact in the repository.
 
 ## Failure taxonomy
 
@@ -46,6 +48,22 @@ Rules are finer than the contract's issue codes:
 | `NUMERALS_CHANGED`, `NAME_DROPPED`                  | A translation that changed a number or dropped a proper noun                                           |
 
 `WINDOW_LENGTH` is split out of `UNSUPPORTED_NUMERAL` by the eval (`tests/eval/taxonomy.py`) from the snippet around the number.
+
+## Worker publish gate checks
+
+The worker gate re-checks every agent draft and overlay on its own (spec §10, §28, §46), so a Fact Checker bug cannot publish text. The rules live in `libs/narrative-guard` (pure TypeScript), and each failure is a `GateIssueCode` on the insight's gate report:
+
+| Code                    | Fires on                                                                                                                                                                           |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FORBIDDEN_CLAIM`       | The shared lexicon: medical or injury speculation, betting and odds, predictions stated as fact, managerial intent                                                                 |
+| `INJECTION_ECHO`        | Echoed instructions ("ignore previous instructions", FR/ES/PCM forms), prompt leakage ("system prompt", "as an AI"), data delimiters, links and markup                             |
+| `UNSUPPORTED_CAUSALITY` | A causal connective ("because", "led to", "thanks to", "parce que", "grâce à", "porque", "gracias a", "bikos", "na im make") in a sentence with no cited value and no named event  |
+| `REPETITION`            | A 4-token phrase repeated within the headline or body, or an agent draft with token Jaccard ≥ 0.8 against a narrative for the same persona and locale in the last 10 match minutes |
+| `UNSAFE_TONE`           | Blocklisted profanity, slurs or abuse; two or more consecutive all-caps words, or a field that is 70% capitals; more than one "!" in a field, or "!!" and "?!"                     |
+
+- **Shared lexicon.** The forbidden and safety patterns are defined once in `libs/narrative-guard/src/lib/lexicon.ts`. `pnpm codegen` exports them to `libs/narrative-guard/generated/narrative-lexicon.json` and copies that file into the Python package, where `guard/lexicon.py` loads it. Drift tests on both sides, and CI's codegen diff, fail if the copies differ.
+- **Reject, not repair.** A causal clause is never cut out: removing it can change what the sentence claims, and the template for that variant is always available. Templates are exempt only from the recent-narrative check, because their deterministic wording repeats by design.
+- **False-positive guards.** Table-driven tests cover all four locales, including causal sentences that cite a metric or name an event, ordinary pressing and possession prose, Pidgin reduplication ("well well") and Pidgin "pass" meaning "more than". Every golden template variant and overlay must still pass the gate.
 
 ## Running an evaluation
 

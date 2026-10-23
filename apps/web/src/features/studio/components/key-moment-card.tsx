@@ -110,6 +110,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
           insight={insight}
           view={view}
           locale={locale}
+          persona={persona}
           clamp={persona === 'BROADCAST'}
         />
       )}
