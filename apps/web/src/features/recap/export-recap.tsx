@@ -29,7 +29,7 @@ export function ExportRecap({
   const { code } = useMatchLabel(recap.fixtureId);
   const name = code ? matchCodeSlug(code) : recap.fixtureId;
   return (
-    <Tooltip ariaChild content={RECAP_COPY.exportHint}>
+    <Tooltip content={RECAP_COPY.exportHint}>
       <Button
         size="sm"
         onClick={() => download(recap, name)}

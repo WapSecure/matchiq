@@ -1,5 +1,5 @@
 import type { Locale } from '@matchiq/contracts';
-import { Badge } from '@/components/ui';
+import { Badge, HintBadge } from '@/components/ui';
 import { CUE_HOLD_MS, OVERLAY_COPY } from '@/constants/overlay';
 import { OVERLAY_KIND_LABELS } from '@/constants/match';
 import type { OnAir } from '../lib/cue-dwell';
@@ -23,19 +23,19 @@ export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
         {OVERLAY_KIND_LABELS[cue.kind]}
       </Badge>
       <Badge>{OVERLAY_COPY.priority(cue.priority)}</Badge>
-      <Badge title={OVERLAY_COPY.sourceHint}>
+      <HintBadge hint={OVERLAY_COPY.sourceHint}>
         {OVERLAY_COPY.source[source]}
-      </Badge>
+      </HintBadge>
       {cue.locale !== locale ? (
         <Badge>{OVERLAY_COPY.localeFallback}</Badge>
       ) : null}
       {onAir.held ? (
-        <Badge
+        <HintBadge
           className="ml-auto"
-          title={OVERLAY_COPY.heldHint(dwellMs / MS_PER_SECOND)}
+          hint={OVERLAY_COPY.heldHint(dwellMs / MS_PER_SECOND)}
         >
           {OVERLAY_COPY.held}
-        </Badge>
+        </HintBadge>
       ) : null}
     </div>
   );

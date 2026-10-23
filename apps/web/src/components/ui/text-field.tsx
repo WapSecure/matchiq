@@ -68,7 +68,6 @@ export function TextField({
       isInvalid={Boolean(errorMessage)}
       maxLength={maxLength}
       autoComplete={autoComplete}
-      aria-label={hideLabel ? label : undefined}
       className={cn(FIELD_ROOT, className)}
     >
       <FieldFrame

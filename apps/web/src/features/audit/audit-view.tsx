@@ -15,6 +15,7 @@ import {
 } from './audit-query';
 import { AuditTable } from './audit-table';
 import { useAuditEvents } from './use-audit-events';
+import { useMatchWindow } from './use-match-window';
 
 const copy = AUDIT_COPY;
 
@@ -89,6 +90,7 @@ function AuditResults({
 /** Gated on `audit:read` by `AuditScreen`; the API enforces it too. */
 export function AuditView({ fixture }: { fixture: Fixture }) {
   const [form, setForm] = useState<AuditFilterForm>(EMPTY_AUDIT_FILTERS);
+  const matchWindow = useMatchWindow(fixture.fixtureId);
   return (
     <main
       id={MAIN_CONTENT_ID}
@@ -103,7 +105,11 @@ export function AuditView({ fixture }: { fixture: Fixture }) {
           {copy.description}
         </p>
       </header>
-      <AuditFilterBar applied={form} onApply={setForm} />
+      <AuditFilterBar
+        applied={form}
+        onApply={setForm}
+        matchWindow={matchWindow}
+      />
       <AuditResults form={form} fixtureId={fixture.fixtureId} />
     </main>
   );

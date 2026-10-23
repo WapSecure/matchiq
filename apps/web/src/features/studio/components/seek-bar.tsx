@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useId, useRef, useState } from 'react';
 import { REPLAY_COPY } from '@/constants/replay';
 import { SEEK_COMMIT_IDLE_MS } from '@/constants/studio';
+
+const PERCENT = 100;
 
 type SeekBarProps = {
   /** Events in the template; the slider is bounded by it. */
@@ -55,7 +57,12 @@ export function SeekBar({ total, applied, onCommit, disabled }: SeekBarProps) {
             timer.current = setTimeout(() => commit(next), SEEK_COMMIT_IDLE_MS);
           }}
           onPointerUp={() => commit()}
-          className="h-1 min-w-0 flex-1 cursor-pointer accent-[var(--mq-accent)] disabled:cursor-not-allowed"
+          style={
+            {
+              '--range-fill': `${max > 0 ? (shown / max) * PERCENT : 0}%`,
+            } as CSSProperties
+          }
+          className="range-input min-w-0 flex-1"
         />
         <span className="tabular shrink-0 font-mono text-micro text-ink-subtle">
           {REPLAY_COPY.seekValue(shown, total)}

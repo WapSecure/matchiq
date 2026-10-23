@@ -71,7 +71,6 @@ export function Combobox<K extends string>(props: ComboboxProps<K>) {
       }
       isDisabled={isDisabled}
       isInvalid={Boolean(errorMessage)}
-      aria-label={hideLabel ? label : undefined}
       menuTrigger="focus"
       allowsEmptyCollection
       className={cn(FIELD_ROOT, className)}

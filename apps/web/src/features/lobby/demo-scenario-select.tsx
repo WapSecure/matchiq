@@ -1,11 +1,29 @@
 'use client';
 
 import { FaultScenario } from '@matchiq/contracts';
-import { useId } from 'react';
+import { type ChoiceOption, Select } from '@/components/ui';
+import {
+  NO_FAULT_DESCRIPTION,
+  NO_FAULT_KEY,
+} from '@/constants/control-options';
 import {
   DEMO_FAULT_COPY,
   FAULT_SCENARIO_LABELS,
+  FAULT_SCENARIO_SHORT,
 } from '@/constants/demo-faults';
+
+const OPTIONS: ChoiceOption[] = [
+  {
+    id: NO_FAULT_KEY,
+    label: DEMO_FAULT_COPY.none,
+    description: NO_FAULT_DESCRIPTION,
+  },
+  ...FaultScenario.options.map((s) => ({
+    id: s,
+    label: FAULT_SCENARIO_SHORT[s],
+    description: FAULT_SCENARIO_LABELS[s],
+  })),
+];
 
 type DemoScenarioSelectProps = {
   title: string;
@@ -19,34 +37,23 @@ export function DemoScenarioSelect({
   value,
   onChange,
 }: DemoScenarioSelectProps) {
-  const id = useId();
-  const hintId = useId();
   return (
     <div className="flex w-full flex-col gap-1">
-      <label htmlFor={id} className="text-micro text-ink-subtle">
+      <p aria-hidden className="text-micro text-ink-subtle">
         {DEMO_FAULT_COPY.label}
-      </label>
-      <select
-        id={id}
-        value={value ?? ''}
-        aria-label={DEMO_FAULT_COPY.labelFor(title)}
-        aria-describedby={hintId}
-        onChange={(e) => {
-          const parsed = FaultScenario.safeParse(e.target.value);
+      </p>
+      <Select
+        label={DEMO_FAULT_COPY.labelFor(title)}
+        hideLabel
+        value={value ?? NO_FAULT_KEY}
+        onChange={(id) => {
+          const parsed = FaultScenario.safeParse(id);
           onChange(parsed.success ? parsed.data : null);
         }}
-        className="h-8 rounded-md border border-control bg-surface px-2 text-sm text-ink shadow-panel hover:border-ink-subtle"
-      >
-        <option value="">{DEMO_FAULT_COPY.none}</option>
-        {FaultScenario.options.map((s) => (
-          <option key={s} value={s}>
-            {FAULT_SCENARIO_LABELS[s]}
-          </option>
-        ))}
-      </select>
-      <p id={hintId} className="text-micro text-ink-subtle">
-        {DEMO_FAULT_COPY.hint}
-      </p>
+        options={OPTIONS}
+        description={DEMO_FAULT_COPY.hint}
+        popoverWidth="wide"
+      />
     </div>
   );
 }
