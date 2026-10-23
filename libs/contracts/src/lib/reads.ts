@@ -73,6 +73,10 @@ export const RecapDocument = z.strictObject({
 export const GateIssueCode = z.enum([
   ...VerificationIssueCode.options,
   'UNREQUESTED_VARIANT',
+  'INJECTION_ECHO',
+  'UNSUPPORTED_CAUSALITY',
+  'REPETITION',
+  'UNSAFE_TONE',
 ]);
 
 export const GateRejection = z.strictObject({

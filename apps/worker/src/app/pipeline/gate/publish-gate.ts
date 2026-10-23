@@ -11,12 +11,14 @@ import {
 } from '@matchiq/contracts';
 import { verifyCitedValues, verifyEvidenceIds } from '@matchiq/football-engine';
 import type { GateIssueCode, GateRejection } from '@matchiq/db';
+import type { PublishedText } from '@matchiq/narrative-guard';
 import { GATE_DETAILS, PRIMARY_LOCALE } from '../../constants';
 import {
   OVERLAY_LIMITS,
   PERSONA_LIMITS,
   type TextLimits,
 } from './gate.constants';
+import { guardIssues, repeatIssues } from './guard-checks';
 import {
   allowedNameTokens,
   sentenceCount,
@@ -29,6 +31,8 @@ export interface GateContext {
   readonly entities: EntityAllowlist;
   readonly personas: readonly Persona[];
   readonly locales: readonly Locale[];
+  /** Narratives recently published for this fixture; agent drafts must not repeat them. */
+  readonly recent?: readonly PublishedText[];
 }
 
 export interface GateIssue {
@@ -86,6 +90,7 @@ const textIssues = (
   entities: EntityAllowlist,
 ): GateIssue[] => {
   const text = `${input.headline}\n${input.body}`;
+  const allowed = allowedNameTokens(entities);
   const issues: GateIssue[] = [
     ...unsupportedNumerals(text, input.locale, input.supported).map(
       (raw): GateIssue => ({
@@ -93,12 +98,11 @@ const textIssues = (
         detail: GATE_DETAILS.textNumber(raw),
       }),
     ),
-    ...unknownCapitalised(text, allowedNameTokens(entities)).map(
-      (name): GateIssue => ({
-        code: 'UNKNOWN_ENTITY',
-        detail: GATE_DETAILS.entity(name),
-      }),
-    ),
+    ...unknownCapitalised(text, allowed).map((name): GateIssue => ({
+      code: 'UNKNOWN_ENTITY',
+      detail: GATE_DETAILS.entity(name),
+    })),
+    ...guardIssues({ ...input, allowed }),
   ];
   const { limits } = input;
   for (const [field, value, max] of [
@@ -136,7 +140,9 @@ const schemaIssues = (error: {
  * The deterministic publish gate for one narrative draft (ADR-0002): every
  * cited value must equal the envelope's, every number in the text must be a
  * cited value, evidence ids must come from the envelope, capitalised names
- * from the entity allowlist, and lengths must fit the persona.
+ * from the entity allowlist, and lengths must fit the persona. The text
+ * also passes the shared guard (claims, causality, tone, repetition), and an
+ * agent draft must not repeat a recent narrative for its variant.
  */
 export const gateNarrative = (
   raw: unknown,
@@ -169,6 +175,8 @@ export const gateNarrative = (
       ctx.entities,
     ),
   );
+  if (draft.source === 'AGENT')
+    issues.push(...repeatIssues(draft, ctx.recent ?? []));
   return verdict(draft, issues);
 };
 
