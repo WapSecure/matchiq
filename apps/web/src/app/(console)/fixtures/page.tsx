@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { RegionBoundary } from '@/components/feedback';
 import { SiteFooter, SiteHeader, SyntheticNotice } from '@/components/layout';
 import { REGION_NAMES } from '@/constants/errors';
-import { Container } from '@/components/ui';
+import { Container, InfoTip } from '@/components/ui';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import { RecentSessions } from '@/features/lobby/recent-sessions';
@@ -22,9 +22,16 @@ export default function FixturesPage() {
             <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
               {LOBBY_COPY.title}
             </h1>
-            <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-              {LOBBY_COPY.description}
-            </p>
+            <div className="mt-3 flex items-start gap-1.5">
+              <p className="text-sm leading-relaxed text-ink-muted sm:text-base">
+                {LOBBY_COPY.description}
+              </p>
+              <InfoTip
+                label={LOBBY_COPY.howItWorks.label}
+                content={LOBBY_COPY.howItWorks.text}
+                className="-mt-0.5 sm:mt-0"
+              />
+            </div>
           </header>
           <div className="mt-8">
             <RegionBoundary region={REGION_NAMES.matches}>

@@ -17,7 +17,26 @@ import { useStartSession } from './use-start-session';
 
 type SessionStartProps = { templateId: string; title: string };
 
-/** Speed picker and Start: creates a session and opens its studio. */
+function StartProblem({ id, error }: { id: string; error: unknown }) {
+  return (
+    <div id={id}>
+      <InlineProblem
+        error={error}
+        lead={LOBBY_COPY.startFailed}
+        message={
+          isApiError(error) && error.status === HTTP_STATUS.tooManyRequests
+            ? LOBBY_COPY.rateLimited
+            : undefined
+        }
+      />
+    </div>
+  );
+}
+
+/**
+ * Speed, the demo failure (demo mode only) and Start on one row when the card
+ * is wide enough, stacked otherwise. Starting creates a session and opens its studio.
+ */
 export function SessionStart({ templateId, title }: SessionStartProps) {
   const errorId = useId();
   const [speed, setSpeed] = useState<ReplaySpeed>(
@@ -26,41 +45,33 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
   const [fault, setFault] = useState<FaultScenario | null>(null);
   const session = useStartSession();
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <SpeedSelect title={title} value={speed} onChange={setSpeed} />
-      <Button
-        variant="primary"
-        onClick={() =>
-          session.start(
-            templateId,
-            speed,
-            fault ? demoFaultPlan(fault) : undefined,
-          )
-        }
-        disabled={session.pending}
-        aria-label={LOBBY_COPY.startLabel(title)}
-        aria-describedby={session.error ? errorId : undefined}
-        leadingIcon={<PlayIcon size={14} />}
-        className="ml-auto"
-      >
-        {session.pending ? LOBBY_COPY.starting : LOBBY_COPY.start}
-      </Button>
-      {PUBLIC_ENV.NEXT_PUBLIC_DEMO_MODE ? (
-        <DemoScenarioSelect title={title} value={fault} onChange={setFault} />
-      ) : null}
+    <div className="@container flex flex-col gap-3">
+      <div className="flex flex-col gap-3 @lg:flex-row @lg:items-end">
+        <SpeedSelect title={title} value={speed} onChange={setSpeed} />
+        {PUBLIC_ENV.NEXT_PUBLIC_DEMO_MODE ? (
+          <DemoScenarioSelect title={title} value={fault} onChange={setFault} />
+        ) : null}
+        <Button
+          variant="primary"
+          onClick={() =>
+            session.start(
+              templateId,
+              speed,
+              fault ? demoFaultPlan(fault) : undefined,
+            )
+          }
+          disabled={session.pending}
+          aria-label={LOBBY_COPY.startLabel(title)}
+          aria-describedby={session.error ? errorId : undefined}
+          size="md"
+          leadingIcon={<PlayIcon size={14} />}
+          className="w-full shrink-0 @lg:ml-auto @lg:w-auto"
+        >
+          {session.pending ? LOBBY_COPY.starting : LOBBY_COPY.start}
+        </Button>
+      </div>
       {session.error ? (
-        <div id={errorId} className="w-full">
-          <InlineProblem
-            error={session.error}
-            lead={LOBBY_COPY.startFailed}
-            message={
-              isApiError(session.error) &&
-              session.error.status === HTTP_STATUS.tooManyRequests
-                ? LOBBY_COPY.rateLimited
-                : undefined
-            }
-          />
-        </div>
+        <StartProblem id={errorId} error={session.error} />
       ) : null}
     </div>
   );

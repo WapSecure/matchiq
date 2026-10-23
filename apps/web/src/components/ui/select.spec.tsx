@@ -67,6 +67,25 @@ describe('Select', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('keeps the closed field to the label unless asked to describe it', () => {
+    const { rerender } = render(
+      <Select label="Speed" value="1" onChange={vi.fn()} options={SPEEDS} />,
+    );
+    const trigger = screen.getByRole('button', { name: /Speed/ });
+    expect(trigger).toHaveTextContent('Real time');
+    expect(trigger).not.toHaveTextContent('About 90 minutes.');
+    rerender(
+      <Select
+        label="Speed"
+        value="1"
+        onChange={vi.fn()}
+        options={SPEEDS}
+        showDescriptionInTrigger
+      />,
+    );
+    expect(trigger).toHaveTextContent('About 90 minutes.');
+  });
+
   it('groups options under headings', async () => {
     const user = userEvent.setup();
     render(
