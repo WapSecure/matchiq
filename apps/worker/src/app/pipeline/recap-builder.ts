@@ -41,6 +41,7 @@ const momentOf = (
       headline: n.headline,
       body: n.body,
       source: n.source,
+      localeFallback: n.localeFallback,
       citations: [...n.citations],
     })),
 });
