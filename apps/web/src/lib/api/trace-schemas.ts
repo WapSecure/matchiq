@@ -31,7 +31,7 @@ export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 
 /** Producer and policy decisions; absent from APIs older than ADR-0016. */
 export const InsightEditorialTrace = z.object({
-  insight: z.enum(['SUPPRESSED']).nullable(),
+  insight: z.enum(['SUPPRESSED', 'RETRACTED']).nullable(),
   insightReason: z.string().nullable(),
   overlay: z.enum(['RETRACTED', 'HELD', 'SUPPRESSED']).nullable(),
   overlayReason: z.string().nullable(),

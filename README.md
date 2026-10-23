@@ -28,7 +28,7 @@ git checkout dev                       # see "Branches" below
 docker compose --profile app up -d --build --wait
 ```
 
-This starts Postgres, Redis, a one-shot `migrate` job that also seeds the five golden fixtures, then the api (`:3000`), worker (`:3001`), agents (`:8000`) and web (`:4200`). Open <http://localhost:4200>, choose **Fixtures**, then **Start** on _Late comeback_.
+This starts Postgres, Redis, a one-shot `migrate` job that also seeds the six golden fixtures, then the api (`:3000`), worker (`:3001`), agents (`:8000`) and web (`:4200`). Open <http://localhost:4200>, choose **Fixtures**, then **Start** on _Late comeback_.
 
 In this profile the agents container runs `MODEL_PROVIDER=mock` and `AI_ENABLED` defaults to `false`, so the narratives on screen are deterministic templates, labelled as such. Sign-in is not available in the web container ([why](docs/security/IDENTITY_AND_ACCESS.md#web-sign-in)). Details: [`docs/deployment/LOCAL_STACK.md`](docs/deployment/LOCAL_STACK.md). The container path was last exercised end to end during MQ-014 and MQ-022 ([implementation log](docs/implementation-log.md)); it was not re-run for this document.
 
@@ -43,7 +43,7 @@ cp .env.example .env
 #   STREAM_TICKET_SECRET, AGENTS_SERVICE_TOKEN, WEB_SESSION_SECRET
 pnpm infra:up                  # Postgres :54320, Redis :63790, Keycloak :8180
 pnpm nx run db:migrate         # apply migrations
-pnpm seed:fixtures             # load the five golden fixtures (idempotent)
+pnpm seed:fixtures             # load the six golden fixtures (idempotent)
 pnpm dev                       # api :3000, worker :3001, agents :8000, web :4200
 ```
 
@@ -131,7 +131,7 @@ flowchart LR
 
 How an insight reaches the screen:
 
-1. The worker replays a synthetic fixture into the session's append-only ledger. The pure engine (`libs/football-engine`) projects each event into a `MatchSnapshot` with a state hash ([ADR-0002](docs/adr/0002-deterministic-engine-first.md)).
+1. The worker replays a synthetic fixture into the session's append-only ledger (a database trigger refuses updates and deletes; only retention can purge a whole expired ledger). The pure engine (`libs/football-engine`) projects each event into a `MatchSnapshot` with a state hash ([ADR-0002](docs/adr/0002-deterministic-engine-first.md)).
 2. Key-moment rules emit an `Insight` with an evidence envelope: computed metrics, source event ids and counter-evidence.
 3. A deterministic template narrative and overlay go on air at once, so the product works with AI off.
 4. With AI on, the worker sends a `FactPacket` to the agents service. Agent Framework executors run the roster as a typed state machine with revise and reject branches ([ADR-0011](docs/adr/0011-agent-orchestration.md)). The agents service only returns proposals.

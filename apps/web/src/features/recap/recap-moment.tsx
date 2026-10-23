@@ -1,5 +1,6 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import { SparkIcon } from '@/components/icons';
+import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { SIDE_BG } from '@/components/match/team-swatch';
 import { Badge } from '@/components/ui';
 import {
@@ -125,7 +126,13 @@ export function RecapMomentItem({
             {CONFIDENCE_LABELS[moment.confidenceLabel]}
           </span>
         </header>
-        {picked ? (
+        {moment.retracted ? (
+          <RuledOutNote
+            kind={moment.kind}
+            reason={moment.retracted.reason}
+            className="mt-1.5"
+          />
+        ) : picked ? (
           <div className="mt-1.5" lang={picked.language}>
             <p className="text-[15px] font-semibold leading-snug text-ink">
               {picked.narrative.headline}
