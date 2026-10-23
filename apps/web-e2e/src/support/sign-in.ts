@@ -8,9 +8,7 @@ export const signIn = async (
   returnTo = '/fixtures',
 ) => {
   await page.goto(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`);
-  await page
-    .getByRole('link', { name: 'Continue with single sign-on' })
-    .click();
+  await page.getByRole('link', { name: 'Continue to sign in' }).click();
   await page.locator('#username').fill(username);
   await page.locator('#password').fill(OIDC_PASSWORD);
   await page.locator('#kc-login').click();

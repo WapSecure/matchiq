@@ -18,8 +18,8 @@ export const HERO = {
   howItWorks: { label: 'See how it works', href: '#pipeline' },
   facts: [
     { value: '0', label: 'numbers made up by AI' },
-    { value: '3 × 4', label: 'audiences × languages, same facts' },
-    { value: '16:9', label: 'on-air preview with safe areas' },
+    { value: '3 × 4', label: 'audiences and languages, same facts' },
+    { value: '1 click', label: 'to take any graphic off air' },
   ],
   disclosure:
     'The demo uses fictional, simulated matches. No real clubs, players or league marks.',
@@ -30,13 +30,13 @@ export const PIPELINE = {
   eyebrow: 'How it works',
   title: 'Five steps from the pitch to the screen',
   description:
-    'Every fact is worked out once from the match data. AI explains the facts but never changes them.',
+    'Every fact is worked out once from the match data. AI explains the facts but never changes them, and a fact check confirms each number before it airs.',
   stages: [
     {
       key: 'ingest',
       title: 'Collect',
       description:
-        'Every pass, shot and tackle is recorded once, in order, with where it came from.',
+        'Every pass, shot and tackle is recorded once, in order, with its source.',
       Icon: IngestIcon,
     },
     {
@@ -77,23 +77,23 @@ export const PRINCIPLES = {
   items: [
     {
       key: 'evidence',
-      title: 'Every claim shows its evidence',
+      title: 'Every number is checked',
       description:
-        'Each number on screen links back to the plays and the stat it came from. If it cannot, it does not air.',
+        'Each number on screen links back to the plays and the stat behind it. If a number cannot be checked, it does not go on air.',
       Icon: EvidenceIcon,
     },
     {
-      key: 'deterministic',
+      key: 'repeatable',
       title: 'Same match, same numbers',
       description:
-        'Stats are worked out by tested rules, not AI. Replay a match and you get exactly the same figures.',
+        'Stats come from fixed, tested rules, not AI. Replay a match and you get exactly the same figures every time.',
       Icon: DeterministicIcon,
     },
     {
       key: 'resilience',
       title: 'Keeps going if AI fails',
       description:
-        'Scores and stats never depend on AI. If the AI is slow or wrong, standard wording goes on air instead.',
+        'Scores and stats never depend on AI. If it is slow or wrong, standard wording goes on air, and a producer can pull any graphic at any time.',
       Icon: ResilienceIcon,
     },
   ],
