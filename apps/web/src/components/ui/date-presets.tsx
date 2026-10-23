@@ -1,6 +1,7 @@
 'use client';
 
-import { Button } from 'react-aria-components';
+import { ToggleButton } from 'react-aria-components';
+import { CheckIcon } from '@/components/icons';
 import {
   DATE_COPY,
   DATE_PRESET_LABELS,
@@ -17,45 +18,62 @@ type DatePresetsProps = {
   presets: readonly DatePresetId[];
   timeZone: string;
   matchWindow?: InstantRange | null;
-  onPick: (range: ZonedRange) => void;
+  /** The preset the current value came from, if any. */
+  active?: DatePresetId | null;
+  onPick: (range: ZonedRange, id: DatePresetId) => void;
 };
 
-/** Relative ranges resolved at the moment they are picked. */
+const ITEM = cn(
+  'group/preset flex min-h-8 shrink-0 items-center gap-2 rounded-md px-2.5 text-start text-[13px] text-ink outline-none transition-colors duration-150 pointer-coarse:min-h-11',
+  'max-sm:border max-sm:border-line-strong max-sm:bg-surface',
+  'data-hovered:bg-surface-raised data-pressed:bg-surface-sunken',
+  'data-selected:bg-accent-soft data-selected:font-semibold data-selected:text-accent max-sm:data-selected:border-accent/40',
+  'data-focus-visible:outline-2 data-focus-visible:-outline-offset-2 data-focus-visible:outline-accent',
+  'data-disabled:cursor-not-allowed data-disabled:text-ink-subtle data-disabled:opacity-60',
+);
+
+/** Relative ranges, resolved at the moment they are picked; one tap applies. */
 export function DatePresets({
   presets,
   timeZone,
   matchWindow,
+  active,
   onPick,
 }: DatePresetsProps) {
   return (
     <div
       role="group"
       aria-label={DATE_COPY.presets}
-      className="flex flex-col gap-0.5 border-line pb-2 sm:min-w-40 sm:border-e sm:pb-0 sm:pe-2"
+      className={cn(
+        'flex gap-1.5 overflow-x-auto p-3 [scrollbar-width:none]',
+        'sm:w-44 sm:shrink-0 sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-e sm:border-line sm:bg-surface-raised/50 sm:p-2',
+      )}
     >
-      <p aria-hidden className="eyebrow px-2 pb-1">
+      <p aria-hidden className="eyebrow hidden px-2.5 pb-1.5 pt-1.5 sm:block">
         {DATE_COPY.presets}
       </p>
       {presets.map((id) => {
         const unavailable =
           id === 'thisMatch' && !presetRange(id, { timeZone, matchWindow });
         return (
-          <Button
+          <ToggleButton
             key={id}
-            slot={null}
+            isSelected={active === id}
             isDisabled={unavailable}
-            onPress={() => {
+            onChange={() => {
               const range = presetRange(id, { timeZone, matchWindow });
-              if (range) onPick(range);
+              if (range) onPick(range, id);
             }}
-            className={cn(
-              'flex min-h-8 items-center rounded-md px-2 text-left text-[13px] text-ink outline-none pointer-coarse:min-h-11',
-              'data-hovered:bg-surface-raised data-pressed:bg-surface-sunken data-focus-visible:outline-2 data-focus-visible:-outline-offset-2 data-focus-visible:outline-accent',
-              'data-disabled:cursor-not-allowed data-disabled:text-ink-subtle',
-            )}
+            className={ITEM}
           >
-            {DATE_PRESET_LABELS[id]}
-          </Button>
+            <span className="flex-1 whitespace-nowrap">
+              {DATE_PRESET_LABELS[id]}
+            </span>
+            <CheckIcon
+              size={14}
+              className="hidden shrink-0 group-data-selected/preset:block"
+            />
+          </ToggleButton>
         );
       })}
     </div>

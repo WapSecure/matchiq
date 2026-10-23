@@ -158,9 +158,8 @@ describe('AuditView', () => {
     });
     renderView();
     await screen.findByRole('table', { name: /Activity/ });
-    const when = screen.getAllByRole('group', { name: /When/ })[0];
     await userEvent.click(
-      within(when as HTMLElement).getByRole('button', { name: /calendar/i }),
+      screen.getByRole('button', { name: /When.*Any time/ }),
     );
     await userEvent.click(
       screen.getByRole('button', { name: 'Last 15 minutes' }),

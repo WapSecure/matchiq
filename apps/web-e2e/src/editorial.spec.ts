@@ -144,13 +144,11 @@ test.describe('editorial controls', () => {
     // A virtual press, as assistive tech sends: phones keep re-laying out the list.
     await option.dispatchEvent('click');
     await expect(action).toHaveValue('Emergency stop on');
-    await filters
-      .getByRole('group', { name: /When/ })
-      .first()
-      .getByRole('button', { name: /calendar/i })
-      .click();
+    await filters.getByRole('button', { name: /When/ }).click();
     await page.getByRole('button', { name: 'Last hour' }).click();
-    await expect(filters.getByText(/ UTC$/)).toBeVisible();
+    await expect(
+      filters.getByRole('button', { name: /When.*Last hour/ }),
+    ).toBeVisible();
     const request = page.waitForRequest(
       (r) =>
         r.url().includes('/audit-events') &&
