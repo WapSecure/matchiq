@@ -1123,3 +1123,7 @@ Not changed: the publish gate, prompts and roster files. Retention relies on the
 ### MQ-076: Agent timeline test-provider integration
 
 The updated CI passed the account regressions and 462 frontend tests, then exposed one existing correction-card fixture without a QueryClientProvider after the agent timeline integration. Wrapped that fixture in the same query provider used by timeline tests; all correction assertions remain intact. The diagnostic single correction spec passed all three cases with workspace source aliases. Removed its temporary config. This is test integration only; the application already supplies the query provider.
+
+## MQ-077: Complete correction-test provider repair
+
+PR #76 merged externally at 18:22:20 UTC while its integration verification later failed on the correction-card provider fixture. No merge command was issued by this workstream. Its final missing provider correction is isolated on `fix/MQ-077-correction-test-provider`, cut from current origin/dev after checking that no PRs were open. The original account feature is already on dev; this follow-up only restores the required test context and records the handoff. The three-case correction spec passed locally during diagnosis; full CI remains required. No assertion was removed or relaxed. Next three tickets remain independent interface catalogs, long-content accessibility qualification and production identity/pilot evidence.
