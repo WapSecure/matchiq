@@ -17,11 +17,46 @@ export type UploadItem = {
   error?: string;
 };
 
+const WELL = {
+  uploading: 'bg-accent-soft text-accent',
+  done: 'bg-positive/12 text-positive',
+  error: 'bg-critical/12 text-critical',
+} as const;
+
 const STATUS_TEXT = {
   uploading: FILE_COPY.uploading,
   done: FILE_COPY.done,
   error: FILE_COPY.failed,
 } as const;
+
+function UploadProgress({ item }: { item: UploadItem }) {
+  return (
+    <ProgressBar
+      aria-label={FILE_COPY.progress(item.name)}
+      value={item.progress ?? undefined}
+      isIndeterminate={item.progress === null}
+      className="flex flex-col gap-1"
+    >
+      {({ percentage, valueText, isIndeterminate }) => (
+        <>
+          <span className="relative h-1.5 overflow-hidden rounded-full bg-surface-sunken">
+            <span
+              className={cn(
+                'absolute inset-y-0 start-0 rounded-full bg-accent transition-[width] duration-300 ease-out',
+                isIndeterminate &&
+                  'w-2/5 motion-safe:animate-[progress-sweep_1.2s_ease-in-out_infinite]',
+              )}
+              style={isIndeterminate ? undefined : { width: `${percentage}%` }}
+            />
+          </span>
+          <span className="tabular text-micro text-ink-subtle">
+            {isIndeterminate ? STATUS_TEXT.uploading : valueText}
+          </span>
+        </>
+      )}
+    </ProgressBar>
+  );
+}
 
 function Row({
   item,
@@ -34,11 +69,23 @@ function Row({
   return (
     <li
       className={cn(
-        'flex items-start gap-3 rounded-md border bg-surface p-2.5',
+        'flex items-start gap-3 rounded-lg border bg-surface p-2.5 shadow-panel transition-colors',
         failed ? 'border-critical/50' : 'border-line',
       )}
     >
-      <FileIcon size={18} className="mt-0.5 shrink-0 text-ink-muted" />
+      <span
+        aria-hidden
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-md transition-colors duration-200',
+          WELL[item.status],
+        )}
+      >
+        {item.status === 'done' ? (
+          <CheckIcon size={15} />
+        ) : (
+          <FileIcon size={16} />
+        )}
+      </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-2 text-[13px]">
           <span className="truncate font-medium text-ink">{item.name}</span>
@@ -47,32 +94,7 @@ function Row({
           </span>
         </div>
         {item.status === 'uploading' ? (
-          <ProgressBar
-            aria-label={FILE_COPY.progress(item.name)}
-            value={item.progress ?? undefined}
-            isIndeterminate={item.progress === null}
-            className="flex flex-col gap-1"
-          >
-            {({ percentage, valueText, isIndeterminate }) => (
-              <>
-                <span className="relative h-1 overflow-hidden rounded-full bg-surface-sunken">
-                  <span
-                    className={cn(
-                      'absolute inset-y-0 start-0 rounded-full bg-accent transition-[width] duration-200',
-                      isIndeterminate &&
-                        'w-2/5 motion-safe:animate-[progress-sweep_1.2s_ease-in-out_infinite]',
-                    )}
-                    style={
-                      isIndeterminate ? undefined : { width: `${percentage}%` }
-                    }
-                  />
-                </span>
-                <span className="tabular text-micro text-ink-subtle">
-                  {isIndeterminate ? STATUS_TEXT.uploading : valueText}
-                </span>
-              </>
-            )}
-          </ProgressBar>
+          <UploadProgress item={item} />
         ) : (
           <p
             className={cn(

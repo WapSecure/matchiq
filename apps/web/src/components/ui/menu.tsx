@@ -44,11 +44,18 @@ function Item({ action }: { action: MenuAction }) {
         LIST_ITEM,
         'items-center data-disabled:opacity-50',
         action.tone === 'danger' &&
-          'text-critical data-focused:bg-critical/10 data-hovered:bg-critical/10',
+          'text-critical data-focused:bg-critical/10! data-hovered:bg-critical/10!',
       )}
     >
       {action.icon ? (
-        <span className="flex shrink-0 text-ink-muted">{action.icon}</span>
+        <span
+          className={cn(
+            'flex shrink-0',
+            action.tone === 'danger' ? 'text-critical' : 'text-ink-muted',
+          )}
+        >
+          {action.icon}
+        </span>
       ) : null}
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="font-medium">{action.label}</span>
@@ -60,7 +67,7 @@ function Item({ action }: { action: MenuAction }) {
         ) : null}
       </span>
       {action.shortcut ? (
-        <Keyboard className="ml-4 font-mono text-micro text-ink-subtle">
+        <Keyboard className="ms-4 rounded-[4px] border border-line bg-surface-raised px-1.5 font-mono text-micro text-ink-subtle shadow-[inset_0_-1px_0_var(--mq-line)]">
           {action.shortcut}
         </Keyboard>
       ) : null}
@@ -79,7 +86,7 @@ export function Menu({
   return (
     <MenuTrigger>
       {trigger}
-      <Popover placement={placement} className="min-w-48 p-1">
+      <Popover placement={placement} className="min-w-52 p-1.5">
         <AriaMenu
           aria-label={label}
           onAction={(key: Key) => onAction(String(key))}
@@ -90,7 +97,7 @@ export function Menu({
               ? [
                   <Separator
                     key={`${action.id}-separator`}
-                    className="mx-1 my-1 h-px bg-line"
+                    className="-mx-1.5 my-1.5 h-px bg-line"
                   />,
                   <Item key={action.id} action={action} />,
                 ]

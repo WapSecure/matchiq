@@ -55,8 +55,8 @@ export function RadioCards<K extends string>({
               value={option.id}
               isDisabled={Boolean(option.disabledReason)}
               className={cn(
-                'press group/card relative flex cursor-pointer items-start gap-3 rounded-lg border border-line-strong bg-surface p-3 text-left shadow-panel outline-none',
-                'data-hovered:border-control data-pressed:bg-surface-raised',
+                'press group/card relative flex cursor-pointer items-start gap-3 rounded-lg border border-line-strong bg-surface p-3 text-start shadow-panel outline-none transition-[border-color,background-color,box-shadow] duration-150',
+                'data-hovered:border-control data-hovered:shadow-float data-pressed:bg-surface-raised',
                 'data-selected:border-accent data-selected:bg-accent-soft data-selected:shadow-[0_0_0_1px_var(--mq-accent)]',
                 'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent',
                 'data-disabled:cursor-not-allowed data-disabled:opacity-60',
@@ -65,9 +65,9 @@ export function RadioCards<K extends string>({
             >
               <span
                 aria-hidden
-                className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-control bg-surface group-data-selected/card:border-accent"
+                className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-control bg-surface transition-colors group-data-hovered/card:border-ink-subtle group-data-selected/card:border-accent group-data-selected/card:bg-accent"
               >
-                <span className="size-2 scale-0 rounded-full bg-accent transition-transform duration-150 group-data-selected/card:scale-100" />
+                <span className="size-1.5 scale-0 rounded-full bg-accent-ink transition-transform duration-150 ease-[var(--ease-broadcast)] group-data-selected/card:scale-100" />
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-[13px] font-semibold text-ink">

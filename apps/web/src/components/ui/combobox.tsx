@@ -12,10 +12,12 @@ import { ChevronDownIcon, SearchIcon, SpinnerIcon } from '@/components/icons';
 import { UI_COPY } from '@/constants/ui';
 import { cn } from '@/lib/cn';
 import {
+  CONTROL_FOCUSED,
   CONTROL_HEIGHT,
   CONTROL_INVALID,
   CONTROL_PADDING,
   CONTROL_SURFACE,
+  INLINE_ACTION,
   TEXT_INPUT,
 } from './control-styles';
 import { FIELD_ROOT, FieldFrame, type FieldProps } from './field';
@@ -29,6 +31,18 @@ export type ComboboxProps<K extends string> = FieldProps &
     placeholder?: string;
     isLoading?: boolean;
   };
+
+function ListEmpty({ loading }: { loading: boolean }) {
+  const Icon = loading ? SpinnerIcon : SearchIcon;
+  return (
+    <p className="flex flex-col items-center gap-2 px-3 py-5 text-center text-xs text-ink-subtle">
+      <span className="flex size-8 items-center justify-center rounded-full border border-line bg-surface-raised">
+        <Icon size={14} />
+      </span>
+      {loading ? UI_COPY.loading : UI_COPY.noResults}
+    </p>
+  );
+}
 
 /** Searchable single choice; filtering is locale-aware and starts on the first keystroke. */
 export function Combobox<K extends string>(props: ComboboxProps<K>) {
@@ -74,33 +88,33 @@ export function Combobox<K extends string>(props: ComboboxProps<K>) {
             CONTROL_SURFACE,
             CONTROL_HEIGHT[size],
             CONTROL_PADDING[size],
-            'bg-surface-sunken pr-0.5',
-            'data-hovered:border-control data-focus-within:border-accent data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent',
-            'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised',
+            'pe-1',
+            'data-hovered:border-control',
+            CONTROL_FOCUSED,
+            'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised data-disabled:shadow-none',
             CONTROL_INVALID,
           )}
         >
-          <SearchIcon size={14} className="shrink-0 text-ink-subtle" />
+          <SearchIcon
+            size={14}
+            className="shrink-0 text-ink-subtle transition-colors group-data-focus-within:text-accent"
+          />
           <Input placeholder={placeholder} className={TEXT_INPUT} />
           {isLoading ? (
-            <SpinnerIcon size={14} className="mr-2 shrink-0 text-ink-subtle" />
+            <SpinnerIcon size={14} className="shrink-0 text-ink-subtle" />
           ) : null}
-          <Button
-            aria-label={UI_COPY.showOptions}
-            className="flex size-7 shrink-0 items-center justify-center rounded-sm text-ink-subtle outline-none pointer-coarse:size-10 data-hovered:bg-surface-raised data-hovered:text-ink data-focus-visible:outline-2 data-focus-visible:outline-accent"
-          >
-            <ChevronDownIcon size={14} />
+          <Button aria-label={UI_COPY.showOptions} className={INLINE_ACTION}>
+            <ChevronDownIcon
+              size={14}
+              className="transition-transform duration-150 group-data-open:rotate-180"
+            />
           </Button>
         </Group>
       </FieldFrame>
-      <Popover className="min-w-(--trigger-width) p-1">
+      <Popover className="min-w-(--trigger-width) p-1.5">
         <ListBox
           className="outline-none"
-          renderEmptyState={() => (
-            <p className="px-2.5 py-3 text-center text-xs text-ink-subtle">
-              {isLoading ? UI_COPY.loading : UI_COPY.noResults}
-            </p>
-          )}
+          renderEmptyState={() => <ListEmpty loading={isLoading} />}
         >
           <ChoiceItems source={source} />
         </ListBox>

@@ -16,13 +16,13 @@ type SwitchProps = {
 };
 
 const TRACK: Record<ControlSize, string> = {
-  sm: 'h-4 w-7',
-  md: 'h-5 w-9',
+  sm: 'h-[18px] w-8',
+  md: 'h-6 w-11',
 };
 
 const THUMB: Record<ControlSize, string> = {
-  sm: 'size-3 group-data-selected:translate-x-3',
-  md: 'size-4 group-data-selected:translate-x-4',
+  sm: 'size-3.5 group-data-selected:translate-x-3.5',
+  md: 'size-5 group-data-selected:translate-x-5',
 };
 
 /** On/off setting that takes effect immediately; use Checkbox inside forms. */
@@ -48,8 +48,8 @@ export function Switch({
       <span
         aria-hidden
         className={cn(
-          'mt-0.5 flex shrink-0 items-center rounded-full border border-line-strong bg-surface-sunken p-px transition-colors duration-150',
-          'group-data-hovered:border-control group-data-selected:border-accent group-data-selected:bg-accent',
+          'mt-px flex shrink-0 items-center rounded-full border border-control bg-line-strong p-px transition-[background-color,border-color,box-shadow] duration-200',
+          'group-data-hovered:ring-3 group-data-hovered:ring-accent/10 group-data-selected:border-accent group-data-selected:bg-accent',
           'group-data-pressed:brightness-95',
           'group-data-focus-visible:outline-2 group-data-focus-visible:outline-offset-2 group-data-focus-visible:outline-accent',
           TRACK[size],
@@ -57,7 +57,7 @@ export function Switch({
       >
         <span
           className={cn(
-            'rounded-full bg-control shadow-panel transition-transform duration-150 ease-[var(--ease-broadcast)] group-data-selected:bg-accent-ink',
+            'rounded-full bg-surface shadow-[0_1px_2px_0_rgb(0_0_0/0.25)] transition-[transform,width] duration-200 ease-[var(--ease-broadcast)] group-data-pressed:scale-90 group-data-selected:bg-accent-ink',
             THUMB[size],
           )}
         />

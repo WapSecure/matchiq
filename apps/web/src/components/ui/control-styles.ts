@@ -11,35 +11,48 @@ export const CONTROL_PADDING: Record<ControlSize, string> = {
   md: 'px-3',
 };
 
+/** One focus treatment everywhere: a 2px accent ring, offset from the control. */
 export const FOCUS_RING =
-  'outline-none data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent';
+  'outline-none data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent';
 
-/** Trigger-like controls (select, date field, combobox shell). */
+/** Trigger-like controls (select, combobox shell, text input). */
 export const CONTROL_SURFACE =
-  'rounded-md border border-line-strong bg-surface text-ink shadow-panel transition-[border-color,background-color,box-shadow] duration-150 ease-out';
+  'rounded-md border border-line-strong bg-surface text-ink shadow-panel transition-[border-color,background-color,box-shadow,color] duration-150 ease-out';
 
 export const CONTROL_INTERACTIVE =
-  'data-hovered:border-control data-pressed:bg-surface-raised data-disabled:cursor-not-allowed data-disabled:opacity-50';
+  'data-hovered:border-control data-pressed:bg-surface-raised data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised data-disabled:text-ink-subtle data-disabled:shadow-none';
+
+/** Typing focus: the border turns accent and a soft halo appears (mouse and keyboard alike). */
+export const CONTROL_FOCUSED =
+  'data-focused:border-accent data-focused:ring-3 data-focused:ring-accent/15 data-focus-within:border-accent data-focus-within:ring-3 data-focus-within:ring-accent/15';
 
 /** Applied on a field root marked `group`; RAC sets `data-invalid` there. */
 export const CONTROL_INVALID =
-  'group-data-invalid:border-critical group-data-invalid:shadow-[0_0_0_1px_var(--mq-critical)]';
+  'group-data-invalid:border-critical group-data-invalid:ring-3 group-data-invalid:ring-critical/12';
 
 export const TEXT_INPUT =
   'min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-ink-subtle disabled:cursor-not-allowed';
 
+/** Floating surfaces share radius, border, elevation and inner padding. */
 export const OVERLAY_SURFACE =
   'rounded-lg border border-line-strong bg-surface text-ink shadow-float outline-none';
 
-/** Entering/exiting states are set by React Aria; global CSS clamps them under reduced motion. */
+/** Scale and fade from the trigger; global CSS clamps it under reduced motion. */
 export const OVERLAY_MOTION =
-  'data-entering:animate-[overlay-in_160ms_var(--ease-broadcast)] data-exiting:animate-[overlay-out_120ms_ease-in] motion-reduce:animate-none';
+  'origin-(--trigger-anchor-point) data-entering:animate-[overlay-in_120ms_var(--ease-broadcast)] data-exiting:animate-[overlay-out_100ms_ease-in] motion-reduce:animate-none';
 
+/**
+ * List rows: hover and keyboard highlight are neutral, the keyboard adds an
+ * inset accent ring, and the selected row is tinted with a check mark.
+ */
 export const LIST_ITEM =
-  'group/item relative flex cursor-default select-none items-start gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-ink outline-none pointer-coarse:min-h-11 data-focused:bg-surface-raised data-hovered:bg-surface-raised data-pressed:bg-surface-sunken data-disabled:cursor-not-allowed data-focus-visible:outline-2 data-focus-visible:-outline-offset-2 data-focus-visible:outline-accent';
+  'group/item relative flex cursor-default select-none items-start gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-ink outline-none transition-colors duration-100 pointer-coarse:min-h-11 data-hovered:bg-ink/5 data-focused:bg-ink/5 data-pressed:bg-ink/8 data-selected:bg-accent-soft data-selected:data-focused:bg-accent/15 data-disabled:cursor-not-allowed data-focus-visible:outline-2 data-focus-visible:-outline-offset-2 data-focus-visible:outline-accent';
 
-export const SECTION_HEADER =
-  'eyebrow px-2.5 pb-1 pt-2.5 first:pt-1 text-ink-subtle';
+export const SECTION_HEADER = 'eyebrow px-2.5 pb-1.5 pt-2 text-ink-subtle';
+
+/** Between listbox groups. */
+export const SECTION_DIVIDER =
+  'not-first:mt-1 not-first:border-t not-first:border-line not-first:pt-1';
 
 export const LABEL = 'eyebrow';
 export const HELP_TEXT = 'text-micro text-ink-subtle';
