@@ -15,12 +15,13 @@ export const RECAP_COPY = {
   localeFallback: (locale: string) =>
     `${locale} variant unavailable; showing en-GB.`,
   export: 'Export JSON',
-  exportHint: 'Downloads the structured recap exactly as the API serves it',
+  exportHint:
+    'Download match statistics, key moments and source references as JSON',
   exportFile: (fixtureId: string) => `matchiq-recap-${fixtureId}.json`,
   notReady: {
     title: 'Recap available at full time',
     description:
-      'The recap is built from the committed read models when the match ends. This page refreshes on its own.',
+      'The recap appears when the match ends. This page refreshes automatically.',
     back: 'Back to the live studio',
   },
   error: 'The recap could not be loaded',

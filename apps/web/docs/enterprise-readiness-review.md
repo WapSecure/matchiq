@@ -53,7 +53,7 @@ P0 means required before a production customer relies on MatchIQ. P1 means requi
 
 ## Visual acceptance still required
 
-This pass changes source presentation, not the whole interaction design. Inspect light and dark themes at desktop, tablet and mobile widths; long club/player names, translated strings, empty/error/loading states, dense cue lists, 200% zoom and reduced motion. Confirm preview label fits at narrow widths. Run the existing Playwright/axe suite after the QA owner updates the renamed labels. Landing screenshots were inspected on desktop light and mobile dark. Inspection exposed a preview minimum-width clipping issue missed by the existing overflow test; the hero now uses one explicit mobile grid column and the preview can shrink. The QA patch adds preview-bounds regression coverage. Other authenticated screens and long-content states still require visual review.
+This pass changes source presentation, not the whole interaction design. Inspect light and dark themes at desktop, tablet and mobile widths; long club/player names, translated strings, empty/error/loading states, dense cue lists, 200% zoom and reduced motion. Confirm preview label fits at narrow widths. MQ-041 applied the selector migration and validated the public and protected workflows. Landing screenshots were inspected on desktop light and mobile dark. Inspection exposed a preview minimum-width clipping issue missed by the existing overflow test; the hero now uses one explicit mobile grid column and the preview can shrink. MQ-041 added preview-bounds regression coverage. MQ-041 subsequently captured all six screens in both themes at desktop/mobile widths with producer sign-in. Long-content and translated-interface states still require qualification.
 
 Next design iteration should use a producer-observed task sequence: choose match → assess freshness → inspect insight → review evidence → control publication → inspect audit result. Prefer clear hierarchy, compact tables and meaningful status over additional ornamental cards. Retain the established semantic colors until contrast and real layouts justify changes.
 
@@ -63,7 +63,7 @@ Use concrete actions and short sentences. Distinguish live data, replay, static 
 
 ## Next three tickets
 
-1. MQ-041 (F): update Playwright selectors for Recommended replay and Match insights; run four theme/viewport projects, accessibility checks and screenshot review.
+1. MQ-044 (E): preserve fixture identity and account access on mobile; remove the empty summary cell; wrap panel descriptions. MQ-041 selector migration and browser review are complete.
 2. MQ-042 (product, B, C): qualify one licensed feed and sign two producer pilot scorecards with measured workflow and reliability acceptance criteria.
 3. MQ-043 (E, C): deliver workspace onboarding and production operator review using the current identity and editorial contracts; document contract gaps for their owners.
 
@@ -76,7 +76,7 @@ Commands used Node 22.22.3 with `NX_DAEMON=false NX_ISOLATE_PLUGINS=false` for N
 - `pnpm exec vitest run --config apps/web/vitest.config.mts --maxWorkers=1`: 30 files, 197 tests passed. Earlier concurrent runs hit different 5-second timeouts; no timeout or assertion was relaxed. Existing auth tests emit React act warnings.
 - `pnpm exec prettier --check apps/web/src apps/web/docs/enterprise-readiness-review.md`: passed; implementation log formatting and `git diff --check` also passed.
 - Standard `pnpm nx run web:build`: blocked by Turbopack resolving symlinked dependencies outside this worktree. `NODE_ENV=production pnpm exec next build --webpack` from `apps/web`: passed compilation, type checking and page generation; 27 external dependency files were omitted from standalone tracing, so deployment packaging remains unverified.
-- Existing landing Playwright suite against local port 4312 on the final build: 20 passed, covering desktop/mobile and light/dark themes, keyboard skip link, navigation, no page horizontal scroll and no serious/critical axe violations. The mobile preview bounding box was also measured at x=16, width=361 in a 393px viewport, and the corrected screenshot was inspected. The full studio/lobby browser suite still needs the QA-owned label migration patch applied.
-- `git apply --check apps/web/docs/qa-label-migration.patch`: passed. This proposes selector updates and a preview-bounds regression test without modifying QA-owned files.
+- Existing landing Playwright suite against local port 4312 on the final build: 20 passed, covering desktop/mobile and light/dark themes, keyboard skip link, navigation, no page horizontal scroll and no serious/critical axe violations. The mobile preview bounding box was also measured at x=16, width=361 in a 393px viewport, and the corrected screenshot was inspected. MQ-041 subsequently applied the QA migration: 128 public-demo browser checks, 64 authentication/editorial checks and 24 signed-in screenshot captures passed.
+- The QA selector migration and preview-bounds regression are now implemented in `apps/web-e2e/src`; the handoff patch has been removed after application.
 
-No changes are merged into dev or deployed. This is an enterprise review and an initial frontend polish pass; the P0 and P1 delivery gates remain outstanding.
+MQ-040 and MQ-041 are committed and merged into local dev under the repository owner’s configured Git identity. No changes have been pushed or deployed. The P0 and P1 delivery gates remain outstanding.

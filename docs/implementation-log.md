@@ -678,3 +678,11 @@ Stream F, branch `fix/MQ-041-frontend-validation` cut from `dev` after MQ-040 me
 Validation: 128 public-demo browser tests passed across desktop/mobile and light/dark projects. All 24 authenticated screenshot captures passed using the local OIDC test issuer and mocked API/stream fixtures. The initial anonymous capture failed four audit-table assertions because access was correctly denied; sign-in fixed the capture setup. QA TypeScript check passed. QA lint passed with existing warnings; the new bounds test uses unconditional assertions. Authentication/editorial suite: 64 passed across all four projects using the local test issuer.
 
 Next: preserve match identity and account access on mobile; finish global interface localization; qualify real feed and production identity integrations. Browser fixtures and the test issuer do not certify production integrations.
+
+## MQ-044: Mobile studio polish (23 October 2026)
+
+Stream E, branch `fix/MQ-044-mobile-studio-polish` cut from `dev`. Screenshot review found hidden mobile fixture identity/account access, an empty observatory summary cell and truncated panel descriptions. The studio header now wraps the fixture title onto a dedicated mobile row and retains the account menu; panel headings/descriptions wrap; all six summary tiles use the available grid cells. Recap waiting/export copy now describes user outcomes. Removed the applied MQ-041 patch artifact and updated the readiness report. No code comments were added; the obsolete phone-header comment was removed.
+
+Validation: web lint and typecheck passed; 18 affected unit tests passed; 56 mobile studio/authentication/editorial browser checks passed, including axe and keyboard flows; all 24 producer screenshot captures passed and revised mobile studio/recap/observatory images were inspected. Formatting and diff whitespace checks passed. Webpack production compilation, type checking and page generation passed, with the same standalone tracing limitation from reused dependency symlinks. No deployment or real external integration was verified.
+
+Next three tickets: permanent mobile identity/account browser regression; full interface localization and native editorial review; licensed feed and operational qualification for a paid pilot.
