@@ -1,5 +1,9 @@
 import { ProblemDetails } from '@matchiq/contracts';
-import { PROBLEM_FALLBACK } from '@/constants/api';
+import {
+  DELTA_SECONDS,
+  PROBLEM_FALLBACK,
+  RETRY_AFTER_HEADER,
+} from '@/constants/api';
 
 export type ApiErrorKind = 'network' | 'timeout' | 'invalidResponse' | 'http';
 
@@ -14,12 +18,19 @@ const SERVER_ERROR_MIN = 500;
 export class ApiError extends Error {
   readonly kind: ApiErrorKind;
   readonly problem: ProblemDetails;
+  /** Seconds from `Retry-After`, when the API sent one. */
+  readonly retryAfterSeconds: number | null;
 
-  constructor(kind: ApiErrorKind, problem: ProblemDetails) {
-    super(problem.detail ?? problem.title);
+  constructor(
+    kind: ApiErrorKind,
+    problem: ProblemDetails,
+    retryAfterSeconds: number | null = null,
+  ) {
+    super(problem.title);
     this.name = 'ApiError';
     this.kind = kind;
     this.problem = problem;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 
   get status(): number {
@@ -53,11 +64,31 @@ export const invalidResponseError = (detail: string): ApiError =>
     detail,
   });
 
-export const httpError = (status: number, body: unknown): ApiError => {
+const MS_PER_SECOND = 1_000;
+
+/** `Retry-After` as delta-seconds or an HTTP date (RFC 9110 §10.2.3). */
+export const parseRetryAfter = (
+  value: string | null | undefined,
+  nowMs = Date.now(),
+): number | null => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (DELTA_SECONDS.test(trimmed)) return Number(trimmed);
+  const at = Date.parse(trimmed);
+  if (Number.isNaN(at)) return null;
+  return Math.max(0, Math.ceil((at - nowMs) / MS_PER_SECOND));
+};
+
+export const httpError = (
+  status: number,
+  body: unknown,
+  headers?: Headers,
+): ApiError => {
   const parsed = ProblemDetails.safeParse(body);
   return new ApiError(
     'http',
     parsed.success ? parsed.data : { ...PROBLEM_FALLBACK.http, status },
+    parseRetryAfter(headers?.get(RETRY_AFTER_HEADER)),
   );
 };
 

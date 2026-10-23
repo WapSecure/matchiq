@@ -1,41 +1,39 @@
+'use client';
+
+import { useMemo } from 'react';
 import { AccessDenied } from '@/components/auth/access-denied';
-import { AlertIcon, RefreshIcon } from '@/components/icons';
-import { Button } from '@/components/ui';
-import { HTTP_STATUS } from '@/constants/api';
-import { FEEDBACK_COPY } from '@/constants/feedback';
-import { isApiError } from '@/lib/api/api-error';
+import { AlertIcon } from '@/components/icons';
+import { humanizeError } from '@/lib/errors';
 import { cn } from '@/lib/cn';
+import { RecoveryAction } from './recovery-action';
+import { SupportReference } from './support-reference';
 
 type ErrorStateProps = {
-  title: string;
+  /** What the user was trying to see, e.g. "We couldn't load the matches". */
+  title?: string;
   error: unknown;
   onRetry?: () => void;
   className?: string;
 };
 
-const describe = (error: unknown): { detail: string; ref: string | null } => {
-  if (isApiError(error)) {
-    return {
-      detail: error.problem.detail ?? error.problem.title,
-      ref: error.problem.requestId ?? null,
-    };
-  }
-  return { detail: FEEDBACK_COPY.unknownError, ref: null };
-};
-
-/** Renders problem details; never leaks stack traces or raw payloads. */
+/**
+ * What happened, what it means and what to do, in plain words. Problem
+ * details, status codes and library messages are never rendered.
+ */
 export function ErrorState({
   title,
   error,
   onRetry,
   className,
 }: ErrorStateProps) {
-  if (isApiError(error) && error.status === HTTP_STATUS.forbidden)
-    return <AccessDenied className={className} />;
-  const { detail, ref } = describe(error);
+  const human = useMemo(() => humanizeError(error), [error]);
+  if (human.kind === 'forbidden') return <AccessDenied className={className} />;
+  const heading = human.specific || !title ? human.title : title;
   return (
     <div
       role="alert"
+      data-testid="error-state"
+      data-error-kind={human.kind}
       className={cn(
         'flex flex-col items-start gap-3 rounded-lg border border-critical/30 bg-critical/5 p-4 sm:flex-row sm:items-center',
         className,
@@ -43,19 +41,13 @@ export function ErrorState({
     >
       <AlertIcon size={18} className="shrink-0 text-critical" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-ink">{title}</p>
-        <p className="mt-0.5 text-xs text-ink-muted">{detail}</p>
-        {ref ? (
-          <p className="tabular mt-1 font-mono text-micro text-ink-subtle">
-            {FEEDBACK_COPY.requestRef(ref)}
-          </p>
+        <p className="text-sm font-medium text-ink">{heading}</p>
+        <p className="mt-0.5 text-xs text-ink-muted">{human.message}</p>
+        {human.reference && human.support ? (
+          <SupportReference reference={human.reference} />
         ) : null}
       </div>
-      {onRetry ? (
-        <Button onClick={onRetry} leadingIcon={<RefreshIcon size={14} />}>
-          {FEEDBACK_COPY.retry}
-        </Button>
-      ) : null}
+      <RecoveryAction human={human} onRetry={onRetry} />
     </div>
   );
 }

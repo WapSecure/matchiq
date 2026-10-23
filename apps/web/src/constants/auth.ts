@@ -124,9 +124,11 @@ export const AUTH_COPY = {
   role: 'Role',
   publicDemo: 'Public demo',
   errors: {
-    callback: 'Sign-in did not complete. Please try again.',
-    unavailable: 'The identity provider could not be reached.',
-    expired: 'Your session expired. Sign in again to continue.',
+    callback: "Sign-in didn't finish. Please try again.",
+    unavailable:
+      "We can't reach the sign-in service right now. Try again in a moment.",
+    expired:
+      "You've been signed out for security. Sign in again to carry on where you left off.",
   },
   forbiddenTitle: 'You do not have access to this',
   forbiddenBody: (role: string) =>

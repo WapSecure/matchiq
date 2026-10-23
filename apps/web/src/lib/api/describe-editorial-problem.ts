@@ -1,20 +1,22 @@
 import { EDITORIAL_PROBLEMS } from '@/constants/editorial';
-import { isApiError } from './api-error';
+import { humanizeError } from '@/lib/errors/humanize-error';
 
-export type ProblemView = { message: string; reference: string | null };
+export type ProblemView = { error: unknown; message: string };
 
-const slugOf = (type: string): string => type.slice(type.lastIndexOf(':') + 1);
-
-/** Readable copy for a failed producer command; never the raw payload. */
-export const describeEditorialProblem = (error: unknown): ProblemView => {
-  if (!isApiError(error)) {
-    return { message: EDITORIAL_PROBLEMS.fallback, reference: null };
-  }
-  const { problem } = error;
-  const message =
-    EDITORIAL_PROBLEMS.bySlug[slugOf(problem.type)] ??
-    EDITORIAL_PROBLEMS.byStatus[problem.status] ??
-    problem.detail ??
-    problem.title;
-  return { message, reference: problem.requestId ?? null };
+/**
+ * A producer command's failure in gallery words. Category messages say
+ * plainly that nothing changed; the raw problem is never shown.
+ */
+export const describeEditorialProblem = (error: unknown): string => {
+  const human = humanizeError(error);
+  if (human.specific) return `${human.title}. ${human.message}`;
+  return (
+    EDITORIAL_PROBLEMS.byKind[human.kind] ??
+    `${human.title}. ${EDITORIAL_PROBLEMS.nothingChanged}`
+  );
 };
+
+export const editorialProblem = (error: unknown): ProblemView => ({
+  error,
+  message: describeEditorialProblem(error),
+});

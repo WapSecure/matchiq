@@ -14,22 +14,22 @@ export const LOBBY_COPY = {
   starting: 'Starting…',
   speedLabel: 'Replay speed',
   speedFor: (title: string) => `Replay speed for ${title}`,
-  startFailed: 'Replay could not be started',
+  startFailed: "We couldn't start the replay.",
   rateLimited:
-    'Too many replay starts from this browser. Wait a minute, or join a recent session below.',
+    "You've started a lot of replays in a short time. Wait a minute, or join one of the recent replays below.",
   empty: {
-    title: 'No fixtures available',
+    title: 'No matches to replay yet',
     description:
-      'The API returned no fixture templates. Run `pnpm seed:fixtures`, then refresh.',
+      'Matches appear here as soon as they are ready. Check back in a moment.',
   },
-  error: { title: 'Fixtures could not be loaded' },
+  error: { title: "We couldn't load the matches" },
   loading: 'Loading fixtures',
   sessions: {
     title: 'Recent sessions',
     description: 'Join a replay already in progress or review a finished one',
     listLabel: 'Recent replay sessions',
     empty: 'No sessions yet. Start a replay above.',
-    error: 'Recent sessions could not be loaded',
+    error: "We couldn't load recent replays",
     loading: 'Loading recent sessions',
     open: 'Open',
     openLabel: (title: string, n: number) => `Open session ${n} of ${title}`,

@@ -101,7 +101,7 @@ export const AUDIT_COPY = {
   loadingMore: 'Loading…',
   end: 'End of the audit trail.',
   loading: 'Loading the audit trail',
-  error: 'The audit trail could not be loaded',
+  error: "We couldn't load the activity log",
   empty: 'No audit events match these filters.',
   scrollRegion: 'Audit events table, scrolls horizontally',
 } as const;

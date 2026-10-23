@@ -41,6 +41,9 @@ export const HTTP_HEADERS = {
   lastEventId: 'Last-Event-ID',
 } as const;
 
+export const RETRY_AFTER_HEADER = 'Retry-After';
+export const DELTA_SECONDS = /^\d+$/;
+
 export const MEDIA_TYPES = {
   json: 'application/json',
   problem: 'application/problem+json',
