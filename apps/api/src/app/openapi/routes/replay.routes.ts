@@ -8,8 +8,9 @@ import {
 import {
   CreateSessionBody,
   SessionListQuery,
+  TemplateListQuery,
 } from '../../replay/replay.schemas';
-import { TAGS } from '../openapi.constants';
+import { KEYSET_TEXT, TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
 import { FixturePath } from './fixture.routes';
 
@@ -23,13 +24,15 @@ export const REPLAY_ROUTES: readonly ApiRoute[] = [
     path: '/fixture-templates',
     tag: TAGS.replay,
     summary: 'List replayable fixture templates (the lobby)',
+    description: `By template id. ${KEYSET_TEXT}`,
     auth: 'fixtures:read',
+    query: TemplateListQuery,
     success: {
       status: 200,
-      description: 'Templates',
+      description: 'One page of templates, with the total',
       body: json(FixtureTemplateList),
     },
-    problems: [],
+    problems: ['validation', 'invalidCursor'],
   },
   {
     operationId: 'listReplaySessions',
@@ -37,14 +40,15 @@ export const REPLAY_ROUTES: readonly ApiRoute[] = [
     path: '/replay-sessions',
     tag: TAGS.replay,
     summary: 'List recent replay sessions to join',
+    description: `Newest first. ${KEYSET_TEXT}`,
     auth: 'fixtures:read',
     query: SessionListQuery,
     success: {
       status: 200,
-      description: 'Sessions, most recent first',
+      description: 'One page of sessions, newest first, with the total',
       body: json(ReplaySessionList),
     },
-    problems: ['validation'],
+    problems: ['validation', 'invalidCursor'],
   },
   {
     operationId: 'createReplaySession',

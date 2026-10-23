@@ -79,6 +79,9 @@ export const API_LIMITS = {
   shutdownGraceMs: 5_000,
   sessionListDefault: 20,
   sessionListMax: 100,
+  /** The catalogue is small; the default still returns all of it for `{ items }` clients. */
+  templateListDefault: 100,
+  templateListMax: 100,
   /** Seconds a client should wait after a replay-capacity 503. */
   replayCapacityRetryAfterS: 30,
 } as const;

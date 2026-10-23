@@ -2,6 +2,20 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-053 (1/2): Keyset pagination for the lobby and fixture lists
+
+| Area                                                                                                                                                                                                                                                                  | Status | Evidence                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------- |
+| `CursorPage` envelope (`{ items, nextCursor, total? }`) and `CursorPageQuery` (`cursor`, `limit`) in `libs/contracts`; `FixtureList`, `FixtureTemplateList` and `ReplaySessionList` now use it. `items` stays at the top level, so `{ items }` clients keep working   | Done   | `libs/contracts/src/lib/paging.ts`                  |
+| `cursor` + `limit` on `GET /replay-sessions` (newest first, 20 / 100, `total`), `GET /fixture-templates` (by id, 100 / 100 so the old unpaged call still gets everything, `total`) and `GET /fixtures` (kickoff order, 50 / 100)                                      | Done   | `lobby-paging.integration.spec.ts`                  |
+| Base64url keyset cursors tagged with their list (`libs/db` `keyset-cursor.ts`), the same approach as audit; a tampered or foreign cursor is `400 invalid-cursor` through one `readPage` helper, which the audit controller now shares. Reads stay tenant-scoped (RLS) | Done   | `keyset-cursor.spec.ts`, integration spec           |
+| Tests: order stability under a concurrent insert, last page, totals, cross-tenant isolation (including a replayed cursor), five bad-cursor shapes, limit bounds                                                                                                       | Done   | 11 integration tests green locally against Postgres |
+| OpenAPI registry entries, `docs/api/openapi.json` and `libs/api-client` regenerated; Spectral clean; README pagination table                                                                                                                                          | Done   | `docs/api/README.md`                                |
+
+No Python contracts changed (the lobby schemas are not exported to the agents service), so `agents:codegen` is not affected.
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for `contracts`, `db`, `api`, `api-client` and `worker`, plus the touched API integration specs.
+
 ## 2026-10-23 — MQ-050 (2/2): One visual system for the remaining controls
 
 - **Shared tokens (`control-styles.ts`, `button-styles.ts`, `global.css`):** one focus ring (2 px accent, 2 px offset), a typing halo (accent border plus soft ring), an invalid ring, a disabled look that dims colour instead of fading the whole control, and overlays that scale and fade from their trigger in 120 ms (`--trigger-anchor-point`), clamped by reduced motion.
