@@ -17,6 +17,18 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for `web`, `web-e2e` and `server-kit`, plus the touched spec files.
 
+## 2026-10-23 — MQ-037: Walkthrough polish (audit actor names, dev CSP, recap polling)
+
+| Area                                                                                                                                                                                   | Status | Evidence                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------ |
+| `AuditEvent.actorDisplayName` (optional, backward compatible); `audit_events.actor_display_name` (migration 0007, nullable); written by every API audit path from the OIDC name claim  | Done   | `editorial-audit.spec.ts`, `audit.integration.spec.ts` |
+| Audit trail shows the person's name, with the actor type and short id as detail and the full id on hover                                                                               | Done   | `audit.spec.tsx`                                       |
+| OpenAPI document and `libs/api-client` regenerated; Python contracts unchanged (audit is not exported to the agents)                                                                   | Done   | `docs/api/openapi.json`, `libs/api-client`             |
+| Dev-only CSP: `style-src 'self' 'unsafe-inline'` without the nonce (a nonce makes browsers ignore `'unsafe-inline'`), so Next's dev overlay and HMR styles apply; production unchanged | Done   | `csp.spec.ts`                                          |
+| Observatory requests the recap only once the replay status says `COMPLETED` (or the fixture has no replay), instead of polling a 404 every 5 s                                         | Done   | `recap-observatory.spec.tsx`                           |
+
+Verification: CI (owner directive). Locally: format, lint and typecheck of `contracts`, `db`, `api`, `web`, `worker`; `api-client:codegen`, `agents:codegen` (no Python change); the four touched web and contracts unit spec files.
+
 ## 2026-10-23 — MQ-036: Signed-in users no longer drop out at token refresh
 
 Root cause (confirmed in the Keycloak log: `REFRESH_TOKEN_ERROR … error="invalid_token", reason="Maximum allowed refresh token reuse exceeded"` at 07:07:42): the realm rotates single-use refresh tokens, the studio polls several BFF routes in parallel, and every request near expiry refreshed with the same token. One won; the rest were treated as expired and cleared the session cookie.

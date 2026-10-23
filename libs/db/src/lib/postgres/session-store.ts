@@ -196,6 +196,9 @@ export class PostgresSessionStore implements SessionStore {
       orgId: command.orgId,
       actor: command.actor?.id ?? AUDIT_ACTORS.anonymousViewer,
       actorType: command.actor?.type ?? 'ANONYMOUS',
+      ...(command.actor?.displayName === undefined
+        ? {}
+        : { actorDisplayName: command.actor.displayName }),
       action: AUDIT_ACTIONS.sessionCreated,
       targetType: AUDIT_TARGET_TYPES.fixture,
       targetId: fixture.fixtureId,

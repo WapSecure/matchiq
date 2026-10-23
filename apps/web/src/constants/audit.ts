@@ -61,6 +61,8 @@ export const AUDIT_FILTER_OPTIONS = {
   ],
 } as const;
 
+const ACTOR_ID_SHORT = 8;
+
 export const AUDIT_COPY = {
   metaTitle: 'Audit trail',
   eyebrow: 'Editorial governance',
@@ -90,6 +92,9 @@ export const AUDIT_COPY = {
     reason: 'Reason',
     changes: 'Changes',
   },
+  /** Under a named actor: the type and a short id; the full id is the hover title. */
+  actorDetail: (type: string, id: string) =>
+    `${type} · ${id.length > ACTOR_ID_SHORT + 4 ? `${id.slice(0, ACTOR_ID_SHORT)}…` : id}`,
   noReason: 'None recorded',
   noChanges: 'No state change',
   viewChanges: (n: number) => `${n} field${n === 1 ? '' : 's'} changed`,

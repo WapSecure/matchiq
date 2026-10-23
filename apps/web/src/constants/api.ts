@@ -89,6 +89,8 @@ export const STORE_LIMITS = {
 export const POLL_MS = {
   sessions: 10_000,
   recap: 5_000,
+  /** Views that need the recap wait for full time on this instead. */
+  replayStatus: 5_000,
   agentRuns: 4_000,
   /** Editorial marks on the insight feed (held and suppressed cues). */
   editorialMarks: 8_000,

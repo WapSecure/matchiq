@@ -169,6 +169,9 @@ export class ReplayService {
         actor: {
           id: principal.userId,
           type: actorTypeOf(principal),
+          ...(principal.displayName === undefined
+            ? {}
+            : { displayName: principal.displayName }),
           details: actorDetails(principal),
         },
         templateId,

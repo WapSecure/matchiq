@@ -108,6 +108,30 @@ describe('AuditView', () => {
     expect(screen.getByText('End of the audit trail.')).toBeInTheDocument();
   });
 
+  it('names a person by display name and keeps the id as detail', async () => {
+    const id = 'da1bb4b2-7c1e-4a51-9d0f-2f6d1c0b9e11';
+    stubApi({
+      'GET /audit-events': {
+        body: {
+          items: [
+            event(1, {
+              actor: { type: 'USER', id },
+              actorDisplayName: 'Pat Producer',
+            }),
+            event(2),
+          ],
+          nextCursor: null,
+        },
+      },
+    });
+    renderView();
+    const table = await screen.findByRole('table', { name: /Audit events/ });
+    expect(within(table).getByText('Pat Producer')).toBeInTheDocument();
+    const detail = within(table).getByText('User · da1bb4b2…');
+    expect(detail).toHaveAttribute('title', id);
+    expect(within(table).getByText('operator-key')).toBeInTheDocument();
+  });
+
   it('applies filters on submit', async () => {
     const api = stubApi({
       'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },

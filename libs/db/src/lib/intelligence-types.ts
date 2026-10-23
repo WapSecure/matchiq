@@ -166,6 +166,7 @@ export interface CreateSessionCommand {
   readonly actor?: {
     readonly id: string;
     readonly type: AuditActorType;
+    readonly displayName?: string;
     readonly details: Record<string, unknown>;
   };
   readonly templateId: string;

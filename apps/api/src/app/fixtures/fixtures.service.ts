@@ -8,7 +8,7 @@ import {
   sha256Hex,
   type UnitOfWork,
 } from '@matchiq/db';
-import { actorTypeOf } from '../auth/actor';
+import { actorTypeOf, auditNameOf } from '../auth/actor';
 import { actorDetails } from '../auth/audit-trail.service';
 import { AUDIT_TARGETS, IDEMPOTENCY_SCOPES } from '../constants';
 import type { CallerContext } from '../http/caller-context';
@@ -57,6 +57,7 @@ export class FixturesService {
             orgId,
             actor: principal.userId,
             actorType: actorTypeOf(principal),
+            ...auditNameOf(principal),
             action: AUDIT_ACTIONS.fixtureCreated,
             targetType: AUDIT_TARGETS.fixture,
             targetId: fixture.fixtureId,

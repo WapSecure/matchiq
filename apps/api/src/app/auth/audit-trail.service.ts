@@ -3,7 +3,7 @@ import type { Principal } from '@matchiq/access';
 import type { AccessDenial, AccessDeniedListener } from '@matchiq/auth';
 import type { UnitOfWork } from '@matchiq/db';
 import { API_AUDIT_ACTIONS, AUDIT_TARGET_KINDS } from '../constants';
-import { actorTypeOf } from './actor';
+import { actorTypeOf, auditNameOf } from './actor';
 import { UNIT_OF_WORK } from '../infrastructure/tokens';
 
 export interface AuditRecord {
@@ -37,6 +37,7 @@ export class AuditTrail implements AccessDeniedListener {
         orgId: principal.orgId,
         actor: principal.userId,
         actorType: actorTypeOf(principal),
+        ...auditNameOf(principal),
         action: record.action,
         targetType: record.targetType,
         targetId: record.targetId,
