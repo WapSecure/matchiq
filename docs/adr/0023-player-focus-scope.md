@@ -1,4 +1,4 @@
-# ADR-0022: Player Focus scope and saved viewing preferences
+# ADR-0023: Player Focus scope and saved viewing preferences
 
 - Status: Accepted (2026-10-23, MQ-066). Refines spec §27, §29, §31.6, §45, E13, US-012 and US-014.
 
