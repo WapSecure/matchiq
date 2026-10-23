@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { EmptyState } from '@/components/feedback';
 import { SparkIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
+import { LoadMore } from '@/components/ui/pagination';
+import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
 import { STUDIO_COPY } from '@/constants/studio';
 import { useInsightMarks } from '../editorial/use-insight-marks';
 import type { Roster } from '../lib/roster';
@@ -22,6 +25,9 @@ export function InsightFeed({
   const locale = useStudioUi((s) => s.locale);
   const openEvidence = useStudioUi((s) => s.openEvidence);
   const markOf = useInsightMarks();
+  // Newest first and bounded per match, so a client-side window is enough;
+  // virtualising would break find-in-page and the screen-reader reading order.
+  const [limit, setLimit] = useState<number>(PAGE_SIZES.feed);
 
   return (
     <Panel
@@ -37,7 +43,7 @@ export function InsightFeed({
         <EmptyState compact title={STUDIO_COPY.insights.empty} />
       ) : (
         <div>
-          {insights.map((insight) => (
+          {insights.slice(0, limit).map((insight) => (
             <KeyMomentCard
               key={insight.insightId}
               insight={insight}
@@ -54,6 +60,17 @@ export function InsightFeed({
               onOpenEvidence={openEvidence}
             />
           ))}
+          {insights.length > PAGE_SIZES.feed ? (
+            <LoadMore
+              className="border-t border-line px-4 py-3"
+              shown={Math.min(limit, insights.length)}
+              total={insights.length}
+              hasMore={limit < insights.length}
+              onLoadMore={() => setLimit((n) => n + PAGE_SIZES.feed)}
+              noun={PAGINATION_NOUNS.moments}
+              label={STUDIO_COPY.insights.moreLabel}
+            />
+          ) : null}
         </div>
       )}
     </Panel>

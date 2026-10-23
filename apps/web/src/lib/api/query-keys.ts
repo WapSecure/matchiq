@@ -4,6 +4,8 @@ import type { EventsQuery, NarrativeQuery } from './endpoints';
 export const queryKeys = {
   templates: () => ['fixture-templates'] as const,
   sessions: () => ['replay-sessions'] as const,
+  sessionsPage: (page: { cursor?: string; limit: number }) =>
+    ['replay-sessions', page] as const,
   fixture: (fixtureId: string) => ['fixtures', fixtureId] as const,
   events: (fixtureId: string, query: EventsQuery) =>
     ['fixtures', fixtureId, 'events', query] as const,

@@ -118,7 +118,7 @@ test.describe('editorial controls', () => {
     });
     await expect(table).toBeVisible();
     await expect(table).toContainText('Producer note 1');
-    await page.getByRole('button', { name: 'Load more' }).click();
+    await page.getByRole('button', { name: 'Show more' }).click();
     await expect(
       page.getByRole('table', { name: /Activity: 4 shown/ }),
     ).toBeVisible();

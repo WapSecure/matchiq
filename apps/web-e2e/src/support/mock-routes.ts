@@ -16,6 +16,7 @@ import {
   mockTraces,
 } from './mock-session';
 import { mockFaultTraces } from './mock-faults';
+import { pagedLobby } from './mock-paging';
 import { mockLoadTraces } from './mock-load';
 
 /** The public API and the signed-in BFF share one mock. */
@@ -62,6 +63,8 @@ export type MockApiOptions = {
   hydrate?: boolean;
   /** Add traces of demo fault scenarios (ADR-0020) to the observatory. */
   faults?: boolean;
+  /** Serve eight matches and eleven replays in keyset pages. */
+  paging?: boolean;
   /** Add moments that fell back to standard wording under heavy load. */
   load?: boolean;
 };
@@ -158,7 +161,13 @@ const handleRead = (
   );
 };
 
-const handleLobby = (route: Route, path: string, options: MockApiOptions) => {
+const handleLobby = (
+  route: Route,
+  url: URL,
+  path: string,
+  options: MockApiOptions,
+) => {
+  if (options.paging) return json(route, pagedLobby(path, url));
   if (path === '/replay-sessions')
     return json(route, { items: mockSessions() });
   if (options.templates === 'forbidden')
@@ -180,7 +189,7 @@ export const handleRoute = (
   const path = url.pathname.replace(API_PREFIX, '');
   if (request.method() === 'OPTIONS') return preflight(route);
   if (path === '/fixture-templates' || path === '/replay-sessions')
-    return handleLobby(route, path, options);
+    return handleLobby(route, url, path, options);
   const editorial = handleEditorial(
     route,
     path,

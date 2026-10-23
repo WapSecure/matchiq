@@ -5,6 +5,7 @@ export const LOBBY_COPY = {
   description:
     'Every match is fictional and plays out exactly the same way each time, so you can rehearse and compare. Anyone with the link to a replay sees the same thing at the same moment.',
   listLabel: 'Matches',
+  pagesLabel: 'Match pages',
   scenario: 'Storyline',
   events: 'Match events',
   start: 'Start replay',
@@ -26,6 +27,7 @@ export const LOBBY_COPY = {
     title: 'Recent replays',
     description: 'Join a replay in progress or look back at a finished one',
     listLabel: 'Recent replays',
+    pagesLabel: 'Recent replay pages',
     empty: 'No replays yet. Start one above.',
     error: "We couldn't load recent replays",
     loading: 'Loading recent replays',

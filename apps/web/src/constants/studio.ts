@@ -20,6 +20,7 @@ export const STUDIO_COPY = {
     period: (n: number) => `Period ${n}`,
   },
   insights: {
+    moreLabel: 'More key moments',
     title: 'Key moments',
     description: 'Spotted in the match data, written up by AI and fact-checked',
     empty: 'No key moments yet. They appear here as the match unfolds.',

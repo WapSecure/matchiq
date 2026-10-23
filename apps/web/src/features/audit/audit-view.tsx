@@ -4,8 +4,10 @@ import type { Fixture } from '@matchiq/contracts';
 import { useMemo, useState } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback';
 import { AuditIcon } from '@/components/icons';
-import { Button, Skeleton } from '@/components/ui';
+import { Skeleton } from '@/components/ui';
+import { LoadMore } from '@/components/ui/pagination';
 import { AUDIT_COPY } from '@/constants/audit';
+import { PAGINATION_NOUNS } from '@/constants/pagination';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import { AuditFilterBar } from './audit-filter-bar';
 import {
@@ -62,20 +64,15 @@ function AuditResults({
   return (
     <div className="flex flex-col gap-3">
       <AuditTable events={events} hasMore={audit.hasNextPage} nowMs={nowMs} />
-      <div className="flex items-center justify-center gap-3 text-xs text-ink-subtle">
-        {audit.hasNextPage ? (
-          <Button
-            onClick={() => {
-              if (!audit.isFetchingNextPage) void audit.fetchNextPage();
-            }}
-            aria-disabled={audit.isFetchingNextPage || undefined}
-          >
-            {audit.isFetchingNextPage ? copy.loadingMore : copy.loadMore}
-          </Button>
-        ) : (
-          <p>{copy.end}</p>
-        )}
-      </div>
+      <LoadMore
+        shown={events.length}
+        hasMore={audit.hasNextPage}
+        isLoading={audit.isFetchingNextPage}
+        onLoadMore={() => void audit.fetchNextPage()}
+        noun={PAGINATION_NOUNS.activity}
+        label={copy.moreLabel}
+        endMessage={copy.end}
+      />
       {audit.isFetchNextPageError ? (
         <ErrorState
           title={copy.error}
