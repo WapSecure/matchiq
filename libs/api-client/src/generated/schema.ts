@@ -200,6 +200,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The caller's saved viewing preferences
+         * @description Persona, language, favourite team, followed players (at most three) and reduced motion. A caller who has never saved gets the defaults with `updatedAt: null`. Presentation only: no statistic depends on it.
+         *
+         *     Access: requires the `preferences:write` permission.
+         */
+        get: operations["getMyPreferences"];
+        /**
+         * Replace the caller's viewing preferences
+         * @description Replaces the whole profile. Idempotent: repeating the same body changes nothing, `updatedAt` included. Scoped to the caller and their organisation.
+         *
+         *     Access: requires the `preferences:write` permission.
+         */
+        put: operations["putMyPreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/fixture-templates": {
         parameters: {
             query?: never;
@@ -1631,6 +1659,15 @@ export interface components {
             /** Format: date-time */
             at: string;
         };
+        ViewerPreferences: {
+            /** @enum {string} */
+            persona: "CASUAL" | "ANALYST" | "BROADCAST";
+            /** @enum {string} */
+            locale: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+            favouriteTeamId: string | null;
+            followedPlayerIds: string[];
+            reducedMotion: boolean;
+        };
         ProblemDetails: {
             type: string;
             title: string;
@@ -1781,6 +1818,16 @@ export interface components {
             displayName: string | null;
             roles: string[];
             permissions: string[];
+        };
+        PreferenceProfile: {
+            /** @enum {string} */
+            persona: "CASUAL" | "ANALYST" | "BROADCAST";
+            /** @enum {string} */
+            locale: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+            favouriteTeamId: string | null;
+            followedPlayerIds: string[];
+            reducedMotion: boolean;
+            updatedAt: string | null;
         };
         StreamMessage: {
             /** @constant */
@@ -2872,6 +2919,182 @@ export interface operations {
             };
             /** @description `forbidden`: You do not have permission for this action */
             403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preference profile */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferenceProfile"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    putMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ViewerPreferences"];
+            };
+        };
+        responses: {
+            /** @description Saved profile */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferenceProfile"];
+                };
+            };
+            /** @description `bad-request`: Malformed request body */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;

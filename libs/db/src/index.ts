@@ -27,3 +27,5 @@ export * from './lib/operations-types.js';
 export * from './lib/postgres/retention-store.js';
 export * from './lib/postgres/tenant-scope.js';
 export * from './lib/postgres/keyset-cursor.js';
+export * from './lib/postgres/preference-store.js';
+export * as preferenceSchema from './lib/schema/preference-tables.js';

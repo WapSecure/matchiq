@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { PITCH_COORD_MAX } from '@/constants/pitch';
+import { PITCH_COORD_MAX, PITCH_MARK } from '@/constants/pitch';
 import { cn } from '@/lib/cn';
 import type { PitchMark } from './pitch-events';
 import { PitchGlyph } from './pitch-glyph';
@@ -16,10 +16,13 @@ type PitchPlotProps = {
   className?: string;
 };
 
-/** Goals draw last so they sit above shots and recoveries in the same spot. */
+const FOLLOWED_RING = 2.2;
+
+/** Goals, then the followed player's marks, draw last so they stay on top. */
 const paintOrder = (marks: readonly PitchMark[]) => [
-  ...marks.filter((m) => m.kind !== 'GOAL'),
-  ...marks.filter((m) => m.kind === 'GOAL'),
+  ...marks.filter((m) => m.kind !== 'GOAL' && !m.followed),
+  ...marks.filter((m) => m.kind === 'GOAL' && !m.followed),
+  ...marks.filter((m) => m.followed),
 ];
 
 /** Top-down pitch in metres; marks are positioned from normalised 0..100. */
@@ -54,6 +57,7 @@ export function PitchPlot({
             key={m.id}
             data-mark={m.kind}
             data-side={m.side}
+            data-followed={m.followed || undefined}
             onPointerEnter={onActivate ? () => onActivate(m.id) : undefined}
             className={cn(
               onActivate && 'cursor-crosshair',
@@ -61,6 +65,16 @@ export function PitchPlot({
               'transition-opacity duration-150',
             )}
           >
+            {m.followed ? (
+              <circle
+                cx={m.x * sx}
+                cy={m.y * sy}
+                r={PITCH_MARK.radius * FOLLOWED_RING}
+                fill="none"
+                strokeWidth={PITCH_MARK.ring}
+                className="stroke-accent"
+              />
+            ) : null}
             <PitchGlyph
               kind={m.kind}
               side={m.side}

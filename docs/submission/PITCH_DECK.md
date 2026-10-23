@@ -88,7 +88,7 @@ The same insight as Casual, Analyst and Broadcast, in EN, FR, ES and PCM.
 
 1. Public hosted demo.
 2. Azure: deploy the Bicep, run Foundry, record a Foundry baseline, switch on Entra ID.
-3. Pass difficulty, shot speed, player-focus and favourite-club modes.
+3. Pass difficulty, shot speed, and player speed and distance once tracking data is in the fixtures.
 4. Licensed data adapters with rights propagation; a design-partner pilot.
 
 > **Notes:** Ask for Azure credits and a broadcast design partner. Close on the promise: one trusted event stream, many audiences, no invented numbers.

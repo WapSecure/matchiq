@@ -3,7 +3,7 @@ import type { z } from 'zod';
 import type { Tag } from './openapi.constants';
 import type { ProblemRef } from './problem-catalog';
 
-export type HttpMethod = 'get' | 'post';
+export type HttpMethod = 'get' | 'post' | 'put';
 
 /**
  * What `@RequirePermission` (or `@PublicRoute`) declares on the handler;

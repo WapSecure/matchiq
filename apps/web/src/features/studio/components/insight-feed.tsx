@@ -1,12 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { EmptyState } from '@/components/feedback';
 import { SparkIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { LoadMore } from '@/components/ui/pagination';
 import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
 import { STUDIO_COPY } from '@/constants/studio';
+import {
+  biasesFavourite,
+  favouriteFirst,
+} from '@/features/preferences/favourite-first';
+import { FavouriteFrame } from '@/features/preferences/favourite-frame';
+import { usePreferences } from '@/features/preferences/preferences-store';
 import { useInsightMarks } from '../editorial/use-insight-marks';
 import type { Roster } from '../lib/roster';
 import { selectNarrative, useMatchStore, useStudioUi } from '../store';
@@ -20,9 +26,15 @@ export function InsightFeed({
   roster: Roster;
   className?: string;
 }) {
-  const insights = useMatchStore((s) => s.insights);
+  const all = useMatchStore((s) => s.insights);
   const narratives = useMatchStore((s) => s.narratives);
   const persona = useStudioUi((s) => s.persona);
+  const favourite = usePreferences((s) => s.favouriteTeamId);
+  const biased = biasesFavourite(persona, favourite);
+  const insights = useMemo(
+    () => (biased ? favouriteFirst(all, favourite) : all),
+    [all, biased, favourite],
+  );
   const locale = useStudioUi((s) => s.locale);
   const openEvidence = useStudioUi((s) => s.openEvidence);
   const markOf = useInsightMarks();
@@ -46,21 +58,25 @@ export function InsightFeed({
       ) : (
         <div>
           {insights.slice(0, limit).map((insight) => (
-            <KeyMomentCard
+            <FavouriteFrame
               key={insight.insightId}
-              insight={insight}
-              view={selectNarrative(
-                { narratives },
-                insight.insightId,
-                persona,
-                locale,
-              )}
-              persona={persona}
-              locale={locale}
-              team={roster.team(insight.teamId)}
-              mark={markOf(insight.insightId)}
-              onOpenEvidence={openEvidence}
-            />
+              active={biased && insight.teamId === favourite}
+            >
+              <KeyMomentCard
+                insight={insight}
+                view={selectNarrative(
+                  { narratives },
+                  insight.insightId,
+                  persona,
+                  locale,
+                )}
+                persona={persona}
+                locale={locale}
+                team={roster.team(insight.teamId)}
+                mark={markOf(insight.insightId)}
+                onOpenEvidence={openEvidence}
+              />
+            </FavouriteFrame>
           ))}
           {insights.length > PAGE_SIZES.feed ? (
             <LoadMore
