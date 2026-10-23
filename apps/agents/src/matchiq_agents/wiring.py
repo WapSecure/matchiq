@@ -1,5 +1,7 @@
 """Wires the model port and orchestrator from validated settings."""
 
+from collections.abc import Callable
+
 from matchiq_agents.clock import Clock
 from matchiq_agents.constants import (
     DEADLINE_RESERVE_MS,
@@ -13,6 +15,7 @@ from matchiq_agents.constants import (
     RETRY_BACKOFF_BASE_MS,
     WORKFLOW_GRACE_MS,
 )
+from matchiq_agents.contracts.generated.PipelineRequest import FaultScenario
 from matchiq_agents.contracts.types import RunProvider
 from matchiq_agents.faults.orchestrator import FaultAwareOrchestrator
 from matchiq_agents.models.agent_framework import AgentFrameworkModel
@@ -107,16 +110,38 @@ def build_orchestrator(
     )
 
 
+def fault_breaker(
+    settings: Settings, clock: Clock, config: PipelineConfig
+) -> Callable[[FaultScenario], CircuitBreaker]:
+    """A fresh breaker per faulted run. Only MODEL_TIMEOUT gets the hair-trigger one.
+
+    Any other scenario gets the shared breaker's thresholds, so a real failure during the demo
+    behaves as it would in an ordinary run and cannot short-circuit later stages early.
+    """
+    attempts = config.retry.max_retries + 1 if config.retry.retry_timeouts else 1
+
+    def build(scenario: FaultScenario) -> CircuitBreaker:
+        if scenario is FaultScenario.MODEL_TIMEOUT:
+            # Opens once one call has spent every attempt, so the next stage is short-circuited.
+            return CircuitBreaker(clock, attempts, settings.agent_circuit_reset_ms)
+        return CircuitBreaker(
+            clock,
+            settings.agent_circuit_failure_threshold,
+            settings.agent_circuit_reset_ms,
+            settings.circuit_timeout_threshold,
+        )
+
+    return build
+
+
 def build_service(
     settings: Settings, clock: Clock, model: ModelPort | None = None
 ) -> FaultAwareOrchestrator:
     """The orchestrator plus demo fault routing (ADR-0020); a faulted run never shares state."""
     config = pipeline_config(settings)
-    attempts = config.retry.max_retries + 1 if config.retry.retry_timeouts else 1
     return FaultAwareOrchestrator(
         build_orchestrator(settings, clock, model),
         enabled=settings.demo_faults_enabled,
         faulted=lambda faulty, isolated: PipelineOrchestrator(faulty, isolated, clock, config),
-        # Opens once one call has spent every attempt, so the next stage is short-circuited.
-        breaker=lambda: CircuitBreaker(clock, attempts, settings.agent_circuit_reset_ms),
+        breaker=fault_breaker(settings, clock, config),
     )
