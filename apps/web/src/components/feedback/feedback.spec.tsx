@@ -62,6 +62,20 @@ describe('ErrorState', () => {
     expectNoLeaks(container);
   });
 
+  it('leads with the offline title whatever the surface heading', () => {
+    vi.stubGlobal('navigator', { ...navigator, onLine: false });
+    render(
+      <ErrorState
+        title="We couldn't load the matches"
+        error={networkError()}
+      />,
+    );
+    expect(screen.getByTestId('error-state')).toHaveTextContent(
+      "You're offline",
+    );
+    vi.unstubAllGlobals();
+  });
+
   it('offers Try again and calls the retry', () => {
     const retry = vi.fn();
     render(<ErrorState error={networkError()} onRetry={retry} />);
