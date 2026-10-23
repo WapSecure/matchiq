@@ -8,7 +8,6 @@ import {
   Keyboard,
   MenuTrigger,
   Separator,
-  Text,
 } from 'react-aria-components';
 import { cn } from '@/lib/cn';
 import { LIST_ITEM } from './control-styles';
@@ -52,13 +51,12 @@ function Item({ action }: { action: MenuAction }) {
         <span className="flex shrink-0 text-ink-muted">{action.icon}</span>
       ) : null}
       <span className="flex min-w-0 flex-1 flex-col">
-        <Text slot="label" className="font-medium">
-          {action.label}
-        </Text>
+        <span className="font-medium">{action.label}</span>
         {action.description ? (
-          <Text slot="description" className="text-xs text-ink-muted">
+          <span className="text-xs text-ink-muted">
+            <span className="sr-only">, </span>
             {action.description}
-          </Text>
+          </span>
         ) : null}
       </span>
       {action.shortcut ? (

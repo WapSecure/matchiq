@@ -50,7 +50,7 @@ export function Disclosure({
       className={cn(
         'flex cursor-pointer select-none items-center text-left outline-none pointer-coarse:min-h-11',
         'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+        'data-disabled:cursor-not-allowed data-disabled:text-ink-subtle',
         TRIGGER[variant],
       )}
     >
