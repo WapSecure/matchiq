@@ -15,7 +15,7 @@ export const RECAP_COPY = {
     `The ${language} version isn't ready yet, so you're seeing English.`,
   export: 'Download recap (JSON)',
   exportHint: 'Saves the full recap as a data file for your own tools',
-  exportFile: (fixtureId: string) => `matchiq-recap-${fixtureId}.json`,
+  exportFile: (name: string) => `matchiq-recap-${name}.json`,
   notReady: {
     title: 'The recap is ready at full time',
     description:

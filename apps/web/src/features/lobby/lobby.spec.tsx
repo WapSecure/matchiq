@@ -98,6 +98,29 @@ describe('lobby', () => {
     expect(push).not.toHaveBeenCalled();
   });
 
+  it('shows a copyable match code and keeps the hash in technical details', async () => {
+    const user = userEvent.setup();
+    stubApi({
+      'GET /fixture-templates': { body: { items: [template()] } },
+      'GET /replay-sessions': { body: { items: [sessionView()] } },
+    });
+    renderLobby();
+    const card = await screen.findByRole('article');
+    const copy = within(card).getByRole('button', {
+      name: 'Copy match code: HMU-AWC · NANA',
+    });
+    const hash = within(card).getByText('a'.repeat(64));
+    expect(hash).not.toBeVisible();
+    await user.click(copy);
+    expect(await within(card).findByText('Copied')).toBeInTheDocument();
+    expect(await navigator.clipboard.readText()).toBe('HMU-AWC · NANA');
+    await user.click(
+      within(card).getByRole('button', { name: /Technical details/ }),
+    );
+    expect(hash).toBeVisible();
+    expect(await screen.findByText(/Replay 1 · HMU-AWC · NANA/)).toBeVisible();
+  });
+
   it('shows empty states', async () => {
     stubApi({
       'GET /fixture-templates': { body: { items: [] } },

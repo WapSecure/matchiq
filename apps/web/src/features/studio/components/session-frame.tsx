@@ -10,6 +10,7 @@ import { MAIN_CONTENT_ID } from '@/constants/site';
 import { STUDIO_COPY } from '@/constants/studio';
 import { isApiError } from '@/lib/api/api-error';
 import { useFixture } from '@/lib/api/hooks';
+import { useMatchLabel } from '@/lib/use-match-label';
 import { StudioHeader } from './studio-header';
 
 type SessionFrameProps = {
@@ -43,6 +44,7 @@ export function SessionFrame({
   children,
 }: SessionFrameProps) {
   const fixture = useFixture(fixtureId);
+  const label = useMatchLabel(fixtureId);
   const missing =
     isApiError(fixture.error) && fixture.error.status === HTTP_STATUS.notFound;
   return (
@@ -52,6 +54,8 @@ export function SessionFrame({
         view={view}
         title={fixture.data?.title ?? null}
         competition={fixture.data?.competitionLabel ?? null}
+        matchCode={label.code}
+        replay={label.replay}
         status={status}
       />
       {banner}
