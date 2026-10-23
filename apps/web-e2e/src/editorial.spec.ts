@@ -137,8 +137,15 @@ test.describe('editorial controls', () => {
     const filters = page.getByRole('form', { name: 'Filter the activity log' });
     await filters.getByRole('button', { name: /Who$/ }).click();
     await page.getByRole('option', { name: 'Automatic' }).click();
-    await filters.getByRole('combobox', { name: 'Action' }).fill('emergency');
-    await page.getByRole('option', { name: 'Emergency stop on' }).click();
+    const action = filters.getByRole('combobox', { name: 'Action' });
+    await action.fill('emergency');
+    await expect(
+      page.getByRole('option', { name: 'Emergency stop on' }),
+    ).toBeVisible();
+    // Keyboard selection: the filtered list can still be settling on phones.
+    await action.press('ArrowDown');
+    await action.press('Enter');
+    await expect(action).toHaveValue('Emergency stop on');
     await filters
       .getByRole('group', { name: /When/ })
       .first()
