@@ -1,11 +1,13 @@
 import type { Fixture, MatchSnapshot } from '@matchiq/contracts';
 import { TeamMonogram } from '@/components/match/team-monogram';
 import { SIDE_BG, type Side as TeamSide } from '@/components/match/team-swatch';
+import { MatchCodeChip } from '@/components/match/match-code-chip';
 import { Badge } from '@/components/ui';
 import { RECAP_COPY } from '@/constants/recap';
 import { WATERMARK } from '@/constants/studio';
 import { ExportRecap } from './export-recap';
 import type { RecapDocument } from '@/lib/api/session-schemas';
+import { useMatchLabel } from '@/lib/use-match-label';
 
 type RecapScorelineProps = {
   fixture: Fixture;
@@ -40,6 +42,7 @@ export function RecapScoreline({
   recap,
 }: RecapScorelineProps) {
   const { home, away } = snapshot.score;
+  const { code } = useMatchLabel(fixture.fixtureId);
   return (
     <section
       aria-label={RECAP_COPY.scoreLabel(
@@ -53,11 +56,9 @@ export function RecapScoreline({
       <div className="flex flex-wrap items-center gap-2">
         <p className="eyebrow text-accent">{RECAP_COPY.eyebrow}</p>
         <Badge tone="synthetic">{WATERMARK}</Badge>
-        <span className="font-mono text-micro text-ink-subtle">
-          {RECAP_COPY.engine(snapshot.algorithmVersion)}
-        </span>
         <ExportRecap recap={recap} className="ml-auto" />
       </div>
+      {code ? <MatchCodeChip code={code} className="mt-3" /> : null}
       <div
         aria-hidden
         className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-6"

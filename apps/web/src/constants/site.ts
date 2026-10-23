@@ -2,14 +2,14 @@ export const SITE = {
   name: 'MatchIQ',
   title: 'MatchIQ | Football intelligence for live broadcast',
   description:
-    'Match analytics, traceable commentary and editorial controls for football broadcast workflows.',
+    'Live football intelligence for broadcast: match stats, AI-written key moments checked against the data, and on-air graphics in four languages.',
   repositoryUrl: 'https://github.com/WapSecure/matchiq',
   locale: 'en-GB',
 } as const;
 
 export const SYNTHETIC_DISCLOSURE = {
-  label: 'Synthetic match data',
-  text: 'All teams, players and events are fictional and generated for demonstration. MatchIQ is not affiliated with or endorsed by the Premier League.',
+  label: 'Simulated match data',
+  text: 'All teams, players and events are fictional and made up for this demo. MatchIQ is not affiliated with or endorsed by the Premier League.',
 } as const;
 
 export const SKIP_LINK_LABEL = 'Skip to content';

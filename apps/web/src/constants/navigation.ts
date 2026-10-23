@@ -19,17 +19,17 @@ export const STUDIO_TABS: readonly {
 }[] = [
   { view: 'live', label: 'Live studio', href: ROUTES.studio },
   { view: 'recap', label: 'Recap', href: ROUTES.recap },
-  { view: 'observatory', label: 'Agent observatory', href: ROUTES.observatory },
-  { view: 'audit', label: 'Audit trail', href: ROUTES.audit },
+  { view: 'observatory', label: 'AI fact-checks', href: ROUTES.observatory },
+  { view: 'audit', label: 'Activity log', href: ROUTES.audit },
 ];
 
-export const STUDIO_TABS_LABEL = 'Session views';
+export const STUDIO_TABS_LABEL = 'Match views';
 
 /** `compact: false` items are hidden below the `sm` breakpoint. */
 export const NAV_ITEMS = [
-  { label: 'Fixtures', href: ROUTES.fixtures, compact: true },
-  { label: 'Pipeline', href: '/#pipeline', compact: false },
-  { label: 'Principles', href: '/#principles', compact: false },
+  { label: 'Matches', href: ROUTES.fixtures, compact: true },
+  { label: 'How it works', href: '/#pipeline', compact: false },
+  { label: 'Why trust it', href: '/#principles', compact: false },
 ] as const;
 
 export const HEADER_LABELS = {

@@ -1,14 +1,13 @@
 import { RequirePermission } from '@/components/auth/require-permission';
 import { TeamMonogram } from '@/components/match/team-monogram';
-import { Badge } from '@/components/ui';
-import {
-  FEATURED_LABEL,
-  HASH_PREVIEW_CHARS,
-  LOBBY_COPY,
-} from '@/constants/lobby';
+import { MatchCodeChip } from '@/components/match/match-code-chip';
+import { Badge, TechnicalDetails } from '@/components/ui';
+import { FEATURED_LABEL, LOBBY_COPY } from '@/constants/lobby';
+import { MATCH_CODE_COPY } from '@/constants/match-code';
 import { SIDE_LABELS } from '@/constants/match';
 import { WATERMARK } from '@/constants/studio';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
+import { templateCode } from '@/lib/use-match-label';
 import { scenarioLabel } from './scenario';
 import { SessionStart } from './session-start';
 
@@ -26,23 +25,34 @@ function TeamLine({ team, side }: { team: Team; side: 'home' | 'away' }) {
   );
 }
 
+/** The event count up front; seed and hash are reproducibility proof for engineers. */
 function Facts({ template }: { template: FixtureTemplateSummary }) {
-  const rows: [string, string][] = [
-    [LOBBY_COPY.seedLabel, String(template.seed)],
-    [LOBBY_COPY.events, template.eventCount.toLocaleString('en-GB')],
-    [LOBBY_COPY.hash, `${template.eventsHash.slice(0, HASH_PREVIEW_CHARS)}…`],
-  ];
   return (
-    <dl className="mt-1 grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-xs">
-      {rows.map(([label, value]) => (
-        <div key={label} className="min-w-0 bg-surface-raised px-2.5 py-2">
-          <dt className="text-micro text-ink-subtle">{label}</dt>
-          <dd className="tabular mt-0.5 truncate font-mono text-ink">
-            {value}
-          </dd>
-        </div>
-      ))}
-    </dl>
+    <div className="mt-1 flex flex-col gap-2">
+      <MatchCodeChip code={templateCode(template)} />
+      <p className="tabular text-xs text-ink-muted">
+        <span className="text-ink-subtle">{LOBBY_COPY.events}: </span>
+        {template.eventCount.toLocaleString('en-GB')}
+      </p>
+      <TechnicalDetails>
+        <dl className="grid gap-2 font-mono">
+          <div className="min-w-0">
+            <dt className="text-micro text-ink-subtle">
+              {MATCH_CODE_COPY.technical.seed}
+            </dt>
+            <dd className="tabular text-ink">{template.seed}</dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-micro text-ink-subtle">
+              {MATCH_CODE_COPY.technical.hash}
+            </dt>
+            <dd className="tabular break-all text-ink">
+              {template.eventsHash}
+            </dd>
+          </div>
+        </dl>
+      </TechnicalDetails>
+    </div>
   );
 }
 

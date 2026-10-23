@@ -61,7 +61,7 @@ test.describe('colour theme', () => {
     await mockApi(page);
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto(`/studio/${FIXTURE_ID}`);
-    const frame = page.getByRole('group', { name: /Overlay preview/ });
+    const frame = page.getByRole('group', { name: /On-air preview/ });
     await expect(frame).toBeVisible();
     const background = await frame.evaluate(
       (el) => getComputedStyle(el).backgroundColor,

@@ -51,6 +51,7 @@ export { UserIcon } from './user-icon';
 export { SignOutIcon } from './sign-out-icon';
 export { CalendarIcon } from './calendar-icon';
 export { CheckIcon } from './check-icon';
+export { CopyIcon } from './copy-icon';
 export { ChevronDownIcon } from './chevron-down-icon';
 export { ChevronRightIcon } from './chevron-right-icon';
 export { ClockIcon } from './clock-icon';

@@ -113,7 +113,7 @@ test.describe('installable progressive web app', () => {
     );
   });
 
-  test('shows the offline fallback with the synthetic notice when the network is gone', async ({
+  test('shows the offline fallback with the simulated-data notice when the network is gone', async ({
     page,
     context,
   }) => {
@@ -126,7 +126,7 @@ test.describe('installable progressive web app', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: OFFLINE_TITLE }),
     ).toBeVisible();
-    await expect(page.getByRole('note')).toContainText('Synthetic match data');
+    await expect(page.getByRole('note')).toContainText('Simulated match data');
     await expectNoBlockingA11yViolations(page);
     await context.setOffline(false);
   });

@@ -2,7 +2,7 @@ import type { GateReport } from '@/lib/api/trace-schemas';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import { withUniqueKeys } from '@/lib/unique-keys';
 
-const copy = OBSERVATORY_COPY;
+const copy = OBSERVATORY_COPY.technical;
 
 function Rejections({ report }: { report: GateReport }) {
   if (report.rejected.length === 0)
@@ -42,7 +42,7 @@ function Rejections({ report }: { report: GateReport }) {
   );
 }
 
-/** What the deterministic gate published and what it rejected, with issue codes. */
+/** Raw publish-gate verdict with issue codes, for Technical details. */
 export function GateReportView({ report }: { report: GateReport | null }) {
   if (!report)
     return <p className="text-xs text-ink-subtle">{copy.gatePending}</p>;

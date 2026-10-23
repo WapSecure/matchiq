@@ -44,7 +44,7 @@ export const PWA_MANIFEST: MetadataRoute.Manifest = {
   name: SITE.name,
   short_name: SITE.name,
   description:
-    'Football intelligence for live broadcast, demonstrated on synthetic match data: deterministic analytics, evidence-grounded narratives and timed overlays. Fictional teams; not affiliated with the Premier League.',
+    'Football intelligence for live broadcast, shown on simulated matches: match stats, fact-checked key moments and on-air graphics. Fictional teams; not affiliated with the Premier League.',
   start_url: PWA_ROUTES.start,
   scope: '/',
   display: 'standalone',
@@ -67,9 +67,9 @@ export const PWA_MANIFEST: MetadataRoute.Manifest = {
   ],
   shortcuts: [
     {
-      name: 'Fixture lobby',
-      short_name: 'Fixtures',
-      description: 'Pick a synthetic fixture and start a replay',
+      name: 'Matches',
+      short_name: 'Matches',
+      description: 'Pick a match and start a replay',
       url: PWA_ROUTES.start,
       icons: [{ src: PWA_ICONS.any192, sizes: '192x192', type: 'image/png' }],
     },
@@ -107,7 +107,7 @@ export const PWA_COPY = {
     retry: 'Try again',
   },
   update: {
-    message: 'Update available',
+    message: 'A new version is ready',
     action: 'Reload',
     region: 'App update',
   },

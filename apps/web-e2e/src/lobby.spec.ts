@@ -8,24 +8,24 @@ import { FIXTURE_ID } from './support/mock-fixture';
 
 const SINGLE_LINE_MAX_PX = 24;
 
-test.describe('fixture lobby', () => {
+test.describe('match lobby', () => {
   test('lists templates with the quick-start scenario first, and recent sessions', async ({
     page,
   }) => {
     await mockApi(page);
     await page.goto('/fixtures');
     const cards = page
-      .getByRole('list', { name: 'Synthetic fixtures' })
+      .getByRole('list', { name: 'Matches' })
       .getByRole('article');
     await expect(cards).toHaveCount(2);
     await expect(cards.first()).toContainText('Late comeback');
     await expect(cards.first()).toContainText('Recommended replay');
     await expect(cards.first()).toContainText('Northbridge Athletic');
-    await expect(cards.first()).toContainText('Synthetic match demo');
+    await expect(cards.first()).toContainText('Simulated match');
     await expect(cards.first()).toContainText('4207');
     await expect(cards.nth(1)).toContainText('High press');
-    const sessions = page.getByRole('list', { name: 'Recent replay sessions' });
-    await expect(sessions).toContainText('Session 1');
+    const sessions = page.getByRole('list', { name: 'Recent replays' });
+    await expect(sessions).toContainText('Replay 1 · NBA-HSR · NANA');
     await expect(sessions).toContainText('Playing');
   });
 
@@ -90,7 +90,7 @@ test.describe('fixture lobby', () => {
     await mockApi(page);
     await page.goto('/fixtures');
     await expect(page.getByRole('article').first()).toBeVisible();
-    await expect(page.getByText('Session 1')).toBeVisible();
+    await expect(page.getByText('Replay 1 · NBA-HSR · NANA')).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });
 
@@ -102,9 +102,9 @@ test.describe('fixture lobby', () => {
   });
 });
 
-test.describe('synthetic notice bar', () => {
+test.describe('simulated-data notice bar', () => {
   for (const width of [390, 768, 1440]) {
-    test(`keeps the synthetic badge on one line at ${width}px`, async ({
+    test(`keeps the simulated-data badge on one line at ${width}px`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -112,7 +112,7 @@ test.describe('synthetic notice bar', () => {
       await page.goto('/fixtures');
       const badge = page
         .getByRole('note')
-        .getByText('Synthetic match data', { exact: true });
+        .getByText('Simulated match data', { exact: true });
       const box = await badge.boundingBox();
       expect(box?.height ?? 0).toBeLessThan(SINGLE_LINE_MAX_PX);
       await expectNoHorizontalOverflow(page);

@@ -3,10 +3,11 @@ import {
   ACTOR_TYPE_LABELS,
   AUDIT_ACTION_LABELS,
   AUDIT_COPY,
-  TARGET_TYPE_LABELS,
 } from '@/constants/audit';
+import { TechnicalDetails } from '@/components/ui';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
 import { AuditDiff } from './audit-diff';
+import { AuditTargetCell } from './audit-target-cell';
 
 type AuditTableProps = {
   events: readonly AuditEvent[];
@@ -17,20 +18,37 @@ type AuditTableProps = {
 const columns = AUDIT_COPY.columns;
 const CELL = 'px-3 py-2.5 align-top';
 
-/** The person's name first; the type and the stable id stay visible as detail. */
+/** The person's name first, then who they are; raw ids live in Technical details. */
 function AuditActorCell({ event }: { event: AuditEvent }) {
   const type = ACTOR_TYPE_LABELS[event.actor.type];
   const name = event.actorDisplayName;
   return (
     <>
       <span className="block text-ink">{name ?? type}</span>
-      <span
-        title={event.actor.id}
-        className="block break-all font-mono text-micro text-ink-subtle"
-      >
-        {name ? AUDIT_COPY.actorDetail(type, event.actor.id) : event.actor.id}
-      </span>
+      {name ? (
+        <span className="block text-micro text-ink-subtle">{type}</span>
+      ) : null}
     </>
+  );
+}
+
+function AuditTechnical({ event }: { event: AuditEvent }) {
+  const t = AUDIT_COPY.technical;
+  return (
+    <TechnicalDetails className="mt-1.5 font-normal">
+      <dl className="grid gap-1 font-mono text-micro">
+        {[
+          [t.action, event.action],
+          [t.actor, event.actor.id],
+          [t.target, event.target.id],
+        ].map(([label, value]) => (
+          <div key={label}>
+            <dt className="text-ink-subtle">{label}</dt>
+            <dd className="break-all text-ink">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </TechnicalDetails>
   );
 }
 
@@ -47,20 +65,12 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
       </td>
       <th scope="row" className={`${CELL} text-left font-medium text-ink`}>
         {AUDIT_ACTION_LABELS[event.action] ?? event.action}
-        <span className="block font-mono text-micro font-normal text-ink-subtle">
-          {event.action}
-        </span>
       </th>
       <td className={CELL}>
         <AuditActorCell event={event} />
       </td>
       <td className={CELL}>
-        <span className="block text-ink">
-          {TARGET_TYPE_LABELS[event.target.type]}
-        </span>
-        <span className="block break-all font-mono text-micro text-ink-subtle">
-          {event.target.id}
-        </span>
+        <AuditTargetCell target={event.target} />
       </td>
       <td className={`${CELL} max-w-[22rem] text-ink`}>
         {event.reason ?? (
@@ -69,6 +79,7 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
       </td>
       <td className={CELL}>
         <AuditDiff event={event} />
+        <AuditTechnical event={event} />
       </td>
     </tr>
   );

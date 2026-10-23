@@ -98,7 +98,7 @@ export const BFF = {
 
 export const ROLE_LABELS: Readonly<Record<AnyRole, string>> = {
   'platform-operator': 'Platform operator',
-  'tenant-owner': 'Tenant owner',
+  'tenant-owner': 'Organisation owner',
   producer: 'Producer',
   analyst: 'Analyst',
   developer: 'Developer',
@@ -126,15 +126,15 @@ export const AUTH_COPY = {
   signOut: 'Sign out',
   signInTitle: 'Sign in to MatchIQ',
   signInLead:
-    'Use your organisation account. Your role decides which controls you see.',
+    'Use your organisation account. What you can do depends on your role.',
   continueSso: 'Continue with single sign-on',
   ssoUnavailable:
-    'Single sign-on is not configured for this environment. The public demo stays available without signing in.',
+    "Sign-in isn't set up here. You can still use the public demo without signing in.",
   browseAnonymously: 'Continue to the public demo',
   demoTitle: 'Demo accounts',
   demoBadge: 'Development only',
   demoLead: (password: string) =>
-    `Local Keycloak accounts for trying role-based access. Each opens the normal sign-in page; the password is ${password}.`,
+    `Test accounts for trying out each role. Each opens the normal sign-in page; the password is ${password}.`,
   demoAccount: (role: string, org: string) => `${role} · ${org}`,
   userMenu: 'Account',
   signedInAs: 'Signed in as',
@@ -149,9 +149,9 @@ export const AUTH_COPY = {
       "You've been signed out for security. Sign in again to carry on where you left off.",
   },
   sessionExpiredAction: 'Sign in again',
-  forbiddenTitle: 'You do not have access to this',
+  forbiddenTitle: "You don't have access to this",
   forbiddenBody: (role: string) =>
-    `Your role (${role}) does not include this permission. Ask a tenant owner if you need it.`,
-  forbiddenAction: 'Back to fixtures',
+    `Your role (${role}) doesn't include this. Ask your organisation owner if you need it.`,
+  forbiddenAction: 'Go to matches',
   requiresRole: (roles: string) => `Requires ${roles}`,
 } as const;
