@@ -115,15 +115,3 @@ export const POLICY_COPY: {
     },
   },
 };
-
-/** Gallery wording for review conflicts, by problem slug. */
-export const REVIEW_PROBLEMS: Record<string, string> = {
-  'overlay-approval-expired':
-    'Its moment has passed, so it can no longer go on air.',
-  'overlay-not-awaiting-approval':
-    'Someone already decided on this graphic. Nothing changed.',
-  'overlay-revision-stale':
-    'The wording just changed. Check the new version, then decide again.',
-  'editorial-air-paused':
-    'Graphics are paused or the emergency stop is on, so nothing can go on air.',
-};

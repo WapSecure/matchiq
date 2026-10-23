@@ -70,7 +70,7 @@ describe('Replay sessions API (integration)', () => {
     const body = await jsonOf<{
       items: { templateId: string; finalScore: unknown; eventCount: number }[];
     }>(res);
-    expect(body.items).toHaveLength(5);
+    expect(body.items).toHaveLength(6);
     expect(body.items.find((i) => i.templateId === TEMPLATE)).toMatchObject({
       finalScore: { home: 3, away: 2 },
       eventCount: 1470,

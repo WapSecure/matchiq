@@ -1,5 +1,6 @@
 import type {
   AgentRun,
+  InsightRetraction,
   MatchSnapshot,
   Narrative,
   ReplayStatus,
@@ -30,6 +31,7 @@ import { matchEvents } from '../schema/tables.js';
 import { readEditorialView } from './editorial-queries.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
 import * as writes from './read-model-writes.js';
+import { retractInsight } from './retraction-writes.js';
 
 const scoped = (
   table: { orgId: PgColumn; fixtureId: PgColumn },
@@ -238,6 +240,14 @@ class PostgresPipelineTransaction
   async saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
     await this.pin.to(key.orgId);
     return writes.saveRecap(this.tx, key, recap);
+  }
+
+  async retractInsight(
+    key: FixtureKey,
+    retraction: InsightRetraction,
+  ): Promise<boolean> {
+    await this.pin.to(key.orgId);
+    return retractInsight(this.tx, key, retraction);
   }
 }
 

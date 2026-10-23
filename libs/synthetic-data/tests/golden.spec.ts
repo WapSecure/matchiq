@@ -21,6 +21,8 @@ const GOLDEN_HASHES: Record<(typeof SCENARIO_NAMES)[number], string> = {
     '09e36e761a82036fea2f2817bc5a510f6810b9f5a30b5865bc4c16a4db0563e1',
   'low-event':
     '1b82c4c9f4956b638190062880dc3ff99912197fcc37f1aab7fcde63ca437d7a',
+  'disallowed-goal':
+    'd01020bd7252b7c5a04591dc94b823c79595629df2483ba382c7d71b0bf64e6c',
 };
 
 describe.each(SCENARIO_NAMES)('golden fixture %s (seed 42)', (scenario) => {

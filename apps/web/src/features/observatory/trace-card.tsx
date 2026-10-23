@@ -1,4 +1,5 @@
 import { SparkIcon } from '@/components/icons';
+import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { Badge } from '@/components/ui';
 import { FACT_CHECKS_COPY } from '@/constants/fact-checks';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
@@ -95,6 +96,12 @@ export function TraceCard({ trace, period, variants }: TraceCardProps) {
         <PublicationBadge trace={trace} />
       </header>
       <div className="flex flex-col gap-3 py-3 pl-5 pr-4">
+        {trace.editorial?.insight === 'RETRACTED' ? (
+          <RuledOutNote
+            kind={trace.kind}
+            reason={trace.editorial.insightReason}
+          />
+        ) : null}
         <TraceFactsRow
           facts={traceFacts(trace, variants)}
           label={copy.label(kind, minute)}

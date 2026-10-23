@@ -11,6 +11,7 @@ Each file has the shape `{ fixture, events, manifest }`. `fixture` and every ent
 | `red-card-swing.json`       | `red-card-swing`       | 42   | 1403   | 1-2         | `75daa5cca013b0f041d4f5875a459876805b116b5a0adee0ba86dbb595632a7b` |
 | `high-press.json`           | `high-press`           | 42   | 1361   | 0-0         | `09e36e761a82036fea2f2817bc5a510f6810b9f5a30b5865bc4c16a4db0563e1` |
 | `low-event.json`            | `low-event`            | 42   | 1016   | 0-0         | `1b82c4c9f4956b638190062880dc3ff99912197fcc37f1aab7fcde63ca437d7a` |
+| `disallowed-goal.json`      | `disallowed-goal`      | 42   | 1388   | 2-1         | `d01020bd7252b7c5a04591dc94b823c79595629df2483ba382c7d71b0bf64e6c` |
 
 ## Scenarios
 
@@ -18,6 +19,7 @@ Each file has the shape `{ fixture, events, manifest }`. `fixture` and every ent
 - **possession-dominance** (B): the home side is much stronger and keeps the ball (about 85% of completed passes at seed 42; above 65% across 400 sampled seeds) but cannot score, so the game ends 0-0. Natural goals are disabled.
 - **red-card-swing** (C): home leads around 14', has a player sent off with a straight red around 31', then the away side scores around 58' and 79' to win 1-2. The ten men play with reduced strength and pressing.
 - **high-press** (D): both sides press hard, which produces the most pressures, tackles, fouls and turnovers. Natural goals are on, so the score depends on the seed.
+- **disallowed-goal** (F): the home side scores around 18', and a `CORRECTION` (VOID, "offside in the build-up") rules the goal out a few seconds later while its graphic is still on air. The away side scores around 33' and the home side around 61' and 80' to win 2-1. This is the only fixture with a correction; it exercises retraction of the moment, cue and narratives.
 - **low-event** (E): a slow, cagey game with few shots and long stoppages. `SHOT.speedKph` is deliberately omitted, which covers the "missing speed data" case.
 
 ## Commands
@@ -27,7 +29,7 @@ pnpm generate:fixture --seed 42 --scenario comeback --out fixtures/comeback.json
 pnpm validate:fixture fixtures/*.json
 ```
 
-`validate:fixture` checks contract validity, gap-free sequences, unique IDs, per-period clock monotonicity, period structure, player and team membership and on-pitch status (substitutions and dismissals are respected), references (pass attempts, shots and fouls), and that the score comes only from `GOAL` events. It also checks the manifest against the events. The golden test (`libs/synthetic-data/tests/golden.spec.ts`) fails if the generator stops reproducing these files exactly (same JSON, same hash). If you change the generator on purpose, regenerate all five files and update the hashes in that test and in this table.
+`validate:fixture` checks contract validity, gap-free sequences, unique IDs, per-period clock monotonicity, period structure, player and team membership and on-pitch status (substitutions and dismissals are respected), references (pass attempts, shots and fouls), and that the score comes only from `GOAL` events not voided by a `CORRECTION`. It also checks the manifest against the events. The golden test (`libs/synthetic-data/tests/golden.spec.ts`) fails if the generator stops reproducing these files exactly (same JSON, same hash). If you change the generator on purpose, regenerate all six files and update the hashes in that test and in this table.
 
 ## Conventions
 

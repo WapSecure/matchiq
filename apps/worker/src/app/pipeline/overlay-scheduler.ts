@@ -151,6 +151,26 @@ export class OverlayScheduler {
     };
   }
 
+  /**
+   * Pulls the live or queued cue of an insight that no longer holds, e.g. a
+   * goal voided by a CORRECTION. Corrections are part of the event stream, so
+   * this stays a pure function of it. The insight is never offered again.
+   */
+  withdraw(insightId: string, reason: string): OverlayAction[] {
+    this.seen.add(insightId);
+    const queued = this.queue.filter((p) => p.cue.insightId === insightId);
+    this.queue = this.queue.filter((p) => p.cue.insightId !== insightId);
+    const actions: OverlayAction[] = queued.map((p) => ({
+      kind: 'drop',
+      cue: p.cue,
+      reason,
+    }));
+    if (this.live?.cue.insightId === insightId) {
+      actions.unshift(this.end('RETRACTED', reason));
+    }
+    return actions;
+  }
+
   private dwellMet(at: ClockPoint): boolean {
     return (
       this.live !== null &&

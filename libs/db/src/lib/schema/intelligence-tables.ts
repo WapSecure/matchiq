@@ -151,6 +151,8 @@ export const narratives = pgTable(
     source: text('source').notNull(),
     revision: integer('revision').notNull(),
     payload: jsonb('payload').$type<Narrative>().notNull(),
+    /** Set when a correction ruled out the insight; never served again. */
+    retractedAt: utc('retracted_at'),
     createdAt: createdAt(),
   },
   (t) => [

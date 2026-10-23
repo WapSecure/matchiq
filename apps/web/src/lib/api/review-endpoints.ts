@@ -6,9 +6,7 @@ import {
   SetPublishPolicyCommand,
   type PublishPolicy,
 } from '@matchiq/contracts';
-import { REVIEW_PROBLEMS } from '@/constants/approval';
 import { API_PATHS, HTTP_HEADERS } from '@/constants/api';
-import { isApiError } from './api-error';
 import { describeEditorialProblem } from './describe-editorial-problem';
 import type { CommandInput } from './editorial-endpoints';
 import { requestJson } from './http-client';
@@ -40,10 +38,5 @@ export const setPublishPolicy = (
     headers: { [HTTP_HEADERS.idempotencyKey]: idempotencyKey },
   });
 
-/** A review conflict in producer words; anything else as other producer commands. */
-export const describeReviewProblem = (error: unknown): string => {
-  const slug = isApiError(error)
-    ? error.problem.type.split(':').at(-1)
-    : undefined;
-  return (slug && REVIEW_PROBLEMS[slug]) ?? describeEditorialProblem(error);
-};
+/** Review conflicts have their own problem copy, like every other producer command. */
+export const describeReviewProblem = describeEditorialProblem;

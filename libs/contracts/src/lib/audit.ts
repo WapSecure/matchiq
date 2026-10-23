@@ -13,6 +13,7 @@ export const AUDIT_ACTIONS = {
   overlayHeld: 'overlay.held',
   overlayBlocked: 'overlay.blocked',
   insightSuppressed: 'insight.suppressed',
+  insightRetracted: 'insight.retracted',
   publicationGated: 'publication.gated',
   editorialFrozen: 'editorial.frozen',
   editorialResumed: 'editorial.resumed',

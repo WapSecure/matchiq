@@ -6,7 +6,11 @@ export interface RecapInput {
   readonly title: string;
   readonly snapshot: MatchSnapshot;
   /** In detection order, with the period each was detected in. */
-  readonly insights: readonly { insight: Insight; period: number }[];
+  readonly insights: readonly {
+    insight: Insight;
+    period: number;
+    retraction?: { reason: string };
+  }[];
   readonly narratives: readonly Narrative[];
 }
 
@@ -18,7 +22,7 @@ const byVariant = (a: Narrative, b: Narrative): number =>
   LOCALE_ORDER.indexOf(a.locale) - LOCALE_ORDER.indexOf(b.locale);
 
 const momentOf = (
-  { insight, period }: RecapInput['insights'][number],
+  { insight, period, retraction }: RecapInput['insights'][number],
   narratives: readonly Narrative[],
 ): RecapMoment => ({
   insightId: insight.insightId,
@@ -32,8 +36,13 @@ const momentOf = (
   confidenceLabel: insight.evidence.confidenceLabel,
   evidenceEventIds: [...insight.evidence.eventIds],
   metricRefs: Object.keys(insight.evidence.computedMetrics).sort(),
+  ...(retraction === undefined
+    ? {}
+    : { retracted: { reason: retraction.reason } }),
   narratives: narratives
-    .filter((n) => n.insightId === insight.insightId)
+    .filter(
+      (n) => retraction === undefined && n.insightId === insight.insightId,
+    )
     .sort(byVariant)
     .map((n) => ({
       persona: n.persona,
@@ -48,7 +57,8 @@ const momentOf = (
 
 /**
  * MQ-013 recap: key moments in match order with their evidence ids and the
- * narratives the gate published, plus the final deterministic snapshot.
+ * narratives the gate published, plus the final deterministic snapshot. A
+ * moment a correction ruled out stays listed, marked, without narratives.
  * Contains no wall-clock values, so equal inputs give an equal document.
  */
 export const buildRecap = (input: RecapInput): RecapDocument => ({

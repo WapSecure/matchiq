@@ -10,7 +10,7 @@ Until now every cue that passed the publish gate aired as `AUTO_APPROVED`. A pro
 
 ### Publish policy
 
-- Each session has a publish policy: `AUTO` (the default, which keeps today's behaviour and the demo) or `MANUAL`. It is stored as an `APPROVAL` row in `editorial_controls`, keyed by the fixture, and is active when the policy is MANUAL. Migration `0008` widens the scope check. The table already has row-level security (ADR-0018).
+- Each session has a publish policy: `AUTO` (the default, which keeps today's behaviour and the demo) or `MANUAL`. It is stored as an `APPROVAL` row in `editorial_controls`, keyed by the fixture, and is active when the policy is MANUAL. Migration `0009` widens the scope check. The table already has row-level security (ADR-0018).
 - `POST /fixtures/{id}/editorial/publish-policy` takes `{ policy, reason }` and needs `policy:configure`. Tenant owners and producers have that permission; this ADR adds it to the producer role. The endpoint is idempotent in two ways: it honours `Idempotency-Key`, and setting the current policy again returns `changed: false`. It writes an `editorial.publish-policy.changed` audit row with the before and after values, and it announces the change in `editorial.status`.
 - `EditorialStatus` gains `publishPolicy: { policy, changedAt }`. The field is optional in the contract, because `editorial.status` frames stored before this change do not have it. A missing field means AUTO.
 - A freeze or the kill switch outranks MANUAL. While either one is active, new cues are `HELD` as before, not queued for approval.
@@ -58,6 +58,6 @@ An approval does not offer the cue to the scheduler again. Doing that would make
 
 ## Consequences
 
-- Migration `0008_approval_publish_policy`, contract additions (`PublishPolicy`, `ReviewInsightCommand`, `ReviewInsightResult`, `OverlayReview(List)`, `SetPublishPolicyCommand`, the `overlay.review` stream message and the four new `OverlayEditorialState` values), the OpenAPI document and the producer role's `policy:configure`.
+- Migration `0009_approval_publish_policy`, contract additions (`PublishPolicy`, `ReviewInsightCommand`, `ReviewInsightResult`, `OverlayReview(List)`, `SetPublishPolicyCommand`, the `overlay.review` stream message and the four new `OverlayEditorialState` values), the OpenAPI document and the producer role's `policy:configure`.
 - The studio's broadcast panel gains the approval queue (preview, copy fit, time on screen and priority, "Send to air" and "Don't air"). The producer controls gain an Auto/Manual switch with a confirmation.
 - Python codegen is unaffected: none of the cross-language contracts changed.

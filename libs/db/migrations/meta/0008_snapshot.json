@@ -1,5 +1,5 @@
 {
-  "id": "ff2a4419-8e2a-438b-92db-fffc618dfd55",
+  "id": "f0f179f2-ebcf-427e-bf20-59102233d3af",
   "prevId": "b1875ce7-fa96-4e2e-bd4c-69083e29819e",
   "version": "7",
   "dialect": "postgresql",
@@ -1422,6 +1422,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "retracted_at": {
+          "name": "retracted_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp (3) with time zone",
@@ -1940,7 +1946,7 @@
       "checkConstraints": {
         "editorial_controls_scope_valid": {
           "name": "editorial_controls_scope_valid",
-          "value": "\"editorial_controls\".\"scope_type\" in ('ORG', 'FIXTURE', 'APPROVAL')"
+          "value": "\"editorial_controls\".\"scope_type\" in ('ORG', 'FIXTURE')"
         }
       },
       "isRLSEnabled": false

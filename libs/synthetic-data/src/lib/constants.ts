@@ -6,6 +6,7 @@ export const SCENARIO_NAMES = [
   'red-card-swing',
   'high-press',
   'low-event',
+  'disallowed-goal',
 ] as const;
 
 export const FIXTURE_DEFAULTS = {
@@ -49,6 +50,8 @@ export const DURATION = {
   outOfPlayMs: [12_000, 32_000],
   foulRestartMs: [20_000, 45_000],
   goalRestartMs: [45_000, 80_000],
+  /** Short enough that the goal's cue is still on air when the VOID lands. */
+  goalReviewMs: [4_000, 7_000],
   substitutionMs: [20_000, 40_000],
   kickoffMs: [0, 500],
 } as const;
@@ -112,6 +115,11 @@ export const SHOT_OUTCOME_WEIGHTS = [
 ] as const;
 
 export const SHOT_SPEED_KPH = { min: 55, max: 118 } as const;
+
+/** Fixed wording for scripted VOIDs, so a fixture's hash does not depend on prose drift. */
+export const CORRECTION_REASONS = {
+  offside: 'Goal ruled out: offside in the build-up',
+} as const;
 
 export const MOVEMENT = {
   passBackMax: 14,

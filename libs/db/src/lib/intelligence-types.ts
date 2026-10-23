@@ -10,6 +10,7 @@ import type {
   GateReport,
   Insight,
   InsightPublication,
+  InsightRetraction,
   InsightTrace,
   Locale,
   MatchEvent,
@@ -84,6 +85,8 @@ export interface OverlayRecord {
 export interface InsightWithPeriod {
   readonly insight: Insight;
   readonly period: number;
+  /** Set when a correction ruled the insight out (editorial state RETRACTED). */
+  readonly retraction?: { readonly reason: string };
 }
 
 export interface InsightCompletion {
@@ -150,6 +153,15 @@ export interface PipelineTransaction extends LedgerTransaction {
     progress: SessionProgress,
   ): Promise<void>;
   saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void>;
+  /**
+   * Rules an insight out after a correction: the insight becomes REJECTED and
+   * RETRACTED, its narratives are withdrawn and its cue row is marked so no
+   * later revision airs. Idempotent; true when anything changed.
+   */
+  retractInsight(
+    key: FixtureKey,
+    retraction: InsightRetraction,
+  ): Promise<boolean>;
 }
 
 export interface PipelineUnitOfWork {

@@ -95,7 +95,7 @@ describe('data retention (integration)', () => {
     expect(await rowsFor(recent)).toEqual(recentBefore);
     expect(
       await count('select count(*)::int as n from fixture_templates'),
-    ).toBe(5);
+    ).toBe(6);
     expect(
       await count(
         `select count(*)::int as n from idempotency_keys where key = 'new'`,

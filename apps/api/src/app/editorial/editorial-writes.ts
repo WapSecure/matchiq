@@ -55,7 +55,7 @@ export interface CommandContext extends RequestContext {
 
 type EditorialCause = Exclude<
   OverlayRetractCause,
-  'EXPIRED' | 'SUPERSEDED' | 'PERIOD_ENDED' | 'MATCH_ENDED'
+  'EXPIRED' | 'SUPERSEDED' | 'PERIOD_ENDED' | 'MATCH_ENDED' | 'CORRECTION'
 >;
 
 export const auditOf = (

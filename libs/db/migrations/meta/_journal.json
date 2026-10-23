@@ -61,8 +61,15 @@
     {
       "idx": 8,
       "version": "7",
-      "when": 1792776031575,
-      "tag": "0008_approval_publish_policy",
+      "when": 1792775836876,
+      "tag": "0008_ledger_immutability",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792778725396,
+      "tag": "0009_approval_publish_policy",
       "breakpoints": true
     }
   ]

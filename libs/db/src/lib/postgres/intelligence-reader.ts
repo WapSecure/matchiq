@@ -89,7 +89,11 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
   async insightsWithPeriod(key: FixtureKey): Promise<InsightWithPeriod[]> {
     const rows = await withTenant(this.db, key.orgId, (tx) =>
       tx
-        .select(insightColumns)
+        .select({
+          ...insightColumns,
+          editorialState: insights.editorialState,
+          editorialReason: insights.editorialReason,
+        })
         .from(insights)
         .where(scoped(insights, key))
         .orderBy(asc(insights.detectedSequence), asc(insights.createdAt)),
@@ -97,6 +101,9 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
     return rows.map((row) => ({
       insight: withInsightStatus(row),
       period: row.period,
+      ...(row.editorialState === 'RETRACTED'
+        ? { retraction: { reason: row.editorialReason ?? 'CORRECTION' } }
+        : {}),
     }));
   }
 
@@ -139,6 +146,7 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
         .where(
           and(
             scoped(narratives, key),
+            isNull(narratives.retractedAt),
             filter.persona === undefined
               ? undefined
               : eq(narratives.persona, filter.persona),
