@@ -1,4 +1,5 @@
 export { IconBase, ICON_DEFAULT_SIZE, type IconProps } from './icon';
+export { ArrowLeftIcon } from './arrow-left-icon';
 export { ArrowRightIcon } from './arrow-right-icon';
 export { DeterministicIcon } from './deterministic-icon';
 export { EvidenceIcon } from './evidence-icon';

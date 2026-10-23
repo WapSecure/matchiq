@@ -79,8 +79,16 @@ export const RecapDocument = z.object({
 export const itemsOf = <S extends z.ZodType>(item: S) =>
   z.object({ items: z.array(item) }).transform((page) => page.items);
 
-export const TemplateList = itemsOf(FixtureTemplateSummary);
-export const SessionList = itemsOf(ReplaySessionView);
+/** One page of a keyset list. Older `{ items }` replies read as a single last page. */
+export const cursorPageOf = <S extends z.ZodType>(item: S) =>
+  z.object({
+    items: z.array(item),
+    nextCursor: z.string().nullable().default(null),
+    total: z.int().nonnegative().optional(),
+  });
+
+export const TemplatePage = cursorPageOf(FixtureTemplateSummary);
+export const SessionPage = cursorPageOf(ReplaySessionView);
 export const InsightList = itemsOf(Insight);
 export const NarrativeList = itemsOf(Narrative);
 export const OverlayList = itemsOf(OverlayCue);
@@ -91,3 +99,4 @@ export type CreatedSession = z.output<typeof CreatedSession>;
 export type RecapNarrative = z.output<typeof RecapNarrativeSchema>;
 export type RecapMoment = z.output<typeof RecapMoment>;
 export type RecapDocument = z.output<typeof RecapDocument>;
+export type SessionPage = z.infer<typeof SessionPage>;

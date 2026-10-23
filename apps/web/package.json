@@ -40,6 +40,36 @@
         "options": {
           "port": 4200
         }
+      },
+      "test": {
+        "inputs": [
+          "default",
+          "^production",
+          {
+            "fileset": "{projectRoot}/tsconfig.spec.json",
+            "dependencies": true
+          },
+          {
+            "json": "{workspaceRoot}/tsconfig.json",
+            "fields": [
+              "compilerOptions"
+            ]
+          },
+          {
+            "externalDependencies": [
+              "vitest"
+            ]
+          },
+          {
+            "env": "CI"
+          },
+          {
+            "dependentTasksOutputFiles": "**/*.js",
+            "transitive": true
+          },
+          "{workspaceRoot}/infra/keycloak/**/*",
+          "{workspaceRoot}/docker-compose.yml"
+        ]
       }
     }
   },

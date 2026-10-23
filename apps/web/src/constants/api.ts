@@ -57,7 +57,10 @@ export const API_LIMITS = {
   eventsPageMax: 500,
   /** Pages walked when resolving evidence ids outside the loaded timeline. */
   evidencePagesMax: 8,
-  sessionListLimit: 8,
+  /** The API's largest `/replay-sessions` page, searched for one session's times. */
+  sessionLookupMax: 100,
+  /** Pages followed when loading the whole match catalogue. */
+  templatePagesMax: 10,
   queryStaleMs: 15_000,
   queryRetries: 2,
   auditPageSize: 50,

@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { AlertIcon, ShieldIcon } from '@/components/icons';
-import { SiteFooter, SiteHeader, SyntheticNotice } from '@/components/layout';
+import {
+  BackLink,
+  SiteFooter,
+  SiteHeader,
+  SyntheticNotice,
+} from '@/components/layout';
 import { ButtonLink, Container } from '@/components/ui';
 import {
   AUTH_COPY,
@@ -37,8 +42,9 @@ export default async function SignInPage({ searchParams }: PageProps) {
       <SyntheticNotice />
       <SiteHeader />
       <main id={MAIN_CONTENT_ID} className="min-h-[60dvh]">
-        <Container className="max-w-2xl py-10 sm:py-14">
-          <span className="flex size-10 items-center justify-center rounded-md bg-accent-soft text-accent-strong">
+        <Container className="max-w-2xl py-6 sm:py-10">
+          <BackLink />
+          <span className="mt-6 flex size-10 items-center justify-center rounded-md bg-accent-soft text-accent-strong">
             <ShieldIcon size={20} />
           </span>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">

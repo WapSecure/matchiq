@@ -34,6 +34,14 @@ test.describe('sign-in', () => {
     await expectNoBlockingA11yViolations(page);
   });
 
+  test('offers a way back, falling back to the home page', async ({ page }) => {
+    await page.goto('/sign-in');
+    const back = page.getByRole('link', { name: 'Back', exact: true });
+    await expect(back).toHaveAttribute('href', '/');
+    await back.click();
+    await page.waitForURL((url) => url.pathname === '/');
+  });
+
   for (const username of [
     'harbour.producer',
     'harbour.viewer',

@@ -126,6 +126,19 @@ Keycloak imports `infra/keycloak/matchiq-realm.json` on start. The admin console
 | `matchiq-api` | Bearer-only resource server. Its client roles are the six product roles; the web client's audience mapper puts `matchiq-api` in `aud`.                                                                 |
 | User profile  | `org` and `org_name` are admin-only attributes: users cannot change their own organisation in the account console.                                                                                     |
 
+### Branded sign-in pages
+
+Sign-in stays on the provider's hosted page, so the app never handles passwords. Locally that page uses the `matchiq` login theme in `infra/keycloak/themes/matchiq/login/` (MQ-054), which the realm selects with `"loginTheme": "matchiq"`.
+
+- It extends Keycloak 26's `keycloak.v2` login theme. `template.ftl` replaces the page frame, and `error.ftl`, `info.ftl`, `logout-confirm.ftl` and `login-page-expired.ftl` restyle the other pages in the flow. The login form itself is the parent's `login.ftl`, so the field ids (`#username`, `#password`, `#kc-login`) the e2e suite drives are unchanged.
+- `resources/css/matchiq.css` carries the web app's tokens from `apps/web/src/app/global.css`, with light and dark following `prefers-color-scheme`. PatternFly is not loaded. The Geist font, the logo mark and the icons are self-hosted in the theme, with no CDN.
+- Every page shows the "Simulated match data" note and a **Back to MatchIQ** link. The link goes to the client's base URL (`matchiq-web` `baseUrl`, `http://localhost:4200/`). Pages that have no client, such as an expired link, use `WEB_PUBLIC_URL` from the Keycloak container's environment (`matchiqAppUrl` in `theme.properties`).
+- The wording lives in `messages/messages_en.properties` and follows the content style guide. A locked account gets the same wording as a wrong password, with a hint to wait, so the page never reveals which accounts exist. Apostrophes are doubled (`''`) because Keycloak formats messages with `MessageFormat`.
+- Compose mounts the theme read-only at `/opt/keycloak/themes/matchiq`. `start-dev` already turns theme caching off, so edits to templates and CSS show on reload. A production Keycloak caches themes, so it needs a restart after a theme change.
+- `apps/web/src/features/auth/keycloak-theme.spec.ts` checks in CI that the theme exists, extends `keycloak.v2`, is mounted and is the realm's login theme.
+
+To pick up the theme on an existing local stack, recreate the Keycloak container: `docker compose --profile infra up -d keycloak`. Keycloak stores its data inside the container, so recreating it re-imports the realm: the seeded accounts come back, any users or settings added in the admin console are lost, and everyone has to sign in again.
+
 ### Demo accounts (development only)
 
 Every account uses the password **`matchiq-dev-only`**. These credentials exist only in the local realm export and must never be used anywhere else.
@@ -165,6 +178,31 @@ Then set:
 | `OIDC_ORG_NAME_CLAIM` | `org_name`                             | an optional claim, or leave the default (it is optional) |
 
 Literal claim names win over dotted paths, so Entra's `extn.org` works as a name while Keycloak paths such as `realm_access.roles` still resolve.
+
+### Entra sign-in branding
+
+The Keycloak theme does not apply to Entra. Microsoft's hosted sign-in page uses **company branding** for the tenant instead, set up in the Entra admin centre with no code changes. Company branding needs Microsoft Entra ID P1 or P2, Microsoft 365 Business Standard or SharePoint (Plan 1), and at least the **Organizational Branding Administrator** role.
+
+1. Sign in to <https://entra.microsoft.com> and go to **Entra ID** > **Custom Branding**. Select **Configure** the first time, or **Edit** after that.
+2. **Basics:** upload the favicon and background image below, and set the page background colour to `#080A0E`.
+3. **Layout:** choose the partial-screen background template and turn on **Show header** and **Show footer**. Custom CSS isn't available to tenants created after 5 January 2026, so the pages don't rely on it.
+4. **Header:** upload the header logo.
+5. **Footer:** untick the Microsoft "Privacy & Cookies" and "Terms of Use" links, or point them at MatchIQ's own pages.
+6. **Sign-in form:** upload the banner logo and both square logos. Set the **username hint** to `you@yourorganisation.com` and the **sign-in page text** to: `Sign in to MatchIQ with your organisation account. MatchIQ shows simulated match data only and is not affiliated with or endorsed by the Premier League.`
+7. **Review + create.** Changes can take a while to reach every region.
+
+The assets are in `infra/entra-branding/`, rendered from the same logo mark and tokens as the app:
+
+| File                    | Entra field               | Size        | Entra limit |
+| ----------------------- | ------------------------- | ----------- | ----------- |
+| `favicon.png`           | Favicon                   | 32 × 32     | 5 KB        |
+| `background.png`        | Background image          | 1920 × 1080 | 300 KB      |
+| `header-logo.png`       | Header logo               | 245 × 36    | 10 KB       |
+| `banner-logo.png`       | Banner logo               | 245 × 36    | 50 KB       |
+| `square-logo-light.png` | Square logo (light theme) | 240 × 240   | 50 KB       |
+| `square-logo-dark.png`  | Square logo (dark theme)  | 240 × 240   | 50 KB       |
+
+Entra has no "Back to MatchIQ" link of its own. People get back with the browser's back button, or from the app's `/sign-in` page, which has a back link.
 
 ## Threat notes
 
