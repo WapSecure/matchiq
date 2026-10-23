@@ -11,16 +11,15 @@ import {
 
 export const HERO = {
   eyebrow: 'Broadcast intelligence platform',
-  title: 'One trusted event stream. Every audience, every language.',
+  title: 'Football insight. Ready for editorial review.',
   description:
-    'MatchIQ turns match events into verified insight in seconds — a deterministic football engine detects what changed, coordinated AI agents explain why it matters, and producers receive timed, evidence-linked overlays.',
-  primaryCta: { label: 'Open fixture lobby', href: '/fixtures' },
+    'Follow the match, inspect the evidence and control what goes on air. MatchIQ brings match analytics, commentary and broadcast overlay previews into one workspace.',
+  primaryCta: { label: 'Explore the demo', href: '/fixtures' },
   howItWorks: { label: 'How it works', href: '#pipeline' },
-  secondaryCta: { label: 'View source' },
   facts: [
-    { value: '0', label: 'numbers written by a model' },
-    { value: '3 × 4', label: 'audiences × languages, same facts' },
-    { value: '16:9', label: 'graphics-safe broadcast preview' },
+    { value: 'Evidence', label: 'Trace insights to match events' },
+    { value: 'Control', label: 'Hold or retract broadcast cues' },
+    { value: 'Replay', label: 'Review the same match together' },
   ],
   disclosure:
     'Demo runs on seeded synthetic matches. No real clubs, players or league marks.',
@@ -28,37 +27,37 @@ export const HERO = {
 
 export const PIPELINE = {
   id: 'pipeline',
-  eyebrow: 'Event-to-audience pipeline',
+  eyebrow: 'Match workflow',
   title: 'Five stages, one source of truth',
   description:
-    'Every stage consumes typed, versioned contracts. Facts are computed once and never re-derived by a model.',
+    'Follow each insight from its source events to the screen. Match statistics remain the reference for every audience and language.',
   stages: [
     {
       key: 'ingest',
       title: 'Ingest',
       description:
-        'Schema-validated, idempotent event ledger with strict sequencing and provenance.',
+        'Validate incoming events, preserve their source and keep them in match order.',
       Icon: IngestIcon,
     },
     {
       key: 'interpret',
       title: 'Interpret',
       description:
-        'Deterministic match state, rolling metrics and versioned evidence windows.',
+        'Track match statistics and identify changes with supporting events.',
       Icon: InterpretIcon,
     },
     {
       key: 'explain',
       title: 'Explain',
       description:
-        'Analyst, writer and fact-checker agents produce claims bound to source events.',
+        'Agents propose commentary. Automated checks verify numbers, names and citations before publication.',
       Icon: ExplainIcon,
     },
     {
       key: 'render',
       title: 'Render',
       description:
-        'Timed overlay cues with priorities, safe areas and instant retraction.',
+        'Preview timed graphics and retract a cue when editorial judgment calls for it.',
       Icon: RenderIcon,
     },
     {
@@ -73,28 +72,28 @@ export const PIPELINE = {
 
 export const PRINCIPLES = {
   id: 'principles',
-  eyebrow: 'Engineering principles',
-  title: 'Built to be trusted on air',
+  eyebrow: 'Editorial confidence',
+  title: 'Check the evidence. Keep control.',
   items: [
     {
       key: 'evidence',
-      title: 'Evidence-linked claims',
+      title: 'Traceable claims',
       description:
-        'Every published number resolves to event IDs and a metric version, or it is not published.',
+        'Inspect the source events and metric definitions behind each published number.',
       Icon: EvidenceIcon,
     },
     {
       key: 'deterministic',
-      title: 'Deterministic by default',
+      title: 'Consistent match facts',
       description:
-        'Statistics come from pure, tested functions. Seeded replays reproduce identical state.',
+        'Replay the same fixture with reproducible statistics. Commentary does not change the underlying facts.',
       Icon: DeterministicIcon,
     },
     {
       key: 'resilience',
-      title: 'Degrades gracefully',
+      title: 'Continuity during model outages',
       description:
-        'Replay and match state run without AI. Model outages fall back to verified templates.',
+        'Match playback continues without a model connection. Verified templates provide fallback commentary.',
       Icon: ResilienceIcon,
     },
   ],

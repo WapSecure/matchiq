@@ -1,6 +1,8 @@
 import type { Insight } from '@matchiq/contracts';
 import { STUDIO_COPY } from '@/constants/studio';
+import { SITE } from '@/constants/site';
 import { cn } from '@/lib/cn';
+import { narrativeLanguage } from '@/lib/narrative-language';
 import type { NarrativeView } from '../store';
 
 type NarrativePanelProps = {
@@ -19,7 +21,7 @@ export function NarrativePanel({
 }: NarrativePanelProps) {
   if (!view) {
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1" lang={SITE.locale}>
         <p className="text-sm leading-snug text-ink">
           {insight.evidence.rationale}
         </p>
@@ -31,7 +33,7 @@ export function NarrativePanel({
   }
   const { narrative, localeFallback } = view;
   return (
-    <div className="flex flex-col gap-1" lang={narrative.locale}>
+    <div className="flex flex-col gap-1" lang={narrativeLanguage(narrative)}>
       <p className="text-sm font-semibold leading-snug text-ink">
         {narrative.headline}
       </p>
@@ -43,10 +45,13 @@ export function NarrativePanel({
       >
         {narrative.body}
       </p>
-      <p className="flex flex-wrap gap-x-2 text-micro text-ink-subtle">
+      <p
+        lang={SITE.locale}
+        className="flex flex-wrap gap-x-2 text-micro text-ink-subtle"
+      >
         <span>{STUDIO_COPY.insights.source[narrative.source]}</span>
         {localeFallback ? (
-          <span className="text-warning" lang="en-GB">
+          <span className="text-warning" lang={SITE.locale}>
             {STUDIO_COPY.insights.localeFallback(locale)}
           </span>
         ) : null}

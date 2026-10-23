@@ -46,7 +46,7 @@ test.describe('judge quick-start', () => {
     await expect(trigger).toBeFocused();
 
     const metrics = page.getByRole('region', { name: 'Live metrics' });
-    const feed = page.getByRole('group', { name: 'AI insight feed' });
+    const feed = page.getByRole('group', { name: 'Match insights' });
     const before = (await metrics.textContent()) ?? '';
     await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
     await expect(feed.getByText('Northbridge are on top now')).toBeVisible();

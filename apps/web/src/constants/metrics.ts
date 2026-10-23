@@ -35,7 +35,7 @@ export const METRIC_BASES: Record<string, { label: string; formula: string }> =
       formula: 'count(RECOVERY where location.x ≥ 60)',
     },
     finalThirdEntries: {
-      label: 'Final-third entries',
+      label: 'Final third entries',
       formula: 'count(FINAL_THIRD_ENTRY)',
     },
     fouls: { label: 'Fouls', formula: 'count(FOUL)' },
@@ -50,7 +50,7 @@ export const METRIC_BASES: Record<string, { label: string; formula: string }> =
     momentum: {
       label: 'Momentum index',
       formula:
-        'Σ wₖ · clamp(z-score of countₖ per 5 min, −3, 3); w = shots .35, final-third entries .25, pressures .20, high recoveries .20',
+        'Σ wₖ · clamp(z-score of countₖ per 5 min, −3, 3); w = shots .35, final third entries .25, pressures .20, high recoveries .20',
     },
   };
 

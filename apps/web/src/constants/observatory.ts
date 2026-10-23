@@ -9,11 +9,11 @@ export const OBSERVATORY_COPY = {
   eyebrow: 'Agent observatory',
   title: 'How every insight was published',
   description:
-    'The deterministic engine detects each moment. Agents may propose wording; the worker publish gate re-checks every number, entity and citation, and anything rejected falls back to deterministic templates.',
+    'Review how each insight was produced. Publication checks verify numbers, names and citations. Rejected commentary is replaced with a verified template.',
   summary: {
     insights: 'Insights',
-    agent: 'Agent-published',
-    template: 'Template-published',
+    agent: 'Published by agents',
+    template: 'Published from templates',
     pending: 'Pending',
     rejected: 'Gate rejections',
     providers: 'Providers used',
@@ -70,7 +70,7 @@ export const PROVIDER_LABELS: Record<
     label: 'Mock',
     hint: 'Scripted test provider; not a language model',
   },
-  ollama: { label: 'Ollama', hint: 'Local open-weights model via Ollama' },
+  ollama: { label: 'Ollama', hint: 'Local model via Ollama' },
   foundry: { label: 'Foundry', hint: 'Model deployment on Microsoft Foundry' },
 };
 
