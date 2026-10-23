@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { expectNoBlockingA11yViolations } from './support/a11y';
 import { API_BASE, mockApi } from './support/mock-api';
 
-const OFFLINE_TITLE = "You're offline — live match data needs a connection";
+const OFFLINE_TITLE = 'You are offline. Live match data needs a connection.';
 const PNG_WIDTH_OFFSET = 16;
 const PNG_HEIGHT_OFFSET = 20;
 
