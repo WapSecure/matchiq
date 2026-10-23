@@ -18,6 +18,20 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for `web` and `web-e2e`, plus the touched spec files.
 
+## 2026-10-23 — MQ-057: Consistency sweep
+
+| Item                                                                                                                                                                                                 | Status | Evidence                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------ |
+| AI fact-checks: every summary tile heading is sentence case; minute-strip markers within about 2.5% of the timeline stack into up to three lanes, keeping 24 px targets                              | Done   | `minute-strip-lanes.spec.ts`, `fact-checks.spec.tsx`                     |
+| AI fact-checks: `LoadMore` over a client-side window of 10 moments, reset on filter change; a strip link to an unloaded moment widens the window and scrolls to it                                   | Done   | `fact-checks.spec.tsx`                                                   |
+| Activity log: rows become stacked cards below 768 px, plain field names and values in changes, "No activity yet" empty state, Technical details holds action key, actor, item, entry and request ids | Done   | `audit.spec.tsx`                                                         |
+| Shared `Select`: the selected label no longer truncates when it has no description                                                                                                                   | Done   | `select.spec.tsx`                                                        |
+| Landing: removed "safe areas" and tightened trust copy; sign-in: branded card matching the hosted page, role-first demo accounts, plain button labels                                                | Done   | `apps/web-e2e` sign-in helpers                                           |
+| Keycloak theme: dev-mode template comment and the repeated brand no longer reach `<title>`, which now reads "Sign in · MatchIQ"                                                                      | Done   | `keycloak-theme.spec.ts` (static; not exercised against a live Keycloak) |
+| Screenshots, before and after, light and dark at 1440 and 390                                                                                                                                        | Done   | `docs/screenshots/consistency-sweep/`                                    |
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for `web`, plus the touched specs.
+
 ## 2026-10-23 — MQ-054: Branded sign-in pages and back navigation
 
 | Area                                                                                                                                                                                                                                                                                            | Status | Evidence                                                                       |
