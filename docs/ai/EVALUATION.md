@@ -20,11 +20,11 @@ Mock and template output are never counted as agent output. A narrative served i
 
 ## Cases
 
-- **Golden** (`tests/eval/cases.py`, 38 cases): every insight kind, sparse and rich evidence, decimals, negative and zero values, accented, apostrophe and hyphenated names, every locale including Nigerian Pidgin, persona subsets, a tight deadline, and `real_packet_shape` (28 metrics over two windows and 38 allowlisted names, the shape the worker sends for a real fixture).
+- **Golden** (`tests/eval/cases.py`, 42 cases): every insight kind, sparse and rich evidence, decimals, negative and zero values, accented, apostrophe and hyphenated names, every locale including Nigerian Pidgin, persona subsets, a tight deadline, and `real_packet_shape` (28 metrics over two windows and 38 allowlisted names, the shape the worker sends for a real fixture). Four editorial cases use the real two-window shape: `goal_real_shape` (the 3–2 winner, scorer named), `goal_equaliser_away`, `red_card_real_shape` and `momentum_real_shape` (two negative momentum indices).
 - **Adversarial inputs** (8 cases): prompt injection in player and team names, rationale and counter-evidence (English and Pidgin), a forged data delimiter and a digit in a name.
 - **Compromised-model attacks** (`tests/eval/attacks.py`, 13 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
 
-A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 46) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds 10 cases, the size of the run recorded after PR #40. A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
+A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 50) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds the 10 cases of the MQ-060 run (implementation log). A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
 
 The "28% to 87% fully localised" figure compares the run before and after commit `4d977d6` (PR #40). Only the after run is committed as a baseline; the before figure is historical, recorded in the implementation log, and has no artifact in the repository.
 
@@ -34,18 +34,21 @@ Each rejection is logged once per issue by `pipeline/diagnostics.py` as a struct
 
 Rules are finer than the contract's issue codes:
 
-| Rule                                                | Meaning                                                                                                |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `TIMEOUT`, `TRANSPORT`, `UNPARSEABLE`               | The call itself failed: deadline, connection, or output that is not the requested JSON                 |
-| `CONTRACT_INVALID`                                  | The JSON parsed but broke the contract (for example a 90-character headline); per persona where known  |
-| `UNSUPPORTED_NUMERAL`, `WINDOW_LENGTH`              | A number that is no cited engine value; `WINDOW_LENGTH` when it is a time window ("last 10 minutes")   |
-| `SPELLED_NUMBER`, `WRONG_VALUE`, `UNKNOWN_METRIC`   | A number written as a word, a cited value that differs from the engine, or a ref the engine never made |
-| `SPELLED_COUNT`                                     | A short word that is no quantifier written as the count before "times" ("twi times")                   |
-| `MISSING_ITEM`                                      | A required (locale, persona) item the Localization output left out                                     |
-| `UNKNOWN_NAME`, `UNCITED`, `UNKNOWN_EVENT`          | Names outside the allowlist; missing or foreign evidence ids                                           |
-| `TOO_LONG`, `TOO_MANY_SENTENCES`, `MISSING_PERSONA` | Persona limits and missing drafts                                                                      |
-| `FORBIDDEN`, `UNSAFE_CONTENT`                       | Forbidden claims (medical, betting, prediction, managerial intent, injection) and the safety blocklist |
-| `NUMERALS_CHANGED`, `NAME_DROPPED`                  | A translation that changed a number or dropped a proper noun                                           |
+| Rule                                                     | Meaning                                                                                                                                                                     |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TIMEOUT`, `TRANSPORT`, `UNPARSEABLE`                    | The call itself failed: deadline, connection, or output that is not the requested JSON                                                                                      |
+| `CONTRACT_INVALID`                                       | The JSON parsed but broke the contract (for example a 90-character headline); per persona where known                                                                       |
+| `UNSUPPORTED_NUMERAL`, `WINDOW_LENGTH`                   | A number that is no cited engine value; `WINDOW_LENGTH` when it is a time window ("last 10 minutes")                                                                        |
+| `SPELLED_NUMBER`, `WRONG_VALUE`, `UNKNOWN_METRIC`        | A number written as a word, a cited value that differs from the engine, or a ref the engine never made                                                                      |
+| `SPELLED_COUNT`                                          | A short word that is no quantifier written as the count before "times" ("twi times")                                                                                        |
+| `MISSING_ITEM`                                           | A required (locale, persona) item the Localization output left out                                                                                                          |
+| `UNKNOWN_NAME`, `UNCITED`, `UNKNOWN_EVENT`               | Names outside the allowlist; missing or foreign evidence ids                                                                                                                |
+| `TOO_LONG`, `TOO_MANY_SENTENCES`, `MISSING_PERSONA`      | Persona limits and missing drafts                                                                                                                                           |
+| `FORBIDDEN`, `UNSAFE_CONTENT`                            | Forbidden claims (medical, betting, prediction, managerial intent, injection) and the safety blocklist                                                                      |
+| `NUMERALS_CHANGED`, `NAME_DROPPED`                       | A translation that changed a number or dropped a proper noun                                                                                                                |
+| `EVENT_NOT_LEAD`, `OFF_TOPIC_HEADLINE`, `SECONDARY_STAT` | Editorial: a goal or red-card headline that does not lead with the event, a headline without the subject and its event, a goal headline with a number that is not the score |
+| `MISSING_SCORELINE`, `GOAL_TALLY`, `MISSING_PLAYER`      | Editorial: a goal without the score after it, a goal told as a count ("2 goals"), a scorer or dismissed player the evidence names but the text leaves out                   |
+| `WRONG_DIRECTION`, `RAW_INDEX`, `UNLABELLED_INDEX`       | Editorial: a rising moment told as a fall, an internal index value shown to Fan or Broadcast, an Analyst index value without its label                                      |
 
 `WINDOW_LENGTH` is split out of `UNSUPPORTED_NUMERAL` by the eval (`tests/eval/taxonomy.py`) from the snippet around the number.
 
@@ -91,7 +94,7 @@ uv run python scripts/run_eval.py --provider ollama --deadline-ms 120000 \
 
 ## Repairs, retries and what may never change
 
-- Deterministic repairs (`guard/repair.py`) may delete trailing sentences to meet a persona's sentence or length limit, and replace a time-window phrase ("in the last 10 minutes") with "recently" when the number is the window of an engine metric and not a cited value. The overlay may gain the ref of a number its approved draft cited. Every repair is recorded on the run's `AgentRun.repairs`, and the checks run on the repaired text.
+- Deterministic repairs (`guard/repair.py`) may delete trailing sentences to meet a persona's sentence or length limit, and replace a time-window phrase ("in the last 10 minutes") with "recently" when the number is the window of an engine metric and not a cited value. The overlay may gain the ref of a number its approved draft cited. Editorial repairs (`guard/editorial_repair.py`, ADR-0011 addendum 3) may replace an off-topic goal or red-card headline with the engine's event line, put the engine's scorer sentence first where the persona has room, and delete a Fan or Broadcast sentence that shows an internal index. Every repair is recorded on the run's `AgentRun.repairs`, and the checks run on the repaired text.
 - A rejected Analyst or Producer answer gets one retry with the violations and their fix fed back (`revisionNotes`), only while 60% of the deadline is left. The Writer's revision loop already feeds the Fact Checker's notes back.
 - No grounding rule is loosened to raise the agent share. Every change must keep zero violations on the oracle across mock, scripted attacks and live runs.
 

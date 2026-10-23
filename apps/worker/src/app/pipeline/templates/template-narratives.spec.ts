@@ -1,4 +1,8 @@
-import { NarrativeDraft, OverlayProposal } from '@matchiq/contracts';
+import {
+  isInternalIndexMetric,
+  NarrativeDraft,
+  OverlayProposal,
+} from '@matchiq/contracts';
 import { LOCALES, PERSONAS } from '../../constants';
 import { firstOfKind, goldenMoments } from '../../../test/golden';
 import { templateDrafts, templateOverlay } from './template-narratives';
@@ -52,6 +56,24 @@ describe('template fallback narratives', () => {
     expect(fr?.body).toContain(text.replace('.', ','));
     expect(es?.body).toContain(text.replace('.', ','));
     expect(pcm?.body).toContain(text);
+  });
+
+  it('never shows an internal index to fans or on the graphic', async () => {
+    const { fixture, insights } = await goldenMoments('comeback');
+    const shift = firstOfKind(insights, 'MOMENTUM_SHIFT');
+    const drafts = templateDrafts(shift, fixture, {
+      personas: ['CASUAL', 'BROADCAST'],
+      locales: LOCALES,
+    });
+    const values = Object.entries(shift.evidence.computedMetrics)
+      .filter(([ref]) => isInternalIndexMetric(ref))
+      .map(([, value]) => String(Math.abs(value)));
+    expect(values.length).toBeGreaterThan(0);
+    for (const draft of drafts) {
+      const text = `${draft.headline} ${draft.body}`.replaceAll(',', '.');
+      for (const value of values) expect(text).not.toContain(value);
+    }
+    expect(templateOverlay(shift, fixture).body).not.toMatch(/\d/);
   });
 
   it('derives a deterministic broadcast overlay from the insight', async () => {

@@ -144,9 +144,11 @@ def test_cited_events_must_belong_to_the_envelope() -> None:
 
 
 def test_overlay_numbers_must_come_from_listed_metrics() -> None:
-    overlay = to_overlay("Pressure building", "5 high recoveries", [], VIEW)
+    overlay = to_overlay("Harbour City press high", "5 high recoveries", [], VIEW)
     assert _codes(check_overlay(overlay, VIEW)) == {IssueCode.UNSUPPORTED_NUMBER}
-    grounded = to_overlay("Pressure building", "5 high recoveries", list(VIEW.metrics)[:1], VIEW)
+    grounded = to_overlay(
+        "Harbour City press high", "5 high recoveries", list(VIEW.metrics)[:1], VIEW
+    )
     assert check_overlay(grounded, VIEW) == []
 
 

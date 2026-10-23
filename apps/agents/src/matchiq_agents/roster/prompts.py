@@ -8,7 +8,8 @@ not run against the current prompts (docs/ai/EVALUATION.md).
 
 Prompt style (v2, ADR-0011 addendum 2): rules are stated positively with the exact form to use,
 each agent's output fields are described, and one grounded example from the golden case
-`sample_high_regains` (`roster/examples.py`) shows the expected JSON.
+`sample_high_regains` (`roster/examples.py`) shows the expected JSON. From v3 (addendum 3) the
+Writer and Producer also get moment-type rules with one correct example per moment type.
 """
 
 import hashlib
@@ -24,6 +25,7 @@ from matchiq_agents.roster.examples import (
     LOCALIZATION_EXAMPLE,
     LOCALIZATION_REQUIRED,
     LOCALIZATION_SOURCES,
+    MOMENT_EXAMPLES,
     PRODUCER_EXAMPLE,
     WRITER_EXAMPLE,
     compact,
@@ -62,20 +64,36 @@ _EXAMPLE_INTRO: Final = (
     f"Example for computedMetrics {compact(EXAMPLE_METRICS)}, subject {EXAMPLE_TEAM}, "
     "confidence medium: "
 )
+# Moment-type rules (v3, ADR-0011 addendum 3): the copy leads with the moment's own story.
+_MOMENTS: Final = (
+    "Lead with the story of `insightKind`; the subject (`subjectTeam`, on side `subjectSide`) "
+    "is the team the moment is about. Every headline names the subject and the event; never "
+    "headline a different statistic. GOAL: the headline is `eventLine` exactly; every body "
+    "names the scorer (`subjectPlayer`) when given and gives the score from `goals.home` and "
+    "`goals.away` as in 2\u20131, citing both metrics; never count goals ('2 goals'). "
+    "RED_CARD: the headline is `eventLine`; bodies name the dismissed player when given. "
+    "MOMENTUM_SHIFT, PRESSURE_SWING, SHOT_BURST and HIGH_REGAINS: the subject is rising, so "
+    "never say it is losing, dropping or down. A momentum index is not a number fans read: "
+    "CASUAL and BROADCAST describe it in words ('Kestrel Vale are on top'); ANALYST may give "
+    "it as 'a momentum index of 0.62'. Correct example per moment type: "
+    f"{compact(MOMENT_EXAMPLES)}"
+)
 _REVISION: Final = (
     "If `revisionNotes` is not empty, your previous answer broke the rules: fix every note."
 )
 
 MATCH_ANALYST: Final = Prompt(
     agent=AgentName.MATCH_ANALYST,
-    version="2.0.0",
+    version="2.1.0",
     instructions=(
         f"{_GROUNDING} You are the Match Analyst. Return JSON with `claims`: 1 to 3 OBSERVATION "
         "claims about the metrics that matter most for `insightKind` and the subject, each one "
         "sentence under 160 characters stating one or two metric values listed in its "
         "`citedValues`; then at most 1 INFERENCE claim worded cautiously ('may', 'appears to') "
         "with no number and empty `citedValues`. Every claim lists `evidenceEventIds` from "
-        "`eventIds`. `limitations`: 1 or 2 short notes without numbers, such as 'Synthetic match "
+        "`eventIds`. For GOAL, the first claim names the scorer (`subjectPlayer`) when given "
+        "and gives the score from `goals.home` and `goals.away`, citing both. "
+        "`limitations`: 1 or 2 short notes without numbers, such as 'Synthetic match "
         "feed.' or 'Partial data coverage.'. `confidenceLabel`: copy it from the data. "
         f"{_REVISION} {_EXAMPLE_INTRO}{compact(ANALYST_EXAMPLE)}"
     ),
@@ -83,10 +101,11 @@ MATCH_ANALYST: Final = Prompt(
 
 NARRATIVE_WRITER: Final = Prompt(
     agent=AgentName.NARRATIVE_WRITER,
-    version="2.0.0",
+    version="3.0.0",
     instructions=(
-        f"{_GROUNDING} You are the Narrative Writer. Using only the analyst's `claims` and "
-        "`limitations`, write one en-GB draft per persona in `personas`. Each draft has "
+        f"{_GROUNDING} You are the Narrative Writer. Using only the analyst's `claims`, "
+        "`limitations` and `computedMetrics`, write one en-GB draft per persona in `personas`. "
+        "Each draft has "
         "`persona`, `headline`, `body`, `evidenceEventIds` (from `eventIds`) and `citedValues` "
         "(every number in its headline or body, with its metricRef). Headlines are sentence case "
         "with no full stop. CASUAL: headline of at most 8 words; body exactly ONE sentence of at "
@@ -94,7 +113,7 @@ NARRATIVE_WRITER: Final = Prompt(
         "2 to 4 sentences (at most 500 characters) giving each cited value, the confidence in "
         "words ('Confidence is medium.') and one limitation. BROADCAST: headline of at most 6 "
         "words; body exactly ONE sentence of at most 15 words, for an on-screen caption. "
-        f"{_REVISION} Rewrite only the personas the notes name. "
+        f"{_MOMENTS} {_REVISION} Rewrite only the personas the notes name. "
         f"{_EXAMPLE_INTRO}{compact(WRITER_EXAMPLE)}"
     ),
 )
@@ -144,13 +163,15 @@ LOCALIZATION: Final = Prompt(
 
 BROADCAST_PRODUCER: Final = Prompt(
     agent=AgentName.BROADCAST_PRODUCER,
-    version="2.0.0",
+    version="2.1.0",
     instructions=(
         f"{_GROUNDING} You are the Broadcast Producer. Turn `broadcastDraft` into an on-screen "
         "overlay: `headline` of at most `headlineMax` characters and `body` of one sentence of "
         "at most `bodyMax` characters. Keep its numbers and names exactly and add nothing. List "
         "in `metricRefs` the metricRef of every number in the text, as keys of "
-        f"`computedMetrics`. {_REVISION} {_EXAMPLE_INTRO}{compact(PRODUCER_EXAMPLE)}"
+        f"`computedMetrics`. When `eventLine` is present, the headline is `eventLine` exactly. "
+        "Never show a momentum index number; say it in words. "
+        f"{_REVISION} {_EXAMPLE_INTRO}{compact(PRODUCER_EXAMPLE)}"
     ),
 )
 

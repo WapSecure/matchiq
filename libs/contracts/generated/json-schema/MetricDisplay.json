@@ -1,0 +1,24 @@
+{
+  "title": "MetricDisplay",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "internalIndex": {
+      "$ref": "#/$defs/InternalIndexMetric"
+    }
+  },
+  "required": [
+    "internalIndex"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "InternalIndexMetric": {
+      "type": "string",
+      "enum": [
+        "momentum",
+        "xT",
+        "pressureIndex"
+      ]
+    }
+  }
+}

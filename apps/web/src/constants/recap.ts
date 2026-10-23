@@ -18,6 +18,7 @@ export const RECAP_COPY = {
     moments: (n: number) => plural(n, 'key moment'),
     possession: (home: string, away: string) => `Possession ${home}–${away}`,
     shots: (home: number, away: number) => `Shots ${home}–${away}`,
+    missing: '–',
   },
   momentsTitle: 'Key moments',
   momentsDescription: 'Every key moment of the match, with the plays behind it',

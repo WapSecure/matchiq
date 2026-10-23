@@ -5,7 +5,7 @@ import { RECAP_COPY } from '@/constants/recap';
 import { SITE } from '@/constants/site';
 import { useStudioUi } from '@/features/studio/store';
 import type { RecapDocument } from '@/lib/api/session-schemas';
-import { formatMetric } from '@/lib/format';
+import { formatSharePair } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { orderedMoments } from './recap-order';
 import { recapTranslationNotice } from './recap-translation-notice';
@@ -37,11 +37,16 @@ export function RecapStory({
   const lede = useLede(recap);
   const locale = useStudioUi((state) => state.locale);
   const notice = recapTranslationNotice(lede, locale);
+  // The same whole-percent split as Final stats, so the two always add up to 100%.
+  const possession = formatSharePair(
+    s.home.possessionPct,
+    s.away.possessionPct,
+  );
   const facts = [
     copy.facts.moments(recap.keyMoments.length),
     copy.facts.possession(
-      formatMetric(s.home.possessionPct) ?? '–',
-      formatMetric(s.away.possessionPct) ?? '–',
+      possession?.[0] ?? copy.facts.missing,
+      possession?.[1] ?? copy.facts.missing,
     ),
     copy.facts.shots(s.home.shots, s.away.shots),
   ];

@@ -60,6 +60,12 @@ class FactView:
         return sorted(names)
 
     @property
+    def opponent_name(self) -> str | None:
+        """The other team, when the subject is one of exactly two allowlisted teams."""
+        others = sorted(self.team_names - {self.team_name}) if self.team_name else []
+        return others[0] if len(others) == 1 and len(self.team_names) == len(TEAM_SIDES) else None
+
+    @property
     def has_metrics(self) -> bool:
         return bool(self.metrics)
 
