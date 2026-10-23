@@ -36,6 +36,7 @@ export const useTickerRows = (
   timeline: readonly MatchEvent[],
   voided: Record<string, string>,
   roster: Roster,
+  types: ReadonlySet<MatchEvent['type']> = KEY_EVENT_TYPES,
 ): TickerRow[] => {
   const cache = useRef(new WeakMap<MatchEvent, TickerRow>());
   const cachedRoster = useRef(roster);
@@ -47,7 +48,7 @@ export const useTickerRows = (
     const rows: TickerRow[] = [];
     for (let i = timeline.length - 1; i >= 0; i -= 1) {
       const event = timeline[i];
-      if (!event || !KEY_EVENT_TYPES.has(event.type)) continue;
+      if (!event || !types.has(event.type)) continue;
       const reason = voided[event.eventId] ?? null;
       let row = cache.current.get(event);
       if (!row || row.voided !== reason) {
@@ -57,5 +58,5 @@ export const useTickerRows = (
       rows.push(row);
     }
     return rows;
-  }, [timeline, voided, roster]);
+  }, [timeline, voided, roster, types]);
 };

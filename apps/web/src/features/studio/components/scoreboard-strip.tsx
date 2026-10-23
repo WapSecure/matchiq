@@ -6,6 +6,7 @@ import { HintBadge } from '@/components/ui';
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 import { useMatchStore } from '../store';
+import { FullTimeCallout } from './full-time-callout';
 
 function Provenance() {
   const snapshot = useMatchStore((s) => s.snapshot);
@@ -54,6 +55,7 @@ export function ScoreboardStrip({
         phase={phase}
         meta={<Provenance />}
       />
+      <FullTimeCallout />
     </div>
   );
 }
