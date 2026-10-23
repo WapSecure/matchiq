@@ -98,6 +98,16 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: apps/agents/uv.lock
+      - name: Resolve Nx base and head
+        if: github.event_name == 'pull_request'
+        uses: nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c # v5.1.0
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .nx/cache
+          key: nx-verify-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-verify-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nx-verify-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - if: hashFiles('apps/agents/uv.lock') != ''
         run: uv sync
@@ -106,7 +116,11 @@ jobs:
         run: pnpm nx sync:check
       - name: Formatting
         run: pnpm format:check
-      - name: Lint, typecheck, test, build
+      - name: Lint, typecheck, test, build (affected)
+        if: github.event_name == 'pull_request'
+        run: pnpm nx affected -t lint typecheck test build --parallel=3
+      - name: Lint, typecheck, test, build (all projects)
+        if: github.event_name != 'pull_request'
         run: pnpm nx run-many -t lint typecheck test build --parallel=3
       - name: OpenAPI lint (Spectral)
         run: |
@@ -122,29 +136,96 @@ jobs:
           git diff --exit-code
           test -z "$(git status --porcelain)" || { git status --porcelain; exit 1; }
 
-  e2e:
-    name: End-to-end and accessibility
+  e2e-shard:
+    name: End-to-end shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: verify
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # Pull requests run one smaller shard; pushes split all projects in two.
+        shard: ${{ fromJSON(github.event_name == 'pull_request' && '["1/1"]' || '["1/2","2/2"]') }}
+    env:
+      # Pull requests cover one desktop and one mobile project; pushes run all four.
+      E2E_PROJECTS: ${{ github.event_name == 'pull_request' && '--project=desktop-dark --project=mobile-light' || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm nx run-many -t e2e
+      - name: Resolve Nx base and head
+        if: github.event_name == 'pull_request'
+        uses: nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c # v5.1.0
+      - name: Find affected e2e projects
+        id: affected
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            projects=$(pnpm nx show projects --affected --with-target e2e)
+          else
+            projects=$(pnpm nx show projects --with-target e2e)
+          fi
+          echo "$projects"
+          echo "run=$([ -n "$projects" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Resolve Playwright version
+        if: steps.affected.outputs.run == 'true'
+        id: pw
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Playwright browser cache
+        if: steps.affected.outputs.run == 'true'
+        id: pw-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.affected.outputs.run == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .nx/cache
+          key: nx-e2e-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-e2e-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nx-e2e-${{ runner.os }}-
+      - name: Install Playwright browsers
+        if: steps.affected.outputs.run == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright system dependencies
+        if: steps.affected.outputs.run == 'true' && steps.pw-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      - name: Run Playwright (affected, pull request)
+        if: steps.affected.outputs.run == 'true' && github.event_name == 'pull_request'
+        run: pnpm nx affected -t e2e -- $E2E_PROJECTS --shard=${{ matrix.shard }}
+      - name: Run Playwright (all projects)
+        if: steps.affected.outputs.run == 'true' && github.event_name != 'pull_request'
+        run: pnpm nx run-many -t e2e -- --shard=${{ matrix.shard }}
       - if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: playwright-report
+          name: playwright-report-${{ strategy.job-index }}
           path: apps/web-e2e/test-output
           retention-days: 7
+
+  e2e:
+    name: End-to-end and accessibility
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: e2e-shard
+    permissions: {}
+    steps:
+      - name: Every shard passed
+        env:
+          RESULT: ${{ needs.e2e-shard.result }}
+        run: |
+          echo "e2e shards: $RESULT"
+          [ "$RESULT" = success ]
 
   container:
     name: Container image (${{ matrix.app }})
