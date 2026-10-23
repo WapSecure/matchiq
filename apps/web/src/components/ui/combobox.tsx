@@ -75,7 +75,7 @@ export function Combobox<K extends string>(props: ComboboxProps<K>) {
             CONTROL_PADDING[size],
             'bg-surface-sunken pr-0.5',
             'data-hovered:border-control data-focus-within:border-accent data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent',
-            'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+            'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised',
             CONTROL_INVALID,
           )}
         >

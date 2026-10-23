@@ -60,9 +60,9 @@ describe('Select', () => {
     const highlights = screen.getByRole('option', { name: /Highlights/ });
     expect(highlights).toHaveAttribute('aria-disabled', 'true');
     expect(highlights).toHaveTextContent('Needs a producer role.');
-    expect(
-      screen.getByRole('option', { name: /Brisk/ }),
-    ).toHaveAccessibleDescription('About 18 minutes.');
+    expect(screen.getByRole('option', { name: /Brisk/ })).toHaveAccessibleName(
+      /^Brisk,\s?About 18 minutes\.$/,
+    );
     await user.click(highlights);
     expect(onChange).not.toHaveBeenCalled();
   });

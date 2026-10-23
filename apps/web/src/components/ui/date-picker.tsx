@@ -36,7 +36,7 @@ export type DatePickerProps = FieldProps & {
 export const PICKER_GROUP = cn(
   'flex w-full items-center gap-2 bg-surface-sunken pl-2.5 pr-0.5',
   CONTROL_SURFACE,
-  'data-hovered:border-control data-focus-within:border-accent data-disabled:cursor-not-allowed data-disabled:opacity-50',
+  'data-hovered:border-control data-focus-within:border-accent data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised',
   CONTROL_INVALID,
 );
 

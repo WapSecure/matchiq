@@ -1,12 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import {
-  Header,
-  ListBoxItem,
-  ListBoxSection,
-  Text,
-} from 'react-aria-components';
+import { Header, ListBoxItem, ListBoxSection } from 'react-aria-components';
 import { CheckIcon, LockIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { LIST_ITEM, SECTION_HEADER } from './control-styles';
@@ -58,22 +53,18 @@ function OptionItem<K extends string>({
             </span>
           ) : null}
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <Text
-              slot="label"
-              className={cn('font-medium', isDisabled && 'text-ink-muted')}
-            >
+            <span className={cn('font-medium', isDisabled && 'text-ink-muted')}>
               {option.label}
-            </Text>
+            </span>
             {option.description ? (
-              <Text
-                slot="description"
-                className="text-xs leading-snug text-ink-muted"
-              >
+              <span className="text-xs leading-snug text-ink-muted">
+                <span className="sr-only">, </span>
                 {option.description}
-              </Text>
+              </span>
             ) : null}
             {option.disabledReason ? (
               <span className="flex items-center gap-1 text-xs text-ink-subtle">
+                <span className="sr-only">, </span>
                 <LockIcon size={12} className="shrink-0" />
                 {option.disabledReason}
               </span>
