@@ -59,7 +59,10 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
     headers: Record<string, string> = AUTH_HEADER,
   ) => postJson(`${t.baseUrl}/insights/${insightId}/review`, body, headers);
 
-  const setPolicy = (policy: string, headers: Record<string, string> = AUTH_HEADER) =>
+  const setPolicy = (
+    policy: string,
+    headers: Record<string, string> = AUTH_HEADER,
+  ) =>
     postJson(
       `${t.baseUrl}/fixtures/${fixtureId}/editorial/publish-policy`,
       { policy, reason: reason.reason },
