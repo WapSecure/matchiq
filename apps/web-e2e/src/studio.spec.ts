@@ -127,12 +127,14 @@ test.describe('live studio', () => {
 
   test('replay controls wait for the replay to confirm', async ({ page }) => {
     const api = await openStudio(page);
-    await page.getByRole('button', { name: 'Pause' }).click();
+    await page.getByRole('button', { name: 'Pause', exact: true }).click();
     await expect(
       page.getByText(/Waiting for the replay to respond/),
     ).toBeVisible();
     await api.push(envelope('replay.status', mockStatus({ state: 'PAUSED' })));
-    await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Resume', exact: true }),
+    ).toBeVisible();
     // Controlled by server status: the radio only moves once the 202 lands.
     await page.getByRole('radio', { name: '5×' }).click({ force: true });
     await expect
@@ -208,7 +210,7 @@ test.describe('live studio', () => {
     page,
   }) => {
     await openStudio(page);
-    await page.getByRole('button', { name: /open evidence/i }).click();
+    await page.getByRole('button', { name: /see the evidence/i }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });
