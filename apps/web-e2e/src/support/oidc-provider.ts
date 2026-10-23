@@ -15,8 +15,8 @@ import {
   OIDC_API_AUDIENCE,
   OIDC_CLIENT_ID,
   OIDC_PASSWORD,
-  OIDC_USERS,
   type OidcUser,
+  TEST_ISSUER_USERS,
 } from './oidc-users.ts';
 
 const PORT = Number(process.env['E2E_OIDC_PORT'] ?? 4387);
@@ -92,14 +92,18 @@ const loginPage = (params: URLSearchParams, error = '') => {
 <button id="kc-login" type="submit">Sign In</button></form></main></body></html>`;
 };
 
-const sign = async (claims: Record<string, unknown>, audience: string) => {
+const sign = async (
+  claims: Record<string, unknown>,
+  audience: string,
+  ttl: number,
+) => {
   const now = Math.floor(Date.now() / 1_000);
   return await new SignJWT(claims)
     .setProtectedHeader({ alg: 'RS256', kid: KID })
     .setIssuer(ISSUER)
     .setAudience(audience)
     .setIssuedAt(now)
-    .setExpirationTime(now + TTL_SECONDS)
+    .setExpirationTime(now + ttl)
     .setJti(randomUUID())
     .sign((await keys).privateKey);
 };
@@ -115,22 +119,26 @@ const userClaims = (user: OidcUser) => ({
 
 const tokensFor = async (user: OidcUser, nonce?: string) => {
   const refresh = randomUUID();
+  const ttl = user.ttlSeconds ?? TTL_SECONDS;
   refreshTokens.set(refresh, user);
   return JSON.stringify({
     token_type: 'Bearer',
-    expires_in: TTL_SECONDS,
+    expires_in: ttl,
     access_token: await sign(
       { ...userClaims(user), typ: 'Bearer', scope: 'openid profile' },
       OIDC_API_AUDIENCE,
+      ttl,
     ),
-    id_token: await sign({ ...userClaims(user), nonce }, OIDC_CLIENT_ID),
+    id_token: await sign({ ...userClaims(user), nonce }, OIDC_CLIENT_ID, ttl),
     refresh_token: refresh,
   });
 };
 
 const authorize = async (req: IncomingMessage, res: ServerResponse) => {
   const form = await readForm(req);
-  const user = OIDC_USERS.find((u) => u.username === form.get('username'));
+  const user = TEST_ISSUER_USERS.find(
+    (u) => u.username === form.get('username'),
+  );
   if (!user || form.get('password') !== OIDC_PASSWORD) {
     form.delete('username');
     form.delete('password');
@@ -160,7 +168,10 @@ const pkceMatches = (verifier: string, challenge: string) =>
 const token = async (req: IncomingMessage, res: ServerResponse) => {
   const form = await readForm(req);
   if (form.get('grant_type') === 'refresh_token') {
-    const user = refreshTokens.get(form.get('refresh_token') ?? '');
+    // Refresh tokens rotate and are single-use, as in the Keycloak realm.
+    const presented = form.get('refresh_token') ?? '';
+    const user = refreshTokens.get(presented);
+    refreshTokens.delete(presented);
     return user
       ? send(res, 200, await tokensFor(user))
       : send(res, 400, JSON.stringify({ error: 'invalid_grant' }));

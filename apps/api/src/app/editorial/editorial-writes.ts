@@ -13,7 +13,7 @@ import {
   type StreamMessageDraft,
 } from '@matchiq/db';
 import { Inject, Injectable } from '@nestjs/common';
-import type { Actor } from '../auth/actor';
+import { type Actor, auditNameOf } from '../auth/actor';
 import { AUDIT_TARGETS, RETRACT_REASONS } from '../constants';
 import {
   CLOCK,
@@ -58,12 +58,19 @@ export const auditOf = (
   ctx: CommandContext,
   entry: Omit<
     AuditEntry,
-    'orgId' | 'actor' | 'actorType' | 'reason' | 'requestId' | 'correlationId'
+    | 'orgId'
+    | 'actor'
+    | 'actorType'
+    | 'actorDisplayName'
+    | 'reason'
+    | 'requestId'
+    | 'correlationId'
   >,
 ): AuditEntry => ({
   orgId: ctx.actor.orgId,
   actor: ctx.actor.id,
   actorType: ctx.actor.type,
+  ...auditNameOf(ctx.actor),
   reason: ctx.reason,
   ...(ctx.requestId === undefined ? {} : { requestId: ctx.requestId }),
   ...(ctx.correlationId === undefined

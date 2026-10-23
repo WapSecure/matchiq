@@ -3,6 +3,7 @@ import { buildTestFixture } from '@matchiq/db/testing';
 import {
   AUTH_HEADER,
   createFixture,
+  DEMO_ORG,
   jsonOf,
   postJson,
   startTestApp,
@@ -103,6 +104,29 @@ describe('Audit trail API (integration)', () => {
       { headers: AUTH_HEADER },
     );
     expect(range.status).toBe(422);
+  });
+
+  it('records the signed-in actor display name, and none for the operator key', async () => {
+    const producer = await t.bearer(['producer'], DEMO_ORG, {
+      claims: { name: 'Pat Producer' },
+    });
+    const res = await postJson(
+      `${t.baseUrl}/fixtures/fx_audit_d/editorial/freeze`,
+      REASON,
+      producer,
+    );
+    expect(res.ok).toBe(true);
+    const [frozen] = (
+      await list('?fixtureId=fx_audit_d&action=editorial.frozen')
+    ).items;
+    expect(frozen).toMatchObject({
+      actor: { type: 'USER' },
+      actorDisplayName: 'Pat Producer',
+    });
+    const [created] = (
+      await list('?fixtureId=fx_audit_d&action=fixture.created')
+    ).items;
+    expect(created?.actorDisplayName).toBeUndefined();
   });
 
   it('keeps the audit table append-only', async () => {

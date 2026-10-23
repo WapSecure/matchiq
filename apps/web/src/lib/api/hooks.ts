@@ -16,6 +16,7 @@ import {
   fetchFixture,
   fetchNarratives,
   fetchRecap,
+  fetchReplayStatus,
   fetchSessions,
   fetchTemplates,
   sendReplayCommand,
@@ -63,11 +64,33 @@ export const useReplayCommand = (sessionId: string) =>
 const notReady = (error: unknown): boolean =>
   isApiError(error) && error.status === HTTP_STATUS.notFound;
 
+/**
+ * True once the replay has reached full time, or when the fixture has no
+ * replay at all (404). Polls the replay status, which answers 200 throughout,
+ * so callers need not poll a 404 recap to find out.
+ */
+export const useReplayFinished = (fixtureId: string): boolean => {
+  const status = useQuery({
+    queryKey: queryKeys.replay(fixtureId),
+    queryFn: ({ signal }) => fetchReplayStatus(fixtureId, signal),
+    retry: (count, error) => !notReady(error) && count < 2,
+    refetchInterval: (query) =>
+      query.state.data?.state === 'COMPLETED' || notReady(query.state.error)
+        ? false
+        : POLL_MS.replayStatus,
+  });
+  return status.data?.state === 'COMPLETED' || notReady(status.error);
+};
+
 /** 404 `recap-not-ready` until full time; polled until it exists. */
-export const useRecap = (fixtureId: string) =>
+export const useRecap = (
+  fixtureId: string,
+  { enabled = true }: { enabled?: boolean } = {},
+) =>
   useQuery({
     queryKey: queryKeys.recap(fixtureId),
     queryFn: ({ signal }) => fetchRecap(fixtureId, signal),
+    enabled,
     retry: (count, error) => !notReady(error) && count < 2,
     refetchInterval: (query) =>
       query.state.data ? false : notReady(query.state.error) && POLL_MS.recap,

@@ -37,6 +37,8 @@ export interface AuditEntry {
   readonly actor: string;
   /** Defaults to OPERATOR. */
   readonly actorType?: AuditActorType;
+  /** The actor's display name at write time; people only. */
+  readonly actorDisplayName?: string;
   readonly action: string;
   readonly targetType: string;
   readonly targetId: string;

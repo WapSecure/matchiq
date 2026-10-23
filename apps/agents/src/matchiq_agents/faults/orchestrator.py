@@ -1,7 +1,8 @@
 """Routes requests that carry a demo fault to an isolated, faulted pipeline (ADR-0020).
 
 A faulted run gets its own circuit breaker, so a demo can open a breaker without degrading any
-other session, and every run of its trace is labelled `faultInjected`.
+other session, and every run of its trace is labelled `faultInjected`. Only MODEL_TIMEOUT
+simulates timeouts; under any other scenario a failure is real and is reported as real.
 """
 
 import logging
@@ -35,6 +36,7 @@ from matchiq_agents.pipeline.orchestrator import PipelineOrchestrator
 logger = logging.getLogger(__name__)
 
 FaultedPipeline = Callable[[ModelPort, CircuitBreaker], PipelineOrchestrator]
+BreakerFactory = Callable[[FaultScenario], CircuitBreaker]
 
 
 def _revise_notes(
@@ -53,7 +55,9 @@ def _revise_notes(
 def _timeout_note(
     model: FaultInjectingModel, run: AgentRun, seen: dict[AgentName, int]
 ) -> str | None:
-    if run.outcome is RunOutcome.TIMED_OUT and seen[run.agent] == 1:
+    # A budget that ran out before any call reached the model is a real timeout.
+    simulated = model.calls[run.agent] > 0
+    if run.outcome is RunOutcome.TIMED_OUT and seen[run.agent] == 1 and simulated:
         return NOTE_TIMEOUT
     if run.outcome is RunOutcome.FAILED and model.calls[run.agent] == 0:
         return NOTE_SHORT_CIRCUIT
@@ -61,7 +65,7 @@ def _timeout_note(
 
 
 def label_runs(model: FaultInjectingModel, runs: list[AgentRun]) -> list[AgentRun]:
-    """Marks every run as simulated and annotates the steps of the recovery chain."""
+    """Labels every run with the trace's scenario and annotates only the steps the fault caused."""
     fault = RunFault(model.scenario.value)
     note_for = _timeout_note if model.scenario is FaultScenario.MODEL_TIMEOUT else _revise_notes
     seen: dict[AgentName, int] = dict.fromkeys(AgentName, 0)
@@ -80,6 +84,14 @@ def _with_reason(current: str | None, extra: str) -> str:
     return (REASON_SEPARATOR.join(filter(None, (current, extra))))[:REASON_MAX]
 
 
+def _opened_by_simulated_timeouts(model: FaultInjectingModel, breaker: CircuitBreaker) -> bool:
+    return (
+        model.scenario is FaultScenario.MODEL_TIMEOUT
+        and model.simulated_timeouts > 0
+        and breaker.state is BreakerState.OPEN
+    )
+
+
 class FaultAwareOrchestrator:
     def __init__(
         self,
@@ -87,7 +99,7 @@ class FaultAwareOrchestrator:
         *,
         enabled: bool,
         faulted: FaultedPipeline,
-        breaker: Callable[[], CircuitBreaker],
+        breaker: BreakerFactory,
     ) -> None:
         self._base = base
         self._enabled = enabled
@@ -106,9 +118,9 @@ class FaultAwareOrchestrator:
             logger.warning("demo fault ignored: DEMO_FAULTS_ENABLED is off")
             return await self._base.run(request)
         model = FaultInjectingModel(self._base.model, scenario)
-        breaker = self._breaker()
+        breaker = self._breaker(scenario)
         result = await self._faulted(model, breaker).run(request)
         update: dict[str, object] = {"runs": label_runs(model, list(result.runs))}
-        if breaker.state is BreakerState.OPEN:
+        if _opened_by_simulated_timeouts(model, breaker):
             update["fallbackReason"] = _with_reason(result.fallbackReason, REASON_BREAKER_OPEN)
         return result.model_copy(update=update)
