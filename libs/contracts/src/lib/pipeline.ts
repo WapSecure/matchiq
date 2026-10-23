@@ -28,7 +28,7 @@ export const PipelineRequest = z
     packet: FactPacket,
     personas: z.array(Persona).min(1),
     locales: z.array(Locale).min(1),
-    /** Demo fault for this insight (ADR-0017); ignored unless demo faults are enabled. */
+    /** Demo fault for this insight (ADR-0020); ignored unless demo faults are enabled. */
     fault: FaultScenario.optional(),
   })
   .meta({ id: 'PipelineRequest' });

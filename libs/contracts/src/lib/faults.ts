@@ -3,7 +3,7 @@ import { LIMITS } from './constants.js';
 import { InsightKind } from './insight.js';
 
 /**
- * Demo-only failure scenarios (ADR-0017). Each is simulated deterministically
+ * Demo-only failure scenarios (ADR-0020). Each is simulated deterministically
  * so the Observatory can show a recovery chain; none is ever real inference.
  */
 export const FaultScenario = z

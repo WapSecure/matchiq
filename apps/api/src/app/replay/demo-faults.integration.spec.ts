@@ -29,7 +29,7 @@ const seed = async (t: TestApp): Promise<void> => {
 const create = (t: TestApp, body: object) =>
   postJson(`${t.baseUrl}/fixtures/${TEMPLATE}/sessions`, body, {});
 
-describe('Demo fault plans on session create (integration, ADR-0017)', () => {
+describe('Demo fault plans on session create (integration, ADR-0020)', () => {
   describe('with DEMO_FAULTS_ENABLED=false', () => {
     let t: TestApp;
     beforeAll(async () => {

@@ -56,7 +56,7 @@ export const ROLE_PERMISSIONS: Readonly<
     'replay:control',
   ],
   viewer: [...VIEW, 'replay:control', 'preferences:write'],
-  /** The public judge path (ADR-0015): published outputs, traces and replay controls. */
+  /** The public judge path (ADR-0018): published outputs, traces and replay controls. */
   [ANONYMOUS_ROLE]: [...VIEW, 'agents:traces:read', 'replay:control'],
 };
 

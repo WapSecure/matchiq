@@ -19,7 +19,7 @@ export interface PipelineRequestInput {
   readonly insight: Insight;
   readonly revision: number;
   readonly deadlineMs: number;
-  /** Demo fault for this insight (ADR-0017); absent for every ordinary run. */
+  /** Demo fault for this insight (ADR-0020); absent for every ordinary run. */
   readonly fault?: FaultScenario;
 }
 

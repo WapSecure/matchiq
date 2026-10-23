@@ -11,7 +11,7 @@ export type AuthenticatedRequest = Request & {
   [PRINCIPAL_PROPERTY]?: Principal;
 };
 
-/** Every non-public route declares exactly one permission (ADR-0015). */
+/** Every non-public route declares exactly one permission (ADR-0018). */
 export const RequirePermission = (permission: Permission) =>
   SetMetadata(METADATA.permission, permission);
 

@@ -36,7 +36,7 @@ import { actorDetails } from '../auth/audit-trail.service';
 import { classifyBatch } from './classify-batch';
 
 export interface IngestCommand {
-  /** `key.orgId` is the principal's organisation (ADR-0015). */
+  /** `key.orgId` is the principal's organisation (ADR-0018). */
   readonly key: FixtureKey;
   readonly batch: IngestBatchRequest;
   readonly principal: Principal;

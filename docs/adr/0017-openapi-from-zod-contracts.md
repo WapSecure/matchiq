@@ -1,6 +1,6 @@
 # ADR-0017: OpenAPI 3.1 generated from the Zod contracts
 
-- Status: Accepted (2026-10-22). Implements audit item P0-8 and the API half of spec §11 and §45 ("OpenAPI generated and validated in CI; typed SDK"). Builds on ADR-0005 (API and streaming conventions) and ADR-0015 (identity).
+- Status: Accepted (2026-10-22). Implements audit item P0-8 and the API half of spec §11 and §45 ("OpenAPI generated and validated in CI; typed SDK"). Builds on ADR-0005 (API and streaming conventions) and ADR-0018 (identity).
 
 ## Context
 
@@ -19,7 +19,7 @@ The API had no machine-readable description. Integrators had to read controllers
   - RFC 9457 responses per route, grouped by status, with an example and `x-problem-types` for each `type` URI.
   - The `Idempotency-Key`, `X-Request-ID` and `Last-Event-ID` request headers, and the `Idempotent-Replayed`, `Retry-After` and `X-Request-ID` response headers.
   - The SSE endpoint as `text/event-stream`, with `x-sse-data` pointing at the `StreamMessage` component (OpenAPI 3.1 has no item schema for event streams).
-  - Security per operation from ADR-0015: `oidc` (`openIdConnect`, discovery from `OIDC_ISSUER_URL`), the dev/CI `operatorKey`, `streamTicket` on the stream, and `{}` where the anonymous demo principal holds the permission. `x-matchiq-permission` names the permission, and the integration spec checks it against the `@RequirePermission`/`@PublicRoute` metadata the guards read.
+  - Security per operation from ADR-0018: `oidc` (`openIdConnect`, discovery from `OIDC_ISSUER_URL`), the dev/CI `operatorKey`, `streamTicket` on the stream, and `{}` where the anonymous demo principal holds the permission. `x-matchiq-permission` names the permission, and the integration spec checks it against the `@RequirePermission`/`@PublicRoute` metadata the guards read.
   - `info.version` from `apps/api/package.json`, which a test enforces. `servers` come from `API_PUBLIC_URL` when served, and from the config default in the committed file.
 - **Serving.** `GET /api/v1/openapi.json` and a self-hosted Swagger UI at `/api/v1/docs`. The assets come from the exact-pinned `swagger-ui-dist`, with no CDN, under a page CSP with `script-src 'self'` and no validator call-out. Both are on unless `APP_ENV=prod`; `API_DOCS_ENABLED` overrides that either way.
 - **Typed client.** `libs/api-client` holds `openapi-typescript` output generated from the committed document (`nx run api-client:codegen`, which is checked for drift) and an `openapi-fetch` wrapper. The web's `fetchTemplates` uses it and still validates the body with Zod. The remaining endpoints migrate later.

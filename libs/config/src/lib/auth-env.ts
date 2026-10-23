@@ -17,7 +17,7 @@ import {
 } from './fields.js';
 import { AppEnvironment } from './environment.js';
 
-/** Claim names differ per identity provider (Keycloak, Entra ID); ADR-0015. */
+/** Claim names differ per identity provider (Keycloak, Entra ID); ADR-0018. */
 export const OidcClaimFields = {
   OIDC_ORG_CLAIM: z.string().min(1).default(AUTH_DEFAULTS.orgClaim),
   OIDC_ROLES_CLAIM: z.string().min(1).default(AUTH_DEFAULTS.rolesClaim),
@@ -25,7 +25,7 @@ export const OidcClaimFields = {
   OIDC_ORG_NAME_CLAIM: z.string().min(1).default(AUTH_DEFAULTS.orgNameClaim),
 };
 
-/** Resource-server settings for the API (ADR-0015). */
+/** Resource-server settings for the API (ADR-0018). */
 export const AuthFields = {
   OIDC_ISSUER_URL: optionalUrl,
   OIDC_AUDIENCE: optionalString,

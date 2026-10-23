@@ -1,4 +1,4 @@
--- ADR-0015: row-level security on every tenant table. Tenant transactions run
+-- ADR-0018: row-level security on every tenant table. Tenant transactions run
 -- `set_config('role', 'matchiq_app', true)` and `set_config('app.org_id', <org>, true)`;
 -- the migrating owner keeps bypassing RLS for migrations, seeding, the outbox
 -- relay and retention. Roles are cluster-wide, so creation tolerates a race with

@@ -1,4 +1,4 @@
-# ADR-0015: Identity, authorisation and tenant isolation
+# ADR-0018: Identity, authorisation and tenant isolation
 
 - Status: Accepted (2026-10-22). Delivered in stages: libraries and Keycloak first, then API enforcement with RLS, then web sign-in. Supersedes ADR-0010 and the enforcement parts of ADR-0007 (the tenant-ready schema it describes stays). Implements spec §40, §45 (scopes), §48 (IDOR, token theft, editorial tampering) and invariant I2.
 

@@ -27,7 +27,7 @@ export type CreateFixtureCommand = CallerContext & {
   readonly fixture: Fixture;
 };
 
-/** The organisation always comes from the caller's principal (ADR-0015). */
+/** The organisation always comes from the caller's principal (ADR-0018). */
 @Injectable()
 export class FixturesService {
   constructor(

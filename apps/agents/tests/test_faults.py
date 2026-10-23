@@ -1,4 +1,4 @@
-"""Demo fault scenarios (ADR-0017): deterministic, labelled, isolated and refused in prod."""
+"""Demo fault scenarios (ADR-0020): deterministic, labelled, isolated and refused in prod."""
 
 import pytest
 from fastapi.testclient import TestClient

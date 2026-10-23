@@ -33,7 +33,7 @@ const isKind = (value: unknown): value is Principal['kind'] =>
 
 /**
  * Short-lived HS256 tickets for clients that cannot send headers on a
- * stream request (ADR-0015). Bound to one organisation and one fixture.
+ * stream request (ADR-0018). Bound to one organisation and one fixture.
  */
 export class StreamTickets {
   private readonly key: Uint8Array;

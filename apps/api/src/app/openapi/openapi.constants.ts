@@ -57,7 +57,7 @@ export const DOCUMENT_TEXT = {
   localServer: 'Local development',
   configuredServer: 'This deployment (API_PUBLIC_URL)',
   oidc:
-    'OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0015). ' +
+    'OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0018). ' +
     'Roles map to permissions; a token `scope` naming MatchIQ permissions narrows them.',
   oidcDiscovery: 'https://issuer.example/.well-known/openid-configuration',
   operatorKey:

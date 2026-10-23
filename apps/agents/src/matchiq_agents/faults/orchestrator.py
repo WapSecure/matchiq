@@ -1,4 +1,4 @@
-"""Routes requests that carry a demo fault to an isolated, faulted pipeline (ADR-0017).
+"""Routes requests that carry a demo fault to an isolated, faulted pipeline (ADR-0020).
 
 A faulted run gets its own circuit breaker, so a demo can open a breaker without degrading any
 other session, and every run of its trace is labelled `faultInjected`.

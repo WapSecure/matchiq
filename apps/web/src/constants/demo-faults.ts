@@ -1,6 +1,6 @@
 import type { FaultPlanInput, FaultScenario } from '@matchiq/contracts';
 
-/** Lobby and observatory copy for demo fault scenarios (ADR-0017). */
+/** Lobby and observatory copy for demo fault scenarios (ADR-0020). */
 export const DEMO_FAULT_COPY = {
   label: 'Demo scenario',
   labelFor: (title: string) => `Demo scenario for ${title}`,

@@ -60,7 +60,7 @@ export const buildPrincipal = (
   permissions: effectivePermissions(input.roles, input.scopes),
 });
 
-/** The public demo principal (ADR-0015); its organisation comes from configuration. */
+/** The public demo principal (ADR-0018); its organisation comes from configuration. */
 export const anonymousPrincipal = (orgId: string): Principal =>
   buildPrincipal({
     kind: 'anonymous',

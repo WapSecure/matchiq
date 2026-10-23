@@ -18,7 +18,7 @@ import { AppEnvironment } from './environment.js';
 
 /**
  * Server-only settings for the web app's OIDC relying party and BFF
- * (ADR-0015). Never `NEXT_PUBLIC_*`: none of these reach the browser.
+ * (ADR-0018). Never `NEXT_PUBLIC_*`: none of these reach the browser.
  */
 const WebServerObject = z.object({
   APP_ENV: AppEnvironment.default('local'),

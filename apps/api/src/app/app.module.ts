@@ -90,7 +90,7 @@ export class AppModule {
       ],
       controllers: API_CONTROLLERS,
       providers: [
-        // Order matters (ADR-0015): who is calling, then their budget, then what they may do.
+        // Order matters (ADR-0018): who is calling, then their budget, then what they may do.
         { provide: APP_GUARD, useClass: AuthenticationGuard },
         { provide: APP_GUARD, useClass: PrincipalThrottlerGuard },
         { provide: APP_GUARD, useClass: PermissionGuard },

@@ -63,7 +63,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
   }
 
   private toProblem(exception: unknown, req: Request): ProblemDetails {
-    // The query is dropped: it can carry a stream ticket (ADR-0015).
+    // The query is dropped: it can carry a stream ticket (ADR-0018).
     const base = { instance: pathOf(req), requestId: requestIdOf(req) };
 
     if (exception instanceof ProblemException) {

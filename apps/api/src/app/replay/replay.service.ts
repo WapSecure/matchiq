@@ -63,7 +63,7 @@ const keyOf = (orgId: string, fixtureId: string): FixtureKey => ({
  * authority on the resulting status, which reaches clients as `replay.status`.
  * Starting playback needs a free slot: the API answers 503 with `Retry-After`
  * at the limit rather than accepting work the worker would drop. Every
- * lookup is scoped to the caller's organisation (ADR-0015).
+ * lookup is scoped to the caller's organisation (ADR-0018).
  */
 @Injectable()
 export class ReplayService {
@@ -95,7 +95,7 @@ export class ReplayService {
     },
   ): Promise<IdempotentResult<CreatedSession>> {
     const { templateId, speed, faultPlan } = request;
-    // Simulated failures exist only where the operator enabled them (ADR-0017).
+    // Simulated failures exist only where the operator enabled them (ADR-0020).
     if (faultPlan !== undefined && !this.env.DEMO_FAULTS_ENABLED)
       return Promise.reject(problem('demoFaultsDisabled'));
     return this.idempotent(

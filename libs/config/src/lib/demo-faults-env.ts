@@ -3,10 +3,10 @@ import { PROD_ENVIRONMENT } from './auth-constants.js';
 import { booleanFlag } from './fields.js';
 
 export const DEMO_FAULTS_MESSAGES = {
-  inProd: 'must be false when APP_ENV=prod (ADR-0017)',
+  inProd: 'must be false when APP_ENV=prod (ADR-0020)',
 } as const;
 
-/** Accepts per-session demo fault plans (ADR-0017). Simulated failures only. */
+/** Accepts per-session demo fault plans (ADR-0020). Simulated failures only. */
 export const DemoFaultFields = { DEMO_FAULTS_ENABLED: booleanFlag };
 
 /** Demo faults are refused at startup in prod, like the mock model provider. */

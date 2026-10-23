@@ -36,7 +36,7 @@ const declarationOf = (
 };
 
 /** Deny by default is enforced at runtime; this makes a missing declaration fail CI instead. */
-describe('route permissions (ADR-0015)', () => {
+describe('route permissions (ADR-0018)', () => {
   const routes = API_CONTROLLERS.flatMap((controller) =>
     routesOf(controller).map((r) => ({ ...r, controller })),
   );

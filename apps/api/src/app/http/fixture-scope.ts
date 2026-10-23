@@ -9,7 +9,7 @@ const fixtureIdPipe = new ZodValidationPipe(FixtureIdParam);
 
 /**
  * `{ orgId, fixtureId }` for the `:fixtureId` route: the id from the path,
- * the organisation from the caller's principal and nowhere else (ADR-0015).
+ * the organisation from the caller's principal and nowhere else (ADR-0018).
  */
 export const FixtureScope = createParamDecorator(
   (_data: unknown, context: ExecutionContext): FixtureKey => {

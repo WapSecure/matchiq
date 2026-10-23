@@ -12,7 +12,7 @@ Reference: OWASP ASVS 5.0. MatchIQ makes **no compliance or certification claims
 | Dev/CI fallback                                              | `OPERATOR_API_KEY` behind `AUTH_OPERATOR_KEY_ENABLED`, refused when `APP_ENV=prod`                                                      |
 | Worker → agents                                              | Shared service token (`AGENTS_SERVICE_TOKEN`) and internal ingress only                                                                 |
 
-Authorization is deny-by-default and enforced server-side (ADR-0015): every route declares one permission with `RequirePermission` or is `@PublicRoute` (health), and a test fails otherwise. 401 for missing or invalid credentials, 403 without the permission, non-disclosing 404 across tenants. The organisation comes only from the verified principal. Postgres row-level security backs every tenant table (a test fails if a table with `org_id` has no policy). Privileged actions, denials, sign-in and sign-out are recorded with the real actor in the append-only `audit_events` table.
+Authorization is deny-by-default and enforced server-side (ADR-0018): every route declares one permission with `RequirePermission` or is `@PublicRoute` (health), and a test fails otherwise. 401 for missing or invalid credentials, 403 without the permission, non-disclosing 404 across tenants. The organisation comes only from the verified principal. Postgres row-level security backs every tenant table (a test fails if a table with `org_id` has no policy). Privileged actions, denials, sign-in and sign-out are recorded with the real actor in the append-only `audit_events` table.
 
 ## Baseline controls (implemented)
 

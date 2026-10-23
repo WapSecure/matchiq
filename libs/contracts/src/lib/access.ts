@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { OrgId, UtcTimestamp } from './primitives.js';
 
-/** `POST /fixtures/{id}/stream-tickets`: opens that fixture's stream with `?ticket=` (ADR-0015). */
+/** `POST /fixtures/{id}/stream-tickets`: opens that fixture's stream with `?ticket=` (ADR-0018). */
 export const StreamTicket = z.strictObject({
   ticket: z.string().min(1),
   expiresAt: UtcTimestamp,

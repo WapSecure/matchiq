@@ -47,7 +47,7 @@ export const ReplaySessionView = z.strictObject({
   status: ReplayStatus,
   createdAt: UtcTimestamp,
   updatedAt: UtcTimestamp,
-  /** Present only on demo sessions created with simulated failures (ADR-0017). */
+  /** Present only on demo sessions created with simulated failures (ADR-0020). */
   faultPlan: FaultPlan.optional(),
 });
 

@@ -8,7 +8,7 @@ import {
 import { DEMO_FAULTS } from '../constants';
 
 /**
- * The demo fault for one insight of a session (ADR-0017), or undefined.
+ * The demo fault for one insight of a session (ADR-0020), or undefined.
  * Insights are counted in detection order among the plan's kinds, so a
  * replay of the same template faults the same insights every time.
  */

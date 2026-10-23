@@ -13,7 +13,7 @@ export const IDENTITY_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.stream,
     summary: 'Issue a short-lived ticket that opens this fixture stream',
     description:
-      '`EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0015).',
+      '`EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0018).',
     auth: 'fixtures:read',
     params: FixturePath,
     success: { status: 201, description: 'Ticket', body: json(StreamTicket) },

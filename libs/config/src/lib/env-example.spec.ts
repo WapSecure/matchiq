@@ -22,6 +22,12 @@ const SECRET_KEYS = [
   'WEB_SESSION_SECRET',
 ] as const;
 
+/** Values with spaces are double-quoted so the file can be `source`d by shells. */
+const unquote = (value: string): string =>
+  value.length >= 2 && value.startsWith('"') && value.endsWith('"')
+    ? value.slice(1, -1)
+    : value;
+
 const parseDotenv = (text: string): Record<string, string> =>
   Object.fromEntries(
     text
@@ -30,7 +36,7 @@ const parseDotenv = (text: string): Record<string, string> =>
       .filter((line) => line && !line.startsWith('#') && line.includes('='))
       .map((line) => [
         line.slice(0, line.indexOf('=')),
-        line.slice(line.indexOf('=') + 1),
+        unquote(line.slice(line.indexOf('=') + 1)),
       ]),
   );
 

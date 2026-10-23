@@ -1,4 +1,4 @@
-# ADR-0017: Telemetry baseline: pino logs, OpenTelemetry traces, Prometheus metrics
+# ADR-0019: Telemetry baseline: pino logs, OpenTelemetry traces, Prometheus metrics
 
 - Status: Accepted (2026-10-22). Implements audit item P0-5 (MQ-029) for the API and worker. Refines spec §14 (telemetry), §44 (W3C trace context) and §50 (SLIs, dashboards, runbooks). The agents service follows in a separate change.
 

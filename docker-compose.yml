@@ -37,7 +37,7 @@ services:
       timeout: 3s
       retries: 10
 
-  # --- Local OpenID Connect provider (ADR-0015); `pnpm infra:up` starts it ---
+  # --- Local OpenID Connect provider (ADR-0018); `pnpm infra:up` starts it ---
   # Dev-only: in-memory H2 store, bootstrap admin admin/admin, seeded users with
   # the password in docs/security/IDENTITY_AND_ACCESS.md. Never expose it.
   keycloak:
@@ -119,7 +119,7 @@ services:
       REPLAY_MAX_ACTIVE_SESSIONS: ${REPLAY_MAX_ACTIVE_SESSIONS:-10}
       REPLAY_IDLE_TIMEOUT_MS: ${REPLAY_IDLE_TIMEOUT_MS:-600000}
       TRUST_PROXY: ${TRUST_PROXY:-false}
-      # ADR-0015. The issuer is the host-facing Keycloak URL (tokens carry it);
+      # ADR-0018. The issuer is the host-facing Keycloak URL (tokens carry it);
       # keys are fetched over the compose network. Sign-in needs `--profile infra`.
       OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:-http://localhost:8180/realms/matchiq}
       OIDC_AUDIENCE: ${OIDC_AUDIENCE:-matchiq-api}

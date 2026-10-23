@@ -40,7 +40,7 @@ describe('DEMO_FAULTS_ENABLED', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(ConfigError);
       expect((error as ConfigError).issues).toContain(
-        'DEMO_FAULTS_ENABLED: must be false when APP_ENV=prod (ADR-0017)',
+        'DEMO_FAULTS_ENABLED: must be false when APP_ENV=prod (ADR-0020)',
       );
     }
   });
