@@ -211,6 +211,9 @@
                     "FALLBACK"
                   ]
                 },
+                "context": {
+                  "$ref": "#/$defs/MomentContext"
+                },
                 "synthetic": {
                   "type": "boolean",
                   "const": true
@@ -362,6 +365,147 @@
         "packet",
         "personas",
         "locales"
+      ],
+      "additionalProperties": false
+    },
+    "MomentContext": {
+      "type": "object",
+      "properties": {
+        "methodVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "home",
+            "away"
+          ]
+        },
+        "scoreState": {
+          "type": "string",
+          "enum": [
+            "LEADING",
+            "LEVEL",
+            "TRAILING"
+          ]
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "EARLY",
+            "FIRST_HALF",
+            "BEFORE_HALF_TIME",
+            "SECOND_HALF",
+            "FINAL_15"
+          ]
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "enum": [
+                    "shots",
+                    "shotsOnTarget",
+                    "pressures",
+                    "recoveries",
+                    "highRecoveries",
+                    "finalThirdEntries"
+                  ]
+                }
+              },
+              "required": [
+                "metric"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trend": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "enum": [
+                    "shots",
+                    "shotsOnTarget",
+                    "pressures",
+                    "recoveries",
+                    "highRecoveries",
+                    "finalThirdEntries"
+                  ]
+                },
+                "direction": {
+                  "type": "string",
+                  "enum": [
+                    "RISING",
+                    "FALLING",
+                    "STEADY",
+                    "MIXED"
+                  ]
+                }
+              },
+              "required": [
+                "metric",
+                "direction"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "linked": {
+          "type": "object",
+          "properties": {
+            "regainEventId": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "previousInsightId": {
+              "type": "string",
+              "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "eventIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "methodVersion",
+        "side",
+        "scoreState",
+        "phase",
+        "comparison",
+        "trend",
+        "linked",
+        "eventIds",
+        "metrics"
       ],
       "additionalProperties": false
     },

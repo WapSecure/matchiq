@@ -31,6 +31,24 @@ export {
   stepMoments,
 } from './lib/moments/detect.js';
 export type { MomentCursor } from './lib/moments/types.js';
+export { CONTEXT_METHOD_VERSION, KEY_METRIC } from './lib/context/constants.js';
+export {
+  matchMinute,
+  minutePhase,
+  type ClockPoint,
+} from './lib/context/clock.js';
+export {
+  directionOf,
+  precedingRegain,
+  previousMoment,
+  scoreFact,
+  trendFact,
+  windowFact,
+} from './lib/context/facts.js';
+export {
+  momentContext,
+  type MomentContextInput,
+} from './lib/context/moment-context.js';
 export {
   verifyCitedValues,
   verifyEvidenceIds,

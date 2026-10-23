@@ -6,6 +6,7 @@ import {
   FactPacket,
   VerificationResult,
 } from './agents.js';
+import { AnalystBreakdown } from './breakdown.js';
 import { LIMITS } from './constants.js';
 import { FaultScenario } from './faults.js';
 import { PipelineStatus } from './insight.js';
@@ -44,6 +45,8 @@ export const NarrativeDraft = z
     citedValues: z.array(CitedValue),
     source: NarrativeSource,
     localeFallback: z.boolean(),
+    /** ANALYST only (MQ-068); every part passes the same gate as the body. */
+    breakdown: AnalystBreakdown.optional(),
   })
   .meta({ id: 'NarrativeDraft' });
 

@@ -74,25 +74,6 @@ class Status(StrEnum):
     FALLBACK = "FALLBACK"
 
 
-class Insight(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    schemaVersion: Literal[1]
-    insightId: Annotated[str, Field(pattern="^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
-    fixtureId: Annotated[str, Field(pattern="^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
-    kind: Kind
-    priority: Priority
-    period: Annotated[int, Field(ge=1, le=5)]
-    matchClockMs: Annotated[int, Field(ge=0, le=9007199254740991)]
-    teamId: Annotated[str | None, Field(pattern="^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
-    playerId: Annotated[str | None, Field(pattern="^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
-    reasonCode: Annotated[str, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
-    evidence: Evidence
-    status: Status
-    synthetic: Literal[True]
-
-
 class Team(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -129,6 +110,105 @@ class Locale(StrEnum):
     fr_FR = "fr-FR"
     es_ES = "es-ES"
     pcm_NG = "pcm-NG"
+
+
+class Side(StrEnum):
+    home = "home"
+    away = "away"
+
+
+class ScoreState(StrEnum):
+    LEADING = "LEADING"
+    LEVEL = "LEVEL"
+    TRAILING = "TRAILING"
+
+
+class Phase(StrEnum):
+    EARLY = "EARLY"
+    FIRST_HALF = "FIRST_HALF"
+    BEFORE_HALF_TIME = "BEFORE_HALF_TIME"
+    SECOND_HALF = "SECOND_HALF"
+    FINAL_15 = "FINAL_15"
+
+
+class Metric(StrEnum):
+    shots = "shots"
+    shotsOnTarget = "shotsOnTarget"
+    pressures = "pressures"
+    recoveries = "recoveries"
+    highRecoveries = "highRecoveries"
+    finalThirdEntries = "finalThirdEntries"
+
+
+class Comparison(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    metric: Metric
+
+
+class Direction(StrEnum):
+    RISING = "RISING"
+    FALLING = "FALLING"
+    STEADY = "STEADY"
+    MIXED = "MIXED"
+
+
+class Trend(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    metric: Metric
+    direction: Direction
+
+
+class Linked(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    regainEventId: Annotated[str | None, Field(pattern="^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = (
+        None
+    )
+    previousInsightId: Annotated[
+        str | None, Field(pattern="^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
+    ] = None
+
+
+class MomentContext(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    methodVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
+    side: Side
+    scoreState: ScoreState
+    phase: Phase
+    comparison: Comparison | None
+    trend: Trend | None
+    linked: Linked
+    eventIds: list[EventId]
+    metrics: dict[
+        Annotated[str, StringConstraints(pattern=r"^[a-zA-Z][a-zA-Z0-9]*(\.[a-zA-Z0-9]+)+$")], float
+    ]
+
+
+class Insight(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    schemaVersion: Literal[1]
+    insightId: Annotated[str, Field(pattern="^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
+    fixtureId: Annotated[str, Field(pattern="^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
+    kind: Kind
+    priority: Priority
+    period: Annotated[int, Field(ge=1, le=5)]
+    matchClockMs: Annotated[int, Field(ge=0, le=9007199254740991)]
+    teamId: Annotated[str | None, Field(pattern="^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
+    playerId: Annotated[str | None, Field(pattern="^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")] = None
+    reasonCode: Annotated[str, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+    evidence: Evidence
+    status: Status
+    context: MomentContext | None = None
+    synthetic: Literal[True]
 
 
 class FactPacket(BaseModel):

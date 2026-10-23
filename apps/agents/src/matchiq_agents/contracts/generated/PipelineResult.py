@@ -151,18 +151,13 @@ class Source(StrEnum):
     TEMPLATE = "TEMPLATE"
 
 
-class NarrativeDraft(BaseModel):
+class BreakdownPart(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    persona: Persona
-    locale: Locale
-    headline: Annotated[str, Field(max_length=80, min_length=1)]
-    body: Annotated[str, Field(max_length=600, min_length=1)]
-    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
+    text: Annotated[str, Field(max_length=360, min_length=1)]
     citedValues: list[CitedValue]
-    source: Source
-    localeFallback: bool
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
 
 
 class Kind(StrEnum):
@@ -218,6 +213,30 @@ class Run(BaseModel):
     repairs: Annotated[list[Repair] | None, Field(max_length=16)] = None
     faultInjected: FaultScenario | None = None
     faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None
+
+
+class AnalystBreakdown(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    whatHappened: BreakdownPart
+    whyItMatters: BreakdownPart
+    whatToWatch: BreakdownPart
+
+
+class NarrativeDraft(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    persona: Persona
+    locale: Locale
+    headline: Annotated[str, Field(max_length=80, min_length=1)]
+    body: Annotated[str, Field(max_length=600, min_length=1)]
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
+    citedValues: list[CitedValue]
+    source: Source
+    localeFallback: bool
+    breakdown: AnalystBreakdown | None = None
 
 
 class PipelineResult(BaseModel):

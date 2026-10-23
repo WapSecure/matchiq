@@ -58,6 +58,9 @@ export const LIMITS = {
   auditIdentifierMax: 128,
   faultEveryNthMax: 50,
   faultNoteMax: 300,
+  breakdownPartMax: 360,
+  storyParagraphMax: 700,
+  storyParagraphsMax: 6,
 } as const;
 
 export const MESSAGES = {

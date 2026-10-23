@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AgentRun, VerificationIssueCode } from './agents.js';
+import { AnalystBreakdown, MatchStory } from './breakdown.js';
 import { MatchEvent } from './events.js';
 import {
   Insight,
@@ -43,6 +44,7 @@ export const RecapNarrative = z.strictObject({
   source: NarrativeSource,
   localeFallback: z.boolean().optional(),
   citations: z.array(z.string()),
+  breakdown: AnalystBreakdown.optional(),
 });
 
 export const RecapMoment = z.strictObject({
@@ -67,6 +69,8 @@ export const RecapDocument = z.strictObject({
   title: z.string().min(1),
   finalSnapshot: MatchSnapshot,
   keyMoments: z.array(RecapMoment),
+  /** Full-time story per audience and language (MQ-068); absent on older recaps. */
+  story: z.array(MatchStory).optional(),
   synthetic: z.literal(true),
 });
 
