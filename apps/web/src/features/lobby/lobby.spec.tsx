@@ -30,7 +30,10 @@ const templates = [
 
 describe('lobby', () => {
   beforeEach(() => push.mockReset());
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    window.history.replaceState(null, '', '/');
+  });
 
   it('lists templates with the quick-start scenario first', async () => {
     stubApi({
@@ -119,6 +122,107 @@ describe('lobby', () => {
     );
     expect(hash).toBeVisible();
     expect(await screen.findByText(/Replay 1 · HMU-AWC · NANA/)).toBeVisible();
+  });
+
+  it('pages the matches with numbered pages synced to the URL', async () => {
+    const many = Array.from({ length: 8 }, (_, i) =>
+      template({
+        templateId: `fx_m${i + 1}_42`,
+        scenario: 'high-press',
+        title: `Match ${i + 1}`,
+      }),
+    );
+    stubApi({
+      'GET /fixture-templates': { body: { items: many, nextCursor: null } },
+      'GET /replay-sessions': { body: { items: [], nextCursor: null } },
+    });
+    renderLobby();
+    const list = await screen.findByRole('list', { name: 'Matches' });
+    expect(within(list).getAllByRole('article')).toHaveLength(6);
+    expect(screen.getByText('Showing 1–6 of 8 matches')).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Match pages' });
+    await userEvent.click(within(nav).getByRole('button', { name: 'Page 2' }));
+    expect(window.location.search).toBe('?page=2');
+    expect(within(list).getAllByRole('article')).toHaveLength(2);
+    expect(within(nav).getByRole('button', { name: 'Page 2' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByText('Showing 7–8 of 8 matches')).toBeInTheDocument();
+  });
+
+  it('pages recent replays forward and back with the cursor', async () => {
+    const api = stubApi({
+      'GET /fixture-templates': { body: { items: [template()] } },
+      'GET /replay-sessions': (url) =>
+        url.searchParams.get('cursor') === 'next-1'
+          ? {
+              body: {
+                items: [
+                  sessionView({ sessionId: 'fx_test_s1', sessionNumber: 1 }),
+                ],
+                nextCursor: null,
+                total: 9,
+              },
+            }
+          : {
+              body: {
+                items: Array.from({ length: 8 }, (_, i) =>
+                  sessionView({
+                    sessionId: `fx_test_s${9 - i}`,
+                    sessionNumber: 9 - i,
+                  }),
+                ),
+                nextCursor: 'next-1',
+                total: 9,
+              },
+            },
+    });
+    renderLobby();
+    expect(
+      await screen.findByText('Showing 1–8 of 9 replays'),
+    ).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Recent replay pages' });
+    await userEvent.click(
+      within(nav).getByRole('button', { name: 'Next page' }),
+    );
+    expect(
+      await screen.findByText('Showing 9–9 of 9 replays'),
+    ).toBeInTheDocument();
+    expect(window.location.search).toBe('?after=next-1');
+    const paged = new URL(String(callsTo(api, '/replay-sessions').at(-1)?.[0]));
+    expect(paged.searchParams.get('cursor')).toBe('next-1');
+    expect(paged.searchParams.get('limit')).toBe('8');
+    await userEvent.click(
+      within(nav).getByRole('button', { name: 'Previous page' }),
+    );
+    expect(
+      await screen.findByText('Showing 1–8 of 9 replays'),
+    ).toBeInTheDocument();
+    expect(window.location.search).toBe('');
+  });
+
+  it('falls back to the newest replays when a shared page has gone', async () => {
+    window.history.replaceState(null, '', '/?after=stale');
+    stubApi({
+      'GET /fixture-templates': { body: { items: [template()] } },
+      'GET /replay-sessions': (url) =>
+        url.searchParams.get('cursor') === 'stale'
+          ? {
+              status: 400,
+              body: {
+                type: 'urn:matchiq:problem:invalid-cursor',
+                title: 'Invalid pagination cursor',
+                status: 400,
+              },
+            }
+          : { body: { items: [sessionView()], nextCursor: null, total: 1 } },
+    });
+    renderLobby();
+    expect(
+      await screen.findByText('Showing 1–1 of 1 replay'),
+    ).toBeInTheDocument();
+    expect(window.location.search).toBe('');
   });
 
   it('shows empty states', async () => {

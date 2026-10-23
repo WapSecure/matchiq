@@ -7,6 +7,7 @@ import { ChoicesSection } from './choices-section';
 import { DatesSection } from './dates-section';
 import { FeedbackSection } from './feedback-section';
 import { OverlaysSection } from './overlays-section';
+import { PaginationSection } from './pagination-section';
 import { SelectSection } from './select-section';
 import { ThemePane } from './theme-pane';
 import { UploadSection } from './upload-section';
@@ -20,6 +21,7 @@ function Sections() {
       <ChoicesSection />
       <OverlaysSection />
       <FeedbackSection />
+      <PaginationSection />
       <UploadSection />
     </>
   );

@@ -15,12 +15,13 @@ import { requestJson } from './http-client';
 import { MatchEventPage, ReplayCommandAck } from './schemas';
 import {
   CreatedSession,
+  type FixtureTemplateSummary,
   InsightList,
   NarrativeList,
   OverlayList,
   RecapDocument,
-  SessionList,
-  TemplateList,
+  SessionPage,
+  TemplatePage,
 } from './session-schemas';
 import { TraceList } from './trace-schemas';
 import { validated } from './typed-client';
@@ -32,17 +33,36 @@ const idempotent = () => ({
   [HTTP_HEADERS.idempotencyKey]: crypto.randomUUID(),
 });
 
-/** Proof of the generated client (`@matchiq/api-client`); the rest still use `requestJson`. */
-export const fetchTemplates = (signal?: AbortSignal) =>
-  validated(
-    (client) => client.GET('/fixture-templates', { signal }),
-    TemplateList,
-  );
+export type PageRequest = { cursor?: string; limit: number };
 
-export const fetchSessions = (
-  limit: number = API_LIMITS.sessionListLimit,
-  signal?: AbortSignal,
-) => requestJson(API_PATHS.sessions, SessionList, { signal, query: { limit } });
+/**
+ * The whole catalogue, following `nextCursor`: match codes and numbered lobby
+ * pages need every match, and the catalogue is a small seeded list. Uses the
+ * generated client (`@matchiq/api-client`); the rest still use `requestJson`.
+ */
+export const fetchTemplates = async (signal?: AbortSignal) => {
+  const items: FixtureTemplateSummary[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < API_LIMITS.templatePagesMax; page += 1) {
+    const query = { limit: API_LIMITS.templatePageMax, cursor };
+    const next = await validated(
+      (client) =>
+        client.GET('/fixture-templates', { signal, params: { query } }),
+      TemplatePage,
+    );
+    items.push(...next.items);
+    cursor = next.nextCursor ?? undefined;
+    if (cursor === undefined) break;
+  }
+  return items;
+};
+
+/** One page of recent replays, newest first. */
+export const fetchSessionsPage = (page: PageRequest, signal?: AbortSignal) =>
+  requestJson(API_PATHS.sessions, SessionPage, {
+    signal,
+    query: { limit: page.limit, cursor: page.cursor },
+  });
 
 /** Creates a fresh session of a template; the worker starts it at `speed`. */
 export const createSession = (

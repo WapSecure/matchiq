@@ -7,7 +7,7 @@ import type {
   FaultPlanInput,
   ReplaySpeed,
 } from '@matchiq/contracts';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 import { HTTP_STATUS, POLL_MS } from '@/constants/api';
 import { isApiError } from './api-error';
 import {
@@ -17,10 +17,11 @@ import {
   fetchNarratives,
   fetchRecap,
   fetchReplayStatus,
-  fetchSessions,
+  fetchSessionsPage,
   fetchTemplates,
   sendReplayCommand,
 } from './endpoints';
+import type { PageRequest } from './endpoints';
 import { queryKeys } from './query-keys';
 
 export const useTemplates = () =>
@@ -29,11 +30,13 @@ export const useTemplates = () =>
     queryFn: ({ signal }) => fetchTemplates(signal),
   });
 
-export const useSessions = () =>
+/** Keeps the previous page on screen while the next loads, so the list never jumps. */
+export const useSessionsPage = (page: PageRequest) =>
   useQuery({
-    queryKey: queryKeys.sessions(),
-    queryFn: ({ signal }) => fetchSessions(undefined, signal),
+    queryKey: queryKeys.sessionsPage(page),
+    queryFn: ({ signal }) => fetchSessionsPage(page, signal),
     refetchInterval: POLL_MS.sessions,
+    placeholderData: keepPreviousData,
   });
 
 export const useCreateSession = () =>

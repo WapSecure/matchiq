@@ -1,77 +1,60 @@
 'use client';
 
-import Link from 'next/link';
+import { useEffect } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback';
-import { ArrowRightIcon, TimelineIcon } from '@/components/icons';
+import { TimelineIcon } from '@/components/icons';
+import { Panel } from '@/components/ui';
 import {
-  Badge,
-  BUTTON_BASE,
-  BUTTON_SIZES,
-  BUTTON_VARIANTS,
-  Panel,
-  Skeleton,
-} from '@/components/ui';
+  CursorPagination,
+  SkeletonRows,
+  useCursorPage,
+} from '@/components/ui/pagination';
+import { PROBLEM_SLUGS } from '@/constants/api';
 import { LOBBY_COPY } from '@/constants/lobby';
-import { MATCH_CODE_COPY } from '@/constants/match-code';
-import { ROUTES } from '@/constants/navigation';
-import { REPLAY_COPY } from '@/constants/replay';
-import { useSessions, useTemplates } from '@/lib/api/hooks';
-import type { ReplaySessionView } from '@/lib/api/session-schemas';
+import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
+import { isApiError } from '@/lib/api/api-error';
+import { useSessionsPage, useTemplates } from '@/lib/api/hooks';
 import { cn } from '@/lib/cn';
-import { formatMinute } from '@/lib/format';
 import { templateCode } from '@/lib/use-match-label';
+import { SessionRow } from './session-row';
 
 const copy = LOBBY_COPY.sessions;
-const NOT_STARTED = -1;
+const LIST = 'recent-replays';
+const PAGE_SIZE = PAGE_SIZES.replays;
 
-function SessionRow({
-  session,
-  code,
-}: {
-  session: ReplaySessionView;
-  code: string | undefined;
-}) {
-  const { status } = session;
-  const live = status.state === 'PLAYING';
-  const minute =
-    status.appliedSequence === NOT_STARTED
-      ? copy.notStarted
-      : formatMinute(status.period, status.matchClockMs);
-  return (
-    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-      <div className="min-w-0 flex-1 basis-56">
-        <p className="truncate text-sm font-medium text-ink">{session.title}</p>
-        <p className="tabular font-mono text-micro text-ink-subtle">
-          {MATCH_CODE_COPY.replay(session.sessionNumber)}
-          {code ? ` · ${code}` : ''}
-        </p>
-      </div>
-      <Badge tone={live ? 'accent' : 'neutral'} dot={live}>
-        {REPLAY_COPY.state[status.state]}
-      </Badge>
-      <span className="tabular w-24 text-xs text-ink-muted">
-        {minute} · {REPLAY_COPY.speedOption(status.speed)}
-      </span>
-      <Link
-        href={ROUTES.studio(session.sessionId)}
-        aria-label={copy.openLabel(session.title, session.sessionNumber)}
-        className={cn(BUTTON_BASE, BUTTON_VARIANTS.secondary, BUTTON_SIZES.sm)}
-      >
-        {copy.open}
-        <ArrowRightIcon size={14} />
-      </Link>
-    </li>
-  );
-}
+const isStaleLink = (error: unknown) =>
+  isApiError(error) && error.problem.type.endsWith(PROBLEM_SLUGS.invalidCursor);
+
+const useTemplateCodes = () => {
+  const templates = useTemplates();
+  const found = new Map((templates.data ?? []).map((t) => [t.templateId, t]));
+  return (id: string) => {
+    const template = found.get(id);
+    return template ? templateCode(template) : undefined;
+  };
+};
 
 function SessionsBody() {
-  const sessions = useSessions();
-  const templates = useTemplates();
-  if (sessions.isPending) {
+  const paging = useCursorPage(LIST);
+  const sessions = useSessionsPage({
+    limit: PAGE_SIZE,
+    ...(paging.cursor === null ? {} : { cursor: paging.cursor }),
+  });
+  const codeFor = useTemplateCodes();
+  const stale = sessions.isError && isStaleLink(sessions.error);
+  const { reset } = paging;
+  // A shared link whose page no longer exists falls back to the newest replays.
+  useEffect(() => {
+    if (stale) reset();
+  }, [stale, reset]);
+  if (sessions.isPending || stale) {
     return (
-      <div role="status" aria-label={copy.loading} className="p-4">
-        <Skeleton className="h-12" />
-      </div>
+      <SkeletonRows
+        count={PAGE_SIZE}
+        label={copy.loading}
+        className="p-4"
+        rowClassName="h-10"
+      />
     );
   }
   if (sessions.isError) {
@@ -84,24 +67,46 @@ function SessionsBody() {
       />
     );
   }
-  const found = new Map((templates.data ?? []).map((t) => [t.templateId, t]));
-  const codeFor = (id: string) => {
-    const template = found.get(id);
-    return template ? templateCode(template) : undefined;
-  };
-  if (sessions.data.length === 0) {
+  const { items, nextCursor, total } = sessions.data;
+  if (items.length === 0 && paging.cursor === null) {
     return <EmptyState compact Icon={TimelineIcon} title={copy.empty} />;
   }
+  const loading = sessions.isPlaceholderData;
   return (
-    <ul aria-label={copy.listLabel} className="divide-y divide-line">
-      {sessions.data.map((session) => (
-        <SessionRow
-          key={session.sessionId}
-          session={session}
-          code={codeFor(session.templateId)}
-        />
-      ))}
-    </ul>
+    <>
+      <ul
+        aria-label={copy.listLabel}
+        aria-busy={loading || undefined}
+        className={cn(
+          'divide-y divide-line transition-opacity duration-150',
+          loading && 'opacity-60',
+        )}
+      >
+        {items.map((session) => (
+          <SessionRow
+            key={session.sessionId}
+            session={session}
+            code={codeFor(session.templateId)}
+          />
+        ))}
+      </ul>
+      <CursorPagination
+        className="border-t border-line px-4 py-3"
+        shown={items.length}
+        offset={paging.offset}
+        pageSize={PAGE_SIZE}
+        {...(total === undefined ? {} : { total })}
+        hasPrevious={paging.hasPrevious}
+        hasNext={nextCursor !== null}
+        onPrevious={paging.goPrevious}
+        onNext={() => {
+          if (nextCursor !== null) paging.goNext(nextCursor, items.length);
+        }}
+        noun={PAGINATION_NOUNS.replays}
+        label={copy.pagesLabel}
+        isLoading={loading}
+      />
+    </>
   );
 }
 

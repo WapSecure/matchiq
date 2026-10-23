@@ -101,7 +101,7 @@ describe('AuditView', () => {
     const first = new URL(String(callsTo(api, '/audit-events')[0]?.[0]));
     expect(first.searchParams.get('fixtureId')).toBe(FX);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Show more' }));
     await waitFor(() =>
       expect(screen.getByText('Reason 2')).toBeInTheDocument(),
     );
