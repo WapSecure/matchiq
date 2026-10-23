@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { connection } from 'next/server';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
+import { SessionExpiredNotice } from '@/components/auth/session-expired-notice';
 import { SessionLoader } from '@/components/auth/session-loader';
 import { PwaPrompts } from '@/components/pwa/pwa-prompts';
 import { PWA_METADATA, PWA_THEME_COLOR } from '@/constants/pwa';
@@ -42,6 +43,7 @@ export default async function RootLayout({
       </head>
       <body className="min-h-dvh">
         <SessionLoader />
+        <SessionExpiredNotice />
         {children}
         <PwaPrompts />
       </body>

@@ -2,6 +2,33 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-037: Walkthrough polish (audit actor names, dev CSP, recap polling)
+
+| Area                                                                                                                                                                                   | Status | Evidence                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------ |
+| `AuditEvent.actorDisplayName` (optional, backward compatible); `audit_events.actor_display_name` (migration 0007, nullable); written by every API audit path from the OIDC name claim  | Done   | `editorial-audit.spec.ts`, `audit.integration.spec.ts` |
+| Audit trail shows the person's name, with the actor type and short id as detail and the full id on hover                                                                               | Done   | `audit.spec.tsx`                                       |
+| OpenAPI document and `libs/api-client` regenerated; Python contracts unchanged (audit is not exported to the agents)                                                                   | Done   | `docs/api/openapi.json`, `libs/api-client`             |
+| Dev-only CSP: `style-src 'self' 'unsafe-inline'` without the nonce (a nonce makes browsers ignore `'unsafe-inline'`), so Next's dev overlay and HMR styles apply; production unchanged | Done   | `csp.spec.ts`                                          |
+| Observatory requests the recap only once the replay status says `COMPLETED` (or the fixture has no replay), instead of polling a 404 every 5 s                                         | Done   | `recap-observatory.spec.tsx`                           |
+
+Verification: CI (owner directive). Locally: format, lint and typecheck of `contracts`, `db`, `api`, `web`, `worker`; `api-client:codegen`, `agents:codegen` (no Python change); the four touched web and contracts unit spec files.
+
+## 2026-10-23 — MQ-036: Signed-in users no longer drop out at token refresh
+
+Root cause (confirmed in the Keycloak log: `REFRESH_TOKEN_ERROR … error="invalid_token", reason="Maximum allowed refresh token reuse exceeded"` at 07:07:42): the realm rotates single-use refresh tokens, the studio polls several BFF routes in parallel, and every request near expiry refreshed with the same token. One won; the rest were treated as expired and cleared the session cookie.
+
+| Area                                                                                                                                                            | Status | Evidence                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------ |
+| Single-flight refresh keyed by a SHA-256 digest of the refresh token; 30 s grace store (bounded, TTL-evicted, pluggable) for requests with the old token        | Done   | `refresh-coordinator.spec.ts`              |
+| Only a definitive `invalid_grant`/`invalid_token` ends a session, and only once its access token has expired; an unreachable IdP gives 503 and keeps the cookie | Done   | `refresh-coordinator.spec.ts`              |
+| BFF persists a refreshed session on a 502 too (the old token is already spent)                                                                                  | Done   | `app/bff/[...path]/route.ts`               |
+| UI: a 401 from the BFF shows a "Your session expired" alert with a sign-in link and stops further BFF calls                                                     | Done   | `auth-ui.spec.tsx`                         |
+| Test issuer rotates single-use refresh tokens like the realm; e2e signs in with a 34 s token and polls in parallel past expiry                                  | Done   | `apps/web-e2e/src/session-refresh.spec.ts` |
+| Multi-instance web tier: shared grace store and lock in Redis                                                                                                   | Open   | ADR-0018 addendum                          |
+
+Refresh-token rotation stays on. Verification: CI (owner directive). Locally: format, lint and typecheck of `web` and `web-e2e`, and the three touched unit spec files.
+
 ## 2026-10-23 — MQ-038: Demo fault scenarios are isolated and fallback reasons are accurate
 
 Observed live in `fx_comeback_42_s8` (`WRITER_REVISE`, Ollama `qwen2.5:7b-instruct`): faulted insights showed "circuit breaker opened after simulated timeouts" and a Broadcast Producer FAILED at 0 ms, although `WRITER_REVISE` injects no timeouts. Cause: every faulted run got a per-run breaker with threshold 1 on the local lane (one call's attempts, and timeouts are not retried locally), so one real Localization timeout or Analyst failure opened it and refused the Producer; the breaker phrase was then appended whenever that breaker was open, whatever opened it.

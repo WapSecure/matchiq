@@ -36,6 +36,7 @@ const auditValues = (entry: AuditEntry) => ({
   orgId: entry.orgId,
   actor: entry.actor,
   actorType: entry.actorType ?? 'OPERATOR',
+  actorDisplayName: entry.actorDisplayName ?? null,
   action: entry.action,
   targetType: entry.targetType,
   targetId: entry.targetId,

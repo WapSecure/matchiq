@@ -31,7 +31,7 @@ import {
   type OutboxNotifier,
   UNIT_OF_WORK,
 } from '../infrastructure/tokens';
-import { actorTypeOf } from '../auth/actor';
+import { actorTypeOf, auditNameOf } from '../auth/actor';
 import { actorDetails } from '../auth/audit-trail.service';
 import { classifyBatch } from './classify-batch';
 
@@ -130,6 +130,7 @@ export class IngestService {
       orgId: key.orgId,
       actor: command.principal.userId,
       actorType: actorTypeOf(command.principal),
+      ...auditNameOf(command.principal),
       action: AUDIT_ACTIONS.eventsIngested,
       targetType: AUDIT_TARGETS.fixture,
       targetId: key.fixtureId,

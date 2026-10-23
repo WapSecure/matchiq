@@ -17,6 +17,23 @@ type AuditTableProps = {
 const columns = AUDIT_COPY.columns;
 const CELL = 'px-3 py-2.5 align-top';
 
+/** The person's name first; the type and the stable id stay visible as detail. */
+function AuditActorCell({ event }: { event: AuditEvent }) {
+  const type = ACTOR_TYPE_LABELS[event.actor.type];
+  const name = event.actorDisplayName;
+  return (
+    <>
+      <span className="block text-ink">{name ?? type}</span>
+      <span
+        title={event.actor.id}
+        className="block break-all font-mono text-micro text-ink-subtle"
+      >
+        {name ? AUDIT_COPY.actorDetail(type, event.actor.id) : event.actor.id}
+      </span>
+    </>
+  );
+}
+
 function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
   return (
     <tr className="border-t border-line">
@@ -35,12 +52,7 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
         </span>
       </th>
       <td className={CELL}>
-        <span className="block text-ink">
-          {ACTOR_TYPE_LABELS[event.actor.type]}
-        </span>
-        <span className="block break-all font-mono text-micro text-ink-subtle">
-          {event.actor.id}
-        </span>
+        <AuditActorCell event={event} />
       </td>
       <td className={CELL}>
         <span className="block text-ink">

@@ -122,6 +122,7 @@ export const auditEvents = pgTable(
     orgId: orgId(),
     actor: text('actor').notNull(),
     actorType: text('actor_type').notNull().default('OPERATOR'),
+    actorDisplayName: text('actor_display_name'),
     action: text('action').notNull(),
     targetType: text('target_type').notNull(),
     targetId: text('target_id').notNull(),

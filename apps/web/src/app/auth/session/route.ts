@@ -24,7 +24,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   const live = await liveSession(request, env);
   let body: SessionView;
-  if (live.kind === 'active') {
+  // While the issuer is unreachable the kept session is still shown as signed in.
+  if (live.kind === 'active' || live.kind === 'unavailable') {
     const roles = knownRoles(live.session.user.roles);
     body = {
       status: 'authenticated',

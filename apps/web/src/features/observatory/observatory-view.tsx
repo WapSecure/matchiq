@@ -7,15 +7,18 @@ import { AgentsIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import { MAIN_CONTENT_ID } from '@/constants/site';
-import { useAgentRuns, useRecap } from '@/lib/api/hooks';
+import { useAgentRuns, useRecap, useReplayFinished } from '@/lib/api/hooks';
 import { TraceCard } from './trace-card';
 import { TraceSummary } from './trace-summary';
 
 const copy = OBSERVATORY_COPY;
 
-/** Insight periods are only on recap moments (the trace has period clock only). */
+/**
+ * Insight periods are only on recap moments (the trace has period clock only).
+ * The recap exists from full time, so it is not requested before then.
+ */
 const usePeriods = (fixtureId: string): Map<string, number> => {
-  const recap = useRecap(fixtureId);
+  const recap = useRecap(fixtureId, { enabled: useReplayFinished(fixtureId) });
   return useMemo(
     () =>
       new Map(
