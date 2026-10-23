@@ -112,7 +112,9 @@ describe('commentary language boundaries', () => {
     ).toBe('pcm-NG');
     await user.click(french);
     expect(useStudioUi.getState().locale).toBe('fr-FR');
-    expect(screen.getByRole('radiogroup', { name: 'Audience' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radiogroup', { name: 'Audience' }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Language changes commentary, not the controls/),
     ).toBeInTheDocument();
