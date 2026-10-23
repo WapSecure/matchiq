@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserMenu } from './user-menu';
 import { useSession } from '@/lib/auth/session-store';
@@ -41,7 +41,7 @@ describe('account popover', () => {
     expect(within(dialog).getByText('Harbour Media')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(accountButton()).toHaveFocus();
+    await waitFor(() => expect(accountButton()).toHaveFocus());
   });
 
   it('closes when the user presses outside the panel', async () => {
