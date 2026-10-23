@@ -38,6 +38,7 @@ export const FACT_CHECKS_COPY = {
     line: (n: number, because: string) =>
       `${plural(n, 'moment')} used standard wording because ${because}.`,
   },
+  moreLabel: 'More key moments',
   filters: {
     legend: 'Show',
     option: (label: string, n: number) => `${label} (${n})`,
@@ -122,4 +123,7 @@ export const FILTER_ORDER: readonly MomentFilter[] = [
 
 /** Minutes the strip spans at least: regulation time. */
 export const TIMELINE_MIN_SPAN = 90;
+
+/** Key moments shown per step before "Show more". */
+export const MOMENTS_PAGE_SIZE = 10;
 export const PERCENT = 100;

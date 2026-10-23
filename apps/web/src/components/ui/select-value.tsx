@@ -25,7 +25,12 @@ export function SelectedValue<K extends string>({
           {option.icon}
         </span>
       ) : null}
-      <span className="max-w-[70%] shrink-0 truncate font-medium">
+      <span
+        className={cn(
+          'truncate font-medium',
+          option.description ? 'max-w-[70%] shrink-0' : 'min-w-0',
+        )}
+      >
         {option.label}
       </span>
       {option.description ? (

@@ -79,6 +79,54 @@ describe('AI fact-checks overview', () => {
   });
 });
 
+describe('moment paging', { timeout: 20_000 }, () => {
+  const many = Array.from({ length: 25 }, (_, n) =>
+    trace({
+      insightId: `in_${n}`,
+      publication: n % 2 ? 'AGENT' : 'TEMPLATE',
+      fallbackReason: n % 2 ? null : 'agents service unreachable',
+      matchClockMs: n * 60_000,
+    }),
+  );
+  const articles = () =>
+    within(
+      screen.getByRole('list', { name: 'Key moments and their checks' }),
+    ).getAllByRole('article');
+
+  it('shows ten at a time and loads the rest on request', async () => {
+    const user = userEvent.setup();
+    render(<MomentList traces={many} moments={new Map()} />);
+    expect(articles()).toHaveLength(10);
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(articles()).toHaveLength(20);
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(articles()).toHaveLength(25);
+    expect(screen.queryByRole('button', { name: 'Show more' })).toBeNull();
+  });
+
+  it('starts again from ten when the filter changes', async () => {
+    const user = userEvent.setup();
+    render(<MomentList traces={many} moments={new Map()} />);
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    await user.click(screen.getByRole('radio', { name: /Standard wording/ }));
+    expect(articles()).toHaveLength(10);
+    expect(screen.getByText(/of 13 key moments/)).toBeInTheDocument();
+  });
+
+  it('loads a moment that is not shown yet when its marker is clicked', async () => {
+    const user = userEvent.setup();
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    render(<MomentList traces={many} moments={new Map()} />);
+    expect(document.getElementById('moment-in_22')).toBeNull();
+    const strip = screen.getByRole('list', { name: 'Key moments by minute' });
+    await user.click(within(strip).getAllByRole('link')[22] as HTMLElement);
+    expect(document.getElementById('moment-in_22')).not.toBeNull();
+    expect(articles()).toHaveLength(25);
+    expect(scroll).toHaveBeenCalled();
+  });
+});
+
 describe('match report', () => {
   it('reads as plain text with the score, moments and stats', () => {
     const text = buildReport({

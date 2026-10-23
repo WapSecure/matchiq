@@ -1,9 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { LoadMore } from '@/components/ui/pagination';
+import { PAGINATION_NOUNS } from '@/constants/pagination';
 import { EmptyState } from '@/components/feedback';
 import { Button } from '@/components/ui';
-import { FACT_CHECKS_COPY, type MomentFilter } from '@/constants/fact-checks';
+import {
+  FACT_CHECKS_COPY,
+  MOMENTS_PAGE_SIZE,
+  type MomentFilter,
+} from '@/constants/fact-checks';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
@@ -12,6 +18,7 @@ import { faultOf } from './fault-chain';
 import type { StripMarker } from './minute-strip';
 import { MomentFilterBar } from './moment-filter-bar';
 import { filterCounts, filterTraces } from './moment-filters';
+import { useMomentWindow } from './use-moment-window';
 import { momentAnchor, TraceCard, traceMinute } from './trace-card';
 import type { RecapMomentInfo } from './use-recap-moments';
 
@@ -42,9 +49,10 @@ export function MomentList({
 }) {
   const [filter, setFilter] = useState<MomentFilter>('ALL');
   const shown = filterTraces(traces, filter);
+  const win = useMomentWindow(shown, filter);
   const period = (t: InsightTrace) => moments.get(t.insightId)?.period ?? null;
   return (
-    <>
+    <div onClickCapture={win.onJump} className="contents">
       <MomentFilterBar
         value={filter}
         onChange={setFilter}
@@ -70,7 +78,7 @@ export function MomentList({
           aria-label={OBSERVATORY_COPY.listLabel}
           className="flex flex-col gap-3"
         >
-          {shown.map((trace) => (
+          {win.visible.map((trace) => (
             <li key={trace.insightId}>
               <TraceCard
                 trace={trace}
@@ -81,6 +89,16 @@ export function MomentList({
           ))}
         </ol>
       )}
-    </>
+      {shown.length > MOMENTS_PAGE_SIZE ? (
+        <LoadMore
+          shown={win.visible.length}
+          total={shown.length}
+          hasMore={win.hasMore}
+          onLoadMore={win.loadMore}
+          noun={PAGINATION_NOUNS.moments}
+          label={copy.moreLabel}
+        />
+      ) : null}
+    </div>
   );
 }
