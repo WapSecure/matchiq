@@ -2,6 +2,32 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-038: Demo fault scenarios are isolated and fallback reasons are accurate
+
+Observed live in `fx_comeback_42_s8` (`WRITER_REVISE`, Ollama `qwen2.5:7b-instruct`): faulted insights showed "circuit breaker opened after simulated timeouts" and a Broadcast Producer FAILED at 0 ms, although `WRITER_REVISE` injects no timeouts. Cause: every faulted run got a per-run breaker with threshold 1 on the local lane (one call's attempts, and timeouts are not retried locally), so one real Localization timeout or Analyst failure opened it and refused the Producer; the breaker phrase was then appended whenever that breaker was open, whatever opened it.
+
+| Area                                                                                                                                                                                                                                                      | Status | Evidence                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------- |
+| Only `MODEL_TIMEOUT` gets the hair-trigger per-run breaker; other scenarios get a fresh per-run breaker with the shared breaker's thresholds, so a real failure behaves as in an ordinary run. The shared breaker is still never touched by a faulted run | Done   | `wiring.fault_breaker`, `test_faults.py`           |
+| The breaker phrase is appended only under `MODEL_TIMEOUT`, after at least one simulated timeout, with the breaker open                                                                                                                                    | Done   | `test_faults.py`                                   |
+| A `MODEL_TIMEOUT` run whose budget ran out before any call reached the model is not labelled as a simulated timeout                                                                                                                                       | Done   | `faults/orchestrator.py`                           |
+| Regression: `WRITER_REVISE` with a real Analyst transport failure or a real Localization timeout (cloud and local lanes) keeps the Producer, has no breaker or "simulated" text; ordinary runs never say "simulated"; `MODEL_TIMEOUT` unchanged           | Done   | `test_faults.py` (4 new cases fail before the fix) |
+
+Verification: CI (owner directive). Locally: Ruff, Pyright and `test_faults.py`, `test_resilience.py`. The agents service must be restarted to pick up the fix.
+
+## 2026-10-23 — MQ-035: Hackathon submission package and README
+
+| Area                                                                                                                                                                                          | Status | Evidence                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------- |
+| README rewritten: value proposition, two quick-start paths checked against `package.json`, compose and `.env.example`, Mermaid architecture, provider honesty table, capabilities, disclosure | Done   | `README.md`                                        |
+| Write-up, judging map, demo script (under 2 minutes, per rules §4.4), pitch deck outline, checklist                                                                                           | Done   | `docs/submission/`                                 |
+| Judging criteria and submission rules taken from the official rules (`microsoft/insidethegamehackathon`, `OFFICIAL RULES.md`, commit `d7d8fc3`, fetched 2026-10-23)                           | Done   | `docs/submission/JUDGING_MAP.md`, `CHECKLIST.md`   |
+| `NOTICE` with the main third-party components; licences read from package metadata                                                                                                            | Done   | `NOTICE`                                           |
+| Live session figures read from the owner's running API (`fx_comeback_42_s7`: 222 of 228 narratives agent-written, 0 gate rejections, 117 of 171 non-English served in en-GB before PR #40)    | Done   | `docs/submission/SUBMISSION.md` § Measured results |
+| Video, hosted demo, branch for submission, category, team roster, deck format                                                                                                                 | Open   | Owner decisions, listed in `CHECKLIST.md`          |
+
+Docs only. Verification: Prettier on the changed files and a relative-link check; CI runs the rest (owner directive).
+
 ## 2026-10-23 — MQ-034: Localization covers every requested persona
 
 | Area                                                                                                                                                         | Status | Evidence                                               |

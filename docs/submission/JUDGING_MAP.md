@@ -1,0 +1,105 @@
+# Judging map
+
+Each judging criterion, mapped to evidence that a judge can open in the repository or see in the running app.
+
+**Source of the criteria.** [Official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md) (reached through <https://aka.ms/insidethegame/rules>; last changed 2026-09-28, commit `d7d8fc3`), §6. Spec §2 and §23 record the same five criteria. Paths are relative to the repository root on `dev`. "In the app" assumes the local stack from the [README](../../README.md#run-it-in-5-minutes).
+
+## Stage one (pass/fail)
+
+The project must reasonably fit the theme and apply the featured technologies (rules §6.1).
+
+- **Theme.** MatchIQ covers all five challenge stages: ingest, interpret, explain, render, personalize ([SUBMISSION.md](SUBMISSION.md#the-solution)). It uses synthetic data only.
+- **Technology.** Microsoft Agent Framework runs the agent roster in every live run. Foundry, Entra ID and Azure are implemented but unverified, and the write-up says so.
+
+## Stage two (five criteria, 20% each)
+
+### 1. Technological Implementation (20%)
+
+> Creativity and optimised synthetic data creation; quality software practices; use of hero technologies; well-structured, documented, maintainable code.
+
+| Evidence                                                                                                                         | Where                                                                                                                                                                                       | In the app                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Seeded generator: possession state machine, five scenarios, validator, golden fixtures with pinned hashes, fast-check properties | `libs/synthetic-data`, [`fixtures/README.md`](../../fixtures/README.md), PR [#10](https://github.com/WapSecure/matchiq/pull/10)                                                             | Lobby: scenario, seed, event count and events hash per fixture |
+| Pure, versioned engine with property tests and state hashes                                                                      | `libs/football-engine`, [ADR-0002](../adr/0002-deterministic-engine-first.md), PRs [#7](https://github.com/WapSecure/matchiq/pull/7), [#25](https://github.com/WapSecure/matchiq/pull/25)   | Studio: live metrics, momentum chart, evidence drawer          |
+| Append-only ledger, transactional outbox, resumable SSE                                                                          | `apps/api`, `libs/db`, [ADR-0005](../adr/0005-api-and-streaming-conventions.md), [ADR-0006](../adr/0006-persistence-and-messaging.md), PR [#9](https://github.com/WapSecure/matchiq/pull/9) | Reload the studio mid-match: it resumes                        |
+| Zod contracts as the single source, exported to JSON Schema, Pydantic and OpenAPI 3.1, with drift checks in CI                   | `libs/contracts`, [ADR-0017](../adr/0017-openapi-from-zod-contracts.md), PR [#37](https://github.com/WapSecure/matchiq/pull/37)                                                             | <http://localhost:3000/api/v1/docs>                            |
+| Nx module boundaries, lint caps, strict TypeScript, Ruff and Pyright                                                             | [`ARCHITECTURE_RULES.md`](../engineering/ARCHITECTURE_RULES.md), [`ENGINEERING_STANDARDS.md`](../engineering/ENGINEERING_STANDARDS.md)                                                      | n/a                                                            |
+| CI: lint, typecheck, test and build for 16 projects; e2e with axe; CodeQL; Trivy and SBOMs; gitleaks; audits                     | `.github/workflows/ci.yml`; green on `728c1ce` ([run 39886416370](https://github.com/WapSecure/matchiq/actions/runs/39886416370))                                                           | n/a                                                            |
+| 20 ADRs and an implementation log with evidence                                                                                  | [`docs/adr/`](../adr), [`docs/implementation-log.md`](../implementation-log.md)                                                                                                             | n/a                                                            |
+| Hero technology: Microsoft Agent Framework (used). Foundry, Entra ID and Azure Bicep (implemented, unverified)                   | `apps/agents`, `infra/azure`, [SUBMISSION.md](SUBMISSION.md#use-of-microsoft-technology)                                                                                                    | Observatory: provider and deployment on every agent run        |
+
+Test counts at points in time, taken from the implementation log (CI does not print them):
+
+- MQ-025: api 157, worker 102 (plus 1 skipped), db 22, auth 32, access 25, config 31.
+- MQ-023: contracts 60, web 135.
+- MQ-020: Playwright 152 passed (80 opt-in screenshot tests skipped).
+
+### 2. Agentic Design & Innovation (20%)
+
+> Creative agentic patterns; sophisticated orchestration, MCP or multi-agent collaboration; novel AI implementation.
+
+| Evidence                                                                                                    | Where                                                                                                                                                        | In the app                                                                   |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Five specialised agents on Agent Framework graph workflows, with a typed FSM and REVISE and REJECT branches | `apps/agents/src/matchiq_agents/pipeline`, `roster/`, [ADR-0011](../adr/0011-agent-orchestration.md), PR [#11](https://github.com/WapSecure/matchiq/pull/11) | Observatory: the run table per insight                                       |
+| Shared immutable state (`PipelineState`), deadline shares, feedback retries, circuit breakers               | ADR-0011 addenda, PRs [#24](https://github.com/WapSecure/matchiq/pull/24), [#34](https://github.com/WapSecure/matchiq/pull/34)                               | Observatory: retries, latency, outcome                                       |
+| Two independent deterministic checks (Fact Checker, publish gate) plus an independent evaluation oracle     | `apps/agents/src/matchiq_agents/guard`, `apps/worker`, [`EVALUATION.md`](../ai/EVALUATION.md)                                                                | Observatory: gate report and issue codes                                     |
+| Failure and recovery on demand: `WRITER_REVISE`, `MODEL_TIMEOUT`, `GATE_REJECT`                             | [ADR-0020](../adr/0020-demo-fault-scenarios.md), PR [#35](https://github.com/WapSecure/matchiq/pull/35)                                                      | Lobby "Demo scenario", then the Observatory "Simulated failure (demo)" chain |
+| Prompt registry (version and SHA-256), baseline gate in CI, deterministic repairs recorded per run          | `roster/prompt_registry.json`, `tests/test_prompt_registry.py`                                                                                               | Observatory: prompt version on each run                                      |
+| Localization with item-coverage checks; measured gain from 28% to 87% fully localised, 0 violations         | PR [#40](https://github.com/WapSecure/matchiq/pull/40), `tests/eval/baselines/ollama-qwen2.5-7b-instruct.json`                                               | Switch the locale to FR, ES or PCM                                           |
+
+Not claimed: MCP and A2A are not used.
+
+### 3. Real-World Impact & Applicability (20%)
+
+> Significance of the problem; production deployability; impact on developers, businesses and users.
+
+| Evidence                                                                          | Where                                                                                                                                                                                                                                     | In the app                                                           |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Editorial control: freeze, retract, suppress, kill switch, with an audit trail    | [ADR-0016](../adr/0016-editorial-control-and-audit.md), PRs [#26](https://github.com/WapSecure/matchiq/pull/26), [#32](https://github.com/WapSecure/matchiq/pull/32)                                                                      | Sign in as `harbour.producer`: control bar, then the Audit trail tab |
+| OIDC, six roles, tenant isolation in the API and Postgres RLS, cross-tenant suite | [ADR-0018](../adr/0018-identity-authorisation-and-tenant-isolation.md), PRs [#28](https://github.com/WapSecure/matchiq/pull/28), [#30](https://github.com/WapSecure/matchiq/pull/30), [#33](https://github.com/WapSecure/matchiq/pull/33) | `northbank.producer` cannot see `org_demo` sessions                  |
+| Capacity limits, idempotency, retention                                           | [ADR-0015](../adr/0015-replay-capacity-and-retention.md), PR [#27](https://github.com/WapSecure/matchiq/pull/27)                                                                                                                          | n/a                                                                  |
+| Observability: JSON logs, traces, metrics, dashboards, alert rules                | [ADR-0019](../adr/0019-telemetry-baseline.md), PRs [#36](https://github.com/WapSecure/matchiq/pull/36), [#38](https://github.com/WapSecure/matchiq/pull/38). Validated statically, not run end to end                                     | Grafana on `:3300` (optional)                                        |
+| Security: strict CSP, headers, threat model, supply-chain scanning                | [`THREAT_MODEL.md`](../security/THREAT_MODEL.md), PR [#31](https://github.com/WapSecure/matchiq/pull/31)                                                                                                                                  | n/a                                                                  |
+| Deployability: images, compose, VPS overlay, Azure Bicep                          | `apps/*/Dockerfile`, `infra/`, PR [#15](https://github.com/WapSecure/matchiq/pull/15). **Not deployed.**                                                                                                                                  | n/a                                                                  |
+| Developer integration: OpenAPI 3.1, typed client                                  | [`docs/api/README.md`](../api/README.md)                                                                                                                                                                                                  | Swagger UI                                                           |
+
+### 4. User Experience & Presentation (20%)
+
+> Well-designed, intuitive UX; a video that communicates value; a balanced blend of frontend and backend.
+
+| Evidence                                                                                                   | Where                                                                                                                     | In the app                           |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Broadcast console: scoreboard, 16:9 program preview, pitch map, insight feed, timeline, metrics            | `apps/web/src/features/studio`, PR [#23](https://github.com/WapSecure/matchiq/pull/23), `docs/screenshots/premium/after/` | Studio                               |
+| Light, dark and system themes; the broadcast preview stays in on-air colours                               | [`theme-contrast.md`](../design/theme-contrast.md)                                                                        | Theme toggle in the header           |
+| Evidence drawer, recap, Agent Observatory                                                                  | PR [#19](https://github.com/WapSecure/matchiq/pull/19)                                                                    | Click an insight; Recap; Observatory |
+| WCAG 2.2 AA checks (axe) on every screen, desktop and mobile, both themes; keyboard drawer; reduced motion | `apps/web-e2e`                                                                                                            | Keyboard through the studio          |
+| Installable PWA with an offline shell                                                                      | [`PWA.md`](../deployment/PWA.md), PR [#22](https://github.com/WapSecure/matchiq/pull/22)                                  | Install from the browser             |
+| Demo video under 2 minutes                                                                                 | [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md). **Not recorded yet.**                                                                 | n/a                                  |
+| Frontend and backend balance                                                                               | Next.js web, two NestJS services, a Python agents service, eleven libraries                                               | n/a                                  |
+
+### 5. Adherence to Hackathon Category (20%)
+
+The rules let each entrant win one Grand Prize and up to one Category Prize (§4.2). Judges may reassign the category.
+
+| Category                            | Fit                                                                                                                                                                                                | Recommendation                                                      |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Best Multi-Agent System**         | Strong. Distinct roles, shared typed state, handoffs, REVISE and REJECT, bounded retries, breakers, visible failure recovery, and an outcome a single agent could not verify (rules §4.2 wording). | **Primary**, as the spec also recommends (§3, decision D03)         |
+| **Best Enterprise Solution**        | Strong. RBAC, tenant isolation, audit, editorial controls, observability, security scanning, honest status.                                                                                        | Alternative; owner decision                                         |
+| Best Use of Microsoft Foundry       | Weak today. Foundry has never been exercised.                                                                                                                                                      | Do not choose unless Foundry is run and evidenced before submission |
+| Best Azure Cloud Native Integration | Weak today. Nothing is deployed to Azure.                                                                                                                                                          | Do not choose                                                       |
+| Grand Prize                         | Every eligible entry is considered.                                                                                                                                                                | n/a                                                                 |
+
+## Challenge brief coverage (rules §4.1)
+
+| Brief item                                                     | Status                                                                                                   |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| (i) Ingest, interpret, explain, render, personalize            | Done                                                                                                     |
+| (ii) Player identification with speed and distance             | Not done. Player names appear in narratives and the evidence; there are no speed or distance indicators. |
+| (ii) Pass quality: distance, accuracy, difficulty              | Accuracy (pass completion %) only                                                                        |
+| (ii) Ball and shot speed                                       | Not published. `SHOT.speedKph` exists in the events, but the engine has no metric for it.                |
+| (ii) Auto-eventing from video                                  | Not done (out of scope: synthetic events only)                                                           |
+| (iii) Narratives, player context, milestones, recaps           | Narratives and recaps done. Milestones (`PLAYER_MILESTONE`) not done.                                    |
+| (iv) Explainability: control vs chaos, pressure, rhythm        | Pressure swing, momentum shift, high regains, shot burst, each with evidence and counter-evidence        |
+| (v) Synthetic data innovation                                  | Done                                                                                                     |
+| (vi) Multi-language storytelling                               | Four locales, including Nigerian Pidgin                                                                  |
+| Personalization by favourite club or player, player-focus mode | Not done. Personas and languages only.                                                                   |
