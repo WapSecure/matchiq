@@ -37,6 +37,8 @@ import { OUTBOX_NOTIFIER } from './infrastructure/tokens';
 import { IngestService } from './ingest/ingest.service';
 import { OpenApiModule } from './openapi/openapi.module';
 import { MeController } from './me/me.controller';
+import { PreferencesController } from './me/preferences.controller';
+import { PreferencesService } from './me/preferences.service';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
@@ -57,6 +59,7 @@ export const API_CONTROLLERS = [
   EditorialControlsController,
   AuditController,
   MeController,
+  PreferencesController,
 ];
 
 @Module({})
@@ -106,6 +109,7 @@ export class AppModule {
         OutboxRelayService,
         ReplayService,
         IntelligenceService,
+        PreferencesService,
         StreamGauges,
         { provide: OUTBOX_NOTIFIER, useExisting: OutboxRelayService },
       ],

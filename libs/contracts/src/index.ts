@@ -19,3 +19,4 @@ export * from './lib/access.js';
 export * from './lib/paging.js';
 export * from './lib/lobby.js';
 export * from './lib/reads.js';
+export * from './lib/preferences.js';

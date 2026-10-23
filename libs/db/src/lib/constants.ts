@@ -13,6 +13,7 @@ export const TABLES = {
   matchSnapshots: 'match_snapshots',
   matchRecaps: 'match_recaps',
   editorialControls: 'editorial_controls',
+  preferenceProfiles: 'preference_profiles',
 } as const;
 
 export const DB_LIMITS = {
@@ -24,6 +25,10 @@ export const DB_LIMITS = {
 } as const;
 
 export const PG_ERROR_CODES = { uniqueViolation: '23505' } as const;
+
+export const STORE_ERRORS = {
+  preferenceMissingAfterUpsert: 'preference profile missing after upsert',
+} as const;
 
 export const HASH_ALGORITHM = 'sha256';
 export const HASH_ENCODING = 'hex';

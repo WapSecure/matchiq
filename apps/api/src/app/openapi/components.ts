@@ -106,4 +106,6 @@ export const NAMED_SCHEMAS = {
   HealthStatus: contracts.HealthStatus,
   StreamTicket: contracts.StreamTicket,
   AccessProfile: contracts.AccessProfile,
+  ViewerPreferences: contracts.ViewerPreferences,
+  PreferenceProfile: contracts.PreferenceProfile,
 } as const;

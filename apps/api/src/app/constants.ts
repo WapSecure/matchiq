@@ -11,6 +11,7 @@ export const ROUTES = {
   me: 'me',
   meSignIn: 'sign-in',
   meSignOut: 'sign-out',
+  mePreferences: 'preferences',
   sessions: ':fixtureId/sessions',
   replay: ':fixtureId/replay',
   state: ':fixtureId/state',
