@@ -1,4 +1,5 @@
 import type { EditorialMode, OverlayRetractCause } from '@matchiq/contracts';
+import type { ErrorKind } from './errors';
 
 export type ModeTone = 'positive' | 'warning' | 'critical';
 
@@ -185,22 +186,15 @@ export const EDITORIAL_COPY = {
   },
 } as const;
 
-/** Readable copy for RFC 9457 problems, by `type` slug first, then status. */
+/** Gallery wording for failed producer commands, by humanized error kind. */
 export const EDITORIAL_PROBLEMS = {
-  bySlug: {
-    'overlay-not-on-air':
-      'That cue is no longer on air, so there is nothing to retract.',
-    'insight-already-published':
-      'This insight is already published. Retract its cue from the overlay preview instead.',
-    'idempotency-key-reused':
-      'This request clashed with an earlier attempt. Close the dialog and try again.',
-  } as Record<string, string>,
-  byStatus: {
-    401: 'Your session has ended or you are not signed in. Sign in as a producer to use editorial controls.',
-    403: 'Your role does not allow this action. Ask a producer to make the change.',
-    404: 'It no longer exists. It may have been removed with its session.',
-    429: 'Too many requests. Wait a moment, then try again.',
-  } as Record<number, string>,
-  fallback: 'The command failed. Nothing was changed.',
-  reference: (id: string) => `Reference ${id}`,
+  byKind: {
+    sessionExpired:
+      "You've been signed out for security. Sign in again as a producer, then retry. Nothing was changed.",
+    forbidden:
+      "Your role can't do this. Ask a producer to make the change. Nothing was changed.",
+    notFound: "It no longer exists, so there's nothing to change.",
+    unexpected: "That didn't go through. Nothing was changed.",
+  } as Partial<Record<ErrorKind, string>>,
+  nothingChanged: 'Nothing was changed.',
 } as const;

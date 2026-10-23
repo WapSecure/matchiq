@@ -26,7 +26,7 @@ test.describe('judge quick-start', () => {
     await expect(page).toHaveURL(new RegExp(`/studio/${FIXTURE_ID}$`));
     expect(api.sessionStarts).toHaveLength(1);
     await expect(
-      page.getByRole('status').filter({ hasText: 'Stream Live' }),
+      page.getByRole('status').filter({ hasText: 'Connection: Live' }),
     ).toBeVisible();
     await expect(page.getByTestId('on-air-meta')).toContainText(
       'Tactical insight',

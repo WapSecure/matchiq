@@ -17,10 +17,10 @@ export const MAIN_CONTENT_ID = 'main-content';
 
 export const NOT_FOUND_COPY = {
   metaTitle: 'Page not found',
-  eyebrow: '404',
-  title: 'This page does not exist',
+  eyebrow: 'Page not found',
+  title: "This page doesn't exist",
   description:
-    'The link may be out of date, or the fixture may have been removed. Pick a synthetic fixture to continue.',
-  action: 'Browse fixtures',
+    'The link may be out of date, or the match may have ended. Pick a match to carry on.',
+  action: 'Go to matches',
   href: '/fixtures',
 } as const;

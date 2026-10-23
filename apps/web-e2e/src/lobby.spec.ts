@@ -54,7 +54,9 @@ test.describe('fixture lobby', () => {
       .getByRole('button', { name: /Start replay/ })
       .click();
     await expect(
-      page.getByRole('alert').filter({ hasText: 'Too many replay starts' }),
+      page
+        .getByRole('alert')
+        .filter({ hasText: "You've started a lot of replays" }),
     ).toBeVisible();
     await expect(page).toHaveURL(/\/fixtures$/);
   });
@@ -62,20 +64,23 @@ test.describe('fixture lobby', () => {
   test('explains an empty template list', async ({ page }) => {
     await mockApi(page, { templates: 'empty' });
     await page.goto('/fixtures');
-    await expect(page.getByText('No fixtures available')).toBeVisible();
+    await expect(page.getByText('No matches to replay yet')).toBeVisible();
   });
 
-  test('shows problem details when the API fails', async ({ page }) => {
+  test('explains an API failure in plain words, never its raw text', async ({
+    page,
+  }) => {
     await mockApi(page, { templates: 'error' });
     await page.goto('/fixtures');
     const alert = page
       .getByRole('alert')
-      .filter({ hasText: 'Fixtures could not be loaded' });
-    await expect(alert).toContainText('Template service unavailable', {
+      .filter({ hasText: "We couldn't load the matches" });
+    await expect(alert).toContainText("We're at capacity", {
       timeout: 15_000,
     });
+    await expect(alert).not.toContainText('Template service unavailable');
     await expect(
-      alert.getByRole('button', { name: 'Try again' }),
+      alert.getByRole('button', { name: /Try again/ }),
     ).toBeVisible();
   });
 

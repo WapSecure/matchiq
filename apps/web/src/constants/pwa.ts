@@ -101,9 +101,9 @@ export const PWA_COPY = {
   offline: {
     metaTitle: 'Offline',
     eyebrow: 'Offline',
-    title: 'You are offline. Live match data needs a connection.',
+    title: "You're offline",
     description:
-      'MatchIQ streams synthetic match events, metrics and overlays from its API. Reconnect and reload to continue; nothing is replayed from a cache.',
+      "Live match updates need an internet connection. Reconnect, then try again. We don't show saved copies, so what you see is always current.",
     retry: 'Try again',
   },
   update: {

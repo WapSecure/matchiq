@@ -61,29 +61,30 @@ export const STUDIO_COPY = {
     invariant:
       'Language changes commentary, not the controls. Audience changes its style. Both preserve the match facts.',
   },
-  connectionPrefix: 'Stream ',
-  notFound: 'Fixture not found',
-  loadError: 'The studio could not load this fixture',
+  connectionPrefix: 'Connection: ',
+  notFound: "We couldn't find this match",
+  loadError: "We couldn't open this match",
 } as const;
 
 export const CONNECTION_COPY: Record<
   ConnectionState,
   { label: string; banner: string | null }
 > = {
-  connecting: { label: 'Connecting', banner: null },
+  connecting: { label: 'Connecting…', banner: null },
   live: { label: 'Live', banner: null },
   reconnecting: {
-    label: 'Reconnecting',
-    banner:
-      'Stream interrupted. Reconnecting and resuming from the last event.',
+    label: 'Reconnecting…',
+    banner: 'Reconnecting… The score and stats will catch up by themselves.',
   },
   stale: {
-    label: 'Stale',
-    banner: 'No data received recently. Figures may be out of date.',
+    label: 'Catching up',
+    banner:
+      'Updates are slow to arrive, so figures may be a few seconds behind. No action needed.',
   },
   offline: {
     label: 'Offline',
-    banner: 'You are offline. Showing the last known match state.',
+    banner:
+      "You're offline. Showing the last known score and stats. We'll pick up again when you're back.",
   },
 };
 

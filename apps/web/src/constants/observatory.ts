@@ -20,7 +20,7 @@ export const OBSERVATORY_COPY = {
   },
   listLabel: 'Insight traces',
   empty: 'No insights detected yet. Traces appear as the replay runs.',
-  error: 'Agent runs could not be loaded',
+  error: "We couldn't load the AI fact-checks",
   loading: 'Loading agent runs',
   status: 'Pipeline status',
   publication: 'Published by',
