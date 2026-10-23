@@ -34,27 +34,27 @@ test.describe('judge quick-start', () => {
     await checkScreen(page);
 
     const trigger = page.getByRole('button', {
-      name: /open evidence for northbridge seize control/i,
+      name: /see the evidence for northbridge seize control/i,
     });
     await trigger.focus();
     await page.keyboard.press('Enter');
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Triggering events');
+    await expect(dialog).toContainText('The plays behind it');
     await expect(dialog).toContainText('Ball recovery');
     await checkScreen(page);
     await page.keyboard.press('Escape');
     await expect(trigger).toBeFocused();
 
-    const metrics = page.getByRole('region', { name: 'Live metrics' });
-    const feed = page.getByRole('group', { name: 'Match insights' });
+    const metrics = page.getByRole('region', { name: 'Match stats' });
+    const feed = page.getByRole('group', { name: 'Key moments' });
     const before = (await metrics.textContent()) ?? '';
-    await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
+    await page.getByRole('radio', { name: 'Fan' }).check({ force: true });
     await expect(feed.getByText('Northbridge are on top now')).toBeVisible();
     await page.getByRole('radio', { name: /Français/ }).check({ force: true });
     await page.getByRole('radio', { name: 'Broadcast' }).check({ force: true });
     await expect(feed.getByText('Northbridge prend le contrôle')).toBeVisible();
     await expect(
-      page.getByRole('group', { name: /1 cue on air/ }),
+      page.getByRole('group', { name: /1 graphic on air/ }),
     ).toContainText('Pressure building on the left');
     await expect(metrics).toHaveText(before);
 
@@ -64,19 +64,23 @@ test.describe('judge quick-start', () => {
       'Northbridge prend le contrôle',
     );
     await expect(
-      page.getByRole('button', { name: 'Export JSON' }),
+      page.getByRole('button', { name: 'Download recap (JSON)' }),
     ).toBeVisible();
     await checkScreen(page);
 
-    await page.getByRole('link', { name: 'Agent observatory' }).click();
-    const traces = page.getByRole('list', { name: 'Insight traces' });
+    await page.getByRole('link', { name: 'AI fact-checks' }).click();
+    const traces = page.getByRole('list', {
+      name: 'Key moments and their checks',
+    });
     await expect(traces.getByRole('article')).toHaveCount(2);
-    await expect(traces).toContainText('UNSUPPORTED_NUMBER');
+    await expect(traces).toContainText(
+      "A number that doesn't match the match data",
+    );
     await expect(
       page.locator('[data-provider="template"]').first(),
     ).toBeVisible();
     await expect(page.locator('[data-provider="mock"]').first()).toContainText(
-      'Mock',
+      'Test stand-in (not real AI)',
     );
     await checkScreen(page);
   });
@@ -84,7 +88,9 @@ test.describe('judge quick-start', () => {
   test('recap explains it is available at full time', async ({ page }) => {
     await mockApi(page, { recap: 'notReady' });
     await page.goto(`/studio/${FIXTURE_ID}/recap`);
-    await expect(page.getByText('Recap available at full time')).toBeVisible();
+    await expect(
+      page.getByText('The recap is ready at full time'),
+    ).toBeVisible();
     await checkScreen(page);
   });
 
@@ -92,7 +98,7 @@ test.describe('judge quick-start', () => {
     await mockApi(page);
     await page.goto(`/studio/${FIXTURE_ID}/recap`);
     const download = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Export JSON' }).click();
+    await page.getByRole('button', { name: 'Download recap (JSON)' }).click();
     expect((await download).suggestedFilename()).toBe(
       'matchiq-recap-NBA-HSR-NANA.json',
     );

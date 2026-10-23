@@ -20,7 +20,7 @@ describe('LandingPage', () => {
   it('identifies the static product shot as a sample', () => {
     expect(screen.getByText('Sample preview')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'Explore the demo' }),
+      screen.getByRole('link', { name: 'Choose a match' }),
     ).toHaveAttribute('href', '/fixtures');
   });
 

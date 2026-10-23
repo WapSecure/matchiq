@@ -29,24 +29,24 @@ const submitReason = async (page: Page, submit: string, reason: string) => {
 const banner = (page: Page) => page.getByTestId('editorial-banner');
 
 test.describe('editorial controls', () => {
-  test('freezes auto-publish, shows the banner, then resumes', async ({
-    page,
-  }) => {
+  test('pauses graphics, shows the banner, then resumes', async ({ page }) => {
     const api = await openStudio(page);
-    await page.getByRole('button', { name: 'Freeze auto-publish' }).click();
+    await page.getByRole('button', { name: 'Pause graphics' }).click();
     await expect(
       page.getByRole('dialog', {
-        name: 'Freeze auto-publish for this session',
+        name: 'Pause new graphics for this match',
       }),
     ).toBeVisible();
     await expectNoBlockingA11yViolations(page);
-    await submitReason(page, 'Freeze', 'Goal under VAR review');
+    await submitReason(page, 'Pause', 'Goal under VAR review');
 
-    await expect(banner(page)).toContainText('Auto-publish frozen');
-    await expect(page.getByTestId('editorial-chip')).toHaveText(/Frozen/);
+    await expect(banner(page)).toContainText('Graphics paused');
+    await expect(page.getByTestId('editorial-chip')).toHaveText(
+      /Graphics paused/,
+    );
     await expect(
-      page.getByRole('status', { name: 'Editorial notifications' }),
-    ).toContainText('Auto-publish frozen');
+      page.getByRole('status', { name: 'Producer notifications' }),
+    ).toContainText('Graphics paused');
     expect(api.editorialCommands[0]).toMatchObject({
       path: `/fixtures/${FIXTURE_ID}/editorial/freeze`,
       body: { reason: 'Goal under VAR review' },
@@ -55,70 +55,74 @@ test.describe('editorial controls', () => {
     await expectNoBlockingA11yViolations(page);
     await expectNoHorizontalOverflow(page);
 
-    await page.getByRole('button', { name: 'Resume auto-publish' }).click();
+    await page.getByRole('button', { name: 'Resume graphics' }).click();
     await submitReason(page, 'Resume', 'Review complete');
     await expect(banner(page)).toBeHidden();
   });
 
-  test('retracts the on-air cue from the overlay panel', async ({ page }) => {
+  test('takes the on-air graphic off air from the preview', async ({
+    page,
+  }) => {
     const api = await openStudio(page);
-    await page.getByRole('button', { name: /Retract on-air cue/ }).click();
+    await page.getByRole('button', { name: /Take off air: / }).click();
     await expect(page.getByRole('dialog')).toContainText(
       'Pressure building on the left',
     );
-    await submitReason(page, 'Retract cue', 'Wrong player credited');
+    await submitReason(page, 'Take off air', 'Wrong player credited');
     await expect(
       page.getByRole('group', { name: /standing by/ }),
     ).toBeVisible();
-    await expect(page.getByText('Retracted by producer')).toBeVisible();
+    await expect(page.getByText('Taken off air by a producer')).toBeVisible();
     expect(api.editorialCommands[0]?.path).toBe(
       `/overlays/${OVERLAY_ID}/retract`,
     );
     await expect(
-      page.getByRole('button', { name: /Retract on-air cue/ }),
+      page.getByRole('button', { name: /Take off air: / }),
     ).toBeHidden();
   });
 
-  test('guards the kill switch with a typed confirmation', async ({ page }) => {
+  test('guards the emergency stop with a typed confirmation', async ({
+    page,
+  }) => {
     const api = await openStudio(page);
     await page
-      .getByRole('button', { name: 'Kill switch', exact: true })
+      .getByRole('button', { name: 'Emergency stop', exact: true })
       .click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Reason').fill('Feed integrity incident');
     await dialog.getByRole('button', { name: 'Continue' }).click();
     const phrase = dialog.getByLabel('Confirmation');
     await expect(phrase).toBeFocused();
-    await phrase.fill('kill');
-    await dialog.getByRole('button', { name: 'Activate kill switch' }).click();
-    await expect(dialog).toContainText('Type KILL exactly');
+    await phrase.fill('stop');
+    await dialog.getByRole('button', { name: 'Stop all graphics' }).click();
+    await expect(dialog).toContainText('Type STOP exactly');
     expect(api.editorialCommands).toHaveLength(0);
     await expectNoBlockingA11yViolations(page);
 
-    await phrase.fill('KILL');
-    await dialog.getByRole('button', { name: 'Activate kill switch' }).click();
-    await expect(banner(page)).toContainText('Kill switch active');
+    await phrase.fill('STOP');
+    await dialog.getByRole('button', { name: 'Stop all graphics' }).click();
+    await expect(banner(page)).toContainText('Emergency stop on');
     await expect(
-      page.getByRole('button', { name: 'Release kill switch' }),
+      page.getByRole('button', { name: 'Release emergency stop' }),
     ).toBeVisible();
     expect(api.editorialCommands[0]?.path).toBe(
       '/editorial/kill-switch/activate',
     );
   });
 
-  test('lists the audit trail with load more', async ({ page }) => {
+  test('lists the activity log with load more', async ({ page }) => {
     await mockApi(page);
     await signIn(page, 'harbour.producer', `${STUDIO}/audit`);
     const table = page.getByRole('table', {
-      name: /Audit events: 2 shown, more/,
+      name: /Activity: 2 shown, more/,
     });
     await expect(table).toBeVisible();
     await expect(table).toContainText('Producer note 1');
     await page.getByRole('button', { name: 'Load more' }).click();
     await expect(
-      page.getByRole('table', { name: /Audit events: 4 shown/ }),
+      page.getByRole('table', { name: /Activity: 4 shown/ }),
     ).toBeVisible();
-    await expect(page.getByText('End of the audit trail.')).toBeVisible();
+    await expect(page.getByText('End of the activity log.')).toBeVisible();
     await page.getByText('1 field changed').first().click();
     // At rest under the sticky header, which otherwise overlaps the filters once scrolled.
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -131,7 +135,7 @@ test.describe('editorial controls', () => {
   }) => {
     await mockApi(page);
     await page.goto(STUDIO);
-    const freeze = page.getByRole('button', { name: 'Freeze auto-publish' });
+    const freeze = page.getByRole('button', { name: 'Pause graphics' });
     await expect(freeze).toHaveAttribute('aria-disabled', 'true');
     await expect(freeze).toHaveAccessibleDescription(/Producer/);
     // aria-disabled keeps it focusable; force the click to prove it stays inert.

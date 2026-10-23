@@ -1,7 +1,7 @@
 import { RequirePermission } from '@/components/auth/require-permission';
 import { TeamMonogram } from '@/components/match/team-monogram';
 import { MatchCodeChip } from '@/components/match/match-code-chip';
-import { Badge, Disclosure } from '@/components/ui';
+import { Badge, TechnicalDetails } from '@/components/ui';
 import { FEATURED_LABEL, LOBBY_COPY } from '@/constants/lobby';
 import { MATCH_CODE_COPY } from '@/constants/match-code';
 import { SIDE_LABELS } from '@/constants/match';
@@ -25,31 +25,33 @@ function TeamLine({ team, side }: { team: Team; side: 'home' | 'away' }) {
   );
 }
 
+/** The event count up front; seed and hash are reproducibility proof for engineers. */
 function Facts({ template }: { template: FixtureTemplateSummary }) {
-  const technical = MATCH_CODE_COPY.technical;
-  const rows: [string, string][] = [
-    [technical.seed, String(template.seed)],
-    [technical.hash, template.eventsHash],
-  ];
   return (
     <div className="mt-1 flex flex-col gap-2">
       <MatchCodeChip code={templateCode(template)} />
-      <p className="text-xs text-ink-muted">
-        {LOBBY_COPY.events}:{' '}
-        <span className="tabular text-ink">
-          {template.eventCount.toLocaleString('en-GB')}
-        </span>
+      <p className="tabular text-xs text-ink-muted">
+        <span className="text-ink-subtle">{LOBBY_COPY.events}: </span>
+        {template.eventCount.toLocaleString('en-GB')}
       </p>
-      <Disclosure title={technical.title}>
-        <dl className="grid gap-1 text-xs">
-          {rows.map(([label, value]) => (
-            <div key={label} className="min-w-0">
-              <dt className="text-micro text-ink-subtle">{label}</dt>
-              <dd className="tabular break-all font-mono text-ink">{value}</dd>
-            </div>
-          ))}
+      <TechnicalDetails>
+        <dl className="grid gap-2 font-mono">
+          <div className="min-w-0">
+            <dt className="text-micro text-ink-subtle">
+              {MATCH_CODE_COPY.technical.seed}
+            </dt>
+            <dd className="tabular text-ink">{template.seed}</dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-micro text-ink-subtle">
+              {MATCH_CODE_COPY.technical.hash}
+            </dt>
+            <dd className="tabular break-all text-ink">
+              {template.eventsHash}
+            </dd>
+          </div>
         </dl>
-      </Disclosure>
+      </TechnicalDetails>
     </div>
   );
 }

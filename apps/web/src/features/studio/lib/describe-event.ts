@@ -53,7 +53,7 @@ const specificDetail = (event: MatchEvent, roster: Roster): string | null => {
         event.won ? EVENT_DETAIL.won : EVENT_DETAIL.lost,
       );
     case 'CORRECTION':
-      return EVENT_DETAIL.correction(event.correctedEventId, event.reason);
+      return EVENT_DETAIL.correction(event.reason);
     default:
       return actorOf(event, roster);
   }

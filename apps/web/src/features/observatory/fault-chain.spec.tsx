@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { run } from '@/test/session-factories';
 import { DemoScenarioSelect } from '@/features/lobby/demo-scenario-select';
-import { FaultChain } from './fault-chain';
+import { FaultChain, FaultNotes } from './fault-chain';
 
 describe('FaultChain', () => {
   it('renders nothing for an ordinary trace', () => {
@@ -31,13 +31,51 @@ describe('FaultChain', () => {
     ];
     render(<FaultChain runs={runs} publication="TEMPLATE" />);
     expect(
-      screen.getByText('Simulated failure (demo): Timeout'),
+      screen.getByText('Simulated failure (demo): AI timed out'),
     ).toBeInTheDocument();
+    const chain = screen.getByTestId('fault-chain');
+    expect(chain).toHaveTextContent(
+      'We deliberately made the AI time out to show what happens when it is slow.',
+    );
+    expect(chain).toHaveTextContent('Standard wording went on air on time');
+    expect(chain).toHaveTextContent('What went on air: Standard wording');
+    expect(chain).not.toHaveTextContent('Circuit breaker');
+  });
+
+  it('keeps the raw annotated steps for Technical details, in order', () => {
+    const runs = [
+      run({
+        agent: 'MATCH_ANALYST',
+        outcome: 'TIMED_OUT',
+        startedAt: '2026-10-21T17:19:26.000Z',
+        faultInjected: 'MODEL_TIMEOUT',
+        faultNote: 'every model call raised a timeout',
+      }),
+      run({
+        agent: 'NARRATIVE_WRITER',
+        outcome: 'FAILED',
+        startedAt: '2026-10-21T17:19:27.000Z',
+        faultInjected: 'MODEL_TIMEOUT',
+        faultNote: 'Circuit breaker open',
+      }),
+    ];
+    render(<FaultNotes runs={runs} />);
     const steps = screen.getAllByRole('listitem');
-    expect(steps).toHaveLength(3);
-    expect(steps[0]).toHaveTextContent('Match analyst · Timed out');
+    expect(steps).toHaveLength(2);
+    expect(steps[0]).toHaveTextContent('Analyst · Took too long');
     expect(steps[1]).toHaveTextContent('Circuit breaker open');
-    expect(steps[2]).toHaveTextContent('Final source: Template');
+  });
+
+  it('tells the writer-revise story with the corrected AI wording on air', () => {
+    render(
+      <FaultChain
+        runs={[run({ faultInjected: 'WRITER_REVISE', faultNote: 'x' })]}
+        publication="AGENT"
+      />,
+    );
+    expect(screen.getByTestId('fault-chain')).toHaveTextContent(
+      "We deliberately planted a wrong number in the AI's draft to show the safety net. The fact checker caught it and the writer corrected it.",
+    );
   });
 });
 
@@ -48,7 +86,7 @@ describe('DemoScenarioSelect', () => {
       <DemoScenarioSelect title="Comeback" value={null} onChange={onChange} />,
     );
     const select = screen.getByRole('combobox', {
-      name: 'Demo scenario for Comeback',
+      name: 'Demo failure for Comeback',
     });
     expect(select).toHaveValue('');
     expect(screen.getAllByRole('option')).toHaveLength(4);

@@ -18,9 +18,7 @@ export const MATCH_CODE_COPY = {
   copy: 'Copy match code',
   copied: 'Copied',
   replay: (n: number) => `Replay ${n}`,
-  versus: (home: string, away: string) => `${home} v ${away}`,
   technical: {
-    title: 'Technical details',
     seed: 'Seed',
     hash: 'Events hash',
   },

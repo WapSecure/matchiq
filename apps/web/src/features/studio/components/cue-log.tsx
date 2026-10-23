@@ -1,21 +1,26 @@
 'use client';
 
 import { CAUSE_LABELS, EDITORIAL_CAUSES } from '@/constants/editorial';
-import { OVERLAY_COPY } from '@/constants/overlay';
+import { NATURAL_CUE_ENDS, OVERLAY_COPY } from '@/constants/overlay';
 import { cn } from '@/lib/cn';
 import { type Retraction, useMatchStore } from '../store';
 
-/** Editorial causes replace the generic label; their stream reason only repeats it. */
+/**
+ * The cause names why a graphic ended. Only a correction's own reason (match
+ * data, e.g. "Goal disallowed") is shown; scheduler and editorial reason codes
+ * only repeat the label.
+ */
 const describe = (r: Retraction) => {
   const editorial = r.cause !== null && EDITORIAL_CAUSES.has(r.cause);
+  const natural = NATURAL_CUE_ENDS.has(r.reason);
   return {
     label: r.cause ? CAUSE_LABELS[r.cause] : OVERLAY_COPY.ending[r.ending],
-    reason: editorial ? null : r.reason,
+    reason: editorial || natural ? null : r.reason,
     editorial,
   };
 };
 
-/** Recently ended cues: expired on the match clock, or retracted with a cause. */
+/** Recently ended graphics: finished on the match clock, or taken off air with a cause. */
 export function CueLog() {
   const ended = useMatchStore((s) => s.retractions);
   if (ended.length === 0) return null;
@@ -44,7 +49,7 @@ export function CueLog() {
                 {view.label}
               </span>
               <span className="min-w-0 truncate text-ink">
-                {r.headline ?? r.overlayId}
+                {r.headline ?? OVERLAY_COPY.untitled}
               </span>
               {view.reason ? (
                 <span className="text-ink-subtle">{view.reason}</span>

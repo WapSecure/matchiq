@@ -170,7 +170,7 @@ test.describe('friendly error states', () => {
     await expectFriendly(alert);
     await expect(alert).toContainText("We couldn't load the recap");
     await expect(
-      page.getByRole('navigation', { name: 'Session views' }),
+      page.getByRole('navigation', { name: 'Match views' }),
     ).toBeVisible();
     heal();
     await alert.getByRole('button', { name: 'Try again' }).click();

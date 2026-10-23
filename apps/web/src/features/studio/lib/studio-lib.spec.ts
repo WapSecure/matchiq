@@ -52,13 +52,15 @@ describe('templateOfSession', () => {
 });
 
 describe('describeMetric', () => {
-  it('labels engine metric refs with side, window and formula', () => {
+  it('labels engine metric refs with side, window, a plain definition and the formula', () => {
     expect(describeMetric('pressures.away.rolling5m')).toEqual({
-      label: 'Pressures (away, latest 5 min)',
+      label: 'Pressures (away, last 5 min)',
+      plain: 'Times a player closed down an opponent on the ball',
       formula: 'count(PRESSURE_APPLIED)',
     });
     expect(describeMetric('unknown.ref')).toEqual({
       label: 'unknown.ref',
+      plain: null,
       formula: null,
     });
   });

@@ -39,7 +39,7 @@ describe('lobby', () => {
     });
     renderLobby();
     const list = await screen.findByRole('list', {
-      name: 'Synthetic fixtures',
+      name: 'Matches',
     });
     const cards = within(list).getAllByRole('article');
     expect(cards[0]).toHaveTextContent('Late comeback');
@@ -47,7 +47,7 @@ describe('lobby', () => {
     expect(cards[0]).toHaveTextContent('1,470');
     expect(cards[1]).toHaveTextContent('High press');
     const sessions = await screen.findByRole('list', {
-      name: 'Recent replay sessions',
+      name: 'Recent replays',
     });
     expect(sessions).toHaveTextContent('Playing');
     expect(sessions).toHaveTextContent("11' · 20×");
@@ -115,7 +115,7 @@ describe('lobby', () => {
     expect(await within(card).findByText('Copied')).toBeInTheDocument();
     expect(await navigator.clipboard.readText()).toBe('HMU-AWC · NANA');
     await user.click(
-      within(card).getByRole('button', { name: 'Technical details' }),
+      within(card).getByRole('button', { name: /Technical details/ }),
     );
     expect(hash).toBeVisible();
     expect(await screen.findByText(/Replay 1 · HMU-AWC · NANA/)).toBeVisible();
@@ -131,7 +131,7 @@ describe('lobby', () => {
       await screen.findByText('No matches to replay yet'),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText('No sessions yet. Start a replay above.'),
+      await screen.findByText('No replays yet. Start one above.'),
     ).toBeInTheDocument();
   });
 });
