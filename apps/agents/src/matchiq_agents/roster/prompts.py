@@ -22,7 +22,8 @@ from matchiq_agents.roster.examples import (
     EXAMPLE_METRICS,
     EXAMPLE_TEAM,
     LOCALIZATION_EXAMPLE,
-    LOCALIZATION_SOURCE,
+    LOCALIZATION_REQUIRED,
+    LOCALIZATION_SOURCES,
     PRODUCER_EXAMPLE,
     WRITER_EXAMPLE,
     compact,
@@ -115,24 +116,29 @@ _PIDGIN: Final = (
     "terms in English (goal, shots, shots on target, pressure, possession, momentum, red card, "
     "substitution) and keep sentences short, e.g. 'Penbrook Town don score, na 3-2 now.' or "
     "'Penbrook Town dey press well well.' Write every number in digits, never as words (no "
-    "'tri', 'faiv' or 'three'), and spell 'for' in full. Use the decimal point. Be respectful: "
+    "'twi', 'tri', 'faiv' or 'three'; '2 times', never 'twi times'), and spell 'for' in full. "
+    "Use the decimal point. Be respectful: "
     "no caricature, no insults, no exaggeration beyond the source draft, and no betting, injury "
     "or prediction talk."
 )
 
 LOCALIZATION: Final = Prompt(
     agent=AgentName.LOCALIZATION,
-    version="3.0.0",
+    version="4.0.0",
     instructions=(
-        f"{_GROUNDING} You are the Localization Specialist. Translate every draft in `drafts` "
-        "into every locale in `targetLocales`: one item per (locale, persona) pair, each with "
-        "`locale`, `persona`, `headline` and `body`. Translate the meaning faithfully: the same "
-        "facts, the same numbers in digits (fr-FR and es-ES write decimals with a comma), and "
-        "every name in `protectedTerms` copied exactly. Keep the sentence count: a one-sentence "
-        "body stays one sentence. Add no minutes or other numbers; 'recently' is 'récemment' "
-        "and 'recientemente'. fr-FR and es-ES: natural football commentary. "
-        f"{_PIDGIN} Example for the CASUAL source body '{LOCALIZATION_SOURCE['body']}': "
-        f"{compact(LOCALIZATION_EXAMPLE)}"
+        f"{_GROUNDING} You are the Localization Specialist. `requiredItems` lists every "
+        "(locale, persona) pair to write. Return `drafts` with exactly one item per entry of "
+        "`requiredItems`, in the same order and no others: as many items as entries, covering "
+        "every persona (CASUAL, ANALYST and BROADCAST alike) in every locale. Each item has "
+        "`locale`, `persona`, `headline` and `body`, and translates the source draft in `drafts` "
+        "with that persona. Translate the meaning faithfully: the same facts, the same numbers in "
+        "digits (fr-FR and es-ES write decimals with a comma), and every name in `protectedTerms` "
+        "copied exactly. Keep the sentence count: a one-sentence body stays one sentence, and an "
+        "ANALYST body keeps all its sentences. Add no minutes or other numbers; 'recently' is "
+        "'récemment' and 'recientemente'. fr-FR and es-ES: natural football commentary. "
+        f"{_PIDGIN} Example for the source drafts {compact(LOCALIZATION_SOURCES)} and "
+        f"`requiredItems` {compact(LOCALIZATION_REQUIRED)} ({len(LOCALIZATION_REQUIRED)} "
+        f"entries, so {len(LOCALIZATION_REQUIRED)} items): {compact(LOCALIZATION_EXAMPLE)}"
     ),
 )
 

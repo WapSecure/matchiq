@@ -101,12 +101,13 @@ SAFETY_REGEX: Final = tuple(
 # "one"/"un"/"uno" are omitted: they double as articles and pronouns and would flag
 # ordinary prose; so is Pidgin "wan", which also means "want". Ordinals ("second half") are
 # omitted for the same reason. Pidgin uses English number words plus phonetic spellings; "fo"
-# stays because templates and prompts spell "for" in full.
+# stays because templates and prompts spell "for" in full. "twice" and "thrice" are counts the
+# engine cannot audit ("hit the target twice"); "once" is left out, as a conjunction.
 _ENGLISH: Final[dict[str, int]] = {
     "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
     "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
     "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
-    "twenty": 20, "dozen": 12,
+    "twenty": 20, "dozen": 12, "twice": 2, "thrice": 3,
 }  # fmt: skip
 _PIDGIN_SPELLINGS: Final[dict[str, int]] = {
     "tu": 2, "tri": 3, "fo": 4, "faiv": 5, "siks": 6, "sevin": 7, "et": 8, "nain": 9,
@@ -135,6 +136,17 @@ NUMBER_WORDS: Final[dict[Locale, dict[str, int]]] = {
     },
     Locale.pcm_NG: {**_ENGLISH, **_PIDGIN_SPELLINGS},
 }  # fmt: skip
+
+# A count before "times" must be digits. A short word there that is neither a quantifier nor a
+# known number word is a misspelt number ("twi times") that the number-word list cannot audit.
+COUNT_BEFORE_TIMES_REGEX: Final = re.compile(
+    r"(?<![\w'\u2019-])([^\W\d_]{1,6})\s+times\b", re.IGNORECASE
+)
+COUNT_QUANTIFIERS: Final = frozenset({
+    "all", "and", "at", "both", "by", "dem", "di", "dis", "dose", "few", "good", "hard", "how",
+    "many", "more", "most", "of", "other", "plenty", "recent", "same", "some", "so", "the",
+    "these", "those", "too", "wey",
+})  # fmt: skip
 
 # Capitalised words that are not entities: football terms and locale-specific forms.
 CAPITALISED_ALLOWED: Final = frozenset({"VAR", "MatchIQ"})

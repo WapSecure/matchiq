@@ -16,7 +16,12 @@ from matchiq_agents.contracts.types import (
 from matchiq_agents.domain.facts import FactView
 from matchiq_agents.guard import messages
 from matchiq_agents.guard.safety import unsafe_categories
-from matchiq_agents.guard.text import extract_numerals, forbidden_categories, unknown_capitalised
+from matchiq_agents.guard.text import (
+    extract_numerals,
+    forbidden_categories,
+    suspect_counts,
+    unknown_capitalised,
+)
 from matchiq_agents.limits import OVERLAY_LIMITS, PERSONA_LIMITS, TextLimits
 
 _SENTENCE_END = re.compile(r"(?<=[.!?…])\s+")
@@ -70,6 +75,9 @@ def check_text(
         elif not any(numeral.represents(value) for value in values):
             detail = messages.UNSUPPORTED_NUMERAL.format(raw=numeral.raw)
             found.append(issue(IssueCode.UNSUPPORTED_NUMBER, detail, index))
+    for raw in suspect_counts(text, locale):
+        detail = messages.SPELLED_COUNT.format(raw=raw)
+        found.append(issue(IssueCode.UNSUPPORTED_NUMBER, detail, index))
     for name in unknown_capitalised(text, view.allowed_name_tokens):
         found.append(
             issue(IssueCode.UNKNOWN_ENTITY, messages.UNKNOWN_NAME.format(name=name), index)

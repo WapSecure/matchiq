@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from matchiq_agents.contracts.types import Locale
 from matchiq_agents.guard.lexicon import (
     CAPITALISED_ALLOWED,
+    COUNT_BEFORE_TIMES_REGEX,
+    COUNT_QUANTIFIERS,
     FORBIDDEN_REGEX,
     NAME_TOKEN_REGEX,
     NUMBER_WORDS,
@@ -47,6 +49,17 @@ def extract_numerals(text: str, locale: Locale) -> list[Numeral]:
         if value is not None:
             found.append(Numeral(raw=match.group(), value=float(value), decimals=0))
     return found
+
+
+def suspect_counts(text: str, locale: Locale) -> list[str]:
+    """Words written as the count before "times" that are not digits, quantifiers or a number
+    word the numeral check already reports."""
+    words = NUMBER_WORDS[locale]
+    return [
+        word
+        for word in COUNT_BEFORE_TIMES_REGEX.findall(text)
+        if word.lower() not in COUNT_QUANTIFIERS and word.lower() not in words
+    ]
 
 
 def forbidden_categories(text: str) -> list[str]:

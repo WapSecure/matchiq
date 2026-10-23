@@ -138,7 +138,7 @@ async def test_away_team_subject_is_named() -> None:
 
 
 def _break_persona(persona: str, *, always: bool) -> Any:
-    def override(answer: BaseModel, count: int) -> BaseModel | None:
+    def override(answer: BaseModel, count: int) -> BaseModel | Exception | None:
         assert isinstance(answer, WriterOutput)
         if count > 1 and not always:
             return None
@@ -212,6 +212,44 @@ async def test_localization_is_one_call_and_falls_back_per_item() -> None:
     assert by_variant[("fr-FR", "CASUAL")].source is NarrativeSource.TEMPLATE
     assert by_variant[("fr-FR", "ANALYST")].source is NarrativeSource.AGENT
     assert by_variant[("pcm-NG", "CASUAL")].source is NarrativeSource.AGENT
+    assert len(result.narratives) == 12
+
+
+def _drop_non_casual(*, always: bool, seen: list[int]):
+    def override(answer: BaseModel, count: int) -> BaseModel | Exception | None:
+        assert isinstance(answer, LocalizationOutput)
+        seen.append(len(answer.drafts))
+        if count > 1 and not always:
+            return None
+        drafts = [d for d in answer.drafts if d.persona == "CASUAL"]
+        return answer.model_copy(update={"drafts": drafts}) if drafts else ValueError("empty")
+
+    return override
+
+
+async def test_left_out_localization_items_are_requested_once_more() -> None:
+    seen: list[int] = []
+    model = ScriptedModel({AgentName.LOCALIZATION: _drop_non_casual(always=False, seen=seen)})
+    result = await _run(model)
+    assert model.calls[AgentName.LOCALIZATION] == 2
+    # The follow-up asks only for the 6 ANALYST and BROADCAST items the first call left out.
+    assert seen == [9, 6]
+    assert len(result.narratives) == 12
+    assert {d.source for d in result.narratives} == {NarrativeSource.AGENT}
+    assert not any(d.localeFallback for d in result.narratives)
+
+
+async def test_items_still_missing_after_the_follow_up_fall_back_per_item() -> None:
+    seen: list[int] = []
+    model = ScriptedModel({AgentName.LOCALIZATION: _drop_non_casual(always=True, seen=seen)})
+    result = await _run(model)
+    assert seen[:2] == [9, 6]
+    by_variant = {(d.locale.value, d.persona.value): d for d in result.narratives}
+    assert by_variant[("fr-FR", "CASUAL")].source is NarrativeSource.AGENT
+    for locale in ("fr-FR", "es-ES", "pcm-NG"):
+        for persona in ("ANALYST", "BROADCAST"):
+            draft = by_variant[(locale, persona)]
+            assert draft.source is NarrativeSource.TEMPLATE or draft.localeFallback
     assert len(result.narratives) == 12
 
 

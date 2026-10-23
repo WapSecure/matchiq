@@ -2,6 +2,17 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-034: Localization covers every requested persona
+
+| Area                                                                                                                                                         | Status | Evidence                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------------------------------------ |
+| Localization prompt 4.0.0: `requiredItems` in the payload, an example with every persona in every locale and the item count stated; registry and baseline    | Done   | `test_prompts.py`, `test_prompt_registry.py`           |
+| Output checked against `requiredItems`: `MISSING_ITEM` per left-out item, one follow-up call for those items when the plan fits, per-item fallback otherwise | Done   | `test_pipeline.py`                                     |
+| Guard: "twice"/"thrice" are spelled numbers; a short non-quantifier word before "times" is `SPELLED_COUNT` (live "twi times" in pcm-NG)                      | Done   | `test_guard.py`                                        |
+| Live before/after (Ollama `qwen2.5:7b-instruct`, 120 s, 10 localization cases): fully localised share of agent narratives 28% → 87%, 0 violations            | Done   | `tests/eval/baselines/ollama-qwen2.5-7b-instruct.json` |
+
+Verification: CI (owner directive). Locally: Ruff, Pyright, the four touched test files, and one before/after live evaluation pair (load 8.7 → 10.4 before, 7.6 → 6.4 after).
+
 ## 2026-10-23 — MQ-033: Unique ADR numbers and fresh-clone web dev
 
 | Area                                                                                                                                                                                                                        | Status |

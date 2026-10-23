@@ -2,9 +2,9 @@
  "provider": "ollama",
  "deployment": "ollama/qwen2.5:7b-instruct",
  "deadlineMs": 120000,
- "loadAverageStart": "12.12 47.52 79.59",
- "loadAverageEnd": "47.17 30.25 36.95",
- "recordedAt": "2026-10-22T22:26:48+00:00",
+ "loadAverageStart": "7.56 9.22 8.74",
+ "loadAverageEnd": "6.35 6.88 7.66",
+ "recordedAt": "2026-10-23T01:35:51+00:00",
  "prompts": {
   "MATCH_ANALYST": {
    "version": "2.0.0",
@@ -19,8 +19,8 @@
    "hash": "440e3cc2d61ca5bac919d921c467f9352bc7d5862e71b6aee1c922b7c8305051"
   },
   "LOCALIZATION": {
-   "version": "3.0.0",
-   "hash": "773c03fa4f6e852359247234503a94fc218a4bbf283d4d4ae584b8c0da6eea9c"
+   "version": "4.0.0",
+   "hash": "35c63f34686c3a36085bb84e266ee4d6f945b9e78add82d76ff1ffaa0d5d0d2b"
   },
   "BROADCAST_PRODUCER": {
    "version": "2.0.0",
@@ -28,69 +28,71 @@
   }
  },
  "violations": 0,
- "agentShare": 0.135,
+ "agentShare": 0.883,
  "narratives": {
-  "AGENT": 18,
-  "AGENT+localeFallback": 13,
-  "TEMPLATE": 102
+  "AGENT": 68,
+  "AGENT+localeFallback": 7,
+  "TEMPLATE": 2
  },
  "summary": [
-  "cases=13 violations=0",
-  "statuses={'VERIFIED': 1, 'FALLBACK': 12}",
-  "narrative_sources={'AGENT': 18, 'AGENT+localeFallback': 13, 'TEMPLATE': 102}",
-  "agent_run_outcomes={'ollama:SUCCEEDED': 11, 'template:SUCCEEDED': 14, 'template:FALLBACK': 35, 'ollama:TIMED_OUT': 20}",
-  "model_calls_per_run p50=2 max=5",
-  "latency_ms p50=115675 p95=116258",
-  "agent_latency_ms BROADCAST_PRODUCER:SUCCEEDED=n1/p50 5698 BROADCAST_PRODUCER:TIMED_OUT=n3/p50 6932 LOCALIZATION:SUCCEEDED=n3/p50 35108 LOCALIZATION:TIMED_OUT=n1/p50 22909 MATCH_ANALYST:SUCCEEDED=n2/p50 15856 MATCH_ANALYST:TIMED_OUT=n7/p50 29238 NARRATIVE_WRITER:SUCCEEDED=n5/p50 24474 NARRATIVE_WRITER:TIMED_OUT=n9/p50 86455",
-  "agent_share=18/133 (14%) {'AGENT': 18, 'AGENT+localeFallback': 13, 'TEMPLATE': 102}",
+  "cases=10 violations=0",
+  "statuses={'VERIFIED': 7, 'FALLBACK': 3}",
+  "narrative_sources={'AGENT': 68, 'AGENT+localeFallback': 7, 'TEMPLATE': 2}",
+  "agent_run_outcomes={'ollama:SUCCEEDED': 37, 'template:SUCCEEDED': 10, 'template:FALLBACK': 9, 'ollama:FAILED': 3}",
+  "model_calls_per_run p50=4 max=5",
+  "latency_ms p50=64654 p95=110091",
+  "agent_latency_ms BROADCAST_PRODUCER:FAILED=n1/p50 4241 BROADCAST_PRODUCER:SUCCEEDED=n9/p50 4195 LOCALIZATION:SUCCEEDED=n10/p50 22143 MATCH_ANALYST:FAILED=n2/p50 28716 MATCH_ANALYST:SUCCEEDED=n8/p50 11170 NARRATIVE_WRITER:SUCCEEDED=n10/p50 22088",
+  "agent_share=68/77 (88%) {'AGENT': 68, 'AGENT+localeFallback': 7, 'TEMPLATE': 2}",
   "narratives by persona:",
-  "  ANALYST/TEMPLATE                 37",
-  "  CASUAL/TEMPLATE                  33",
-  "  BROADCAST/TEMPLATE               32",
-  "  CASUAL/AGENT                     10",
-  "  BROADCAST/AGENT+localeFallback    7",
-  "  ANALYST/AGENT+localeFallback      6",
-  "  ANALYST/AGENT                     4",
-  "  BROADCAST/AGENT                   4",
+  "  CASUAL/AGENT                   24",
+  "  BROADCAST/AGENT                23",
+  "  ANALYST/AGENT                  21",
+  "  ANALYST/AGENT+localeFallback    6",
+  "  CASUAL/TEMPLATE                 2",
+  "  CASUAL/AGENT+localeFallback     1",
   "narratives by locale:",
-  "  pcm-NG/TEMPLATE               27",
-  "  en-GB/TEMPLATE                25",
-  "  fr-FR/TEMPLATE                25",
-  "  es-ES/TEMPLATE                25",
-  "  en-GB/AGENT                    9",
-  "  fr-FR/AGENT                    5",
-  "  pcm-NG/AGENT+localeFallback    5",
-  "  fr-FR/AGENT+localeFallback     4",
-  "  es-ES/AGENT+localeFallback     4",
-  "  es-ES/AGENT                    2",
-  "  pcm-NG/AGENT                   2"
+  "  en-GB/AGENT                   20",
+  "  fr-FR/AGENT                   19",
+  "  pcm-NG/AGENT                  15",
+  "  es-ES/AGENT                   14",
+  "  pcm-NG/AGENT+localeFallback    4",
+  "  es-ES/AGENT+localeFallback     2",
+  "  fr-FR/AGENT+localeFallback     1",
+  "  es-ES/TEMPLATE                 1",
+  "  pcm-NG/TEMPLATE                1"
  ],
  "taxonomy": {
-  "NARRATIVE_WRITER/TIMEOUT": 8,
-  "MATCH_ANALYST/TIMEOUT": 7,
-  "BROADCAST_PRODUCER/TIMEOUT": 2,
-  "FACT_CHECKER/WINDOW_LENGTH": 1,
-  "LOCALIZATION/TIMEOUT": 1
+  "MATCH_ANALYST/SPELLED_NUMBER": 10,
+  "LOCALIZATION/NUMERALS_CHANGED": 9,
+  "LOCALIZATION/UNSUPPORTED_NUMERAL": 7,
+  "BROADCAST_PRODUCER/UNKNOWN_NAME": 1
  },
  "cases": [
   {
    "case": "sample_high_regains",
    "status": "VERIFIED",
    "violations": 0,
-   "latencyMs": 73163,
+   "latencyMs": 75881,
    "modelCalls": 4,
    "fallbackReason": null,
    "narratives": {
-    "AGENT": 6,
-    "AGENT+localeFallback": 6
+    "AGENT": 9,
+    "AGENT+localeFallback": 3
    },
-   "rejections": [],
+   "rejections": [
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/fr-FR",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/fr-FR",
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/es-ES",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/es-ES",
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/pcm-NG",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/pcm-NG"
+   ],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 21805,
+     "latencyMs": 11540,
      "retries": 0,
      "tokensIn": 840,
      "tokensOut": 184,
@@ -100,9 +102,229 @@
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 24474,
+     "latencyMs": 20670,
      "retries": 0,
      "tokensIn": 1168,
+     "tokensOut": 349,
+     "repairs": []
+    },
+    {
+     "agent": "FACT_CHECKER",
+     "provider": "template",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 1,
+     "retries": 0,
+     "tokensIn": null,
+     "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 39436,
+     "retries": 0,
+     "tokensIn": 1949,
+     "tokensOut": 614,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "template",
+     "outcome": "FALLBACK",
+     "latencyMs": 0,
+     "retries": 0,
+     "tokensIn": null,
+     "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "BROADCAST_PRODUCER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 4195,
+     "retries": 0,
+     "tokensIn": 710,
+     "tokensOut": 44,
+     "repairs": []
+    }
+   ]
+  },
+  {
+   "case": "high_regains_fr_only",
+   "status": "VERIFIED",
+   "violations": 0,
+   "latencyMs": 53683,
+   "modelCalls": 4,
+   "fallbackReason": null,
+   "narratives": {
+    "AGENT": 3
+   },
+   "rejections": [],
+   "runs": [
+    {
+     "agent": "MATCH_ANALYST",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 10018,
+     "retries": 0,
+     "tokensIn": 840,
+     "tokensOut": 183,
+     "repairs": []
+    },
+    {
+     "agent": "NARRATIVE_WRITER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 26498,
+     "retries": 0,
+     "tokensIn": 1167,
+     "tokensOut": 338,
+     "repairs": []
+    },
+    {
+     "agent": "FACT_CHECKER",
+     "provider": "template",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 1,
+     "retries": 0,
+     "tokensIn": null,
+     "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 14054,
+     "retries": 0,
+     "tokensIn": 1836,
+     "tokensOut": 213,
+     "repairs": []
+    },
+    {
+     "agent": "BROADCAST_PRODUCER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 3092,
+     "retries": 0,
+     "tokensIn": 710,
+     "tokensOut": 44,
+     "repairs": []
+    }
+   ]
+  },
+  {
+   "case": "high_regains_es_only",
+   "status": "VERIFIED",
+   "violations": 0,
+   "latencyMs": 50316,
+   "modelCalls": 4,
+   "fallbackReason": null,
+   "narratives": {
+    "AGENT": 2,
+    "AGENT+localeFallback": 1
+   },
+   "rejections": [
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/es-ES",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/es-ES"
+   ],
+   "runs": [
+    {
+     "agent": "MATCH_ANALYST",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 9733,
+     "retries": 0,
+     "tokensIn": 840,
+     "tokensOut": 180,
+     "repairs": []
+    },
+    {
+     "agent": "NARRATIVE_WRITER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 21868,
+     "retries": 0,
+     "tokensIn": 1164,
+     "tokensOut": 344,
+     "repairs": []
+    },
+    {
+     "agent": "FACT_CHECKER",
+     "provider": "template",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 2,
+     "retries": 0,
+     "tokensIn": null,
+     "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 14468,
+     "retries": 0,
+     "tokensIn": 1842,
+     "tokensOut": 226,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "template",
+     "outcome": "FALLBACK",
+     "latencyMs": 0,
+     "retries": 0,
+     "tokensIn": null,
+     "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "BROADCAST_PRODUCER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 4208,
+     "retries": 0,
+     "tokensIn": 710,
+     "tokensOut": 48,
+     "repairs": []
+    }
+   ]
+  },
+  {
+   "case": "high_regains_pcm_only",
+   "status": "VERIFIED",
+   "violations": 0,
+   "latencyMs": 47528,
+   "modelCalls": 4,
+   "fallbackReason": null,
+   "narratives": {
+    "AGENT": 2,
+    "AGENT+localeFallback": 1
+   },
+   "rejections": [
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/pcm-NG",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/pcm-NG"
+   ],
+   "runs": [
+    {
+     "agent": "MATCH_ANALYST",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 12786,
+     "retries": 0,
+     "tokensIn": 840,
+     "tokensOut": 183,
+     "repairs": []
+    },
+    {
+     "agent": "NARRATIVE_WRITER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 16763,
+     "retries": 0,
+     "tokensIn": 1167,
      "tokensOut": 338,
      "repairs": []
     },
@@ -120,10 +342,10 @@
      "agent": "LOCALIZATION",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 21095,
+     "latencyMs": 13024,
      "retries": 0,
-     "tokensIn": 1140,
-     "tokensOut": 189,
+     "tokensIn": 1836,
+     "tokensOut": 199,
      "repairs": []
     },
     {
@@ -140,54 +362,51 @@
      "agent": "BROADCAST_PRODUCER",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 5698,
+     "latencyMs": 4930,
      "retries": 0,
      "tokensIn": 710,
-     "tokensOut": 48,
+     "tokensOut": 44,
      "repairs": []
     }
    ]
   },
   {
-   "case": "red_card_away",
-   "status": "FALLBACK",
+   "case": "goal_rich_pcm",
+   "status": "VERIFIED",
    "violations": 0,
-   "latencyMs": 97988,
+   "latencyMs": 60410,
    "modelCalls": 4,
-   "fallbackReason": "producer: overlay failed checks",
+   "fallbackReason": null,
    "narratives": {
-    "AGENT": 6,
-    "AGENT+localeFallback": 6
+    "AGENT": 6
    },
-   "rejections": [
-    "BROADCAST_PRODUCER/TIMEOUT"
-   ],
+   "rejections": [],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 9907,
+     "latencyMs": 14416,
      "retries": 0,
-     "tokensIn": 837,
-     "tokensOut": 133,
+     "tokensIn": 841,
+     "tokensOut": 230,
      "repairs": []
     },
     {
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 20355,
+     "latencyMs": 24208,
      "retries": 0,
-     "tokensIn": 1120,
-     "tokensOut": 362,
+     "tokensIn": 1209,
+     "tokensOut": 377,
      "repairs": []
     },
     {
      "agent": "FACT_CHECKER",
      "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 3,
+     "latencyMs": 4,
      "retries": 0,
      "tokensIn": null,
      "tokensOut": null,
@@ -197,87 +416,60 @@
      "agent": "LOCALIZATION",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 44557,
+     "latencyMs": 14177,
      "retries": 0,
-     "tokensIn": 1136,
-     "tokensOut": 179,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 1837,
+     "tokensOut": 184,
      "repairs": []
     },
     {
      "agent": "BROADCAST_PRODUCER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 23093,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 7429,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 703,
+     "tokensOut": 38,
      "repairs": []
     }
    ]
   },
   {
-   "case": "high_regains_fr_only",
-   "status": "FALLBACK",
+   "case": "momentum_shift_decimals",
+   "status": "VERIFIED",
    "violations": 0,
-   "latencyMs": 115675,
+   "latencyMs": 68133,
    "modelCalls": 4,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; producer: overlay failed checks",
+   "fallbackReason": null,
    "narratives": {
-    "AGENT": 3
+    "AGENT": 11,
+    "AGENT+localeFallback": 1
    },
    "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "BROADCAST_PRODUCER/TIMEOUT"
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/CASUAL/pcm-NG",
+    "LOCALIZATION/NUMERALS_CHANGED/CASUAL/pcm-NG"
    ],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 28942,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 10919,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
+     "tokensIn": 845,
+     "tokensOut": 131,
+     "repairs": [
+      "DROP_WINDOW"
+     ]
     },
     {
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 44373,
+     "latencyMs": 18461,
      "retries": 0,
-     "tokensIn": 1290,
-     "tokensOut": 401,
+     "tokensIn": 1118,
+     "tokensOut": 342,
      "repairs": []
     },
     {
@@ -294,24 +486,14 @@
      "agent": "LOCALIZATION",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 35108,
+     "latencyMs": 34518,
      "retries": 0,
-     "tokensIn": 1144,
-     "tokensOut": 202,
+     "tokensIn": 1935,
+     "tokensOut": 565,
      "repairs": []
     },
     {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 6932,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
+     "agent": "LOCALIZATION",
      "provider": "template",
      "outcome": "FALLBACK",
      "latencyMs": 0,
@@ -319,35 +501,42 @@
      "tokensIn": null,
      "tokensOut": null,
      "repairs": []
+    },
+    {
+     "agent": "BROADCAST_PRODUCER",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 4198,
+     "retries": 0,
+     "tokensIn": 714,
+     "tokensOut": 45,
+     "repairs": []
     }
    ]
   },
   {
-   "case": "pressure_swing_pcm",
+   "case": "xg_decimals_fr",
    "status": "FALLBACK",
    "violations": 0,
-   "latencyMs": 115721,
+   "latencyMs": 61641,
    "modelCalls": 5,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; producer: overlay failed checks",
+   "fallbackReason": "analyst: model output unavailable or ungrounded",
    "narratives": {
-    "AGENT": 3,
-    "TEMPLATE": 2,
-    "AGENT+localeFallback": 1
+    "AGENT": 6
    },
    "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "FACT_CHECKER/WINDOW_LENGTH/ANALYST",
-    "LOCALIZATION/TIMEOUT"
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER"
    ],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 29166,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "outcome": "FAILED",
+     "latencyMs": 22982,
+     "retries": 1,
+     "tokensIn": 1699,
+     "tokensOut": 448,
      "repairs": []
     },
     {
@@ -364,12 +553,11 @@
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
      "outcome": "SUCCEEDED",
-     "latencyMs": 46258,
+     "latencyMs": 22309,
      "retries": 0,
-     "tokensIn": 1293,
-     "tokensOut": 414,
+     "tokensIn": 1297,
+     "tokensOut": 409,
      "repairs": [
-      "DROP_WINDOW",
       "DROP_WINDOW",
       "DROP_WINDOW"
      ]
@@ -378,27 +566,7 @@
      "agent": "FACT_CHECKER",
      "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 3,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "SUCCEEDED",
-     "latencyMs": 16624,
-     "retries": 0,
-     "tokensIn": 1319,
-     "tokensOut": 170,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
-     "outcome": "SUCCEEDED",
-     "latencyMs": 6,
+     "latencyMs": 1,
      "retries": 0,
      "tokensIn": null,
      "tokensOut": null,
@@ -407,449 +575,62 @@
     {
      "agent": "LOCALIZATION",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 22909,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 12933,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 1851,
+     "tokensOut": 203,
      "repairs": []
     },
     {
      "agent": "BROADCAST_PRODUCER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 0,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 3376,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
+     "tokensIn": 707,
+     "tokensOut": 50,
+     "repairs": [
+      "DROP_WINDOW"
+     ]
     }
    ]
   },
   {
-   "case": "momentum_shift_decimals",
+   "case": "accented_names",
    "status": "FALLBACK",
    "violations": 0,
-   "latencyMs": 116216,
-   "modelCalls": 2,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; writer: model output unavailable",
+   "latencyMs": 81516,
+   "modelCalls": 4,
+   "fallbackReason": "producer: overlay failed checks",
    "narratives": {
-    "TEMPLATE": 12
+    "AGENT": 10,
+    "TEMPLATE": 2
    },
    "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "NARRATIVE_WRITER/TIMEOUT"
+    "LOCALIZATION/NUMERALS_CHANGED/CASUAL/es-ES",
+    "LOCALIZATION/NUMERALS_CHANGED/CASUAL/pcm-NG",
+    "BROADCAST_PRODUCER/UNKNOWN_NAME"
    ],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 29032,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 86537,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 41,
+     "latencyMs": 7583,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "analyst_only_rich",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 116258,
-   "modelCalls": 2,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 4
-   },
-   "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "NARRATIVE_WRITER/TIMEOUT"
-   ],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 31003,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 871,
+     "tokensOut": 137,
      "repairs": []
     },
     {
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 83879,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 10,
+     "latencyMs": 19025,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "priority_p2",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 116214,
-   "modelCalls": 2,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 12
-   },
-   "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "NARRATIVE_WRITER/TIMEOUT"
-   ],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 29578,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 85667,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
-     "outcome": "SUCCEEDED",
-     "latencyMs": 35,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "no_counter_evidence",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 116112,
-   "modelCalls": 2,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 12
-   },
-   "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "NARRATIVE_WRITER/TIMEOUT"
-   ],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 29453,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 85778,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
-     "outcome": "SUCCEEDED",
-     "latencyMs": 60,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "hyphenated_name",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 105984,
-   "modelCalls": 1,
-   "fallbackReason": "analyst: skipped to leave the writer time; template analysis; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 12
-   },
-   "rejections": [
-    "NARRATIVE_WRITER/TIMEOUT"
-   ],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 105242,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
-     "outcome": "SUCCEEDED",
-     "latencyMs": 12,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "tight_deadline",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 102,
-   "modelCalls": 1,
-   "fallbackReason": "analyst: skipped to leave the writer time; template analysis; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 12
-   },
-   "rejections": [],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
-     "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 1183,
+     "tokensOut": 368,
      "repairs": []
     },
     {
@@ -864,12 +645,32 @@
     },
     {
      "agent": "LOCALIZATION",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 50646,
+     "retries": 0,
+     "tokensIn": 2075,
+     "tokensOut": 823,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
      "provider": "template",
      "outcome": "FALLBACK",
      "latencyMs": 0,
      "retries": 0,
      "tokensIn": null,
      "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "BROADCAST_PRODUCER",
+     "provider": "ollama",
+     "outcome": "FAILED",
+     "latencyMs": 4241,
+     "retries": 0,
+     "tokensIn": 782,
+     "tokensOut": 48,
      "repairs": []
     },
     {
@@ -885,58 +686,59 @@
    ]
   },
   {
-   "case": "injected_player_name",
-   "status": "FALLBACK",
+   "case": "two_personas_three_locales",
+   "status": "VERIFIED",
    "violations": 0,
-   "latencyMs": 116945,
-   "modelCalls": 2,
-   "fallbackReason": "analyst: model output unavailable or ungrounded; writer: model output unavailable",
+   "latencyMs": 67668,
+   "modelCalls": 4,
+   "fallbackReason": null,
    "narratives": {
-    "TEMPLATE": 12
+    "AGENT": 7,
+    "AGENT+localeFallback": 1
    },
    "rejections": [
-    "MATCH_ANALYST/TIMEOUT",
-    "NARRATIVE_WRITER/TIMEOUT"
+    "LOCALIZATION/UNSUPPORTED_NUMERAL/ANALYST/pcm-NG",
+    "LOCALIZATION/NUMERALS_CHANGED/ANALYST/pcm-NG"
    ],
    "runs": [
     {
      "agent": "MATCH_ANALYST",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 29238,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 11421,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 840,
+     "tokensOut": 183,
      "repairs": []
     },
     {
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 86455,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 22471,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 1167,
+     "tokensOut": 338,
      "repairs": []
     },
     {
      "agent": "FACT_CHECKER",
      "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 19,
+     "latencyMs": 4,
      "retries": 0,
      "tokensIn": null,
      "tokensOut": null,
+     "repairs": []
+    },
+    {
+     "agent": "LOCALIZATION",
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 29818,
+     "retries": 0,
+     "tokensIn": 1863,
+     "tokensOut": 445,
      "repairs": []
     },
     {
@@ -951,78 +753,12 @@
     },
     {
      "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    }
-   ]
-  },
-  {
-   "case": "forged_delimiter_name",
-   "status": "FALLBACK",
-   "violations": 0,
-   "latencyMs": 104271,
-   "modelCalls": 1,
-   "fallbackReason": "analyst: skipped to leave the writer time; template analysis; writer: model output unavailable",
-   "narratives": {
-    "TEMPLATE": 12
-   },
-   "rejections": [
-    "NARRATIVE_WRITER/TIMEOUT"
-   ],
-   "runs": [
-    {
-     "agent": "MATCH_ANALYST",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 103830,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "FACT_CHECKER",
-     "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 18,
+     "latencyMs": 3912,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
-    },
-    {
-     "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
-     "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 710,
+     "tokensOut": 44,
      "repairs": []
     }
    ]
@@ -1031,16 +767,33 @@
    "case": "real_packet_shape",
    "status": "FALLBACK",
    "violations": 0,
-   "latencyMs": 105884,
-   "modelCalls": 1,
-   "fallbackReason": "analyst: skipped to leave the writer time; template analysis; writer: model output unavailable",
+   "latencyMs": 110091,
+   "modelCalls": 5,
+   "fallbackReason": "analyst: model output unavailable or ungrounded",
    "narratives": {
-    "TEMPLATE": 12
+    "AGENT": 12
    },
    "rejections": [
-    "NARRATIVE_WRITER/TIMEOUT"
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER",
+    "MATCH_ANALYST/SPELLED_NUMBER"
    ],
    "runs": [
+    {
+     "agent": "MATCH_ANALYST",
+     "provider": "ollama",
+     "outcome": "FAILED",
+     "latencyMs": 34450,
+     "retries": 1,
+     "tokensIn": 1833,
+     "tokensOut": 536,
+     "repairs": []
+    },
     {
      "agent": "MATCH_ANALYST",
      "provider": "template",
@@ -1054,18 +807,20 @@
     {
      "agent": "NARRATIVE_WRITER",
      "provider": "ollama",
-     "outcome": "TIMED_OUT",
-     "latencyMs": 104937,
+     "outcome": "SUCCEEDED",
+     "latencyMs": 31676,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
-     "repairs": []
+     "tokensIn": 1602,
+     "tokensOut": 407,
+     "repairs": [
+      "DROP_WINDOW"
+     ]
     },
     {
      "agent": "FACT_CHECKER",
      "provider": "template",
      "outcome": "SUCCEEDED",
-     "latencyMs": 40,
+     "latencyMs": 5,
      "retries": 0,
      "tokensIn": null,
      "tokensOut": null,
@@ -1073,22 +828,22 @@
     },
     {
      "agent": "LOCALIZATION",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 40298,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 1962,
+     "tokensOut": 623,
      "repairs": []
     },
     {
      "agent": "BROADCAST_PRODUCER",
-     "provider": "template",
-     "outcome": "FALLBACK",
-     "latencyMs": 0,
+     "provider": "ollama",
+     "outcome": "SUCCEEDED",
+     "latencyMs": 3597,
      "retries": 0,
-     "tokensIn": null,
-     "tokensOut": null,
+     "tokensIn": 710,
+     "tokensOut": 41,
      "repairs": []
     }
    ]
@@ -1109,8 +864,8 @@
      "persona": "ANALYST",
      "locale": "en-GB",
      "source": "AGENT",
-     "headline": "Harbour City's press is effective",
-     "body": "Harbour City have 5 high recoveries in this spell. Their press appears to be forcing turnovers. Confidence is medium. This is a synthetic match feed."
+     "headline": "Harbour City's pressing is effective",
+     "body": "Harbour City have 5 high recoveries in this spell, along with no other metrics. Their pressing appears to be disrupting the visitors' build-up play. Confidence is medium. This is a synthetic match feed."
     },
     {
      "persona": "BROADCAST",
@@ -1130,15 +885,15 @@
      "persona": "ANALYST",
      "locale": "fr-FR",
      "source": "AGENT+localeFallback",
-     "headline": "Harbour City's press is effective",
-     "body": "Harbour City have 5 high recoveries in this spell. Their press appears to be forcing turnovers. Confidence is medium. This is a synthetic match feed."
+     "headline": "Harbour City's pressing is effective",
+     "body": "Harbour City have 5 high recoveries in this spell, along with no other metrics. Their pressing appears to be disrupting the visitors' build-up play. Confidence is medium. This is a synthetic match feed."
     },
     {
      "persona": "BROADCAST",
      "locale": "fr-FR",
-     "source": "AGENT+localeFallback",
-     "headline": "Harbour City press high",
-     "body": "5 high recoveries for Harbour City recently."
+     "source": "AGENT",
+     "headline": "Harbour City presse haut",
+     "body": "5 récupérations hautes pour Harbour City récemment."
     },
     {
      "persona": "CASUAL",
@@ -1151,15 +906,15 @@
      "persona": "ANALYST",
      "locale": "es-ES",
      "source": "AGENT+localeFallback",
-     "headline": "Harbour City's press is effective",
-     "body": "Harbour City have 5 high recoveries in this spell. Their press appears to be forcing turnovers. Confidence is medium. This is a synthetic match feed."
+     "headline": "Harbour City's pressing is effective",
+     "body": "Harbour City have 5 high recoveries in this spell, along with no other metrics. Their pressing appears to be disrupting the visitors' build-up play. Confidence is medium. This is a synthetic match feed."
     },
     {
      "persona": "BROADCAST",
      "locale": "es-ES",
-     "source": "AGENT+localeFallback",
-     "headline": "Harbour City press high",
-     "body": "5 high recoveries for Harbour City recently."
+     "source": "AGENT",
+     "headline": "Harbour City presiona arriba",
+     "body": "5 recuperaciones altas para Harbour City recientemente."
     },
     {
      "persona": "CASUAL",
@@ -1172,14 +927,14 @@
      "persona": "ANALYST",
      "locale": "pcm-NG",
      "source": "AGENT+localeFallback",
-     "headline": "Harbour City's press is effective",
-     "body": "Harbour City have 5 high recoveries in this spell. Their press appears to be forcing turnovers. Confidence is medium. This is a synthetic match feed."
+     "headline": "Harbour City's pressing is effective",
+     "body": "Harbour City have 5 high recoveries in this spell, along with no other metrics. Their pressing appears to be disrupting the visitors' build-up play. Confidence is medium. This is a synthetic match feed."
     },
     {
      "persona": "BROADCAST",
      "locale": "pcm-NG",
-     "source": "AGENT+localeFallback",
-     "headline": "Harbour City press high",
+     "source": "AGENT",
+     "headline": "Harbour City dey press for top",
      "body": "5 high recoveries for Harbour City recently."
     }
    ],
@@ -1200,149 +955,84 @@
    }
   },
   {
-   "case": "red_card_away",
-   "narratives": [
-    {
-     "persona": "CASUAL",
-     "locale": "en-GB",
-     "source": "AGENT",
-     "headline": "Northgate Rovers get a red card",
-     "body": "Northgate Rovers have been sent off in this match."
-    },
-    {
-     "persona": "ANALYST",
-     "locale": "en-GB",
-     "source": "AGENT",
-     "headline": "Northgate Rovers receive a red card",
-     "body": "Northgate Rovers have received a red card in this match. There is medium confidence in this observation. The synthetic match feed is a limitation."
-    },
-    {
-     "persona": "BROADCAST",
-     "locale": "en-GB",
-     "source": "AGENT",
-     "headline": "Red card for Northgate Rovers",
-     "body": "Northgate Rovers have received a red card in this match."
-    },
-    {
-     "persona": "CASUAL",
-     "locale": "fr-FR",
-     "source": "AGENT",
-     "headline": "Northgate Rovers ont un carton rouge",
-     "body": "Northgate Rovers ont reçu un carton rouge dans ce match."
-    },
-    {
-     "persona": "ANALYST",
-     "locale": "fr-FR",
-     "source": "AGENT+localeFallback",
-     "headline": "Northgate Rovers receive a red card",
-     "body": "Northgate Rovers have received a red card in this match. There is medium confidence in this observation. The synthetic match feed is a limitation."
-    },
-    {
-     "persona": "BROADCAST",
-     "locale": "fr-FR",
-     "source": "AGENT+localeFallback",
-     "headline": "Red card for Northgate Rovers",
-     "body": "Northgate Rovers have received a red card in this match."
-    },
-    {
-     "persona": "CASUAL",
-     "locale": "es-ES",
-     "source": "AGENT",
-     "headline": "Northgate Rovers reciben un cartón rojo",
-     "body": "Northgate Rovers han recibido un cartón rojo en este partido."
-    },
-    {
-     "persona": "ANALYST",
-     "locale": "es-ES",
-     "source": "AGENT+localeFallback",
-     "headline": "Northgate Rovers receive a red card",
-     "body": "Northgate Rovers have received a red card in this match. There is medium confidence in this observation. The synthetic match feed is a limitation."
-    },
-    {
-     "persona": "BROADCAST",
-     "locale": "es-ES",
-     "source": "AGENT+localeFallback",
-     "headline": "Red card for Northgate Rovers",
-     "body": "Northgate Rovers have received a red card in this match."
-    },
-    {
-     "persona": "CASUAL",
-     "locale": "pcm-NG",
-     "source": "AGENT",
-     "headline": "Northgate Rovers get a red card",
-     "body": "Northgate Rovers don get a red card in dis match."
-    },
-    {
-     "persona": "ANALYST",
-     "locale": "pcm-NG",
-     "source": "AGENT+localeFallback",
-     "headline": "Northgate Rovers receive a red card",
-     "body": "Northgate Rovers have received a red card in this match. There is medium confidence in this observation. The synthetic match feed is a limitation."
-    },
-    {
-     "persona": "BROADCAST",
-     "locale": "pcm-NG",
-     "source": "AGENT+localeFallback",
-     "headline": "Red card for Northgate Rovers",
-     "body": "Northgate Rovers have received a red card in this match."
-    }
-   ],
-   "overlay": {
-    "kind": "DISCIPLINE",
-    "priority": 90,
-    "durationMs": 10000,
-    "headline": "Red card",
-    "body": "Fouls (away) 11; red cards (away) 1",
-    "evidenceEventIds": [
-     "ev_00101",
-     "ev_00112",
-     "ev_00127"
-    ],
-    "metricRefs": [
-     "fouls.away.match",
-     "redCards.away.match"
-    ]
-   }
-  },
-  {
    "case": "high_regains_fr_only",
    "narratives": [
     {
      "persona": "CASUAL",
      "locale": "fr-FR",
      "source": "AGENT",
-     "headline": "Harbour City press hard",
-     "body": "Harbour City ont récupéré le ballon haut 5 fois récemment."
+     "headline": "Harbour City récupère le ballon haut",
+     "body": "Harbour City a récupéré le ballon haut sur le terrain 5 fois récemment."
     },
     {
      "persona": "ANALYST",
      "locale": "fr-FR",
      "source": "AGENT",
-     "headline": "Harbour City's press is effective",
-     "body": "Harbour City ont 5 récupérations hautes en ce moment, avec 3 tirs. Leur pression semble forcer les pertes de balle. Le niveau de confiance est moyen."
+     "headline": "Le pressing de Harbour City provoque des récupérations hautes",
+     "body": "Harbour City compte 5 récupérations hautes sur cette période. Son pressing semble provoquer des pertes de balle. La confiance est moyenne. Ces données de match sont synthétiques."
     },
     {
      "persona": "BROADCAST",
      "locale": "fr-FR",
      "source": "AGENT",
-     "headline": "Harbour City press high",
-     "body": "Harbour City ont récupéré le ballon haut 5 fois récemment."
+     "headline": "Harbour City presse haut",
+     "body": "5 récupérations hautes pour Harbour City récemment."
     }
    ],
    "overlay": {
     "kind": "TACTICAL_INSIGHT",
     "priority": 70,
     "durationMs": 8000,
-    "headline": "Pressure building",
-    "body": "High recoveries (home) 5; shots (home) 3",
+    "headline": "Harbour City press high",
+    "body": "5 high recoveries for Harbour City recently.",
     "evidenceEventIds": [
      "ev_00101",
      "ev_00112",
      "ev_00127"
     ],
     "metricRefs": [
-     "highRecoveries.home.rolling5m",
-     "shots.home.rolling5m"
+     "highRecoveries.home.rolling5m"
+    ]
+   }
+  },
+  {
+   "case": "high_regains_es_only",
+   "narratives": [
+    {
+     "persona": "CASUAL",
+     "locale": "es-ES",
+     "source": "AGENT",
+     "headline": "Harbour City recupera el balón arriba",
+     "body": "Harbour City ha recuperado el balón arriba 5 veces recientemente."
+    },
+    {
+     "persona": "ANALYST",
+     "locale": "es-ES",
+     "source": "AGENT+localeFallback",
+     "headline": "Harbour City's pressing effective",
+     "body": "Harbour City have 5 high recoveries in this spell, along with no other metrics. Their defensive pressing appears to be forcing turnovers. Confidence is medium. This is a synthetic match feed."
+    },
+    {
+     "persona": "BROADCAST",
+     "locale": "es-ES",
+     "source": "AGENT",
+     "headline": "Harbour City presiona arriba",
+     "body": "5 recuperaciones altas para Harbour City recientemente."
+    }
+   ],
+   "overlay": {
+    "kind": "TACTICAL_INSIGHT",
+    "priority": 70,
+    "durationMs": 8000,
+    "headline": "Harbour City press high",
+    "body": "5 high recoveries for Harbour City recently.",
+    "evidenceEventIds": [
+     "ev_00101",
+     "ev_00112",
+     "ev_00127"
+    ],
+    "metricRefs": [
+     "highRecoveries.home.rolling5m"
     ]
    }
   }

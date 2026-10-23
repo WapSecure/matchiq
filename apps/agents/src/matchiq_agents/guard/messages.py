@@ -12,6 +12,8 @@ UNSAFE: Final = "contains language unfit for broadcast ({category})"
 TOO_LONG: Final = "{field} is {length} characters; the limit is {limit}"
 TOO_MANY_SENTENCES: Final = "body has {count} sentences; the limit is {limit}"
 MISSING_PERSONA: Final = "no draft returned for persona {persona}"
+MISSING_ITEM: Final = "no localised item returned for {locale} {persona}"
+SPELLED_COUNT: Final = "writes '{raw} times'; write the count in digits"
 NUMERALS_CHANGED: Final = "localised text changed the numbers ({source} -> {target})"
 NAME_DROPPED: Final = "localised text dropped the proper noun {name}"
 CRITIQUE: Final = "reviewer: {detail}"
@@ -31,6 +33,8 @@ RULE_TEMPLATES: Final = {
     "TOO_LONG": TOO_LONG,
     "TOO_MANY_SENTENCES": TOO_MANY_SENTENCES,
     "MISSING_PERSONA": MISSING_PERSONA,
+    "MISSING_ITEM": MISSING_ITEM,
+    "SPELLED_COUNT": SPELLED_COUNT,
     "NUMERALS_CHANGED": NUMERALS_CHANGED,
     "NAME_DROPPED": NAME_DROPPED,
     "CRITIQUE": CRITIQUE,
