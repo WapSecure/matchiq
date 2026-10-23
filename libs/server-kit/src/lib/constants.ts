@@ -11,7 +11,30 @@ export const PROBLEM_TITLES = {
   validation: 'Request validation failed',
   internal: 'Internal server error',
   timeout: 'Health check timed out',
+  fallback: 'Request failed',
 } as const;
+
+/**
+ * Titles for framework-raised HTTP errors. Their own messages can carry
+ * routes, parser output or library names, so they are never echoed.
+ */
+export const HTTP_STATUS_TITLES: Readonly<Record<number, string>> = {
+  400: 'Malformed request',
+  401: 'Authentication required',
+  403: 'Forbidden',
+  404: 'Not found',
+  405: 'Method not allowed',
+  406: 'Not acceptable',
+  409: 'Conflict',
+  413: 'Request body too large',
+  415: 'Unsupported media type',
+  422: PROBLEM_TITLES.validation,
+  429: 'Too many requests',
+  503: 'Service temporarily unavailable',
+};
+
+/** Response headers browsers on an allowed origin may read. */
+export const CORS_EXPOSED_HEADERS = ['Retry-After', 'X-Request-Id'] as const;
 
 export const PROBLEM_SLUGS: Readonly<Record<number, string>> = {
   400: 'bad-request',

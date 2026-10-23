@@ -9,6 +9,7 @@ import {
 import type { ProblemDetails } from '@matchiq/contracts';
 import type { Request, Response } from 'express';
 import {
+  HTTP_STATUS_TITLES,
   PROBLEM_CONTENT_TYPE,
   PROBLEM_SLUGS,
   PROBLEM_TITLES,
@@ -25,14 +26,20 @@ const problemType = (status: number, slug?: string): string =>
 const pathOf = (req: Request): string =>
   req.originalUrl.split(QUERY_SEPARATOR, 1)[0] ?? req.originalUrl;
 
-const titleOf = (exception: HttpException): string => {
-  const body = exception.getResponse();
-  if (typeof body === 'string') return body;
-  if (typeof body === 'object' && 'message' in body) {
-    const { message } = body as { message: unknown };
-    if (typeof message === 'string') return message;
-  }
-  return exception.message;
+const titleOf = (status: number): string =>
+  status >= HttpStatus.INTERNAL_SERVER_ERROR
+    ? PROBLEM_TITLES.internal
+    : (HTTP_STATUS_TITLES[status] ?? PROBLEM_TITLES.fallback);
+
+/** Body-parser failures arrive as plain errors that carry an HTTP status. */
+const clientStatusOf = (exception: unknown): number | null => {
+  if (typeof exception !== 'object' || exception === null) return null;
+  const { status } = exception as { status?: unknown };
+  return typeof status === 'number' &&
+    status >= HttpStatus.BAD_REQUEST &&
+    status < HttpStatus.INTERNAL_SERVER_ERROR
+    ? status
+    : null;
 };
 
 /** Renders every error as RFC 9457 problem details without leaking internals. */
@@ -87,20 +94,14 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         errors: [...exception.fieldErrors],
       };
     }
-    if (exception instanceof HttpException) {
-      const status = exception.getStatus();
-      return {
-        ...base,
-        type: problemType(status),
-        title: titleOf(exception),
-        status,
-      };
-    }
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : (clientStatusOf(exception) ?? HttpStatus.INTERNAL_SERVER_ERROR);
     return {
       ...base,
       type: problemType(status),
-      title: PROBLEM_TITLES.internal,
+      title: titleOf(status),
       status,
     };
   }

@@ -65,16 +65,53 @@ describe('HTTP baseline', () => {
 
   afterAll(() => app.close());
 
-  it('renders HTTP exceptions as problem details', async () => {
+  it('renders HTTP exceptions as problem details with a generic title', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/probe/missing');
     expect(res.status).toBe(404);
     expect(res.headers['content-type']).toContain(PROBLEM_CONTENT_TYPE);
     expect(res.body).toMatchObject({
       type: 'urn:matchiq:problem:not-found',
-      title: 'Fixture not found',
+      title: 'Not found',
       status: 404,
       instance: '/api/v1/probe/missing',
     });
+  });
+
+  it('never echoes framework messages for unknown routes', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/no/such/route');
+    expect(res.status).toBe(404);
+    expect(res.body.title).toBe('Not found');
+    expect(JSON.stringify(res.body)).not.toMatch(/Cannot GET/);
+  });
+
+  it('answers malformed JSON with a 400 that hides parser output', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/probe')
+      .set('Content-Type', 'application/json')
+      .send('{"name": ');
+    expect(res.status).toBe(400);
+    expect(res.body).toMatchObject({
+      type: 'urn:matchiq:problem:bad-request',
+      title: 'Malformed request',
+    });
+    expect(res.body.detail).toBeUndefined();
+    expect(JSON.stringify(res.body)).not.toMatch(/JSON|token|position/i);
+  });
+
+  it('lets allowed browser origins read Retry-After and the request id', async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [ProbeModule],
+    }).compile();
+    const cors = moduleRef.createNestApplication({ logger: false });
+    configureHttpApp(cors, { corsOrigins: ['https://web.example'] });
+    await cors.init();
+    const res = await request(cors.getHttpServer())
+      .get('/api/v1/probe/missing')
+      .set('Origin', 'https://web.example');
+    expect(res.headers['access-control-expose-headers']).toBe(
+      'Retry-After,X-Request-Id',
+    );
+    await cors.close();
   });
 
   it('renders problem exceptions with detail, errors and headers', async () => {

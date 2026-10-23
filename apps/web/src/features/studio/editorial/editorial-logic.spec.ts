@@ -127,19 +127,19 @@ describe('reason and problem copy', () => {
         status,
         requestId: 'req_1',
       });
-    expect(
-      describeEditorialProblem(problem(409, 'overlay-not-on-air')),
-    ).toEqual({
-      message: 'That cue is no longer on air, so there is nothing to retract.',
-      reference: 'req_1',
-    });
-    expect(
-      describeEditorialProblem(problem(401, 'unauthorized')).message,
-    ).toMatch(/Sign in as a producer/);
-    expect(describeEditorialProblem(problem(403, 'forbidden')).message).toMatch(
-      /role does not allow/,
+    expect(describeEditorialProblem(problem(409, 'overlay-not-on-air'))).toBe(
+      "That graphic is no longer on air. There's nothing to take off air.",
     );
-    expect(describeEditorialProblem(new Error('x')).message).toMatch(
+    expect(describeEditorialProblem(problem(401, 'unauthorized'))).toMatch(
+      /Sign in again as a producer/,
+    );
+    expect(describeEditorialProblem(problem(403, 'forbidden'))).toMatch(
+      /role can't do this/,
+    );
+    expect(describeEditorialProblem(problem(500, 'internal-error'))).toBe(
+      'Something went wrong on our side. Nothing was changed.',
+    );
+    expect(describeEditorialProblem(new Error('x'))).toMatch(
       /Nothing was changed/,
     );
   });

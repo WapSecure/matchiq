@@ -6,10 +6,10 @@ import {
   type ReactNode,
   useState,
 } from 'react';
-import { AlertIcon, type IconProps } from '@/components/icons';
+import { InlineProblem } from '@/components/feedback/inline-problem';
+import type { IconProps } from '@/components/icons';
 import { Button, Modal } from '@/components/ui';
-import { EDITORIAL_COPY, EDITORIAL_PROBLEMS } from '@/constants/editorial';
-import type { ProblemView } from '@/lib/api/describe-editorial-problem';
+import { EDITORIAL_COPY } from '@/constants/editorial';
 import { ConfirmStep, type ConfirmCopy } from './confirm-step';
 import { reasonError } from './reason';
 import { ReasonField } from './reason-field';
@@ -32,25 +32,6 @@ type CommandDialogProps = {
   /** What the command acts on, shown above the reason. */
   subject?: ReactNode;
 };
-
-function ProblemAlert({ problem }: { problem: ProblemView }) {
-  return (
-    <div
-      role="alert"
-      className="flex items-start gap-2 rounded-md border border-critical/40 bg-critical/5 p-3 text-xs text-ink"
-    >
-      <AlertIcon size={16} className="mt-px shrink-0 text-critical" />
-      <div className="min-w-0">
-        <p>{problem.message}</p>
-        {problem.reference ? (
-          <p className="tabular mt-1 font-mono text-micro text-ink-subtle">
-            {EDITORIAL_PROBLEMS.reference(problem.reference)}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
 
 const submitLabel = ({
   advancing,
@@ -115,7 +96,12 @@ function CommandForm({
           disabled={command.pending}
         />
       )}
-      {command.problem ? <ProblemAlert problem={command.problem} /> : null}
+      {command.problem ? (
+        <InlineProblem
+          error={command.problem.error}
+          message={command.problem.message}
+        />
+      ) : null}
       <div className="flex flex-wrap justify-end gap-2">
         <Button
           variant="ghost"

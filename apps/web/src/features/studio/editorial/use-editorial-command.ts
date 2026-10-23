@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { CommandInput } from '@/lib/api/editorial-endpoints';
 import {
-  describeEditorialProblem,
+  editorialProblem,
   type ProblemView,
 } from '@/lib/api/describe-editorial-problem';
 import { useEditorialNotice } from './notice-store';
@@ -69,6 +69,6 @@ export const useEditorialCommand = <T extends Result>({
       mutation.mutate({ reason, idempotencyKey: key });
     },
     pending: mutation.isPending,
-    problem: mutation.isError ? describeEditorialProblem(mutation.error) : null,
+    problem: mutation.isError ? editorialProblem(mutation.error) : null,
   };
 };
