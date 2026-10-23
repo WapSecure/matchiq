@@ -1,36 +1,22 @@
 'use client';
 
 import type { Fixture } from '@matchiq/contracts';
-import { useMemo } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback';
 import { AgentsIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import { MAIN_CONTENT_ID } from '@/constants/site';
-import { useAgentRuns, useRecap, useReplayFinished } from '@/lib/api/hooks';
-import { TraceCard } from './trace-card';
+import { useAgentRuns } from '@/lib/api/hooks';
+import { FallbackNote } from './fallback-note';
+import { MomentList } from './moment-list';
 import { TraceSummary } from './trace-summary';
+import { useRecapMoments } from './use-recap-moments';
 
 const copy = OBSERVATORY_COPY;
 
-/**
- * Insight periods are only on recap moments (the trace has period clock only).
- * The recap exists from full time, so it is not requested before then.
- */
-const usePeriods = (fixtureId: string): Map<string, number> => {
-  const recap = useRecap(fixtureId, { enabled: useReplayFinished(fixtureId) });
-  return useMemo(
-    () =>
-      new Map(
-        (recap.data?.keyMoments ?? []).map((m) => [m.insightId, m.period]),
-      ),
-    [recap.data],
-  );
-};
-
 function Traces({ fixtureId }: { fixtureId: string }) {
   const runs = useAgentRuns(fixtureId);
-  const periods = usePeriods(fixtureId);
+  const moments = useRecapMoments(fixtureId);
   if (runs.isPending) {
     return (
       <div
@@ -38,7 +24,8 @@ function Traces({ fixtureId }: { fixtureId: string }) {
         aria-label={copy.loading}
         className="flex flex-col gap-3"
       >
-        <Skeleton className="h-20" />
+        <Skeleton className="h-28" />
+        <Skeleton className="h-16" />
         <Skeleton className="h-48" />
       </div>
     );
@@ -52,27 +39,20 @@ function Traces({ fixtureId }: { fixtureId: string }) {
       />
     );
   }
+  const period = (id: string) => moments.get(id)?.period ?? 0;
   const traces = [...runs.data].sort(
     (a, b) =>
-      (periods.get(a.insightId) ?? 0) - (periods.get(b.insightId) ?? 0) ||
+      period(a.insightId) - period(b.insightId) ||
       a.matchClockMs - b.matchClockMs,
   );
   return (
     <>
       <TraceSummary traces={traces} />
+      <FallbackNote traces={traces} />
       {traces.length === 0 ? (
         <EmptyState Icon={AgentsIcon} title={copy.empty} />
       ) : (
-        <ol aria-label={copy.listLabel} className="flex flex-col gap-3">
-          {traces.map((trace) => (
-            <li key={trace.insightId}>
-              <TraceCard
-                trace={trace}
-                period={periods.get(trace.insightId) ?? null}
-              />
-            </li>
-          ))}
-        </ol>
+        <MomentList traces={traces} moments={moments} />
       )}
     </>
   );

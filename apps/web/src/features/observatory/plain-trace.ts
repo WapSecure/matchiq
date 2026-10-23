@@ -1,5 +1,6 @@
 import type { GateRejection } from '@/lib/api/trace-schemas';
 import { englishLanguageName, PERSONA_LABELS } from '@/constants/match';
+import type { FallbackGroup } from '@/constants/fact-checks';
 import {
   FALLBACK_REASON_COPY,
   FALLBACK_REASON_DEFAULT,
@@ -7,24 +8,28 @@ import {
   ISSUE_DEFAULT,
   ISSUE_LABELS,
   ITEM_LABELS,
-  OBSERVATORY_COPY,
 } from '@/constants/observatory';
-import type { InsightTrace } from '@/lib/api/trace-schemas';
 
-const story = OBSERVATORY_COPY.story;
+type PlainReason = { text: string; group: FallbackGroup };
 
-/** Machine fallback reasons as plain sentences, without repeats. */
+const plainReason = (part: string): PlainReason =>
+  FALLBACK_REASON_COPY.find((c) => c.pattern.test(part)) ??
+  FALLBACK_REASON_DEFAULT;
+
+/** Machine fallback reasons as short plain sentences, without repeats. */
 export const plainFallbackReasons = (raw: string | null): string[] => {
   if (!raw) return [];
   const sentences = raw
     .split(FALLBACK_REASON_SEPARATOR)
-    .map(
-      (part) =>
-        FALLBACK_REASON_COPY.find((c) => c.pattern.test(part))?.text ??
-        FALLBACK_REASON_DEFAULT,
-    );
+    .map((part) => plainReason(part).text);
   return [...new Set(sentences)];
 };
+
+/** The group a fallback is counted under on the page-level note. */
+export const fallbackGroup = (raw: string | null): FallbackGroup =>
+  raw
+    ? plainReason(raw.split(FALLBACK_REASON_SEPARATOR)[0] ?? raw).group
+    : FALLBACK_REASON_DEFAULT.group;
 
 export const issueLabel = (code: string): string =>
   ISSUE_LABELS[code] ?? ISSUE_DEFAULT;
@@ -41,29 +46,3 @@ export const describeRejection = (r: GateRejection): string => {
   const issues = [...new Set(r.codes.map(issueLabel))].join('; ');
   return `${subject}: ${issues || ISSUE_DEFAULT}`;
 };
-
-const checkStep = (gate: InsightTrace['gate']): string => {
-  if (!gate) return story.checkPending;
-  return gate.rejected.length === 0
-    ? story.checked
-    : story.caught(gate.rejected.length);
-};
-
-const graphicStep = (trace: InsightTrace): string | null => {
-  const editorial = trace.editorial?.overlay;
-  if (editorial) return story.graphic[editorial];
-  if (!trace.gate) return null;
-  return trace.gate.overlayRevision === null
-    ? story.graphic.standard
-    : story.graphic.aiWording;
-};
-
-/** One line per key moment: spotted, written, checked, on air, versions. */
-export const traceStory = (trace: InsightTrace, minute: string): string[] =>
-  [
-    story.spotted(minute),
-    story.written[trace.publication],
-    checkStep(trace.gate),
-    graphicStep(trace),
-    trace.gate ? story.versions(trace.gate.publishedNarratives) : null,
-  ].filter((step): step is string => step !== null);

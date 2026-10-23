@@ -98,8 +98,52 @@ export const mockRecap = () => ({
       metricRefs: ['recoveries.home.rolling6m', 'shots.home.rolling6m'],
       narratives: narrativesOf(),
     },
+    goalMoment({
+      insightId: 'in_goal_away_34',
+      period: 1,
+      matchClockMs: 33 * MINUTE + 10_000,
+      teamId: AWAY_ID,
+      headline: 'Harbourside strike first',
+      body: 'A quick break down the right ends with a low finish at the near post.',
+    }),
+    goalMoment({
+      insightId: 'in_goal_home_84',
+      period: 2,
+      matchClockMs: 38 * MINUTE + 40_000,
+      teamId: HOME_ID,
+      headline: 'Northbridge complete the comeback',
+      body: 'Sustained pressure pays off with a header from a corner.',
+    }),
   ],
   synthetic: true,
+});
+
+type GoalMoment = {
+  insightId: string;
+  period: number;
+  matchClockMs: number;
+  teamId: string;
+  headline: string;
+  body: string;
+};
+
+/** A goal key moment written by AI for every audience, in English only. */
+const goalMoment = ({ headline, body, ...rest }: GoalMoment) => ({
+  ...rest,
+  kind: 'GOAL',
+  priority: 'P0',
+  reasonCode: 'GOAL',
+  confidenceLabel: 'high',
+  evidenceEventIds: ['ev_410', 'ev_412'],
+  metricRefs: ['shots.total'],
+  narratives: (['CASUAL', 'ANALYST', 'BROADCAST'] as const).map((persona) => ({
+    persona,
+    locale: 'en-GB',
+    headline,
+    body,
+    source: 'AGENT',
+    citations: ['ev_412'],
+  })),
 });
 
 const run = (overrides: Partial<AgentRun>): AgentRun => ({

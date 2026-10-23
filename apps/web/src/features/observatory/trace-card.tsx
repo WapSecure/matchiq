@@ -1,130 +1,122 @@
-import type { ReactNode } from 'react';
-import { Badge, TechnicalDetails } from '@/components/ui';
+import { SparkIcon } from '@/components/icons';
+import { Badge } from '@/components/ui';
+import { FACT_CHECKS_COPY } from '@/constants/fact-checks';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
-import { OBSERVATORY_COPY, PUBLICATION_LABELS } from '@/constants/observatory';
+import { OBSERVATORY_COPY } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
+import { cn } from '@/lib/cn';
 import { formatClock, formatMinute } from '@/lib/format';
-import { FaultChain, FaultNotes } from './fault-chain';
-import { GateReportView } from './gate-report';
-import {
-  describeRejection,
-  plainFallbackReasons,
-  traceStory,
-} from './plain-trace';
-import { RunTable } from './run-table';
+import { FaultChain } from './fault-chain';
+import { describeRejection, plainFallbackReasons } from './plain-trace';
+import { traceFacts, type Variants } from './trace-facts';
+import { TraceFactsRow } from './trace-facts-row';
+import { TraceTechnical } from './trace-technical';
 
-const copy = OBSERVATORY_COPY;
-const tech = copy.technical;
+const copy = FACT_CHECKS_COPY.facts;
 
-const PUBLICATION_TONE = {
-  AGENT: 'accent',
-  TEMPLATE: 'neutral',
-  PENDING: 'neutral',
+const RAIL = {
+  AGENT: 'before:bg-accent',
+  TEMPLATE: 'before:bg-line-strong',
+  PENDING: 'before:bg-line',
+} as const;
+
+const HEADER = {
+  AGENT: 'bg-accent-soft/50',
+  TEMPLATE: 'bg-surface-raised/60',
+  PENDING: 'bg-surface-raised/60',
 } as const;
 
 type TraceCardProps = {
   trace: InsightTrace;
   /** Known once the recap exists; otherwise the clock within the period is shown. */
   period: number | null;
+  variants: Variants | null;
 };
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+export const momentAnchor = (insightId: string) => `moment-${insightId}`;
+
+export const traceMinute = (trace: InsightTrace, period: number | null) =>
+  period === null
+    ? formatClock(1, trace.matchClockMs)
+    : formatMinute(period, trace.matchClockMs);
+
+function PublicationBadge({ trace }: { trace: InsightTrace }) {
+  const ai = trace.publication === 'AGENT';
   return (
-    <div className="min-w-0">
-      <dt className="text-micro text-ink-subtle">{label}</dt>
-      <dd className="break-words font-mono text-xs text-ink">{children}</dd>
-    </div>
+    <Badge tone={ai ? 'accent' : 'neutral'} className="ml-auto">
+      {ai ? <SparkIcon size={11} /> : null}
+      {copy.badge[trace.publication]}
+    </Badge>
   );
 }
 
 function Notes({ title, items }: { title: string; items: string[] }) {
   if (items.length === 0) return null;
   return (
-    <section>
-      <h4 className="eyebrow mb-1">{title}</h4>
-      <ul className="flex flex-col gap-0.5 text-xs text-ink">
-        {items.map((item, i) => (
-          <li key={`${i}-${item}`}>{item}</li>
-        ))}
-      </ul>
-    </section>
+    <p className="text-[13px] text-ink-muted">
+      <span className="font-medium text-ink">{title}: </span>
+      {items.join(' ')}
+    </p>
   );
 }
 
-function Technical({
-  trace,
-  caption,
-}: {
-  trace: InsightTrace;
-  caption: string;
-}) {
-  return (
-    <TechnicalDetails>
-      <dl className="grid gap-3 sm:grid-cols-3">
-        <Field label={tech.status}>{trace.status}</Field>
-        <Field label={tech.fallback}>
-          {trace.fallbackReason ?? copy.notApplicable}
-        </Field>
-        <Field label={tech.insightId}>{trace.insightId}</Field>
-      </dl>
-      <FaultNotes runs={trace.runs} />
-      <section>
-        <h4 className="eyebrow mb-1.5">{tech.gate}</h4>
-        <GateReportView report={trace.gate} />
-      </section>
-      <section>
-        <h4 className="eyebrow mb-1.5">{tech.runs}</h4>
-        <RunTable runs={trace.runs} caption={caption} />
-      </section>
-    </TechnicalDetails>
-  );
-}
-
-export function TraceCard({ trace, period }: TraceCardProps) {
+export function TraceCard({ trace, period, variants }: TraceCardProps) {
   const kind = INSIGHT_KIND_LABELS[trace.kind];
   const titleId = `trace-${trace.insightId}`;
-  const minute =
-    period === null
-      ? formatClock(1, trace.matchClockMs)
-      : formatMinute(period, trace.matchClockMs);
+  const minute = traceMinute(trace, period);
   const why =
     trace.publication === 'TEMPLATE'
       ? plainFallbackReasons(trace.fallbackReason)
       : [];
+  const caught = (trace.gate?.rejected ?? []).map(describeRejection);
   return (
     <article
+      id={momentAnchor(trace.insightId)}
       aria-labelledby={titleId}
       data-publication={trace.publication}
-      className="overflow-hidden rounded-lg border border-line bg-surface shadow-panel"
+      className={cn(
+        'relative scroll-mt-24 overflow-hidden rounded-lg border border-line bg-surface shadow-panel',
+        'before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:content-[""]',
+        RAIL[trace.publication],
+      )}
     >
-      <header className="flex flex-wrap items-center gap-2 border-b border-line bg-surface-raised/60 px-4 py-2.5">
+      <header
+        className={cn(
+          'flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-line py-2.5 pl-5 pr-4',
+          HEADER[trace.publication],
+        )}
+      >
+        <span className="tabular rounded-sm bg-surface-sunken px-1.5 py-0.5 font-mono text-xs font-semibold text-ink">
+          {minute}
+        </span>
         <h3 id={titleId} className="text-sm font-semibold text-ink">
           {kind}
         </h3>
-        <span className="tabular font-mono text-xs text-ink-subtle">
-          {minute}
-        </span>
-        <Badge tone={PUBLICATION_TONE[trace.publication]} className="ml-auto">
-          {PUBLICATION_LABELS[trace.publication]}
-        </Badge>
+        <PublicationBadge trace={trace} />
       </header>
-      <div className="flex flex-col gap-3 px-4 py-3">
-        <ol
-          aria-label={copy.story.region(kind, minute)}
-          data-testid="trace-story"
-          className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-ink [&>li+li]:before:mr-2 [&>li+li]:before:text-ink-subtle [&>li+li]:before:content-['·']"
-        >
-          {traceStory(trace, minute).map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
-        <FaultChain runs={trace.runs} publication={trace.publication} />
-        <Notes title={copy.story.why} items={why} />
-        <Notes
-          title={copy.story.caughtTitle}
-          items={(trace.gate?.rejected ?? []).map(describeRejection)}
+      <div className="flex flex-col gap-3 py-3 pl-5 pr-4">
+        <TraceFactsRow
+          facts={traceFacts(trace, variants)}
+          label={copy.label(kind, minute)}
         />
-        <Technical trace={trace} caption={`${tech.runs}: ${kind} ${minute}`} />
+        <FaultChain runs={trace.runs} publication={trace.publication} />
+        <Notes title={copy.why} items={why} />
+        {caught.length > 0 ? (
+          <section>
+            <h4 className="text-[13px] font-medium text-ink">
+              {OBSERVATORY_COPY.story.caughtTitle}
+            </h4>
+            <ul className="mt-0.5 flex flex-col gap-0.5 text-[13px] text-ink-muted">
+              {caught.map((item, i) => (
+                <li key={`${i}-${item}`}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+        <TraceTechnical
+          trace={trace}
+          caption={`${OBSERVATORY_COPY.technical.runs}: ${kind} ${minute}`}
+        />
       </div>
     </article>
   );
