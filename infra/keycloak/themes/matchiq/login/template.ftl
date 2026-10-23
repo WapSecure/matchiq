@@ -23,7 +23,7 @@
 <#assign isSignInPage = ["login", "login-username", "login-password"]?seq_contains(pageId)>
 <#-- Keycloak in dev mode prefixes each template's output with an HTML comment; keep it out of the heading and the tab title. -->
 <#assign pageHeading><#nested "header"></#assign>
-<#assign pageHeading = pageHeading?replace("<!--[\\s\\S]*?-->", "", "r")?trim>
+<#assign pageHeading = pageHeading?markup_string?replace("<!--[\\s\\S]*?-->", "", "r")?trim>
 <#assign tabTitle = pageHeading?replace(" (to|of) " + msg("mqProductName") + "$", "", "r")>
 <!DOCTYPE html>
 <html lang="${lang}"<#if realm.internationalizationEnabled> dir="${(locale.rtl)?then('rtl','ltr')}"</#if>>

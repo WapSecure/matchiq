@@ -55,7 +55,7 @@ describe('MatchIQ Keycloak login theme', () => {
     const title = frame.match(/<title>(.*?)<\/title>/)?.[1] ?? '';
     expect(title).not.toContain('<#nested');
     expect(title).toContain('${tabTitle');
-    expect(frame).toMatch(/pageHeading\?replace\("<!--/);
+    expect(frame).toMatch(/pageHeading\?markup_string\?replace\("<!--/);
     expect(frame).toMatch(/tabTitle = pageHeading\?replace\(" \(to\|of\)/);
     for (const f of readdirSync(THEME).filter((n) => n.endsWith('.ftl'))) {
       const html = readFileSync(join(THEME, f), 'utf8').replace(
