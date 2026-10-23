@@ -1008,7 +1008,6 @@ The owner explicitly approved pushing `fix/MQ-055-recap-fallback`, opening its P
 
 After integrating the completed recap redesign from origin/dev, applied the same language metadata and translation-status notice to the story summary and readable report download. The timeline, summary and report share one notice helper. The targeted recap spec now has 8 passing cases, including story/report fallback and unknown historical status. Frontend lint and application/spec type checks passed; formatting and whitespace checks passed. No other agents' worktrees, stack processes or protected branches were changed.
 
-
 ## MQ-070: Self-contained match reports (23 October 2026)
 
 Stream E, branch `fix/MQ-070-report-context`, isolated worktree cut from origin/dev. Checked open PRs #68 and #69 and existing worktree ownership; this change only touches recap export copy and formatting. Downloaded text reports now retain the selected narrative's writing-source disclosure and name both teams beside every final stat. Translation fallback and unknown-status notices remain intact. Replaced the decorative prose dash in the report heading with a colon; score separators and report rules retain their meaning. No comments, dependencies or contract changes were added.
