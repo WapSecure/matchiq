@@ -17,6 +17,13 @@ describe('LandingPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('identifies the static product shot as a sample', () => {
+    expect(screen.getByText('Sample preview')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Explore the demo' }),
+    ).toHaveAttribute('href', '/fixtures');
+  });
+
   it('lists every pipeline stage in order', () => {
     const list = screen
       .getByRole('region', { name: PIPELINE.title })

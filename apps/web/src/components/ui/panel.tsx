@@ -46,12 +46,12 @@ export function Panel({
           <div className="min-w-0">
             <h2
               id={headingId}
-              className="truncate text-[13px] font-semibold leading-5 tracking-tight text-ink"
+              className="break-words text-[13px] font-semibold leading-5 tracking-tight text-ink"
             >
               {title}
             </h2>
             {description ? (
-              <p className="truncate text-xs leading-4 text-ink-subtle">
+              <p className="break-words text-xs leading-4 text-ink-subtle">
                 {description}
               </p>
             ) : null}

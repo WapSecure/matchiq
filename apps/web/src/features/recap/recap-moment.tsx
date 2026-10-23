@@ -8,6 +8,7 @@ import {
 } from '@/constants/match';
 import { RECAP_COPY } from '@/constants/recap';
 import { STUDIO_COPY } from '@/constants/studio';
+import { SITE } from '@/constants/site';
 import type { RosterTeam } from '@/features/studio/lib/roster';
 import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
 import { formatMinute } from '@/lib/format';
@@ -60,12 +61,15 @@ export function RecapMomentItem({
             <p className="text-[13px] leading-relaxed text-ink-muted">
               {picked.narrative.body}
             </p>
-            <p className="mt-1 flex flex-wrap gap-x-2 text-micro text-ink-subtle">
+            <p
+              lang={SITE.locale}
+              className="mt-1 flex flex-wrap gap-x-2 text-micro text-ink-subtle"
+            >
               <span>
                 {STUDIO_COPY.insights.source[picked.narrative.source]}
               </span>
               {picked.fallback ? (
-                <span className="text-warning" lang="en-GB">
+                <span className="text-warning" lang={SITE.locale}>
                   {RECAP_COPY.localeFallback(locale)}
                 </span>
               ) : null}

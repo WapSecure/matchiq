@@ -37,7 +37,10 @@ export function OverlayCue({ cue }: { cue: OverlayCueData }) {
       </p>
       <div className="flex max-w-full items-stretch overflow-hidden rounded-[0.4cqw] rounded-tl-none bg-surface-sunken/92 shadow-float ring-1 ring-white/10 backdrop-blur-sm">
         <span aria-hidden className={cn('w-[0.5cqw] shrink-0', RULE[tone])} />
-        <div className="min-w-0 px-[1.7cqw] py-[1.1cqw] motion-safe:animate-[cue-copy_420ms_var(--ease-broadcast)_160ms_both]">
+        <div
+          lang={cue.locale}
+          className="min-w-0 px-[1.7cqw] py-[1.1cqw] motion-safe:animate-[cue-copy_420ms_var(--ease-broadcast)_160ms_both]"
+        >
           <p className="line-clamp-1 text-[max(13px,2.5cqw)] font-semibold leading-tight tracking-tight text-ink">
             {cue.headline}
           </p>

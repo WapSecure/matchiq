@@ -43,7 +43,7 @@ describe('lobby', () => {
     });
     const cards = within(list).getAllByRole('article');
     expect(cards[0]).toHaveTextContent('Late comeback');
-    expect(cards[0]).toHaveTextContent('Judge quick-start');
+    expect(cards[0]).toHaveTextContent('Recommended replay');
     expect(cards[0]).toHaveTextContent('1,470');
     expect(cards[1]).toHaveTextContent('High press');
     const sessions = await screen.findByRole('list', {

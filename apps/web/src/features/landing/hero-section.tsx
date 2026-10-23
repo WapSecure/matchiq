@@ -1,7 +1,6 @@
-import { ArrowRightIcon, GithubIcon, ShieldIcon } from '@/components/icons';
+import { ArrowRightIcon, ShieldIcon } from '@/components/icons';
 import { Badge, ButtonLink, Container } from '@/components/ui';
 import { HERO } from '@/constants/landing';
-import { SITE } from '@/constants/site';
 import { HeroPreview } from './hero-preview';
 
 function HeroFacts() {
@@ -15,7 +14,7 @@ function HeroFacts() {
           <dt className="order-2 text-xs leading-snug text-ink-subtle">
             {fact.label}
           </dt>
-          <dd className="tabular font-mono text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+          <dd className="tabular font-mono text-base font-semibold tracking-tight text-ink sm:text-lg">
             {fact.value}
           </dd>
         </div>
@@ -30,11 +29,7 @@ export function HeroSection() {
       aria-labelledby="hero-title"
       className="relative overflow-hidden border-b border-line"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--mq-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--mq-line)_1px,transparent_1px)] bg-[size:56px_56px] opacity-50 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black_20%,transparent_75%)]"
-      />
-      <Container className="relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-24">
+      <Container className="relative grid grid-cols-1 items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-24">
         <div className="min-w-0">
           <Badge tone="accent">{HERO.eyebrow}</Badge>
           <h1
@@ -55,14 +50,6 @@ export function HeroSection() {
             </ButtonLink>
             <ButtonLink href={HERO.howItWorks.href} variant="secondary">
               {HERO.howItWorks.label}
-            </ButtonLink>
-            <ButtonLink
-              href={SITE.repositoryUrl}
-              variant="ghost"
-              external
-              leadingIcon={<GithubIcon size={16} />}
-            >
-              {HERO.secondaryCta.label}
             </ButtonLink>
           </div>
           <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-ink-subtle">

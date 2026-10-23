@@ -1,5 +1,5 @@
 import { PitchPlot } from '@/components/charts/pitch-plot';
-import { EvidenceIcon, SparkIcon } from '@/components/icons';
+import { EvidenceIcon, BroadcastIcon } from '@/components/icons';
 import { Scoreboard } from '@/components/match/scoreboard';
 import { TeamSwatch } from '@/components/match/team-swatch';
 import { OverlayCanvas } from '@/components/overlay/overlay-canvas';
@@ -40,24 +40,20 @@ function PreviewInsight() {
  */
 export function HeroPreview() {
   return (
-    <div role="img" aria-label={DEMO.label} className="relative">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-6 rounded-[28px] bg-[radial-gradient(60%_60%_at_60%_40%,var(--mq-accent-soft),transparent_70%)]"
-      />
+    <div role="img" aria-label={DEMO.label} className="relative min-w-0">
       <div
         aria-hidden
         className="relative overflow-hidden rounded-xl border border-line-strong bg-canvas shadow-float"
       >
         <div className="flex h-9 items-center gap-2 border-b border-line bg-surface px-3">
-          <SparkIcon size={13} className="text-accent" />
+          <BroadcastIcon size={13} className="text-accent" />
           <span className="min-w-0 truncate text-micro font-medium text-ink-muted">
             {DEMO.chrome} · {DEMO.title}
           </span>
           <Badge tone="synthetic" className="ml-auto hidden sm:inline-flex">
             {WATERMARK}
           </Badge>
-          <Badge tone="positive" dot className="ml-auto sm:ml-0">
+          <Badge tone="neutral" className="ml-auto sm:ml-0">
             {DEMO.live}
           </Badge>
         </div>

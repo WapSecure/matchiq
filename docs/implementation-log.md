@@ -34,6 +34,17 @@ Verification: CI (owner directive). Locally: Prettier, `nx lint web`, `nx typech
 
 Limitations: hover, focus-visible and pressed states are interactive in the gallery, not frozen; a static capture shows the resting, selected, disabled, invalid and loading states. The native controls in the app are replaced in part 2.
 
+## 2026-10-23 — MQ-047: Land the local presentation polish through review
+
+| Area                                                                                                                                                                                                                                                        | Status  | Evidence                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
+| Six local commits (MQ-040, MQ-041, MQ-044, MQ-045, MQ-046) moved off local `dev` onto `chore/MQ-047-merge-local-polish` and merged with `origin/dev` (#42, #43, #44, then #45 and #47); #45 conflicts in lobby and offline copy resolved to the #45 wording | Done    | merge commit on the branch     |
+| Their implementation log entries moved from the end of this file to the top, newest first, text unchanged                                                                                                                                                   | Done    | this file                      |
+| Review: no secrets, no attribution trailers, no native controls introduced; pre-existing copy issues recorded in the PR for #45                                                                                                                             | Done    | PR description                 |
+| `pwa.spec.ts` offline heading aligned; lint, typecheck and unit tests                                                                                                                                                                                       | Partial | CI only, per the CI-first rule |
+
+Note: the readiness documents in `apps/web/docs/` propose "MQ-047" and "MQ-048" for interface localization and recap fallback provenance; those proposals need new ticket numbers because MQ-047 is this merge and MQ-048 is the agent workflow guide (#47).
+
 ## 2026-10-23 — MQ-039: Content style guide and graceful errors everywhere
 
 | Area                                                                                                                                                                                                                                                | Status | Evidence                                                                                                               |
@@ -48,6 +59,53 @@ Limitations: hover, focus-visible and pressed states are interactive in the gall
 | Playwright with axe: mocked 500, offline, 401, 429 (`Retry-After` countdown), 503 and 404 across the lobby, studio, recap, AI fact-checks and the activity log, each with a working recovery                                                        | Done   | `apps/web-e2e/src/error-states.spec.ts` (runs in CI)                                                                   |
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for `web`, `web-e2e` and `server-kit`, plus the touched spec files.
+
+## MQ-046: Commentary language boundaries (23 October 2026)
+
+Stream E, branch `fix/MQ-046-commentary-language-boundaries` cut from `dev`. The product owner selected independent interface and commentary languages. The audience bar now states that the picker affects commentary, while operator controls remain English. Native language choices carry language tags; English narrative source/fallback labels no longer inherit French, Spanish or Pidgin pronunciation. Overlay copy uses the actual cue locale. English provider fallback is tagged using `localeFallback` rather than the requested locale.
+
+Live announcements now throttle text and its actual language as one value, retain the previous pair until the next message airs, select the latest pending moment, and cancel timers on removal/unmount. Added 13 regressions covering these boundaries and timing. No code comments or dependencies were added.
+
+Commands/results under Node 22.22.3: `pnpm nx run web:lint --output-style=static` passed; `pnpm nx run web:typecheck --output-style=static` passed; `pnpm exec vitest run --config apps/web/vitest.config.mts --maxWorkers=1` passed 210 tests in 33 files; Prettier source checks and `git diff --check` passed. `NODE_ENV=production pnpm exec next build --webpack` compiled, typechecked and generated pages, with the known 27 standalone-tracing omissions caused by reused external dependency symlinks. The existing studio/judge-flow Playwright suite passed all 60 checks across four theme/viewport projects, including axe, keyboard controls, commentary switching and unchanged match figures. Existing auth unit tests still emit React act warnings. No checks were weakened or skipped.
+
+Known limitations: interface translation and native editorial approval are not delivered by this change. Recap contracts/building omit the provider fallback flag, so an English fallback filed under a requested locale cannot always be identified in recaps. No protected contracts/backend files were changed. The concrete handoff is `apps/web/docs/language-readiness.md`.
+
+Next three tickets: MQ-047 independent interface localization; MQ-048 preserve recap fallback provenance across contracts/backend/UI; MQ-049 native football editorial review of French, Spanish and Pidgin. Production packaging and licensed-feed qualification remain open.
+
+## MQ-045: Mobile identity regression (23 October 2026)
+
+Stream F, branch `test/MQ-045-mobile-studio-identity` cut from `dev`. Added browser coverage at 320px and 390px for a readable, viewport-contained fixture heading and an accessible producer account menu, including organisation, sign-out and Escape dismissal. Initial assertions used the wrong organisation display name; corrected them to the existing synthetic test account without changing application behavior or weakening the check.
+
+Validation: all 8 browser cases passed across the configured projects, QA TypeScript and new-file lint passed, and formatting/diff whitespace checks passed. No code comments were added. The local test issuer and mocked API remain test infrastructure, not production integration proof.
+
+Next three tickets: complete interface localization; obtain native editorial review for supported narrative languages; qualify licensed live data and production operations with a paid pilot.
+
+## MQ-044: Mobile studio polish (23 October 2026)
+
+Stream E, branch `fix/MQ-044-mobile-studio-polish` cut from `dev`. Screenshot review found hidden mobile fixture identity/account access, an empty observatory summary cell and truncated panel descriptions. The studio header now wraps the fixture title onto a dedicated mobile row and retains the account menu; panel headings/descriptions wrap; all six summary tiles use the available grid cells. Recap waiting/export copy now describes user outcomes. Removed the applied MQ-041 patch artifact and updated the readiness report. No code comments were added; the obsolete phone-header comment was removed.
+
+Validation: web lint and typecheck passed; 18 affected unit tests passed; 56 mobile studio/authentication/editorial browser checks passed, including axe and keyboard flows; all 24 producer screenshot captures passed and revised mobile studio/recap/observatory images were inspected. Formatting and diff whitespace checks passed. Webpack production compilation, type checking and page generation passed, with the same standalone tracing limitation from reused dependency symlinks. No deployment or real external integration was verified.
+
+Next three tickets: permanent mobile identity/account browser regression; full interface localization and native editorial review; licensed feed and operational qualification for a paid pilot.
+
+## MQ-041: Frontend browser validation (23 October 2026)
+
+Stream F, branch `fix/MQ-041-frontend-validation` cut from `dev` after MQ-040 merged locally. Updated three browser selectors for the reviewed product labels and added a viewport-bounds regression for the static preview. Screenshot capture now accepts an output directory and signs in as the test producer, allowing protected audit and editorial screens to render without bypassing permissions. No product code comments were added.
+
+Validation: 128 public-demo browser tests passed across desktop/mobile and light/dark projects. All 24 authenticated screenshot captures passed using the local OIDC test issuer and mocked API/stream fixtures. The initial anonymous capture failed four audit-table assertions because access was correctly denied; sign-in fixed the capture setup. QA TypeScript check passed. QA lint passed with existing warnings; the new bounds test uses unconditional assertions. Authentication/editorial suite: 64 passed across all four projects using the local test issuer.
+
+Next: preserve match identity and account access on mobile; finish global interface localization; qualify real feed and production identity integrations. Browser fixtures and the test issuer do not certify production integrations.
+
+## MQ-040: Enterprise review and frontend copy polish (23 October 2026)
+
+Stream E, branch `fix/MQ-040-enterprise-polish`, isolated worktree cut from `dev`.
+
+- Reviewed the enterprise product addendum, ADRs and frontend source. The prioritized review, acceptance evidence and next three tickets are in `apps/web/docs/enterprise-readiness-review.md`.
+- Reworked landing, lobby, studio and diagnostic copy around producer tasks; removed unsupported speed claims, judge-facing labels, prose dashes and unnecessary final third hyphens. Kept synthetic, template and real-provider disclosures.
+- Simplified the landing hero and labeled its static sample explicitly. Updated frontend assertions and added sample-label coverage.
+- Prepared `apps/web/docs/qa-label-migration.patch` for stream F because three existing Playwright selectors reference changed labels. `git apply --check` passes; the patch has not been applied to QA-owned files.
+- Frontend lint, typecheck, source formatting and diff whitespace checks passed under Node 22.22.3. Shell default Node 18 cannot start this Vitest version. Two concurrent suite runs encountered different 5-second test timeouts; the observatory test passed independently without changing its timeout. Final serial run: all 197 tests in 30 files passed. Existing auth tests emit React act warnings.
+- Standard Turbopack build could not resolve Next.js outside the isolated worktree through reused dependency symlinks. Webpack production compilation, type checking and page generation passed with standalone tracing warnings. Landing Playwright: 20 passed across four viewport/theme projects, including axe. Screenshot inspection found mobile clipping; explicit mobile grid sizing and a shrinkable preview address it, with a proposed QA regression test. Deployment packaging and the full browser suite remain unqualified. No enterprise deployment, licensed feed or external graphics integration was claimed.
 
 ## 2026-10-23 — MQ-037: Walkthrough polish (audit actor names, dev CSP, recap polling)
 

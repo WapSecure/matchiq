@@ -19,7 +19,7 @@ test.describe('fixture lobby', () => {
       .getByRole('article');
     await expect(cards).toHaveCount(2);
     await expect(cards.first()).toContainText('Late comeback');
-    await expect(cards.first()).toContainText('Judge quick-start');
+    await expect(cards.first()).toContainText('Recommended replay');
     await expect(cards.first()).toContainText('Northbridge Athletic');
     await expect(cards.first()).toContainText('Synthetic match demo');
     await expect(cards.first()).toContainText('4207');

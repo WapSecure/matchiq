@@ -40,7 +40,7 @@ export function TraceSummary({ traces }: { traces: readonly InsightTrace[] }) {
           </dd>
         </div>
       ))}
-      <div className="col-span-2 bg-surface px-4 py-3 sm:col-span-1">
+      <div className="bg-surface px-4 py-3">
         <dt className="text-micro text-ink-subtle">{copy.providers}</dt>
         <dd className="mt-1 flex flex-wrap gap-1">
           {s.providers.map((p) => (
