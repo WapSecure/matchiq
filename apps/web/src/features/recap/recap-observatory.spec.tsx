@@ -5,8 +5,8 @@ import { ObservatoryView } from '@/features/observatory/observatory-view';
 import { STUDIO_UI_DEFAULTS, useStudioUi } from '@/features/studio/store';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { fixture } from '@/test/factories';
-import { recap, run, trace } from '@/test/session-factories';
-import { stubApi } from '@/test/stub-api';
+import { recap, run, status, trace } from '@/test/session-factories';
+import { callsTo, stubApi } from '@/test/stub-api';
 import { RecapView } from './recap-view';
 
 const NOT_READY = {
@@ -134,5 +134,28 @@ describe('agent observatory', () => {
       screen.getByText('Gate rejections').nextElementSibling,
     ).toHaveTextContent('1');
     expect(document.querySelectorAll('dd [data-provider]')).toHaveLength(3);
+  });
+
+  it('does not request the recap before full time', async () => {
+    const api = stubApi({
+      'GET /replay': { body: status({ state: 'PLAYING' }) },
+      'GET /recap': NOT_READY,
+      'GET /agent-runs': { body: { items: [trace()] } },
+    });
+    renderWith(<ObservatoryView fixture={fixture()} />);
+    await screen.findByRole('list', { name: 'Insight traces' });
+    expect(callsTo(api, '/replay').length).toBeGreaterThan(0);
+    expect(callsTo(api, '/recap')).toHaveLength(0);
+  });
+
+  it('fetches the recap once the replay has completed', async () => {
+    const api = stubApi({
+      'GET /replay': { body: status({ state: 'COMPLETED' }) },
+      'GET /recap': { body: recap() },
+      'GET /agent-runs': { body: { items: [trace()] } },
+    });
+    renderWith(<ObservatoryView fixture={fixture()} />);
+    await screen.findByRole('list', { name: 'Insight traces' });
+    await vi.waitFor(() => expect(callsTo(api, '/recap')).toHaveLength(1));
   });
 });
