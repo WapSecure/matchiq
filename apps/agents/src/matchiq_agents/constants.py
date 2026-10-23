@@ -2,6 +2,7 @@ from types import MappingProxyType
 from typing import Final
 
 from matchiq_agents.contracts.types import AgentName
+from matchiq_agents.pipeline.budget import BudgetLimits
 
 SERVICE_NAME: Final = "matchiq-agents"
 API_PREFIX: Final = "/api/v1"
@@ -38,6 +39,10 @@ LOCAL_FEEDBACK_MIN_SHARE: Final = 0.6
 # times out at most twice before its deadline is spent, so this is four pipelines in a row
 # without a single answer.
 LOCAL_CIRCUIT_TIMEOUT_THRESHOLD: Final = 8
+# Per-run budget defaults (AGENT_BUDGET_*). A normal run takes at most 7 hops (analyst, two
+# writer/checker rounds, localization, producer); the mock and local models report no cost.
+DEFAULT_RUN_BUDGET: Final = BudgetLimits(max_hops=12, max_tokens=60_000, max_cost_usd=0.5)
+BUDGET_HOPS_MAX: Final = 32
 DEADLINE_RESERVE_MS: Final = 50
 MIN_MODEL_CALL_MS: Final = 200
 # Model work ends this long before `deadlineMs`, leaving room to cancel in-flight calls and

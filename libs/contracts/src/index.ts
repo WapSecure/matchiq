@@ -7,6 +7,7 @@ export * from './lib/metric-display.js';
 export * from './lib/insight.js';
 export * from './lib/faults.js';
 export * from './lib/agents.js';
+export * from './lib/trace.js';
 export * from './lib/narrative.js';
 export * from './lib/overlay.js';
 export * from './lib/replay.js';

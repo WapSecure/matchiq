@@ -18,6 +18,7 @@ from matchiq_agents.models.port import ModelOutputError, ModelPort, ModelUsage
 from matchiq_agents.models.pricing import EMPTY_PRICES, PriceTable
 from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy, StageTimer
 from matchiq_agents.pipeline import diagnostics
+from matchiq_agents.pipeline.budget import RunBudget
 from matchiq_agents.pipeline.recorder import RunRecord, RunScope
 from matchiq_agents.roster.prompts import Prompt
 
@@ -66,7 +67,9 @@ class ModelRunner:
         deadline: Deadline,
         prices: PriceTable = EMPTY_PRICES,
         timer: StageTimer | None = None,
+        budget: RunBudget | None = None,
     ) -> None:
+        self._budget = budget or RunBudget()
         self._model = model
         self._breaker = breaker
         self._clock = clock
@@ -88,6 +91,10 @@ class ModelRunner:
     @property
     def deadline(self) -> Deadline:
         return self._deadline
+
+    @property
+    def budget(self) -> RunBudget:
+        return self._budget
 
     def fits(self, *agents: AgentName) -> bool:
         """Whether these calls, by their observed latency, fit in the time that is left."""
@@ -141,6 +148,10 @@ class ModelRunner:
             return None
         self._breaker.record_success()
         state.add_usage(usage)
+        cost = self._prices.estimate(
+            self._model.provider, self._model.deployment, usage.tokens_in, usage.tokens_out
+        )
+        self._budget.charge(usage.tokens_in, usage.tokens_out, cost)
         return self._convert(call, parsed, state)
 
     def _convert[T: BaseModel, R](
@@ -169,7 +180,7 @@ class ModelRunner:
         for attempt in range(self._policy.max_retries + 1):
             if attempt:
                 await self._backoff(attempt)
-            if not self._breaker.allow():
+            if not self._budget.allow() or not self._breaker.allow():
                 state.outcome = RunOutcome.FAILED
                 break
             state.count = attempt + 1
