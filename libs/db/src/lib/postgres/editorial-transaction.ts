@@ -25,7 +25,7 @@ import {
   controlMatch,
   readControls,
 } from './editorial-queries.js';
-import { PostgresLedgerTransaction } from './ledger-transaction.js';
+import { PostgresReviewTransaction } from './review-queries.js';
 
 const scoped = (
   table: { orgId: PgColumn; fixtureId: PgColumn },
@@ -49,7 +49,7 @@ const toOverlayRow = (row: {
 }): OverlayRow => ({ ...row, status: OverlayStatus.parse(row.status) });
 
 class PostgresEditorialTransaction
-  extends PostgresLedgerTransaction
+  extends PostgresReviewTransaction
   implements EditorialTransaction
 {
   async fixtureOfOverlay(

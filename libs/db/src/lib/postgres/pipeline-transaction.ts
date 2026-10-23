@@ -2,7 +2,6 @@ import type {
   AgentRun,
   MatchSnapshot,
   Narrative,
-  OverlayCue,
   ReplayStatus,
 } from '@matchiq/contracts';
 import { and, eq, isNull, max, sql } from 'drizzle-orm';
@@ -12,6 +11,7 @@ import type {
   InsightCompletion,
   InsightPublication,
   InsightRecord,
+  OverlayEndWrite,
   OverlayRecord,
   PipelineTransaction,
   PipelineUnitOfWork,
@@ -180,15 +180,10 @@ class PostgresPipelineTransaction
   async endOverlay(
     key: FixtureKey,
     overlayId: string,
-    end: { status: OverlayCue['status']; reason: string },
+    end: OverlayEndWrite,
   ): Promise<void> {
     await this.pin.to(key.orgId);
-    await this.tx
-      .update(overlayCues)
-      .set({ status: end.status, endReason: end.reason, updatedAt: sql`now()` })
-      .where(
-        and(scoped(overlayCues, key), eq(overlayCues.overlayId, overlayId)),
-      );
+    return writes.endOverlay(this.tx, key, overlayId, end);
   }
 
   editorialView(

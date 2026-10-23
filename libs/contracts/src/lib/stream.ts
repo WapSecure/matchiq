@@ -12,6 +12,7 @@ import {
   UtcTimestamp,
 } from './primitives.js';
 import { ReplayStatus } from './replay.js';
+import { OverlayReviewNotice } from './review.js';
 import { MatchSnapshot } from './snapshot.js';
 
 const EnvelopeBase = z.strictObject({
@@ -44,6 +45,7 @@ export const StreamMessage = z.discriminatedUnion('type', [
       cause: OverlayRetractCause.optional(),
     }),
   ),
+  message('overlay.review', OverlayReviewNotice),
   message('replay.status', ReplayStatus),
   message('editorial.status', EditorialStatus),
   message('heartbeat', z.strictObject({})),

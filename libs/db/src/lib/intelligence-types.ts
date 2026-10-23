@@ -61,6 +61,13 @@ export interface InsightRecord {
   readonly publication: InsightPublication;
 }
 
+export interface OverlayEndWrite {
+  readonly status: OverlayCue['status'];
+  readonly reason: string;
+  /** Set when a cue that never aired closes under review (ADR-0022). */
+  readonly editorial?: OverlayRecord['editorial'];
+}
+
 export interface OverlayRecord {
   readonly cue: OverlayCue;
   /** Lifecycle status stored for reads; the published cue keeps its approval status. */
@@ -128,7 +135,7 @@ export interface PipelineTransaction extends LedgerTransaction {
   endOverlay(
     key: FixtureKey,
     overlayId: string,
-    end: { status: OverlayCue['status']; reason: string },
+    end: OverlayEndWrite,
   ): Promise<void>;
   insertAgentRuns(
     key: FixtureKey,

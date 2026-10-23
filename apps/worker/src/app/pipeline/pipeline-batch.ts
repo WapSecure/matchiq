@@ -21,6 +21,7 @@ export interface OverlayEnd {
   readonly overlayId: string;
   readonly status: OverlayCue['status'];
   readonly reason: string;
+  readonly editorial?: OverlayRecord['editorial'];
 }
 
 /** Everything one transaction writes; stream drafts keep emission order. */

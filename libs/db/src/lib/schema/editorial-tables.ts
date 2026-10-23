@@ -6,8 +6,9 @@ import { orgId, utc } from './columns.js';
 
 /**
  * Current editorial controls: one `ORG` row (the kill switch, `scope_id` is
- * the org id) and one `FIXTURE` row per session ever frozen. History lives
- * in `audit_events`.
+ * the org id), one `FIXTURE` row per session ever frozen and one `APPROVAL`
+ * row per session ever switched to MANUAL publishing (`active`, ADR-0022).
+ * History lives in `audit_events`.
  */
 export const editorialControls = pgTable(
   TABLES.editorialControls,
@@ -27,7 +28,7 @@ export const editorialControls = pgTable(
     }),
     check(
       'editorial_controls_scope_valid',
-      sql`${t.scopeType} in ('ORG', 'FIXTURE')`,
+      sql`${t.scopeType} in ('ORG', 'FIXTURE', 'APPROVAL')`,
     ),
   ],
 );

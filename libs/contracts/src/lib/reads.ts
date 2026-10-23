@@ -95,11 +95,19 @@ export const GateReport = z.strictObject({
 
 export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 
-/** RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its insight was suppressed. */
+/**
+ * RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its
+ * insight was suppressed. The rest are the MANUAL review states (ADR-0022);
+ * only APPROVED and RETRACTED cues ever aired.
+ */
 export const OverlayEditorialState = z.enum([
   'RETRACTED',
   'HELD',
   'SUPPRESSED',
+  'AWAITING_APPROVAL',
+  'APPROVED',
+  'REJECTED',
+  'APPROVAL_EXPIRED',
 ]);
 export const InsightEditorialState = z.enum(['SUPPRESSED']);
 
