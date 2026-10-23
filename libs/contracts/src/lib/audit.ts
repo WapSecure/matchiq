@@ -59,6 +59,11 @@ export const AuditEvent = z.strictObject({
   id: z.uuid(),
   action: AuditAction,
   actor: AuditActor,
+  /**
+   * The actor's name from the identity provider, recorded at write time.
+   * Absent on rows written before it existed and on system actors.
+   */
+  actorDisplayName: identifier.optional(),
   target: AuditTarget,
   fixtureId: FixtureId.nullable(),
   reason: z.string().nullable(),

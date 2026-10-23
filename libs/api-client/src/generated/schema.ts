@@ -1467,6 +1467,7 @@ export interface components {
                 type: "USER" | "SERVICE" | "OPERATOR" | "SYSTEM" | "ANONYMOUS";
                 id: string;
             };
+            actorDisplayName?: string;
             target: {
                 /** @enum {string} */
                 type: "fixture" | "overlay" | "insight" | "organization" | "retention";

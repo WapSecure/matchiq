@@ -14,7 +14,10 @@ export interface CspOptions {
   readonly apiOrigin?: string;
   /** Origin of the OIDC issuer when sign-in is configured. */
   readonly issuerOrigin?: string;
-  /** `next dev`: React needs `eval` for stack frames and HMR uses a websocket. */
+  /**
+   * `next dev`: React needs `eval` for stack frames, HMR uses a websocket, and
+   * the dev overlay and HMR inject inline `<style>` elements without a nonce.
+   */
   readonly development: boolean;
 }
 
@@ -42,6 +45,13 @@ const present = (values: readonly (string | undefined | false)[]): string[] => [
   ...new Set(values.filter((v): v is string => Boolean(v))),
 ];
 
+/**
+ * Dev only: browsers ignore 'unsafe-inline' when a nonce is listed, so the
+ * dev policy drops the style nonce to let Next's dev tooling style itself.
+ */
+const styleSources = (o: CspOptions): string[] =>
+  o.development ? [K.self, K.unsafeInline] : [K.self, `'nonce-${o.nonce}'`];
+
 const directives = (o: CspOptions): [string, string[]][] => [
   ['default-src', [K.self]],
   [
@@ -56,7 +66,7 @@ const directives = (o: CspOptions): [string, string[]][] => [
   ],
   ['script-src-attr', [K.none]],
   // React renders `style` attributes on the server; inline <style> elements are not allowed.
-  ['style-src', [K.self, `'nonce-${o.nonce}'`]],
+  ['style-src', styleSources(o)],
   ['style-src-attr', [K.unsafeInline]],
   ['img-src', [K.self, K.data, K.blob]],
   ['font-src', [K.self]],
