@@ -8,6 +8,8 @@ import type { ControlSize } from './control-styles';
 export type SegmentOption<T extends string | number> = {
   value: T;
   label: string;
+  /** BCP 47 tag when the label is in another language (WCAG 3.1.2). */
+  lang?: string;
   /** Visible text when space is tight; `label` stays the accessible name. */
   short?: string;
   icon?: ReactNode;
@@ -60,6 +62,7 @@ export function SegmentedControl<T extends string | number>({
           <Radio
             key={String(option.value)}
             value={String(option.value)}
+            lang={option.lang}
             isDisabled={option.isDisabled}
             aria-label={
               option.short ? `${option.label} (${option.short})` : undefined

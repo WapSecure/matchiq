@@ -169,7 +169,9 @@ describe('LiveStudio', () => {
         ),
       ).toBe(true),
     );
-    expect(await screen.findByText(/Narrative pending/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Commentary is pending/),
+    ).toBeInTheDocument();
     expect(metricsText()).toBe(before.metrics);
     expect(scoreText()).toBe(before.score);
   });

@@ -43,6 +43,16 @@ test.describe('landing page', () => {
     expect(blocking.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 
+  test('keeps the product preview inside the viewport', async ({ page }) => {
+    const preview = page.getByRole('img', { name: /Product preview/ });
+    const bounds = await preview.evaluate((element) => {
+      const { x, right } = element.getBoundingClientRect();
+      return { x, right, viewport: window.innerWidth };
+    });
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.right).toBeLessThanOrEqual(bounds.viewport);
+  });
+
   test('does not scroll horizontally', async ({ page }) => {
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,

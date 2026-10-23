@@ -20,13 +20,13 @@ export const STUDIO_COPY = {
     period: (n: number) => `Period ${n}`,
   },
   insights: {
-    title: 'AI insight feed',
-    description: 'Detected by the deterministic engine, explained by agents',
+    title: 'Match insights',
+    description: 'Key moments with supporting match evidence',
     empty: 'No key moments detected yet.',
     evidence: 'Evidence',
     coverage: 'Data coverage',
     openEvidence: (headline: string) => `Open evidence for ${headline}`,
-    narrativePending: 'Narrative pending — showing verified facts only.',
+    narrativePending: 'Commentary is pending. Showing verified facts.',
     localeFallback: (locale: string) =>
       `${locale} variant unavailable; showing en-GB.`,
     source: { AGENT: 'Agent narrative', TEMPLATE: 'Deterministic template' },
@@ -47,7 +47,8 @@ export const STUDIO_COPY = {
   },
   overlay: {
     title: 'Broadcast overlay preview',
-    description: '16:9 graphics-safe frame at the current match clock',
+    description:
+      '16:9 preview with graphics safe areas at the current match time',
     safeArea: 'Safe area',
     frameLabel: (count: number) =>
       count === 0
@@ -58,7 +59,7 @@ export const STUDIO_COPY = {
     persona: 'Audience',
     locale: 'Language',
     invariant:
-      'Audience and language change the wording only. Every number comes from the deterministic engine and stays the same.',
+      'Language changes commentary, not the controls. Audience changes its style. Both preserve the match facts.',
   },
   connectionPrefix: 'Connection: ',
   notFound: "We couldn't find this match",
@@ -93,7 +94,7 @@ export const STAT_ROWS = [
   { key: 'passesCompleted', label: 'Passes completed' },
   { key: 'pressures', label: 'Pressures' },
   { key: 'recoveries', label: 'Recoveries' },
-  { key: 'finalThirdEntries', label: 'Final-third entries' },
+  { key: 'finalThirdEntries', label: 'Final third entries' },
   { key: 'fouls', label: 'Fouls' },
   { key: 'yellowCards', label: 'Yellow cards' },
 ] as const;
