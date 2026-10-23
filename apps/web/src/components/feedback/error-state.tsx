@@ -28,7 +28,7 @@ export function ErrorState({
 }: ErrorStateProps) {
   const human = useMemo(() => humanizeError(error), [error]);
   if (human.kind === 'forbidden') return <AccessDenied className={className} />;
-  const heading = human.specific || !title ? human.title : title;
+  const heading = human.headline || !title ? human.title : title;
   return (
     <div
       role="alert"

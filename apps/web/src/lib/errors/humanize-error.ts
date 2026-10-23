@@ -14,6 +14,8 @@ export type HumanError = {
   action: RecoveryAction;
   /** True when the copy is about this exact problem, not its category. */
   specific: boolean;
+  /** True when the title should replace the surface's own heading (specific, offline, signed out). */
+  headline: boolean;
   support: boolean;
   /** The request id, shown only as a small copyable "Reference". */
   reference: string | null;
@@ -22,6 +24,12 @@ export type HumanError = {
 };
 
 const SERVER_ERROR_MIN = 500;
+
+/** These say more than any surface heading could, so they lead. */
+const HEADLINE_KINDS: ReadonlySet<ErrorKind> = new Set([
+  'offline',
+  'sessionExpired',
+]);
 const SLUG_SEPARATOR = ':';
 
 const STATUS_KIND: Readonly<Record<number, ErrorKind>> = {
@@ -77,6 +85,7 @@ const fromCopy = (
   message: copy.message,
   action: copy.action,
   specific: false,
+  headline: HEADLINE_KINDS.has(kind),
   support: copy.support ?? false,
   reference: null,
   retryAfterSeconds: null,
@@ -96,6 +105,7 @@ export const humanizeError = (error: unknown): HumanError => {
   const { kind, copy, specific } = resolve(error);
   return fromCopy(kind, copy, {
     specific,
+    headline: specific || HEADLINE_KINDS.has(kind),
     reference: error.problem.requestId ?? null,
     retryAfterSeconds: copy.action === 'wait' ? error.retryAfterSeconds : null,
   });

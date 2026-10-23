@@ -28,7 +28,7 @@ export function InlineProblem({
   const human = useMemo(() => humanizeError(error), [error]);
   const text =
     message ??
-    (lead && !human.specific
+    (lead && !human.headline
       ? `${lead} ${human.message}`
       : `${human.title}. ${human.message}`);
   return (
