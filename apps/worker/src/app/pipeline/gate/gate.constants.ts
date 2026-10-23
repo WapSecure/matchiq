@@ -134,3 +134,15 @@ export const OVERLAY_LIMITS: TextLimits = {
 };
 
 export const SENTENCE_END_PATTERN = /(?<=[.!?…])\s+/u;
+
+export const GUARD_EXCERPT_MAX = 80;
+
+/** Blocklist hits are recorded by category only, so the fact-check record never repeats them. */
+export const UNQUOTED_TONE_REASONS: ReadonlySet<string> = new Set([
+  'profanity',
+  'slur',
+  'abuse',
+]);
+
+/** Repeats are judged against narratives published this long before, in the same period. */
+export const REPETITION_WINDOW_MS = 10 * 60_000;

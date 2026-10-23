@@ -374,6 +374,9 @@ importers:
       '@matchiq/football-engine':
         specifier: workspace:*
         version: link:../../libs/football-engine
+      '@matchiq/narrative-guard':
+        specifier: workspace:*
+        version: link:../../libs/narrative-guard
       '@matchiq/replay':
         specifier: workspace:*
         version: link:../../libs/replay
@@ -579,6 +582,15 @@ importers:
       fast-check:
         specifier: 4.10.2
         version: 4.10.2
+
+  libs/narrative-guard:
+    dependencies:
+      '@matchiq/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      tslib:
+        specifier: 2.8.1
+        version: 2.8.1
 
   libs/replay:
     dependencies:

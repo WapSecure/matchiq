@@ -12,6 +12,7 @@ import { EvidenceEnvelope, Insight } from './insight.js';
 import { Narrative } from './narrative.js';
 import { OverlayCue } from './overlay.js';
 import { PipelineRequest, PipelineResult } from './pipeline.js';
+import { MetricDisplay } from './metric-display.js';
 import { MatchSnapshot } from './snapshot.js';
 
 /** Contracts exported for non-TypeScript consumers (the Python agents service). */
@@ -19,6 +20,7 @@ export const CROSS_LANGUAGE_CONTRACTS = {
   Fixture,
   MatchEvent,
   MatchSnapshot,
+  MetricDisplay,
   EvidenceEnvelope,
   Insight,
   FactPacket,

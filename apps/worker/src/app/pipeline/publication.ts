@@ -8,6 +8,7 @@ import type {
   PipelineResult,
 } from '@matchiq/contracts';
 import type { GateRejection, GateReport, InsightCompletion } from '@matchiq/db';
+import type { PublishedText } from '@matchiq/narrative-guard';
 import {
   FALLBACK_REASONS,
   INSIGHT_REVISION,
@@ -138,6 +139,8 @@ export interface AgentInput {
   readonly fixture: Fixture;
   readonly result: PipelineResult;
   readonly createdAt: string;
+  /** Narratives recently published for the fixture (`recentNarratives`). */
+  readonly recent?: readonly PublishedText[];
 }
 
 /**
@@ -147,7 +150,7 @@ export interface AgentInput {
  */
 export const agentPublication = (input: AgentInput): Publication => {
   const { insight, fixture, result } = input;
-  const ctx = gateContextOf(insight, fixture);
+  const ctx = { ...gateContextOf(insight, fixture), recent: input.recent };
   const agent = selectNarratives(result.narratives, ctx, 'AGENT');
   const templates = fillMissing(agent.accepted, insight, fixture);
   const overlayVerdict =

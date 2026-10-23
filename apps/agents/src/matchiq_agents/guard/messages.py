@@ -17,6 +17,17 @@ SPELLED_COUNT: Final = "writes '{raw} times'; write the count in digits"
 NUMERALS_CHANGED: Final = "localised text changed the numbers ({source} -> {target})"
 NAME_DROPPED: Final = "localised text dropped the proper noun {name}"
 CRITIQUE: Final = "reviewer: {detail}"
+EVENT_NOT_LEAD: Final = "headline '{headline}' does not lead with the {moment}"
+OFF_TOPIC_HEADLINE: Final = "headline '{headline}' is not about the {moment} for {subject}"
+SECONDARY_STAT: Final = "goal headline leads with {raw} instead of the score"
+WRONG_DIRECTION: Final = (
+    "headline '{headline}' says {subject} are fading; this moment is their rise"
+)
+MISSING_SCORELINE: Final = "goal text does not give the score {score}"
+GOAL_TALLY: Final = "states '{raw}' as a goal count; give the score instead"
+MISSING_PLAYER: Final = "text does not name {player}, whom the evidence names"
+RAW_INDEX: Final = "{persona} text shows the {label} value {raw}; describe it in words"
+UNLABELLED_INDEX: Final = "shows the value {raw} without saying it is the {label}"
 DETAIL_MAX: Final = 300
 
 # Fine-grained rule names for the failure taxonomy (`pipeline/diagnostics.py`).
@@ -38,4 +49,13 @@ RULE_TEMPLATES: Final = {
     "NUMERALS_CHANGED": NUMERALS_CHANGED,
     "NAME_DROPPED": NAME_DROPPED,
     "CRITIQUE": CRITIQUE,
+    "EVENT_NOT_LEAD": EVENT_NOT_LEAD,
+    "OFF_TOPIC_HEADLINE": OFF_TOPIC_HEADLINE,
+    "SECONDARY_STAT": SECONDARY_STAT,
+    "WRONG_DIRECTION": WRONG_DIRECTION,
+    "MISSING_SCORELINE": MISSING_SCORELINE,
+    "GOAL_TALLY": GOAL_TALLY,
+    "MISSING_PLAYER": MISSING_PLAYER,
+    "RAW_INDEX": RAW_INDEX,
+    "UNLABELLED_INDEX": UNLABELLED_INDEX,
 }

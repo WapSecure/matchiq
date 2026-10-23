@@ -47,6 +47,9 @@
     },
     {
       "path": "./libs/api-client"
+    },
+    {
+      "path": "./libs/narrative-guard"
     }
   ],
   "compilerOptions": {}
