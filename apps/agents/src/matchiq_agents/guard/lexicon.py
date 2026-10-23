@@ -2,98 +2,47 @@
 
 Patterns are case-insensitive and matched on word boundaries. They cover claims the evidence
 envelope can never support (medical, betting, predictive, managerial intent) and instruction-like
-text that signals prompt injection.
+text, prompt leakage, links or markup that signal prompt injection.
 """
 
 import re
-from typing import Final
+from importlib.resources import files
+from typing import Final, Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from matchiq_agents.contracts.types import Locale
 
-FORBIDDEN_PATTERNS: Final[dict[str, tuple[str, ...]]] = {
-    "medical": (
-        r"injur\w*",
-        r"fatigue\w*",
-        r"tired",
-        r"exhaust\w*",
-        r"hamstring",
-        r"bless(?:é|ée|és|ées|ure|ures)",
-        r"lesi[oó]n\w*",
-        r"cansad\w*",
-        r"fatigu[ée]\w*",
-        r"agotad\w*",
-        r"don\s+wound",
-        r"(?:don|dey)\s+tire",
-        r"(?:leg|body|knee)\s+dey\s+pain",
-    ),
-    "betting": (
-        r"bet(?:s|ting)?",
-        r"odds",
-        r"wager\w*",
-        r"bookmaker\w*",
-        r"pari(?:s)?\s+sportifs?",
-        r"cotes?",
-        r"apuestas?",
-        r"cuotas?",
-        r"stak(?:e|ing)\s+(?:money|am|una|your)",
-        r"booking\s+codes?",
-        r"sure\s+banker",
-    ),
-    "prediction": (
-        r"win\s+probability",
-        r"(?:is|are)\s+(?:certain|sure|guaranteed)\s+to\s+win",
-        r"will\s+(?:win|lose)",
-        r"probabilit[ée]\s+de\s+victoire",
-        r"va\s+gagner",
-        r"probabilidad\s+de\s+victoria",
-        r"va\s+a\s+ganar",
-        r"go\s+(?:win|lose)(?!\s+(?:di\s+|the\s+)?(?:ball|possession))",
-        r"(?:don\s+)?sure\s+say\s+(?:dem|e|una)\s+go\s+win",
-    ),
-    "managerial_intent": (
-        r"(?:manager|coach|boss)\s+(?:has\s+)?(?:changed|switched|ordered)\w*",
-        r"tactical\s+(?:switch|change)\s+(?:by|from)\s+the\s+(?:manager|coach)",
-        r"(?:entra[iî]neur|coach)\s+a\s+chang[ée]",
-        r"(?:entrenador|t[ée]cnico)\s+(?:ha\s+)?cambi[oó]",
-        r"(?:manager|coach|oga)\s+(?:don\s+)?(?:change|switch|order)\w*",
-    ),
-    "injection": (
-        r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?",
-        r"disregard\s+(?:all\s+)?(?:previous|prior|above)",
-        r"system\s+prompt",
-        r"you\s+are\s+now",
-        r"new\s+instructions?",
-        r"developer\s+mode",
-        r"forget\s+(?:all\s+)?(?:di|the|una)\s+(?:previous\s+)?(?:instructions?|rules?)",
-        r"(?:forget|ignore)\s+wetin\s+dem\s+(?:tell|talk\s+to)\s+you",
-    ),
-}
+LEXICON_FILE: Final = "narrative_lexicon.json"
+
+
+class _Lexicon(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    schema_version: Literal[1] = Field(alias="schemaVersion")
+    forbidden: dict[str, tuple[str, ...]]
+    safety: dict[str, tuple[str, ...]]
+
+
+# Generated from libs/narrative-guard by `pnpm codegen`; the worker publish gate compiles the same
+# patterns, so the two guards cannot drift. Safety covers profanity, slurs and abuse aimed at
+# players, teams or officials; hate speech and subtler toxicity are left to the pluggable
+# `ContentSafetyScreen` (Azure AI Content Safety when it is configured).
+_LEXICON: Final = _Lexicon.model_validate_json(
+    files("matchiq_agents.contracts.generated").joinpath(LEXICON_FILE).read_text("utf-8")
+)
+
+FORBIDDEN_PATTERNS: Final = _LEXICON.forbidden
+SAFETY_PATTERNS: Final = _LEXICON.safety
 
 FORBIDDEN_REGEX: Final = tuple(
-    (category, re.compile(rf"(?<!\w){pattern}(?!\w)", re.IGNORECASE))
+    (category, re.compile(rf"(?<!\w)(?:{pattern})(?!\w)", re.IGNORECASE))
     for category, patterns in FORBIDDEN_PATTERNS.items()
     for pattern in patterns
 )
 
-# Broadcast-safety blocklist (`guard/safety.py`): profanity, and abuse aimed at players, teams or
-# officials. Deliberately narrow and deterministic; hate speech and subtler toxicity are left to
-# the pluggable `ContentSafetyScreen` (Azure AI Content Safety when it is configured).
-SAFETY_PATTERNS: Final[dict[str, tuple[str, ...]]] = {
-    "profanity": (
-        r"fuck\w*", r"shit\w*", r"bullshit", r"bastard\w*", r"wank\w*", r"twat\w*", r"crap",
-        r"piss(?:ed)?", r"arse(?:hole)?s?", r"bollocks", r"merde", r"putain", r"connard\w*",
-        r"mierda", r"joder", r"cabr[oó]n\w*", r"gilipollas", r"pendejo\w*", r"hijo\s+de\s+puta",
-    ),
-    "abuse": (
-        r"idiot\w*", r"stupid\w*", r"moron\w*", r"clowns?", r"pathetic", r"disgrace\w*",
-        r"useless", r"rubbish", r"garbage", r"trash", r"shambolic", r"cowards?", r"lazy",
-        r"minable\w*", r"inútil\w*", r"est[úu]pid\w*", r"basura", r"vergüenza",
-        r"mumu", r"olodo", r"werey", r"ode", r"yeye", r"ashawo",
-    ),
-}  # fmt: skip
-
 SAFETY_REGEX: Final = tuple(
-    (category, re.compile(rf"(?<!\w){pattern}(?!\w)", re.IGNORECASE))
+    (category, re.compile(rf"(?<!\w)(?:{pattern})(?!\w)", re.IGNORECASE))
     for category, patterns in SAFETY_PATTERNS.items()
     for pattern in patterns
 )

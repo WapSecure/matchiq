@@ -11,6 +11,7 @@ import { APP_ENV } from '@matchiq/server-kit';
 import { FALLBACK_REASONS } from '../constants';
 import type { AgentPipelineDeps } from '../infrastructure/bundles';
 import { AGENT_PIPELINE_DEPS } from '../infrastructure/tokens';
+import { recentNarratives } from '../pipeline/gate/recent-narratives';
 import { buildPipelineRequest } from '../pipeline/pipeline-request';
 import {
   agentPublication,
@@ -135,6 +136,7 @@ export class InsightPipelineService {
         fixture,
         result,
         createdAt,
+        recent: await this.recentFor(input.job, insight.insightId),
       });
       return {
         publication,
@@ -169,6 +171,15 @@ export class InsightPipelineService {
       }),
     );
     return fault === 'GATE_REJECT' ? tamperForGate(answer) : answer;
+  }
+
+  private async recentFor(job: InsightPipelineJob, insightId: string) {
+    const key = { orgId: job.orgId, fixtureId: job.fixtureId };
+    const [narratives, insights] = await Promise.all([
+      this.deps.reader.narratives(key, {}),
+      this.deps.reader.insightsWithPeriod(key),
+    ]);
+    return recentNarratives(narratives, insights, insightId);
   }
 
   /** Demo faults apply only where enabled, to sessions created with a plan. */
