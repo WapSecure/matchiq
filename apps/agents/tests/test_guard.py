@@ -184,6 +184,30 @@ def test_pidgin_localisation_must_keep_numbers_and_names() -> None:
     assert IssueCode.UNSUPPORTED_NUMBER in _codes(check_localised(source, invented, VIEW))
 
 
+def test_counts_must_be_digits_even_when_misspelt() -> None:
+    target = TemplateFallback(VIEW).draft(VIEW.personas[0], Locale.pcm_NG)
+    # Live run fx_comeback_42_s7: an uncited "twice" in en-GB became "twi times" in pcm-NG.
+    for body, detail in (
+        (
+            "Harbour City don shoot twi times recently.",
+            "writes 'twi times'; write the count in digits",
+        ),
+        (
+            "Harbour City have hit the target twice recently.",
+            "writes the number twice as a word; use digits",
+        ),
+    ):
+        found = check_draft(target.model_copy(update={"body": body, "citedValues": []}), VIEW)
+        assert detail in [issue.detail for issue in found], body
+    for body in (
+        "Harbour City don shoot many times recently.",
+        "Harbour City don shoot 5 times recently.",
+        "Harbour City don shoot plenty times recently.",
+    ):
+        found = check_draft(target.model_copy(update={"body": body}), VIEW)
+        assert not [issue for issue in found if "times" in issue.detail], body
+
+
 def test_allowlisted_names_get_their_capitals_back_and_hashtags_go() -> None:
     names = {"Harbour City", "Tomas Varell"}
     text = "harbour city press high; tomas varell #MatchIQ #PressingHard"

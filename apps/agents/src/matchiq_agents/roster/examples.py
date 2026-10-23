@@ -64,7 +64,17 @@ WRITER_EXAMPLE: Final = {
     ]
 }
 
-LOCALIZATION_SOURCE: Final = WRITER_EXAMPLE["drafts"][0]
+# The Localization example translates every Writer example draft into every target locale, so
+# the model sees all three personas in every locale (ADR-0011 addendum 2, MQ-034).
+LOCALIZATION_SOURCES: Final = [
+    {key: draft[key] for key in ("persona", "headline", "body")}
+    for draft in WRITER_EXAMPLE["drafts"]
+]
+LOCALIZATION_REQUIRED: Final = [
+    {"locale": locale, "persona": draft["persona"]}
+    for locale in ("fr-FR", "es-ES", "pcm-NG")
+    for draft in LOCALIZATION_SOURCES
+]
 LOCALIZATION_EXAMPLE: Final = {
     "drafts": [
         {
@@ -74,16 +84,64 @@ LOCALIZATION_EXAMPLE: Final = {
             "body": "Kestrel Vale a récupéré le ballon haut sur le terrain 5 fois récemment.",
         },
         {
+            "locale": "fr-FR",
+            "persona": "ANALYST",
+            "headline": "Le pressing de Kestrel Vale provoque des récupérations hautes",
+            "body": (
+                "Kestrel Vale compte 5 récupérations hautes sur cette période, avec 3 tirs. Son "
+                "pressing semble provoquer des pertes de balle. La confiance est moyenne. Ces "
+                "données de match sont synthétiques."
+            ),
+        },
+        {
+            "locale": "fr-FR",
+            "persona": "BROADCAST",
+            "headline": "Kestrel Vale presse haut",
+            "body": "5 récupérations hautes pour Kestrel Vale récemment.",
+        },
+        {
             "locale": "es-ES",
             "persona": "CASUAL",
             "headline": "Kestrel Vale recupera el balón arriba",
             "body": "Kestrel Vale ha recuperado el balón arriba 5 veces recientemente.",
         },
         {
+            "locale": "es-ES",
+            "persona": "ANALYST",
+            "headline": "La presión de Kestrel Vale genera recuperaciones altas",
+            "body": (
+                "Kestrel Vale suma 5 recuperaciones altas en este tramo, junto con 3 tiros. Su "
+                "presión parece estar forzando pérdidas de balón. La confianza es media. Estos "
+                "datos de partido son sintéticos."
+            ),
+        },
+        {
+            "locale": "es-ES",
+            "persona": "BROADCAST",
+            "headline": "Kestrel Vale presiona arriba",
+            "body": "5 recuperaciones altas para Kestrel Vale recientemente.",
+        },
+        {
             "locale": "pcm-NG",
             "persona": "CASUAL",
             "headline": "Kestrel Vale dey collect ball for top",
             "body": "Kestrel Vale don collect di ball back for top 5 times recently.",
+        },
+        {
+            "locale": "pcm-NG",
+            "persona": "ANALYST",
+            "headline": "Kestrel Vale press dey win ball for top",
+            "body": (
+                "Kestrel Vale don get 5 high recoveries for dis spell, plus 3 shots. Dia press "
+                "be like say e dey force turnovers. Confidence na medium. Dis na synthetic match "
+                "feed."
+            ),
+        },
+        {
+            "locale": "pcm-NG",
+            "persona": "BROADCAST",
+            "headline": "Kestrel Vale dey press for top",
+            "body": "5 high recoveries for Kestrel Vale recently.",
         },
     ]
 }

@@ -38,6 +38,8 @@ Rules are finer than the contract's issue codes:
 | `CONTRACT_INVALID`                                  | The JSON parsed but broke the contract (for example a 90-character headline); per persona where known  |
 | `UNSUPPORTED_NUMERAL`, `WINDOW_LENGTH`              | A number that is no cited engine value; `WINDOW_LENGTH` when it is a time window ("last 10 minutes")   |
 | `SPELLED_NUMBER`, `WRONG_VALUE`, `UNKNOWN_METRIC`   | A number written as a word, a cited value that differs from the engine, or a ref the engine never made |
+| `SPELLED_COUNT`                                     | A short word that is no quantifier written as the count before "times" ("twi times")                   |
+| `MISSING_ITEM`                                      | A required (locale, persona) item the Localization output left out                                     |
 | `UNKNOWN_NAME`, `UNCITED`, `UNKNOWN_EVENT`          | Names outside the allowlist; missing or foreign evidence ids                                           |
 | `TOO_LONG`, `TOO_MANY_SENTENCES`, `MISSING_PERSONA` | Persona limits and missing drafts                                                                      |
 | `FORBIDDEN`, `UNSAFE_CONTENT`                       | Forbidden claims (medical, betting, prediction, managerial intent, injection) and the safety blocklist |

@@ -21,6 +21,7 @@ TRANSPORT: Final = "TRANSPORT"
 UNPARSEABLE: Final = "UNPARSEABLE"
 CONTRACT_INVALID: Final = "CONTRACT_INVALID"
 NO_CLAIMS: Final = "NO_CLAIMS"
+MISSING_ITEM: Final = "MISSING_ITEM"
 
 logger = logging.getLogger(LOGGER_NAME)
 
@@ -90,6 +91,12 @@ def report_item(
 ) -> None:
     """One persona or locale item that broke the output contract (length caps, empty text)."""
     _emit(run_id, agent, CONTRACT_INVALID, persona=persona, locale=locale)
+
+
+def report_missing(run_id: str, agent: AgentName, persona: Persona, locale: Locale) -> None:
+    """A requested item the model left out of its output."""
+    detail = messages.MISSING_ITEM.format(locale=locale.value, persona=persona.value)
+    _emit(run_id, agent, MISSING_ITEM, detail=detail, persona=persona, locale=locale)
 
 
 def report(

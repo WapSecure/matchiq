@@ -5,14 +5,20 @@ addendum). Each translated item is checked on its own: evidence ids and cited va
 from the source draft, never from the model, and an item that changes a number or drops a proper
 noun is replaced by that persona's template in the target locale, without discarding the others.
 Template drafts are localised from templates and never sent to the model.
+
+The payload lists every required (locale, persona) item and the output is checked against it:
+each item the model left out is reported and, when the deadline allows, requested once more in a
+smaller follow-up call; whatever is still missing falls back per item like a rejected one.
 """
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Final
 
 from pydantic import ValidationError
 
 from matchiq_agents.contracts.types import (
+    AgentName,
     AgentRun,
     Locale,
     NarrativeDraft,
@@ -82,27 +88,44 @@ def _translated(
     return target
 
 
+@dataclass(frozen=True, slots=True)
+class _Batch:
+    accepted: dict[ItemKey, NarrativeDraft]
+    absent: tuple[ItemKey, ...]
+
+
+def required_items(sources: Sequence[NarrativeDraft], targets: Sequence[Locale]) -> list[ItemKey]:
+    """Every (persona, locale) item the call must return, locale by locale."""
+    return [(draft.persona, locale) for locale in targets for draft in sources]
+
+
 def _accept(
     output: LocalizationOutput,
     sources: Sequence[NarrativeDraft],
-    targets: Sequence[Locale],
+    required: Sequence[ItemKey],
     ctx: AgentContext,
     log: list[Repair],
-) -> dict[ItemKey, NarrativeDraft]:
-    """Keeps every item that passes; a call with no usable item counts as a failed attempt."""
+) -> _Batch:
+    """Keeps every item that passes and reports each required item the output left out; a call
+    with no usable item counts as a failed attempt."""
     by_persona = {draft.persona: draft for draft in sources}
+    wanted = set(required)
+    returned: set[ItemKey] = set()
     accepted: dict[ItemKey, NarrativeDraft] = {}
     for item in output.drafts:
         key = (Persona(item.persona), Locale(item.locale))
-        source = by_persona.get(key[0])
-        if source is None or key[1] not in targets or key in accepted:
+        if key not in wanted or key in accepted:
             continue
-        target = _translated(item, source, ctx, log)
+        returned.add(key)
+        target = _translated(item, by_persona[key[0]], ctx, log)
         if target is not None:
             accepted[key] = target
+    absent = tuple(key for key in required if key not in returned)
+    for persona, locale in absent:
+        diagnostics.report_missing(ctx.runner.scope.run_id, LOCALIZATION.agent, persona, locale)
     if not accepted:
         raise diagnostics.OutputRejectedError(NOTHING_ACCEPTED)
-    return accepted
+    return _Batch(accepted, absent)
 
 
 def _fallback_item(ctx: AgentContext, source: NarrativeDraft, locale: Locale) -> NarrativeDraft:
@@ -114,25 +137,47 @@ def _fallback_item(ctx: AgentContext, source: NarrativeDraft, locale: Locale) ->
 
 
 async def _translate(
-    ctx: AgentContext, sources: Sequence[NarrativeDraft], targets: Sequence[Locale]
-) -> tuple[dict[ItemKey, NarrativeDraft], AgentRun]:
-    payload = LocalizationInput(
-        facts=facts_payload(ctx.view, free_text=False, metric_refs=cited_refs(sources)),
-        source_locale=CANONICAL_LOCALE,
-        target_locales=list(targets),
-        drafts=text_pairs(sources),
-        protected_terms=ctx.view.prompt_entities,
+    ctx: AgentContext, sources: Sequence[NarrativeDraft], required: Sequence[ItemKey]
+) -> tuple[_Batch | None, AgentRun]:
+    personas = {persona for persona, _ in required}
+    drafts = [draft for draft in sources if draft.persona in personas]
+    payload = LocalizationInput.model_validate(
+        {
+            "facts": facts_payload(ctx.view, free_text=False, metric_refs=cited_refs(drafts)),
+            "sourceLocale": CANONICAL_LOCALE,
+            "targetLocales": list(dict.fromkeys(locale for _, locale in required)),
+            "drafts": text_pairs(drafts),
+            "requiredItems": [
+                {"locale": locale.value, "persona": persona.value} for persona, locale in required
+            ],
+            "protectedTerms": ctx.view.prompt_entities,
+        }
     )
     log: list[Repair] = []
     call = ModelCall(
         prompt=LOCALIZATION,
         payload=payload,
         response_model=LocalizationOutput,
-        convert=lambda output: _accept(output, sources, targets, ctx, log),
+        convert=lambda output: _accept(output, drafts, required, ctx, log),
         repairs=log,
     )
-    accepted, run = await ctx.runner.run(call)
-    return accepted or {}, run
+    return await ctx.runner.run(call)
+
+
+async def _translate_all(
+    ctx: AgentContext, sources: Sequence[NarrativeDraft], targets: Sequence[Locale]
+) -> tuple[dict[ItemKey, NarrativeDraft], list[AgentRun]]:
+    """One batched call; items it left out get one follow-up call when the deadline allows."""
+    batch, run = await _translate(ctx, sources, required_items(sources, targets))
+    runs = [run]
+    if batch is None:
+        return {}, runs
+    translated = dict(batch.accepted)
+    if batch.absent and ctx.runner.fits(LOCALIZATION.agent, AgentName.BROADCAST_PRODUCER):
+        retry, run = await _translate(ctx, sources, batch.absent)
+        runs.append(run)
+        translated.update(retry.accepted if retry is not None else {})
+    return translated, runs
 
 
 async def localise_all(
@@ -149,8 +194,7 @@ async def localise_all(
     runs: list[AgentRun] = []
     translated: dict[ItemKey, NarrativeDraft] = {}
     if targets and agent_sources:
-        translated, run = await _translate(ctx, agent_sources, targets)
-        runs.append(run)
+        translated, runs = await _translate_all(ctx, agent_sources, targets)
     localised: list[NarrativeDraft] = []
     used_template = False
     for locale in locales:

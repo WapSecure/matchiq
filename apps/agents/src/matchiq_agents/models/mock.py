@@ -54,19 +54,19 @@ def _write(payload: WriterInput, variant: int) -> WriterOutput:
 
 def _localise(payload: LocalizationInput, variant: int) -> LocalizationOutput:
     drafts: list[LocalizedOut] = []
-    for locale in payload.target_locales:
-        for draft in payload.drafts:
-            text = render_text(payload.facts, draft.persona, locale, variant)
-            drafts.append(
-                LocalizedOut.model_validate(
-                    {
-                        "locale": locale.value,
-                        "persona": draft.persona.value,
-                        "headline": text.headline,
-                        "body": text.body,
-                    }
-                )
+    for item in payload.required_items:
+        persona, locale = Persona(item.persona), Locale(item.locale)
+        text = render_text(payload.facts, persona, locale, variant)
+        drafts.append(
+            LocalizedOut.model_validate(
+                {
+                    "locale": item.locale,
+                    "persona": item.persona,
+                    "headline": text.headline,
+                    "body": text.body,
+                }
             )
+        )
     return LocalizationOutput(drafts=drafts)
 
 

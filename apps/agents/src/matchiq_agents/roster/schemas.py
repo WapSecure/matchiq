@@ -104,13 +104,23 @@ class CritiqueOutput(StrictModel):
     concerns: list[str]
 
 
+class ItemRef(StrictModel):
+    locale: TargetLocaleName
+    persona: PersonaName
+
+
 class LocalizationInput(StrictModel):
-    """One batched call: every source draft into every target locale."""
+    """One batched call: every source draft into every target locale.
+
+    `required_items` spells out each (locale, persona) pair to return, so the model does not
+    infer the item set from the example (ADR-0011 addendum 2).
+    """
 
     facts: FactsPayload
     source_locale: Locale
     target_locales: list[Locale]
     drafts: list[TextPair]
+    required_items: list[ItemRef]
     protected_terms: list[str]
 
 
