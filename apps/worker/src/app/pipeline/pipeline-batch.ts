@@ -1,6 +1,7 @@
 import {
   SCHEMA_VERSION,
   type AgentRun,
+  type AgentStep,
   type Insight,
   type MatchEvent,
   type MatchSnapshot,
@@ -33,6 +34,7 @@ export interface PipelineBatch {
   readonly overlayEnds: OverlayEnd[];
   readonly completions: { insightId: string; completion: InsightCompletion }[];
   readonly agentRuns: { insightId: string; runs: AgentRun[] }[];
+  readonly agentSteps: { insightId: string; steps: AgentStep[] }[];
   /** Insights this batch publishes only if it moves them out of PENDING. */
   readonly claims: { insightId: string; publication: 'AGENT' | 'TEMPLATE' }[];
   /** In-memory effects applied only after the batch commits. */
@@ -51,6 +53,7 @@ export const emptyBatch = (): PipelineBatch => ({
   overlayEnds: [],
   completions: [],
   agentRuns: [],
+  agentSteps: [],
   claims: [],
   afterCommit: [],
   snapshot: null,
@@ -87,6 +90,7 @@ export interface PublicationWrite {
     readonly narratives: readonly Narrative[];
     readonly completion: InsightCompletion;
     readonly runs: readonly AgentRun[];
+    readonly steps?: readonly AgentStep[];
   };
   readonly now: () => string;
 }
@@ -111,4 +115,10 @@ export const appendPublication = (
     insightId: insight.insightId,
     runs: [...publication.runs],
   });
+  if (publication.steps?.length) {
+    batch.agentSteps.push({
+      insightId: insight.insightId,
+      steps: [...publication.steps],
+    });
+  }
 };

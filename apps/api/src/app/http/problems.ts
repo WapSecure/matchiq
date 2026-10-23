@@ -26,6 +26,7 @@ export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   insightPublished: HttpStatus.CONFLICT,
   invalidCursor: HttpStatus.BAD_REQUEST,
   demoFaultsDisabled: HttpStatus.FORBIDDEN,
+  traceNotFound: HttpStatus.NOT_FOUND,
 };
 
 export const problem = (

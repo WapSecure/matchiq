@@ -1,5 +1,7 @@
 import type {
   AgentRun,
+  AgentStep,
+  AgentStepTrace,
   AuditActorType,
   CreatedSession,
   CursorPage,
@@ -135,6 +137,11 @@ export interface PipelineTransaction extends LedgerTransaction {
     insightId: string,
     runs: readonly AgentRun[],
   ): Promise<void>;
+  insertAgentSteps(
+    key: FixtureKey,
+    insightId: string,
+    steps: readonly AgentStep[],
+  ): Promise<void>;
   saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void>;
   updateSession(key: FixtureKey, status: ReplayStatus): Promise<void>;
   /** Moves the session's applied position without touching state or speed. */
@@ -202,6 +209,11 @@ export interface IntelligenceReader {
   overlays(key: FixtureKey): Promise<OverlayCue[]>;
   recap(key: FixtureKey): Promise<RecapDocument | null>;
   traces(key: FixtureKey): Promise<InsightTrace[]>;
+  /** Every handoff of one pipeline run, by correlation id, within the organisation. */
+  stepTrace(
+    orgId: string,
+    correlationId: string,
+  ): Promise<AgentStepTrace | null>;
   /** Detection order, `(detectedSequence, insightId)`. */
   insightPage(
     key: FixtureKey,

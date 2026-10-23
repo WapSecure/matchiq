@@ -1,4 +1,5 @@
 import type {
+  AgentStepTrace,
   CursorPageQuery,
   Insight,
   MatchSnapshot,
@@ -27,6 +28,7 @@ import {
   traceColumns,
   withInsightStatus,
 } from './intelligence-rows.js';
+import { readAgentStepTrace } from './agent-step-store.js';
 import { PostgresMatchPages } from './match-pages.js';
 import { withTenant } from './tenant-scope.js';
 import {
@@ -63,6 +65,13 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
 
   tracePage(key: FixtureKey, query: CursorPageQuery) {
     return this.pages.traces(key, query);
+  }
+
+  stepTrace(
+    orgId: string,
+    correlationId: string,
+  ): Promise<AgentStepTrace | null> {
+    return readAgentStepTrace(this.db, orgId, correlationId);
   }
 
   async latestSnapshot(key: FixtureKey): Promise<MatchSnapshot | null> {

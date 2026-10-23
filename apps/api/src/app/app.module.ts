@@ -38,6 +38,7 @@ import { IngestService } from './ingest/ingest.service';
 import { OpenApiModule } from './openapi/openapi.module';
 import { MeController } from './me/me.controller';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
+import { AgentTracesController } from './intelligence/agent-traces.controller';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
 import { LobbyController, ReplayController } from './replay/replay.controller';
@@ -53,6 +54,7 @@ export const API_CONTROLLERS = [
   ReplayController,
   LobbyController,
   IntelligenceController,
+  AgentTracesController,
   EditorialController,
   EditorialControlsController,
   AuditController,

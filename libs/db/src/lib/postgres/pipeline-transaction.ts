@@ -27,6 +27,7 @@ import {
   overlayCues,
 } from '../schema/intelligence-tables.js';
 import { matchEvents } from '../schema/tables.js';
+import { insertAgentSteps } from './agent-step-store.js';
 import { readEditorialView } from './editorial-queries.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
 import * as writes from './read-model-writes.js';
@@ -221,6 +222,15 @@ class PostgresPipelineTransaction
       })),
     );
   }
+
+  insertAgentSteps: PipelineTransaction['insertAgentSteps'] = async (
+    key,
+    insightId,
+    steps,
+  ) => {
+    await this.pin.to(key.orgId);
+    return insertAgentSteps(this.tx, key, insightId, steps);
+  };
 
   async saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
     await this.pin.to(key.orgId);

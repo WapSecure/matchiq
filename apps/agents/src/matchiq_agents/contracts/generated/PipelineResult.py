@@ -197,6 +197,54 @@ class FaultScenario(StrEnum):
     GATE_REJECT = "GATE_REJECT"
 
 
+class AgentVersion(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    promptVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
+    promptHash: Annotated[str | None, Field(pattern="^[0-9a-f]{64}$")] = None
+
+
+class FromStatus(StrEnum):
+    DETECTED = "DETECTED"
+    ANALYZED = "ANALYZED"
+    DRAFTED = "DRAFTED"
+    VERIFIED = "VERIFIED"
+    SCHEDULED = "SCHEDULED"
+    PUBLISHED = "PUBLISHED"
+    REJECTED = "REJECTED"
+    EXPIRED = "EXPIRED"
+    FALLBACK = "FALLBACK"
+
+
+class ToStatus(StrEnum):
+    DETECTED = "DETECTED"
+    ANALYZED = "ANALYZED"
+    DRAFTED = "DRAFTED"
+    VERIFIED = "VERIFIED"
+    SCHEDULED = "SCHEDULED"
+    PUBLISHED = "PUBLISHED"
+    REJECTED = "REJECTED"
+    EXPIRED = "EXPIRED"
+    FALLBACK = "FALLBACK"
+
+
+class AgentStepRole(StrEnum):
+    MATCH_ANALYST = "MATCH_ANALYST"
+    NARRATIVE_WRITER = "NARRATIVE_WRITER"
+    FACT_CHECKER = "FACT_CHECKER"
+    BROADCAST_PRODUCER = "BROADCAST_PRODUCER"
+    LOCALIZATION = "LOCALIZATION"
+    TEMPLATE_FALLBACK = "TEMPLATE_FALLBACK"
+
+
+class AgentStepDecision(StrEnum):
+    PASS = "PASS"
+    REVISE = "REVISE"
+    REJECT = "REJECT"
+    FALLBACK = "FALLBACK"
+
+
 class Run(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -220,6 +268,33 @@ class Run(BaseModel):
     faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None
 
 
+class AgentStep(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    stepIndex: Annotated[int, Field(ge=0, le=32)]
+    role: AgentStepRole
+    runId: Annotated[str, Field(pattern="^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
+    correlationId: UUID
+    agentVersion: AgentVersion
+    provider: Provider
+    modelDeployment: Annotated[str | None, Field(max_length=128, min_length=1)] = None
+    fromStatus: FromStatus
+    toStatus: ToStatus
+    decision: AgentStepDecision
+    reasonCode: Annotated[str, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+    reason: Annotated[str, Field(max_length=200, min_length=1)]
+    inputChecksum: Annotated[str, Field(pattern="^[0-9a-f]{64}$")]
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(max_length=64)]
+    metricRefs: Annotated[list[MetricRef], Field(max_length=64)]
+    startedAt: AwareDatetime
+    latencyMs: Annotated[int, Field(ge=0, le=9007199254740991)]
+    tokensIn: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
+    tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
+    costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
+    retries: Annotated[int, Field(ge=0, le=64)]
+
+
 class PipelineResult(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -233,4 +308,5 @@ class PipelineResult(BaseModel):
     narratives: list[NarrativeDraft]
     overlay: OverlayProposal | None
     runs: list[Run]
+    steps: Annotated[list[AgentStep] | None, Field(max_length=32, validate_default=True)] = []
     fallbackReason: Annotated[str | None, Field(max_length=200, min_length=1)] = None

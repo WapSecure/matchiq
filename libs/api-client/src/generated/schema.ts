@@ -424,6 +424,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/agents/traces/{correlationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every agent handoff of one pipeline run
+         * @description One record per roster stage, in order: decision and reason, input checksum, cited evidence, prompt version, model, tokens, latency and cost estimate. Holds no prompts or model output text. The correlation id is `runs[].correlationId` from the agent-runs list; another organisation's run answers 404.
+         *
+         *     Access: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         */
+        get: operations["getAgentTrace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/overlays/{overlayId}/retract": {
         parameters: {
             query?: never;
@@ -798,6 +820,10 @@ export interface components {
             /** @enum {string} */
             reason: "ZERO_DENOMINATOR" | "NO_TRACKING_DATA" | "NOT_GENERATED" | "INSUFFICIENT_SAMPLE";
         };
+        /** @enum {string} */
+        AgentStepRole: "MATCH_ANALYST" | "NARRATIVE_WRITER" | "FACT_CHECKER" | "BROADCAST_PRODUCER" | "LOCALIZATION" | "TEMPLATE_FALLBACK";
+        /** @enum {string} */
+        AgentStepDecision: "PASS" | "REVISE" | "REJECT" | "FALLBACK";
         Fixture: {
             /** @constant */
             schemaVersion: 1;
@@ -1318,6 +1344,37 @@ export interface components {
             faultInjected?: components["schemas"]["FaultScenario"];
             faultNote?: string;
         };
+        AgentStep: {
+            stepIndex: number;
+            role: components["schemas"]["AgentStepRole"];
+            runId: string;
+            /** Format: uuid */
+            correlationId: string;
+            agentVersion: {
+                promptVersion: string;
+                promptHash?: string;
+            };
+            /** @enum {string} */
+            provider: "foundry" | "ollama" | "mock" | "template";
+            modelDeployment?: string;
+            /** @enum {string} */
+            fromStatus: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";
+            /** @enum {string} */
+            toStatus: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";
+            decision: components["schemas"]["AgentStepDecision"];
+            reasonCode: string;
+            reason: string;
+            inputChecksum: string;
+            evidenceEventIds: string[];
+            metricRefs: string[];
+            /** Format: date-time */
+            startedAt: string;
+            latencyMs: number;
+            tokensIn?: number;
+            tokensOut?: number;
+            costEstimateUsd?: number;
+            retries: number;
+        };
         ReplayCommand: {
             /** @constant */
             action: "start";
@@ -1529,6 +1586,14 @@ export interface components {
             rejected: number;
             ingestionId: string;
             lastAcceptedSequence: number;
+        };
+        AgentStepTrace: {
+            /** Format: uuid */
+            correlationId: string;
+            runId: string;
+            fixtureId: string;
+            insightId: string;
+            steps: components["schemas"]["AgentStep"][];
         };
         FixtureTemplateList: {
             items: components["schemas"]["FixtureTemplateSummary"][];
@@ -3871,6 +3936,104 @@ export interface operations {
                 };
             };
             /** @description `fixture-not-found`: Fixture not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getAgentTrace: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path: {
+                correlationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The handoff records of the run */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentStepTrace"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `trace-not-found`: Agent trace not found */
             404: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];

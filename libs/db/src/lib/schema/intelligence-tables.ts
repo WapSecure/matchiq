@@ -230,3 +230,4 @@ export const agentRuns = pgTable(
 );
 
 export { matchRecaps, matchSnapshots } from './read-model-tables.js';
+export { agentSteps } from './agent-steps-table.js';

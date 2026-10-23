@@ -67,6 +67,9 @@ const writeArtifacts = async (
   for (const { insightId, runs } of batch.agentRuns) {
     await tx.insertAgentRuns(key, insightId, runs);
   }
+  for (const { insightId, steps } of batch.agentSteps) {
+    await tx.insertAgentSteps(key, insightId, steps);
+  }
   if (batch.snapshot !== null) await tx.saveSnapshot(key, batch.snapshot);
   if (batch.status !== null) await tx.updateSession(key, batch.status);
   // After the status: a batch may start with a command and continue with events.
