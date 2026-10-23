@@ -1,8 +1,11 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { TraceCard } from '@/features/observatory/trace-card';
 import { RecapMomentItem } from '@/features/recap/recap-moment';
+import { createQueryClient } from '@/lib/api/query-provider';
 import { FX, message, narrative } from '@/test/factories';
 import { moment, trace } from '@/test/session-factories';
+import { stubApi } from '@/test/stub-api';
 import { initialMatchData, reduceMessages } from '../store';
 import { insightMarks } from './insight-marks';
 
@@ -51,21 +54,25 @@ describe('a moment ruled out by a correction', () => {
   });
 
   it('reads plainly in the fact-checks', () => {
+    stubApi({});
     render(
-      <TraceCard
-        trace={trace({
-          kind: 'GOAL',
-          editorial: {
-            insight: 'RETRACTED',
-            insightReason: REASON,
-            overlay: 'RETRACTED',
-            overlayReason: REASON,
-          },
-        })}
-        period={1}
-        variants={null}
-      />,
+      <QueryClientProvider client={createQueryClient()}>
+        <TraceCard
+          trace={trace({
+            kind: 'GOAL',
+            editorial: {
+              insight: 'RETRACTED',
+              insightReason: REASON,
+              overlay: 'RETRACTED',
+              overlayReason: REASON,
+            },
+          })}
+          period={1}
+          variants={null}
+        />
+      </QueryClientProvider>,
     );
     expect(screen.getByRole('note')).toHaveTextContent(RULED_OUT);
+    vi.unstubAllGlobals();
   });
 });
