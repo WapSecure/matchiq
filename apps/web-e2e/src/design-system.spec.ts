@@ -5,6 +5,9 @@ import {
 } from './support/a11y';
 
 const GALLERY = '/design-system';
+type Box = { y: number; height: number } | null;
+/** NaN for a missing box, so the comparison fails rather than passing silently. */
+const bottom = (box: Box): number => (box ? box.y + box.height : Number.NaN);
 const SECTIONS = [
   'Buttons and text fields',
   'Select and combobox',
@@ -51,6 +54,10 @@ test.describe('component gallery (ADR-0021)', () => {
     const listbox = page.getByRole('listbox');
     await expect(listbox).toBeVisible();
     await expect(listbox.getByRole('option')).toHaveCount(3);
+    // The popover is sized like on product pages, not clipped by the pane.
+    const popover = await listbox.locator('xpath=..').boundingBox();
+    const last = await listbox.getByRole('option').last().boundingBox();
+    expect(bottom(last)).toBeLessThanOrEqual(bottom(popover) + 1);
     expect(
       await listbox.evaluate((el) =>
         el.closest('[data-scheme]')?.getAttribute('data-scheme'),
