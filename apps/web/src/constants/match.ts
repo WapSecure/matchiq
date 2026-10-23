@@ -12,6 +12,8 @@ import type {
   PossessionBasis,
 } from '@matchiq/contracts';
 
+export const DEFAULT_COMMENTARY_LOCALE: Locale = 'en-GB';
+
 export const EVENT_LABELS: Record<MatchEventType, string> = {
   MATCH_STARTED: 'Kick-off',
   PERIOD_STARTED: 'Period started',
@@ -94,11 +96,12 @@ export const LOCALE_OPTIONS: readonly {
   value: Locale;
   label: string;
   short: string;
+  lang: Locale;
 }[] = [
-  { value: 'en-GB', label: 'English', short: 'EN' },
-  { value: 'fr-FR', label: 'Français', short: 'FR' },
-  { value: 'es-ES', label: 'Español', short: 'ES' },
-  { value: 'pcm-NG', label: 'Naijá (Pidgin)', short: 'PCM' },
+  { value: 'en-GB', lang: 'en-GB', label: 'English', short: 'EN' },
+  { value: 'fr-FR', lang: 'fr-FR', label: 'Français', short: 'FR' },
+  { value: 'es-ES', lang: 'es-ES', label: 'Español', short: 'ES' },
+  { value: 'pcm-NG', lang: 'pcm-NG', label: 'Naijá (Pidgin)', short: 'PCM' },
 ];
 
 export const UNAVAILABLE_REASONS: Record<MetricUnavailableReason, string> = {

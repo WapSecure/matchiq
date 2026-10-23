@@ -59,7 +59,7 @@ export const STUDIO_COPY = {
     persona: 'Audience',
     locale: 'Language',
     invariant:
-      'Audience and language change the wording only. Every number comes from the deterministic engine and stays the same.',
+      'Language changes commentary, not the controls. Audience changes its style. Both preserve the match facts.',
   },
   connectionPrefix: 'Stream ',
   notFound: 'Fixture not found',

@@ -694,3 +694,15 @@ Stream F, branch `test/MQ-045-mobile-studio-identity` cut from `dev`. Added brow
 Validation: all 8 browser cases passed across the configured projects, QA TypeScript and new-file lint passed, and formatting/diff whitespace checks passed. No code comments were added. The local test issuer and mocked API remain test infrastructure, not production integration proof.
 
 Next three tickets: complete interface localization; obtain native editorial review for supported narrative languages; qualify licensed live data and production operations with a paid pilot.
+
+## MQ-046: Commentary language boundaries (23 October 2026)
+
+Stream E, branch `fix/MQ-046-commentary-language-boundaries` cut from `dev`. The product owner selected independent interface and commentary languages. The audience bar now states that the picker affects commentary, while operator controls remain English. Native language choices carry language tags; English narrative source/fallback labels no longer inherit French, Spanish or Pidgin pronunciation. Overlay copy uses the actual cue locale. English provider fallback is tagged using `localeFallback` rather than the requested locale.
+
+Live announcements now throttle text and its actual language as one value, retain the previous pair until the next message airs, select the latest pending moment, and cancel timers on removal/unmount. Added 13 regressions covering these boundaries and timing. No code comments or dependencies were added.
+
+Commands/results under Node 22.22.3: `pnpm nx run web:lint --output-style=static` passed; `pnpm nx run web:typecheck --output-style=static` passed; `pnpm exec vitest run --config apps/web/vitest.config.mts --maxWorkers=1` passed 210 tests in 33 files; Prettier source checks and `git diff --check` passed. `NODE_ENV=production pnpm exec next build --webpack` compiled, typechecked and generated pages, with the known 27 standalone-tracing omissions caused by reused external dependency symlinks. The existing studio/judge-flow Playwright suite passed all 60 checks across four theme/viewport projects, including axe, keyboard controls, commentary switching and unchanged match figures. Existing auth unit tests still emit React act warnings. No checks were weakened or skipped.
+
+Known limitations: interface translation and native editorial approval are not delivered by this change. Recap contracts/building omit the provider fallback flag, so an English fallback filed under a requested locale cannot always be identified in recaps. No protected contracts/backend files were changed. The concrete handoff is `apps/web/docs/language-readiness.md`.
+
+Next three tickets: MQ-047 independent interface localization; MQ-048 preserve recap fallback provenance across contracts/backend/UI; MQ-049 native football editorial review of French, Spanish and Pidgin. Production packaging and licensed-feed qualification remain open.
