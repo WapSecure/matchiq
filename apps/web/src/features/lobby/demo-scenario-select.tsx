@@ -1,7 +1,7 @@
 'use client';
 
 import { FaultScenario } from '@matchiq/contracts';
-import { type ChoiceOption, Select } from '@/components/ui';
+import { type ChoiceOption, InfoTip, Select } from '@/components/ui';
 import {
   NO_FAULT_DESCRIPTION,
   NO_FAULT_KEY,
@@ -11,6 +11,8 @@ import {
   FAULT_SCENARIO_LABELS,
   FAULT_SCENARIO_SHORT,
 } from '@/constants/demo-faults';
+import { LOBBY_COPY } from '@/constants/lobby';
+import { ControlCaption } from './control-caption';
 
 const OPTIONS: ChoiceOption[] = [
   {
@@ -38,20 +40,24 @@ export function DemoScenarioSelect({
   onChange,
 }: DemoScenarioSelectProps) {
   return (
-    <div className="flex w-full flex-col gap-1">
-      <p aria-hidden className="text-micro text-ink-subtle">
-        {DEMO_FAULT_COPY.label}
-      </p>
+    <div className="flex min-w-0 flex-col gap-1 @lg:flex-1">
+      <ControlCaption text={DEMO_FAULT_COPY.label}>
+        <InfoTip
+          label={LOBBY_COPY.demoFaultInfo}
+          content={DEMO_FAULT_COPY.hint}
+          className="pointer-coarse:size-6!"
+        />
+      </ControlCaption>
       <Select
         label={DEMO_FAULT_COPY.labelFor(title)}
         hideLabel
+        size="md"
         value={value ?? NO_FAULT_KEY}
         onChange={(id) => {
           const parsed = FaultScenario.safeParse(id);
           onChange(parsed.success ? parsed.data : null);
         }}
         options={OPTIONS}
-        description={DEMO_FAULT_COPY.hint}
         popoverWidth="wide"
       />
     </div>

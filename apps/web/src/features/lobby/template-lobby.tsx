@@ -15,14 +15,14 @@ import { useTemplates } from '@/lib/api/hooks';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
 import { TemplateCard } from './template-card';
 
-const SKELETON_CARDS = 3;
-const GRID = 'grid gap-4 md:grid-cols-2 xl:grid-cols-3';
+const SKELETON_CARDS = 2;
+const GRID = 'grid gap-5 md:grid-cols-2';
 
 function LobbySkeleton() {
   return (
     <div role="status" aria-label={LOBBY_COPY.loading} className={GRID}>
       {Array.from({ length: SKELETON_CARDS }, (_, i) => (
-        <Skeleton key={i} className="h-72 rounded-lg" />
+        <Skeleton key={i} className="h-[26rem] rounded-xl" />
       ))}
     </div>
   );

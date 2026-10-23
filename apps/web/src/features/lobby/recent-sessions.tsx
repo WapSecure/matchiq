@@ -16,7 +16,7 @@ import { isApiError } from '@/lib/api/api-error';
 import { useSessionsPage, useTemplates } from '@/lib/api/hooks';
 import { cn } from '@/lib/cn';
 import { templateCode } from '@/lib/use-match-label';
-import { SessionRow } from './session-row';
+import { SessionGroups } from './session-groups';
 
 const copy = LOBBY_COPY.sessions;
 const LIST = 'recent-replays';
@@ -53,7 +53,7 @@ function SessionsBody() {
         count={PAGE_SIZE}
         label={copy.loading}
         className="p-4"
-        rowClassName="h-10"
+        rowClassName="h-12"
       />
     );
   }
@@ -69,29 +69,31 @@ function SessionsBody() {
   }
   const { items, nextCursor, total } = sessions.data;
   if (items.length === 0 && paging.cursor === null) {
-    return <EmptyState compact Icon={TimelineIcon} title={copy.empty} />;
+    return (
+      <EmptyState
+        compact
+        Icon={TimelineIcon}
+        title={copy.empty}
+        className="m-4"
+      />
+    );
   }
   const loading = sessions.isPlaceholderData;
   return (
     <>
-      <ul
+      <div
+        role="group"
         aria-label={copy.listLabel}
         aria-busy={loading || undefined}
         className={cn(
-          'divide-y divide-line transition-opacity duration-150',
+          'transition-opacity duration-150',
           loading && 'opacity-60',
         )}
       >
-        {items.map((session) => (
-          <SessionRow
-            key={session.sessionId}
-            session={session}
-            code={codeFor(session.templateId)}
-          />
-        ))}
-      </ul>
+        <SessionGroups sessions={items} codeFor={codeFor} />
+      </div>
       <CursorPagination
-        className="border-t border-line px-4 py-3"
+        className="border-t border-line px-4 py-3 sm:px-5"
         shown={items.length}
         offset={paging.offset}
         pageSize={PAGE_SIZE}
@@ -117,7 +119,7 @@ export function RecentSessions() {
       title={copy.title}
       description={copy.description}
       Icon={TimelineIcon}
-      bodyClassName="p-0"
+      bodyClassName="p-0!"
     >
       <SessionsBody />
     </Panel>
