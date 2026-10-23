@@ -2,6 +2,16 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-050 (2/2): One visual system for the remaining controls
+
+- **Shared tokens (`control-styles.ts`, `button-styles.ts`, `global.css`):** one focus ring (2 px accent, 2 px offset), a typing halo (accent border plus soft ring), an invalid ring, a disabled look that dims colour instead of fading the whole control, and overlays that scale and fade from their trigger in 120 ms (`--trigger-anchor-point`), clamped by reduced motion.
+- **Select:** an icon well for the chosen option, its label, then its description in a quieter tone; an open state with the halo. **Combobox:** a search field with an icon that turns accent on focus, a styled empty state ("No matches") and a loading state. **Lists and menus:** hover and keyboard highlight are neutral, the keyboard adds an inset accent ring, and the selected row is tinted with a check mark. Groups have dividers. Menu shortcuts are key caps, and danger items are tinted.
+- **Text fields:** empty fields read as wells, and focused or filled fields lift to the surface colour. **Buttons:** an inner highlight on primary, pressed states, and 44 px targets on touch for `sm` and `md`. **Switch:** a larger track, a white thumb, and a squeeze on press. **Checkbox:** a hover halo and an animated check. **Radio cards:** a hover lift and a filled dot. **Segmented control:** an inset track, with a raised and bold selected segment.
+- **Toasts:** a tone rail and a tinted icon well, so the text stays ink. **File upload:** a premium drop zone (gradient wash, icon tile that lifts on hover and rises on drag-over, solid accent border and ring while a file is over it). Rows have status wells, a thicker progress bar and a check on completion.
+- Gallery: added empty and described text fields and a textarea placeholder. Screenshots, from one production build (`:4378`), are in `docs/screenshots/design-system/redesign/`.
+
+Verification: CI (owner directive). Locally: format, `nx lint web`, `nx typecheck web` and the `components/ui` specs.
+
 ## 2026-10-23 — MQ-050 (1/2): Date pickers and calendars redesigned
 
 - **Closed state:** `DatePicker`, `DateTimePicker` and `DateRangePicker` are button-style triggers with a calendar icon well and a readable summary ("Sat, 24 Oct 2026", "Sat 24 Oct, 15:00", "Today, 14:00–15:30", "Last hour", "Any time"), plus a × clear button. No segment masks or seconds are shown; `granularity="second"` now picks to the minute.
