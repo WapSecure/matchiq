@@ -10,62 +10,62 @@ import {
 } from '@/components/icons';
 
 export const HERO = {
-  eyebrow: 'Broadcast intelligence platform',
-  title: 'One trusted event stream. Every audience, every language.',
+  eyebrow: 'Football intelligence for live broadcast',
+  title: 'One trusted match feed. Every audience, every language.',
   description:
-    'MatchIQ turns match events into verified insight in seconds — a deterministic football engine detects what changed, coordinated AI agents explain why it matters, and producers receive timed, evidence-linked overlays.',
-  primaryCta: { label: 'Open fixture lobby', href: '/fixtures' },
+    'MatchIQ spots the moments that matter in seconds. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.',
+  primaryCta: { label: 'Choose a match', href: '/fixtures' },
   howItWorks: { label: 'How it works', href: '#pipeline' },
   secondaryCta: { label: 'View source' },
   facts: [
-    { value: '0', label: 'numbers written by a model' },
+    { value: '0', label: 'numbers made up by AI' },
     { value: '3 × 4', label: 'audiences × languages, same facts' },
-    { value: '16:9', label: 'graphics-safe broadcast preview' },
+    { value: '16:9', label: 'on-air preview with safe areas' },
   ],
   disclosure:
-    'Demo runs on seeded synthetic matches. No real clubs, players or league marks.',
+    'The demo uses fictional, simulated matches. No real clubs, players or league marks.',
 } as const;
 
 export const PIPELINE = {
   id: 'pipeline',
-  eyebrow: 'Event-to-audience pipeline',
-  title: 'Five stages, one source of truth',
+  eyebrow: 'How it works',
+  title: 'Five steps from the pitch to the screen',
   description:
-    'Every stage consumes typed, versioned contracts. Facts are computed once and never re-derived by a model.',
+    'Every fact is worked out once from the match data. AI explains the facts but never changes them.',
   stages: [
     {
       key: 'ingest',
-      title: 'Ingest',
+      title: 'Collect',
       description:
-        'Schema-validated, idempotent event ledger with strict sequencing and provenance.',
+        'Every pass, shot and tackle is recorded once, in order, with where it came from.',
       Icon: IngestIcon,
     },
     {
       key: 'interpret',
-      title: 'Interpret',
+      title: 'Understand',
       description:
-        'Deterministic match state, rolling metrics and versioned evidence windows.',
+        'Live score, possession, momentum and other stats, worked out the same way every time.',
       Icon: InterpretIcon,
     },
     {
       key: 'explain',
       title: 'Explain',
       description:
-        'Analyst, writer and fact-checker agents produce claims bound to source events.',
+        'AI analyst, writer and fact checker turn key moments into words, each tied to the plays behind it.',
       Icon: ExplainIcon,
     },
     {
       key: 'render',
-      title: 'Render',
+      title: 'Show',
       description:
-        'Timed overlay cues with priorities, safe areas and instant retraction.',
+        'On-air graphics timed to the match, kept inside safe areas, and removable in one click.',
       Icon: RenderIcon,
     },
     {
       key: 'personalize',
-      title: 'Personalize',
+      title: 'Personalise',
       description:
-        'Casual, analyst and broadcast variants in multiple languages from the same facts.',
+        'Versions for fans, analysts and broadcast, in English, French, Spanish and Nigerian Pidgin, from the same facts.',
       Icon: PersonalizeIcon,
     },
   ],
@@ -73,28 +73,28 @@ export const PIPELINE = {
 
 export const PRINCIPLES = {
   id: 'principles',
-  eyebrow: 'Engineering principles',
+  eyebrow: 'Why you can trust it',
   title: 'Built to be trusted on air',
   items: [
     {
       key: 'evidence',
-      title: 'Evidence-linked claims',
+      title: 'Every claim shows its evidence',
       description:
-        'Every published number resolves to event IDs and a metric version, or it is not published.',
+        'Each number on screen links back to the plays and the stat it came from. If it cannot, it does not air.',
       Icon: EvidenceIcon,
     },
     {
       key: 'deterministic',
-      title: 'Deterministic by default',
+      title: 'Same match, same numbers',
       description:
-        'Statistics come from pure, tested functions. Seeded replays reproduce identical state.',
+        'Stats are worked out by tested rules, not AI. Replay a match and you get exactly the same figures.',
       Icon: DeterministicIcon,
     },
     {
       key: 'resilience',
-      title: 'Degrades gracefully',
+      title: 'Keeps going if AI fails',
       description:
-        'Replay and match state run without AI. Model outages fall back to verified templates.',
+        'Scores and stats never depend on AI. If the AI is slow or wrong, standard wording goes on air instead.',
       Icon: ResilienceIcon,
     },
   ],

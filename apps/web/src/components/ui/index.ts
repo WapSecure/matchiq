@@ -16,3 +16,4 @@ export { Panel } from './panel';
 export { SectionHeader } from './section-header';
 export { SegmentedControl, type SegmentOption } from './segmented-control';
 export { Skeleton } from './skeleton';
+export { TechnicalDetails } from './technical-details';

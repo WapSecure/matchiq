@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react';
-import { Badge } from '@/components/ui';
+import { Badge, TechnicalDetails } from '@/components/ui';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { OBSERVATORY_COPY, PUBLICATION_LABELS } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { formatClock, formatMinute } from '@/lib/format';
-import { FaultChain } from './fault-chain';
+import { FaultChain, FaultNotes } from './fault-chain';
 import { GateReportView } from './gate-report';
+import { describeRejection, plainFallbackReasons, traceStory } from './plain-trace';
 import { RunTable } from './run-table';
 
 const copy = OBSERVATORY_COPY;
+const tech = copy.technical;
 
 const PUBLICATION_TONE = {
   AGENT: 'accent',
@@ -18,7 +20,7 @@ const PUBLICATION_TONE = {
 
 type TraceCardProps = {
   trace: InsightTrace;
-  /** Known once the recap exists; otherwise the period clock is shown. */
+  /** Known once the recap exists; otherwise the clock within the period is shown. */
   period: number | null;
 };
 
@@ -26,8 +28,45 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
       <dt className="text-micro text-ink-subtle">{label}</dt>
-      <dd className="text-xs text-ink">{children}</dd>
+      <dd className="break-words font-mono text-xs text-ink">{children}</dd>
     </div>
+  );
+}
+
+function Notes({ title, items }: { title: string; items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section>
+      <h4 className="eyebrow mb-1">{title}</h4>
+      <ul className="flex flex-col gap-0.5 text-xs text-ink">
+        {items.map((item, i) => (
+          <li key={`${i}-${item}`}>{item}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Technical({ trace, caption }: { trace: InsightTrace; caption: string }) {
+  return (
+    <TechnicalDetails>
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <Field label={tech.status}>{trace.status}</Field>
+        <Field label={tech.fallback}>
+          {trace.fallbackReason ?? copy.notApplicable}
+        </Field>
+        <Field label={tech.insightId}>{trace.insightId}</Field>
+      </dl>
+      <FaultNotes runs={trace.runs} />
+      <section>
+        <h4 className="eyebrow mb-1.5">{tech.gate}</h4>
+        <GateReportView report={trace.gate} />
+      </section>
+      <section>
+        <h4 className="eyebrow mb-1.5">{tech.runs}</h4>
+        <RunTable runs={trace.runs} caption={caption} />
+      </section>
+    </TechnicalDetails>
   );
 }
 
@@ -36,8 +75,12 @@ export function TraceCard({ trace, period }: TraceCardProps) {
   const titleId = `trace-${trace.insightId}`;
   const minute =
     period === null
-      ? `${copy.periodClock} ${formatClock(1, trace.matchClockMs)}`
+      ? formatClock(1, trace.matchClockMs)
       : formatMinute(period, trace.matchClockMs);
+  const why =
+    trace.publication === 'TEMPLATE'
+      ? plainFallbackReasons(trace.fallbackReason)
+      : [];
   return (
     <article
       aria-labelledby={titleId}
@@ -52,30 +95,26 @@ export function TraceCard({ trace, period }: TraceCardProps) {
           {minute}
         </span>
         <Badge tone={PUBLICATION_TONE[trace.publication]} className="ml-auto">
-          {copy.publication}: {PUBLICATION_LABELS[trace.publication]}
+          {PUBLICATION_LABELS[trace.publication]}
         </Badge>
       </header>
-      <div className="flex flex-col gap-4 px-4 py-3">
-        <dl className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
-          <Field label={copy.status}>
-            <span className="font-mono">{trace.status}</span>
-          </Field>
-          <Field label={copy.fallback}>
-            {trace.fallbackReason ?? copy.notApplicable}
-          </Field>
-        </dl>
+      <div className="flex flex-col gap-3 px-4 py-3">
+        <ol
+          aria-label={copy.story.region(kind, minute)}
+          data-testid="trace-story"
+          className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-ink [&>li+li]:before:mr-2 [&>li+li]:before:text-ink-subtle [&>li+li]:before:content-['·']"
+        >
+          {traceStory(trace, minute).map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
         <FaultChain runs={trace.runs} publication={trace.publication} />
-        <section>
-          <h4 className="eyebrow mb-1.5">{copy.gate}</h4>
-          <GateReportView report={trace.gate} />
-        </section>
-        <section>
-          <h4 className="eyebrow mb-1.5">{copy.runs}</h4>
-          <RunTable
-            runs={trace.runs}
-            caption={`${copy.runs}: ${kind} ${minute}`}
-          />
-        </section>
+        <Notes title={copy.story.why} items={why} />
+        <Notes
+          title={copy.story.caughtTitle}
+          items={(trace.gate?.rejected ?? []).map(describeRejection)}
+        />
+        <Technical trace={trace} caption={`${tech.runs}: ${kind} ${minute}`} />
       </div>
     </article>
   );

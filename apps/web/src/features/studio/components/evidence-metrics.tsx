@@ -4,7 +4,10 @@ import { describeMetric } from '@/lib/metric-definition';
 
 const METRIC_DECIMALS = 2;
 
-/** Engine-computed values with the definition of each metricRef. */
+export const formatMetric = (value: number): string =>
+  Number.isInteger(value) ? String(value) : value.toFixed(METRIC_DECIMALS);
+
+/** The match stats behind a claim, each with its name and plain definition. */
 export function EvidenceMetrics({ evidence }: { evidence: EvidenceEnvelope }) {
   const entries = Object.entries(evidence.computedMetrics);
   if (entries.length === 0)
@@ -30,24 +33,37 @@ export function EvidenceMetrics({ evidence }: { evidence: EvidenceEnvelope }) {
                 <span className="block text-[13px] text-ink">
                   {definition.label}
                 </span>
-                <span className="block font-mono text-micro text-ink-subtle">
-                  {ref}
-                </span>
-                {definition.formula ? (
+                {definition.plain ? (
                   <span className="block text-micro text-ink-subtle">
-                    {definition.formula}
+                    {definition.plain}
                   </span>
                 ) : null}
               </th>
               <td className="tabular py-1.5 text-right font-semibold text-ink">
-                {Number.isInteger(value)
-                  ? value
-                  : value.toFixed(METRIC_DECIMALS)}
+                {formatMetric(value)}
               </td>
             </tr>
           );
         })}
       </tbody>
     </table>
+  );
+}
+
+/** Raw metric refs and engine formulas, for Technical details. */
+export function MetricFormulas({ evidence }: { evidence: EvidenceEnvelope }) {
+  const refs = Object.keys(evidence.computedMetrics);
+  if (refs.length === 0) return null;
+  return (
+    <ul className="flex flex-col gap-1 font-mono text-micro text-ink-muted">
+      {refs.map((ref) => (
+        <li key={ref}>
+          {ref}
+          {describeMetric(ref).formula
+            ? ` = ${describeMetric(ref).formula}`
+            : ''}
+        </li>
+      ))}
+    </ul>
   );
 }

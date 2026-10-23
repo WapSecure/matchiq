@@ -12,6 +12,5 @@ export const EVENT_DETAIL = {
     `${playerIn} on for ${playerOut}`,
   won: 'Won',
   lost: 'Lost',
-  correction: (eventId: string, reason: string) =>
-    `Voids ${eventId}: ${reason}`,
+  correction: (reason: string) => `Corrects an earlier event: ${reason}`,
 } as const;

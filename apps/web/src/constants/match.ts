@@ -20,12 +20,12 @@ export const EVENT_LABELS: Record<MatchEventType, string> = {
   PASS_ATTEMPTED: 'Pass attempted',
   PASS_COMPLETED: 'Pass completed',
   PASS_INTERCEPTED: 'Pass intercepted',
-  CARRY: 'Carry',
+  CARRY: 'Run with the ball',
   FINAL_THIRD_ENTRY: 'Final-third entry',
   TACKLE: 'Tackle',
   PRESSURE_APPLIED: 'Pressure',
   RECOVERY: 'Ball recovery',
-  POSSESSION_CHANGED: 'Possession change',
+  POSSESSION_CHANGED: 'Change of possession',
   SHOT: 'Shot',
   GOAL: 'Goal',
   SAVE: 'Save',
@@ -73,22 +73,29 @@ export const INSIGHT_KIND_LABELS: Record<InsightKind, string> = {
 };
 
 export const PRIORITY_LABELS: Record<InsightPriority, string> = {
-  P0: 'Critical',
-  P1: 'High',
+  P0: 'Major',
+  P1: 'Notable',
   P2: 'Context',
 };
 
 export const CONFIDENCE_LABELS: Record<ConfidenceLabel, string> = {
-  low: 'Low confidence',
-  medium: 'Medium confidence',
-  high: 'High confidence',
+  low: 'Limited evidence',
+  medium: 'Moderate evidence',
+  high: 'Strong evidence',
 };
 
 export const PERSONA_OPTIONS: readonly { value: Persona; label: string }[] = [
-  { value: 'CASUAL', label: 'Casual' },
+  { value: 'CASUAL', label: 'Fan' },
   { value: 'ANALYST', label: 'Analyst' },
   { value: 'BROADCAST', label: 'Broadcast' },
 ];
+
+/** Personas inside a sentence: "Write-up for fans". */
+export const PERSONA_LABELS: Record<Persona, string> = {
+  CASUAL: 'fans',
+  ANALYST: 'analysts',
+  BROADCAST: 'broadcast',
+};
 
 export const LOCALE_OPTIONS: readonly {
   value: Locale;
@@ -101,16 +108,20 @@ export const LOCALE_OPTIONS: readonly {
   { value: 'pcm-NG', label: 'Naijá (Pidgin)', short: 'PCM' },
 ];
 
+/** A locale code as its language's own name; unknown codes are shown as given. */
+export const languageName = (locale: string): string =>
+  LOCALE_OPTIONS.find((o) => o.value === locale)?.label ?? locale;
+
 export const UNAVAILABLE_REASONS: Record<MetricUnavailableReason, string> = {
   ZERO_DENOMINATOR: 'No attempts yet',
-  NO_TRACKING_DATA: 'No tracking data',
-  NOT_GENERATED: 'Not in this dataset',
-  INSUFFICIENT_SAMPLE: 'Sample too small',
+  NO_TRACKING_DATA: 'Not tracked in this match',
+  NOT_GENERATED: 'Not recorded in this match',
+  INSUFFICIENT_SAMPLE: 'Too early to tell',
 };
 
 export const POSSESSION_BASIS_LABELS: Record<PossessionBasis, string> = {
-  TIME_WEIGHTED: 'Time-weighted',
-  EVENT_SHARE_PROXY: 'Event-share proxy',
+  TIME_WEIGHTED: 'By time on the ball',
+  EVENT_SHARE_PROXY: 'Estimated from events',
 };
 
 export const FIXTURE_STATUS_LABELS: Record<FixtureStatus, string> = {

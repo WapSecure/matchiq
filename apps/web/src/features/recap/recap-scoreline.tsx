@@ -53,9 +53,6 @@ export function RecapScoreline({
       <div className="flex flex-wrap items-center gap-2">
         <p className="eyebrow text-accent">{RECAP_COPY.eyebrow}</p>
         <Badge tone="synthetic">{WATERMARK}</Badge>
-        <span className="font-mono text-micro text-ink-subtle">
-          {RECAP_COPY.engine(snapshot.algorithmVersion)}
-        </span>
         <ExportRecap recap={recap} className="ml-auto" />
       </div>
       <div

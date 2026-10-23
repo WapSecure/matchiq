@@ -34,7 +34,7 @@ function SessionRow({ session }: { session: ReplaySessionView }) {
       <div className="min-w-0 flex-1 basis-56">
         <p className="truncate text-sm font-medium text-ink">{session.title}</p>
         <p className="tabular font-mono text-micro text-ink-subtle">
-          {copy.number(session.sessionNumber)} · {session.sessionId}
+          {copy.number(session.sessionNumber)}
         </p>
       </div>
       <Badge tone={live ? 'accent' : 'neutral'} dot={live}>

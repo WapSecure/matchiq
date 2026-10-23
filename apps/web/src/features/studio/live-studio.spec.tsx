@@ -252,17 +252,26 @@ describe('LiveStudio', () => {
     });
     await renderStudio(routes);
     await user.click(
-      await screen.findByRole('button', { name: /open evidence/i }),
+      await screen.findByRole('button', { name: /see the evidence/i }),
     );
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Triggering events')).toBeInTheDocument();
+    expect(
+      within(dialog).getByText('The plays behind it'),
+    ).toBeInTheDocument();
     await waitFor(() =>
       expect(within(dialog).getAllByText('Shot')).toHaveLength(2),
     );
     expect(
-      within(dialog).getByText('Shots (home, latest 5 min)'),
+      within(dialog).getByText('Shots (home, last 5 min)'),
     ).toBeInTheDocument();
-    expect(within(dialog).getByText('count(SHOT)')).toBeInTheDocument();
+    expect(
+      within(dialog).getByText('Every attempt at goal'),
+    ).toBeInTheDocument();
+    expect(
+      within(within(dialog).getByTestId('technical-details')).getByText(
+        /count\(SHOT\)/,
+      ),
+    ).toBeInTheDocument();
     await user.click(
       within(dialog).getByRole('button', { name: 'Close evidence' }),
     );

@@ -1,4 +1,5 @@
 import type { Insight } from '@matchiq/contracts';
+import { languageName } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 import type { NarrativeView } from '../store';
@@ -47,7 +48,7 @@ export function NarrativePanel({
         <span>{STUDIO_COPY.insights.source[narrative.source]}</span>
         {localeFallback ? (
           <span className="text-warning" lang="en-GB">
-            {STUDIO_COPY.insights.localeFallback(locale)}
+            {STUDIO_COPY.insights.localeFallback(languageName(locale))}
           </span>
         ) : null}
       </p>

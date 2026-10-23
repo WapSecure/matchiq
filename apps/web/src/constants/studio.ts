@@ -1,64 +1,67 @@
 import type { ConnectionState } from '@/lib/stream';
 
-export const WATERMARK = 'Synthetic match demo';
+export const WATERMARK = 'Simulated match';
 
 export const STUDIO_COPY = {
-  metaTitle: 'Live Studio',
-  backToLobby: 'Fixtures',
-  title: 'Live Studio',
+  metaTitle: 'Live studio',
+  backToLobby: 'Matches',
+  title: 'Live studio',
   scoreboardLabel: 'Scoreboard',
-  awaitingSnapshot: 'Awaiting first match snapshot',
-  provisional: 'Provisional',
-  provisionalHint: 'State is being reconciled after a gap or correction',
-  algorithm: (version: string) => `Engine v${version}`,
+  awaitingSnapshot: 'Waiting for kick-off',
+  provisional: 'Updating',
+  provisionalHint:
+    'Catching up after a short gap. Figures will settle in a moment.',
   timeline: {
-    title: 'Event timeline',
-    description: 'Key events in match order',
-    empty: 'No events yet. Start the replay to begin the feed.',
+    title: 'Match events',
+    description: 'Key events as they happen',
+    empty: 'No events yet. Start the replay to begin.',
     count: (n: number) => `${n} events`,
-    voided: 'Voided',
+    voided: 'Corrected',
     period: (n: number) => `Period ${n}`,
   },
   insights: {
-    title: 'AI insight feed',
-    description: 'Detected by the deterministic engine, explained by agents',
-    empty: 'No key moments detected yet.',
+    title: 'Key moments',
+    description: 'Spotted in the match data, written up by AI and fact-checked',
+    empty: 'No key moments yet. They appear here as the match unfolds.',
     evidence: 'Evidence',
-    coverage: 'Data coverage',
-    openEvidence: (headline: string) => `Open evidence for ${headline}`,
-    narrativePending: 'Narrative pending — showing verified facts only.',
-    localeFallback: (locale: string) =>
-      `${locale} variant unavailable; showing en-GB.`,
-    source: { AGENT: 'Agent narrative', TEMPLATE: 'Deterministic template' },
+    coverage: 'Data completeness',
+    openEvidence: (headline: string) => `See the evidence for ${headline}`,
+    narrativePending: 'Write-up on its way. Here are the facts so far.',
+    localeFallback: (language: string) =>
+      `Not yet available in ${language}, so this is in English.`,
+    source: {
+      AGENT: 'Written by AI · fact-checked',
+      TEMPLATE: 'Standard wording',
+    },
   },
   metrics: {
-    title: 'Live metrics',
+    title: 'Match stats',
     possession: 'Possession',
     comparison: 'Team comparison',
     passCompletion: 'Pass completion',
     momentum: 'Momentum',
-    momentumDescription: 'Engine momentum index per team over match time',
-    awaiting:
-      'Live metrics appear once the engine publishes the first match snapshot.',
-    momentumEmpty: 'Momentum appears once the engine publishes snapshots.',
+    momentumDescription:
+      'Who is on top, from shots, final-third entries, pressing and high ball wins, compared with the rest of the match',
+    awaiting: 'Stats appear once play begins.',
+    momentumEmpty: 'Momentum appears a few minutes into the match.',
     tableToggle: 'View as table',
     lineStyle: { home: 'solid', away: 'dashed' },
     clock: 'Match time',
   },
   overlay: {
-    title: 'Broadcast overlay preview',
-    description: '16:9 graphics-safe frame at the current match clock',
+    title: 'On-air preview',
+    description: 'What viewers see right now',
     safeArea: 'Safe area',
     frameLabel: (count: number) =>
       count === 0
-        ? 'Overlay preview, standing by'
-        : `Overlay preview, ${count} cue${count === 1 ? '' : 's'} on air`,
+        ? 'On-air preview, standing by'
+        : `On-air preview, ${count} graphic${count === 1 ? '' : 's'} on air`,
   },
   controls: {
     persona: 'Audience',
     locale: 'Language',
     invariant:
-      'Audience and language change the wording only. Every number comes from the deterministic engine and stays the same.',
+      'Audience and language change the wording only. Every number comes from the match data and stays the same.',
   },
   connectionPrefix: 'Connection: ',
   notFound: "We couldn't find this match",

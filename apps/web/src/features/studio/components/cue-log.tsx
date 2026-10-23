@@ -5,17 +5,13 @@ import { OVERLAY_COPY } from '@/constants/overlay';
 import { cn } from '@/lib/cn';
 import { type Retraction, useMatchStore } from '../store';
 
-/** Editorial causes replace the generic label; their stream reason only repeats it. */
-const describe = (r: Retraction) => {
-  const editorial = r.cause !== null && EDITORIAL_CAUSES.has(r.cause);
-  return {
-    label: r.cause ? CAUSE_LABELS[r.cause] : OVERLAY_COPY.ending[r.ending],
-    reason: editorial ? null : r.reason,
-    editorial,
-  };
-};
+/** The cause names why a graphic ended; the stream's raw reason text is never shown. */
+const describe = (r: Retraction) => ({
+  label: r.cause ? CAUSE_LABELS[r.cause] : OVERLAY_COPY.ending[r.ending],
+  editorial: r.cause !== null && EDITORIAL_CAUSES.has(r.cause),
+});
 
-/** Recently ended cues: expired on the match clock, or retracted with a cause. */
+/** Recently ended graphics: finished on the match clock, or taken off air with a cause. */
 export function CueLog() {
   const ended = useMatchStore((s) => s.retractions);
   if (ended.length === 0) return null;
@@ -44,11 +40,8 @@ export function CueLog() {
                 {view.label}
               </span>
               <span className="min-w-0 truncate text-ink">
-                {r.headline ?? r.overlayId}
+                {r.headline ?? OVERLAY_COPY.untitled}
               </span>
-              {view.reason ? (
-                <span className="text-ink-subtle">{view.reason}</span>
-              ) : null}
             </li>
           );
         })}

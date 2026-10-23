@@ -8,21 +8,21 @@ export const MODE_VIEW: Record<
   EditorialMode,
   { label: string; tone: ModeTone; standby: string | null }
 > = {
-  AUTO: { label: 'Auto-publish', tone: 'positive', standby: null },
+  AUTO: { label: 'Auto graphics', tone: 'positive', standby: null },
   FROZEN: {
-    label: 'Frozen',
+    label: 'Graphics paused',
     tone: 'warning',
-    standby: 'Held by editorial freeze',
+    standby: 'Held: graphics paused',
   },
   KILLED: {
-    label: 'Kill switch',
+    label: 'Emergency stop',
     tone: 'critical',
-    standby: 'Kill switch active',
+    standby: 'Held: emergency stop',
   },
 };
 
-/** Typed confirmation for the organisation kill switch. */
-export const KILL_CONFIRM_PHRASE = 'KILL';
+/** Typed confirmation for the organisation-wide emergency stop. */
+export const KILL_CONFIRM_PHRASE = 'STOP';
 
 export const NOTICE_DISMISS_MS = 7_000;
 
@@ -36,13 +36,13 @@ export const EDITORIAL_CAUSES: ReadonlySet<OverlayRetractCause> = new Set([
 ]);
 
 export const CAUSE_LABELS: Record<OverlayRetractCause, string> = {
-  EXPIRED: 'Expired',
-  SUPERSEDED: 'Superseded',
-  PERIOD_ENDED: 'Period ended',
-  MATCH_ENDED: 'Match ended',
-  PRODUCER: 'Retracted by producer',
-  INSIGHT_SUPPRESSED: 'Insight suppressed',
-  KILL_SWITCH: 'Kill switch',
+  EXPIRED: 'Finished',
+  SUPERSEDED: 'Replaced',
+  PERIOD_ENDED: 'End of the half',
+  MATCH_ENDED: 'Full time',
+  PRODUCER: 'Taken off air by a producer',
+  INSIGHT_SUPPRESSED: 'Key moment dropped',
+  KILL_SWITCH: 'Emergency stop',
 };
 
 type CommandCopy = {
@@ -56,25 +56,25 @@ type CommandCopy = {
 };
 
 export const FREEZE_COPY: CommandCopy = {
-  action: 'Freeze auto-publish',
-  title: 'Freeze auto-publish for this session',
+  action: 'Pause graphics',
+  title: 'Pause new graphics for this match',
   description:
-    'New cues for this session are held and never air. The cue on air runs out unless you retract it. Narratives still publish.',
-  submit: 'Freeze',
-  pending: 'Freezing…',
-  done: 'Auto-publish frozen. New cues are held.',
-  noop: 'Auto-publish was already frozen. Nothing changed.',
+    "New graphics for this match are held and won't go on air. The graphic on air now runs its course unless you take it off air. Written key moments still appear.",
+  submit: 'Pause graphics',
+  pending: 'Pausing…',
+  done: 'Graphics paused. New graphics are held.',
+  noop: 'Graphics were already paused. Nothing changed.',
 };
 
 export const RESUME_COPY: CommandCopy = {
-  action: 'Resume auto-publish',
-  title: 'Resume auto-publish for this session',
+  action: 'Resume graphics',
+  title: 'Resume automatic graphics for this match',
   description:
-    'New verified cues publish again. Cues held while frozen stay held and never air.',
+    'New fact-checked graphics go on air again. Graphics held while paused stay held.',
   submit: 'Resume',
   pending: 'Resuming…',
-  done: 'Auto-publish resumed.',
-  noop: 'Auto-publish was already running. Nothing changed.',
+  done: 'Graphics resumed.',
+  noop: 'Graphics were already running. Nothing changed.',
 };
 
 export const KILL_COPY: CommandCopy & {
@@ -88,20 +88,20 @@ export const KILL_COPY: CommandCopy & {
   mismatch: string;
   reasonSummary: string;
 } = {
-  action: 'Kill switch',
-  title: 'Activate the organisation kill switch',
+  action: 'Emergency stop',
+  title: 'Emergency stop for your whole organisation',
   description:
-    'Takes every live cue off air in every active session of your organisation, and holds all new cues until it is released.',
-  submit: 'Activate kill switch',
-  pending: 'Activating…',
-  done: 'Kill switch active. Live cues were taken off air.',
-  noop: 'The kill switch was already active. Nothing changed.',
+    'Takes every graphic off air in every live match in your organisation, and holds all new graphics until someone releases the stop.',
+  submit: 'Stop all graphics',
+  pending: 'Stopping…',
+  done: 'Emergency stop on. All graphics were taken off air.',
+  noop: 'The emergency stop was already on. Nothing changed.',
   phrase: KILL_CONFIRM_PHRASE,
   next: 'Continue',
   back: 'Back',
-  confirmTitle: 'Confirm the kill switch',
+  confirmTitle: 'Confirm the emergency stop',
   confirmBody:
-    'This affects every active session in the organisation, not only this one.',
+    'This affects every live match in your organisation, not just this one.',
   confirmLabel: 'Confirmation',
   confirmHint: `Type ${KILL_CONFIRM_PHRASE} in capitals to confirm.`,
   mismatch: `Type ${KILL_CONFIRM_PHRASE} exactly to confirm.`,
@@ -109,80 +109,81 @@ export const KILL_COPY: CommandCopy & {
 };
 
 export const RELEASE_COPY: CommandCopy = {
-  action: 'Release kill switch',
-  title: 'Release the organisation kill switch',
+  action: 'Release emergency stop',
+  title: 'Release the emergency stop',
   description:
-    'New cues publish again in every session that is not frozen. Nothing that was held is released.',
+    "New graphics go on air again in every match that isn't paused. Graphics held during the stop stay held.",
   submit: 'Release',
   pending: 'Releasing…',
-  done: 'Kill switch released.',
-  noop: 'The kill switch was already released. Nothing changed.',
+  done: 'Emergency stop released.',
+  noop: 'The emergency stop was already off. Nothing changed.',
 };
 
 export const RETRACT_COPY: CommandCopy & {
   label: (h: string) => string;
   idle: string;
 } = {
-  action: 'Retract',
-  idle: 'Retract: no cue on air',
-  label: (headline) => `Retract on-air cue: ${headline}`,
-  title: 'Retract the on-air cue',
+  action: 'Take off air',
+  idle: 'Nothing on air to take off',
+  label: (headline) => `Take off air: ${headline}`,
+  title: 'Take this graphic off air',
   description:
-    'The cue leaves air at once and never airs again, including later agent revisions.',
-  submit: 'Retract cue',
-  pending: 'Retracting…',
-  done: 'Cue retracted.',
-  noop: 'The cue was already retracted. Nothing changed.',
+    'The graphic leaves the screen at once and never comes back, including later AI updates.',
+  submit: 'Take off air',
+  pending: 'Taking off air…',
+  done: 'Graphic taken off air.',
+  noop: 'That graphic was already off air. Nothing changed.',
 };
 
 export const SUPPRESS_COPY: CommandCopy & { label: (h: string) => string } = {
-  action: 'Suppress',
-  label: (headline) => `Suppress insight: ${headline}`,
-  title: 'Suppress this insight',
+  action: 'Drop',
+  label: (headline) => `Drop key moment: ${headline}`,
+  title: 'Drop this key moment',
   description:
-    'Its pending narratives are never published, and its cue is taken off air if it is live.',
-  submit: 'Suppress insight',
-  pending: 'Suppressing…',
-  done: 'Insight suppressed.',
-  noop: 'The insight was already suppressed. Nothing changed.',
+    'Its write-ups never appear, and its graphic comes off air if it is showing.',
+  submit: 'Drop key moment',
+  pending: 'Dropping…',
+  done: 'Key moment dropped.',
+  noop: 'That key moment was already dropped. Nothing changed.',
 };
 
 export const EDITORIAL_COPY = {
-  barTitle: 'Editorial control',
-  barDescription: 'Producer overrides. Every action is recorded with a reason.',
-  modeLegend: 'Publishing',
-  chipPrefix: 'Editorial ',
-  auditLink: 'Audit trail',
+  barTitle: 'Producer controls',
+  barDescription:
+    'Override what goes on air. Every action is saved to the activity log with your reason.',
+  modeLegend: 'Mode',
+  chipPrefix: 'Producer mode: ',
+  auditLink: 'Activity log',
   cancel: 'Cancel',
-  noticeRegion: 'Editorial notifications',
+  noticeRegion: 'Producer notifications',
   dismiss: 'Dismiss notification',
-  subject: 'Cue',
+  subject: 'Graphic',
   reason: {
     label: 'Reason',
     hint: (min: number, max: number) =>
-      `Recorded in the audit trail and never shown to viewers. ${min} to ${max} characters.`,
+      `Saved to the activity log and never shown to viewers. ${min} to ${max} characters.`,
     tooShort: (min: number) => `Enter a reason of at least ${min} characters.`,
     tooLong: (max: number) => `Keep the reason to ${max} characters or fewer.`,
     count: (n: number, max: number) => `${n} / ${max}`,
   },
   banner: {
     FROZEN: {
-      title: 'Auto-publish frozen',
-      body: 'New cues for this session are held and will not air. Narratives still publish. Resuming releases nothing that was held.',
+      title: 'Graphics paused',
+      body: "New graphics for this match are held and won't go on air. Written key moments still appear. Resuming doesn't release anything that was held.",
     },
     KILLED: {
-      title: 'Kill switch active',
-      body: 'Every cue in the organisation is held and live cues were taken off air. A producer must release the kill switch before cues air again.',
+      title: 'Emergency stop on',
+      body: 'All graphics across your organisation are held, and live ones were taken off air. A producer must release the emergency stop before graphics go on air again.',
     },
   },
   marks: {
-    suppressed: 'Suppressed',
-    retracted: 'Cue retracted',
+    suppressed: 'Dropped',
+    retracted: 'Taken off air',
     held: {
-      EDITORIAL_FREEZE: 'Cue held: freeze',
-      KILL_SWITCH: 'Cue held: kill switch',
+      EDITORIAL_FREEZE: 'Held: graphics paused',
+      KILL_SWITCH: 'Held: emergency stop',
     } as Record<string, string>,
-    heldFallback: 'Cue held',
+    heldFallback: 'Held',
   },
 } as const;
 
