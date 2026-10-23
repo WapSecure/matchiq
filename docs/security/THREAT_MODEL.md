@@ -1,6 +1,6 @@
 # Threat model
 
-STRIDE over the deployed MatchIQ architecture (spec §48). It covers what runs today plus the OIDC sign-in that is landing (ADR-0018). Each threat maps to a mitigation and the evidence for it: **[test]** is an automated test, **[ci]** is a CI gate, **[config]** is configuration under review, and **[planned]** is not implemented. MatchIQ makes no compliance claims.
+STRIDE over the deployed MatchIQ architecture (spec §48). It covers what runs today plus the OIDC sign-in (ADR-0018). Each threat maps to a mitigation and the evidence for it: **[test]** is an automated test, **[ci]** is a CI gate, **[config]** is configuration under review, and **[planned]** is not implemented. MatchIQ makes no compliance claims.
 
 Owner for every row: the platform team (`.github/CODEOWNERS`). Review this document whenever a trust boundary changes (a new service, ingress, identity provider or data source).
 
@@ -103,7 +103,10 @@ Owner for every row: the platform team (`.github/CODEOWNERS`). Review this docum
 - No DAST against staging and no penetration test (spec §48 expects both before a commercial launch).
 - The worker → agents service token is a shared secret, not workload identity. It is rotated manually.
 - Redis has no authentication on the private compose network. Isolation depends on the network.
-- Until OIDC sign-in ships in the web app, operator access depends on the shared key in dev and CI.
+- OIDC sign-in has shipped (ADR-0018). The shared operator key is a disabled-by-default path (`AUTH_OPERATOR_KEY_ENABLED=false`) kept for dev and CI automation; it must stay off in any shared environment.
+- Token revocation is bounded by the 5-minute access token lifetime. There is no introspection, so a removed role or disabled user keeps access until the token expires.
+- SSRF: the API and agents service make outbound calls to configured URLs only (OIDC issuer and JWKS, the agents service, Ollama or Foundry endpoints). Those URLs are trusted configuration and are not restricted by an egress allowlist or address-range check, so a mistaken or tampered setting could point them at an internal host. No user-supplied URL is fetched today; webhooks (ADR-0031) would add that surface and would need SSRF controls first.
+- Requests from the worker to the agents service carry a shared bearer token only. They are not signed per request (no HMAC over the body, timestamp or nonce), so a captured token can be replayed on the private network.
 
 ## Related
 

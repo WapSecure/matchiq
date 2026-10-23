@@ -2,6 +2,18 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-067: Honesty pass on the documentation
+
+Docs only, plus one stale code comment in `libs/db/src/lib/schema/tables.ts`.
+
+- Corrected counts and order: 13 scripted attacks (not 10), agent order checker, localization, producer, one governance "Evaluation (M2)" paragraph, the 28% localization figure labelled historical (commit `4d977d6`, no committed baseline), and the live sample size explained against the 10-case baseline.
+- Corrected claims: audit rows hold identity since migration 0007 (`DATA_RETENTION.md`), threat model residual risks (OIDC shipped; SSRF, request signing, token revocation), ADR-0007, ADR-0016 and ADR-0018 notes, "automated axe checks (serious and critical)", `infra:up` starts Keycloak, hosting "verified" wording, judging dates (shortlist 2026-11-10, winners 2026-11-20), event types (22 defined, at least 19 exercised), reserved permissions.
+- Implementation log: superseded notes on stale rows, duplicate MQ-040/041/044/045/046 entries removed, an ID note for the reused MQ-047, MQ-054 and MQ-055.
+- Owner decisions applied to the checklist, write-up and README: dev default branch, Best Multi-Agent System, solo, Slides deck, MIT, no hosting before the verdict.
+- New ADRs 0030 to 0036 record deferrals (metering, webhooks, organisation model, provider adapter and clock drift, schema deviations, console surfaces, privacy). The 0030 range avoids collisions with parallel ADRs.
+- New `docs/requirements-traceability.csv` (spec §58), linked from the README.
+- Not changed: the worker moment re-detection claim (MQ-063).
+
 ## 2026-10-23 — MQ-058: Cursor pagination for the per-match lists
 
 | Area                                                                                                                                                                                                                                                                                                                                                                             | Status | Evidence                           |
@@ -203,6 +215,8 @@ Verification: CI (owner directive). Locally: Prettier, `nx lint web`, `nx typech
 Limitations: hover, focus-visible and pressed states are interactive in the gallery, not frozen; a static capture shows the resting, selected, disabled, invalid and loading states. The native controls in the app are replaced in part 2.
 
 ## 2026-10-23 — MQ-047: Land the local presentation polish through review
+
+> ID note: ticket IDs MQ-047, MQ-054 and MQ-055 were each used for two pieces of work. MQ-047 here is the merge of the local polish commits; the "MQ-047" proposed in `apps/web/docs` for interface localization was never built under that ID. MQ-054 is the branded sign-in pages (entry above) and also the recap translation provenance work (`MQ-054A` and `MQ-054` entries near the end). MQ-055 is the lobby premium pass (entry above) and also the recap fallback branch move and publication (`MQ-055` entries near the end).
 
 | Area                                                                                                                                                                                                                                                        | Status  | Evidence                       |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
@@ -751,18 +765,18 @@ A `comeback` session at 30×, streamed with `curl -N` from `Last-Event-ID: 0` fo
 
 ## 2026-10-21 — M2: Evidence-grounded multi-agent pipeline (MQ-009)
 
-| Area                                                                                                                                   | Status            | Evidence                                                                                                              |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Orchestration on Agent Framework graph workflows (`WorkflowBuilder`, `Executor`), typed FSM `DETECTED → ANALYZED → DRAFTED → VERIFIED` | Done              | ADR-0011; `tests/test_pipeline.py`                                                                                    |
-| Roster: Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer, with versioned prompts (all `1.0.0`)          | Done              | `apps/agents/src/matchiq_agents/roster/`                                                                              |
-| Deterministic Fact Checker (cited values, evidence ids, entity allowlist, forbidden lexicon, lengths), then an optional AI critique    | Done              | `tests/test_guard.py`                                                                                                 |
-| REVISE regenerates once; REJECT falls back to verified templates or is suppressed; timeouts, 2 retries with backoff, circuit breaker   | Done              | `tests/test_resilience.py`, `tests/test_pipeline.py`                                                                  |
-| Prompt-injection defence: untrusted fields as escaped JSON data blocks; unsafe entity names dropped from the allowlist                 | Done              | Adversarial cases in `tests/eval/`                                                                                    |
-| `POST /api/v1/pipeline/runs` with service-token auth (constant-time) and RFC 9457 401/422                                              | Done              | `tests/test_api.py`                                                                                                   |
-| Model port: `mock`, `ollama` (`OpenAIChatClient`), `foundry` (`FoundryChatClient`); `/health/ready` probes Ollama                      | Done              | `tests/test_providers.py` (fake agent, no network)                                                                    |
-| Evaluation: 33 golden and 6 adversarial-input cases, plus 10 compromised-model attacks, with an independent oracle                     | Done              | CI (mock and templates): 0 unsupported numbers, 0 unknown entities, 0 leaks; fallback verified with the model failing |
-| Live Ollama evaluation                                                                                                                 | **Not run**       | Pending local model download; `OLLAMA_LIVE=1 uv run pytest -m ollama`, `scripts/run_eval.py --provider ollama`        |
-| Live Foundry call                                                                                                                      | **Not exercised** | No Azure subscription (ADR-0012). Adapter covered by contract tests only                                              |
+| Area                                                                                                                                                                                   | Status            | Evidence                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Orchestration on Agent Framework graph workflows (`WorkflowBuilder`, `Executor`), typed FSM `DETECTED → ANALYZED → DRAFTED → VERIFIED`                                                 | Done              | ADR-0011; `tests/test_pipeline.py`                                                                                    |
+| Roster: Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer, with versioned prompts (all `1.0.0`)                                                          | Done              | `apps/agents/src/matchiq_agents/roster/`                                                                              |
+| Deterministic Fact Checker (cited values, evidence ids, entity allowlist, forbidden lexicon, lengths), then an optional AI critique                                                    | Done              | `tests/test_guard.py`                                                                                                 |
+| REVISE regenerates once; REJECT falls back to verified templates or is suppressed; timeouts, 2 retries with backoff, circuit breaker                                                   | Done              | `tests/test_resilience.py`, `tests/test_pipeline.py`                                                                  |
+| Prompt-injection defence: untrusted fields as escaped JSON data blocks; unsafe entity names dropped from the allowlist                                                                 | Done              | Adversarial cases in `tests/eval/`                                                                                    |
+| `POST /api/v1/pipeline/runs` with service-token auth (constant-time) and RFC 9457 401/422                                                                                              | Done              | `tests/test_api.py`                                                                                                   |
+| Model port: `mock`, `ollama` (`OpenAIChatClient`), `foundry` (`FoundryChatClient`); `/health/ready` probes Ollama                                                                      | Done              | `tests/test_providers.py` (fake agent, no network)                                                                    |
+| Evaluation: 33 golden and 6 adversarial-input cases, plus 10 compromised-model attacks, with an independent oracle (superseded by MQ-026: now 38 golden, 8 adversarial and 13 attacks) | Done              | CI (mock and templates): 0 unsupported numbers, 0 unknown entities, 0 leaks; fallback verified with the model failing |
+| Live Ollama evaluation (superseded: run since, see MQ-026 and docs/ai/EVALUATION.md)                                                                                                   | **Not run**       | Pending local model download; `OLLAMA_LIVE=1 uv run pytest -m ollama`, `scripts/run_eval.py --provider ollama`        |
+| Live Foundry call                                                                                                                                                                      | **Not exercised** | No Azure subscription (ADR-0012). Adapter covered by contract tests only                                              |
 
 ### Known limitations
 
@@ -802,7 +816,7 @@ A `comeback` session at 30×, streamed with `curl -N` from `Last-Event-ID: 0` fo
 
 - Compose uses explicit `environment:` blocks with `.env` interpolation instead of `env_file: .env`. This keeps compose-DNS URLs authoritative over the host `localhost` URLs in `.env`. `libs/config` now treats blank optional values as unset (MQ-001 fix), but `apps/agents` settings still reject an empty `FOUNDRY_PROJECT_ENDPOINT`.
 - GitHub Models was retired on 2026-07-30, so there is no free hosted LLM option. Oracle Always Free has been cut to 2 OCPU / 12 GB. Hetzner CX plans are shown as unavailable.
-- The agents service accepts only `mock` and `foundry` today. The compose `ollama` service is staged for the ADR-0012 provider, which has not been implemented yet.
+- (Superseded: the `ollama` provider shipped with ADR-0012 and MQ-009.) The agents service accepts only `mock` and `foundry` today. The compose `ollama` service is staged for the ADR-0012 provider, which has not been implemented yet.
 
 ### Next
 
@@ -959,53 +973,6 @@ Wire the engine into the worker projection and the deterministic publish gate, a
 ### Next
 
 M1: MQ-003 seeded generator, MQ-004 ledger and idempotent ingest, MQ-005 deterministic metrics, MQ-006 SSE and snapshot reconciliation.
-
-## MQ-040: Enterprise review and frontend copy polish (23 October 2026)
-
-Stream E, branch `fix/MQ-040-enterprise-polish`, isolated worktree cut from `dev`.
-
-- Reviewed the enterprise product addendum, ADRs and frontend source. The prioritized review, acceptance evidence and next three tickets are in `apps/web/docs/enterprise-readiness-review.md`.
-- Reworked landing, lobby, studio and diagnostic copy around producer tasks; removed unsupported speed claims, judge-facing labels, prose dashes and unnecessary final third hyphens. Kept synthetic, template and real-provider disclosures.
-- Simplified the landing hero and labeled its static sample explicitly. Updated frontend assertions and added sample-label coverage.
-- Prepared `apps/web/docs/qa-label-migration.patch` for stream F because three existing Playwright selectors reference changed labels. `git apply --check` passes; the patch has not been applied to QA-owned files.
-- Frontend lint, typecheck, source formatting and diff whitespace checks passed under Node 22.22.3. Shell default Node 18 cannot start this Vitest version. Two concurrent suite runs encountered different 5-second test timeouts; the observatory test passed independently without changing its timeout. Final serial run: all 197 tests in 30 files passed. Existing auth tests emit React act warnings.
-- Standard Turbopack build could not resolve Next.js outside the isolated worktree through reused dependency symlinks. Webpack production compilation, type checking and page generation passed with standalone tracing warnings. Landing Playwright: 20 passed across four viewport/theme projects, including axe. Screenshot inspection found mobile clipping; explicit mobile grid sizing and a shrinkable preview address it, with a proposed QA regression test. Deployment packaging and the full browser suite remain unqualified. No enterprise deployment, licensed feed or external graphics integration was claimed.
-
-## MQ-041: Frontend browser validation (23 October 2026)
-
-Stream F, branch `fix/MQ-041-frontend-validation` cut from `dev` after MQ-040 merged locally. Updated three browser selectors for the reviewed product labels and added a viewport-bounds regression for the static preview. Screenshot capture now accepts an output directory and signs in as the test producer, allowing protected audit and editorial screens to render without bypassing permissions. No product code comments were added.
-
-Validation: 128 public-demo browser tests passed across desktop/mobile and light/dark projects. All 24 authenticated screenshot captures passed using the local OIDC test issuer and mocked API/stream fixtures. The initial anonymous capture failed four audit-table assertions because access was correctly denied; sign-in fixed the capture setup. QA TypeScript check passed. QA lint passed with existing warnings; the new bounds test uses unconditional assertions. Authentication/editorial suite: 64 passed across all four projects using the local test issuer.
-
-Next: preserve match identity and account access on mobile; finish global interface localization; qualify real feed and production identity integrations. Browser fixtures and the test issuer do not certify production integrations.
-
-## MQ-044: Mobile studio polish (23 October 2026)
-
-Stream E, branch `fix/MQ-044-mobile-studio-polish` cut from `dev`. Screenshot review found hidden mobile fixture identity/account access, an empty observatory summary cell and truncated panel descriptions. The studio header now wraps the fixture title onto a dedicated mobile row and retains the account menu; panel headings/descriptions wrap; all six summary tiles use the available grid cells. Recap waiting/export copy now describes user outcomes. Removed the applied MQ-041 patch artifact and updated the readiness report. No code comments were added; the obsolete phone-header comment was removed.
-
-Validation: web lint and typecheck passed; 18 affected unit tests passed; 56 mobile studio/authentication/editorial browser checks passed, including axe and keyboard flows; all 24 producer screenshot captures passed and revised mobile studio/recap/observatory images were inspected. Formatting and diff whitespace checks passed. Webpack production compilation, type checking and page generation passed, with the same standalone tracing limitation from reused dependency symlinks. No deployment or real external integration was verified.
-
-Next three tickets: permanent mobile identity/account browser regression; full interface localization and native editorial review; licensed feed and operational qualification for a paid pilot.
-
-## MQ-045: Mobile identity regression (23 October 2026)
-
-Stream F, branch `test/MQ-045-mobile-studio-identity` cut from `dev`. Added browser coverage at 320px and 390px for a readable, viewport-contained fixture heading and an accessible producer account menu, including organisation, sign-out and Escape dismissal. Initial assertions used the wrong organisation display name; corrected them to the existing synthetic test account without changing application behavior or weakening the check.
-
-Validation: all 8 browser cases passed across the configured projects, QA TypeScript and new-file lint passed, and formatting/diff whitespace checks passed. No code comments were added. The local test issuer and mocked API remain test infrastructure, not production integration proof.
-
-Next three tickets: complete interface localization; obtain native editorial review for supported narrative languages; qualify licensed live data and production operations with a paid pilot.
-
-## MQ-046: Commentary language boundaries (23 October 2026)
-
-Stream E, branch `fix/MQ-046-commentary-language-boundaries` cut from `dev`. The product owner selected independent interface and commentary languages. The audience bar now states that the picker affects commentary, while operator controls remain English. Native language choices carry language tags; English narrative source/fallback labels no longer inherit French, Spanish or Pidgin pronunciation. Overlay copy uses the actual cue locale. English provider fallback is tagged using `localeFallback` rather than the requested locale.
-
-Live announcements now throttle text and its actual language as one value, retain the previous pair until the next message airs, select the latest pending moment, and cancel timers on removal/unmount. Added 13 regressions covering these boundaries and timing. No code comments or dependencies were added.
-
-Commands/results under Node 22.22.3: `pnpm nx run web:lint --output-style=static` passed; `pnpm nx run web:typecheck --output-style=static` passed; `pnpm exec vitest run --config apps/web/vitest.config.mts --maxWorkers=1` passed 210 tests in 33 files; Prettier source checks and `git diff --check` passed. `NODE_ENV=production pnpm exec next build --webpack` compiled, typechecked and generated pages, with the known 27 standalone-tracing omissions caused by reused external dependency symlinks. The existing studio/judge-flow Playwright suite passed all 60 checks across four theme/viewport projects, including axe, keyboard controls, commentary switching and unchanged match figures. Existing auth unit tests still emit React act warnings. No checks were weakened or skipped.
-
-Known limitations: interface translation and native editorial approval are not delivered by this change. Recap contracts/building omit the provider fallback flag, so an English fallback filed under a requested locale cannot always be identified in recaps. No protected contracts/backend files were changed. The concrete handoff is `apps/web/docs/language-readiness.md`.
-
-Next three tickets: MQ-047 independent interface localization; MQ-048 preserve recap fallback provenance across contracts/backend/UI; MQ-049 native football editorial review of French, Spanish and Pidgin. Production packaging and licensed-feed qualification remain open.
 
 ## MQ-054A: Recap fallback contract (23 October 2026)
 
