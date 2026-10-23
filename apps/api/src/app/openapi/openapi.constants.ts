@@ -92,6 +92,9 @@ export const ACCESS = {
       : ''),
 } as const;
 
+export const KEYSET_TEXT =
+  'Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.';
+
 export const STREAM_TEXT = {
   description:
     'Server-Sent Events. Each event has `id: <streamSequence>`, `event: <type>` and `data: <StreamMessage JSON>`. ' +

@@ -1,13 +1,14 @@
-import { FixtureId } from '@matchiq/contracts';
+import { CursorPageQuery, FixtureId } from '@matchiq/contracts';
 import { z } from 'zod';
 import { API_LIMITS } from '../constants';
 
 const limit = (fallback: number, max: number) =>
   z.coerce.number().int().min(1).max(max).default(fallback);
 
-export const FixtureListQuery = z.strictObject({
-  limit: limit(API_LIMITS.fixtureListDefault, API_LIMITS.fixtureListMax),
-});
+export const FixtureListQuery = CursorPageQuery(
+  API_LIMITS.fixtureListDefault,
+  API_LIMITS.fixtureListMax,
+);
 
 export const EventPageQuery = z.strictObject({
   afterSequence: z.coerce.number().int().min(-1).default(-1),

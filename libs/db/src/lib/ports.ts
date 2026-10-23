@@ -1,5 +1,7 @@
 import type {
   AuditActorType,
+  CursorPage,
+  CursorPageQuery,
   Fixture,
   MatchEvent,
   StreamMessage,
@@ -109,6 +111,7 @@ export interface UnitOfWork {
 export interface FixtureReader {
   get(key: FixtureKey): Promise<Fixture | null>;
   list(orgId: string, limit: number): Promise<Fixture[]>;
+  page(orgId: string, query: CursorPageQuery): Promise<CursorPage<Fixture>>;
 }
 
 export interface EventReader {
