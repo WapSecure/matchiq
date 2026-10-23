@@ -28,7 +28,7 @@ export const STUDIO_COPY = {
     openEvidence: (headline: string) => `See the evidence for ${headline}`,
     narrativePending: 'Write-up on its way. Here are the facts so far.',
     localeFallback: (language: string) =>
-      `Not yet available in ${language}, so this is in English.`,
+      `The ${language} version isn't ready yet, so you're seeing English.`,
     source: {
       AGENT: 'Written by AI · fact-checked',
       TEMPLATE: 'Standard wording',
@@ -41,7 +41,7 @@ export const STUDIO_COPY = {
     passCompletion: 'Pass completion',
     momentum: 'Momentum',
     momentumDescription:
-      'Who is on top, from shots, final-third entries, pressing and high ball wins, compared with the rest of the match',
+      'Who is on top, from shots, final third entries, pressing and high ball wins, compared with the rest of the match',
     awaiting: 'Stats appear once play begins.',
     momentumEmpty: 'Momentum appears a few minutes into the match.',
     tableToggle: 'View as table',
@@ -61,7 +61,7 @@ export const STUDIO_COPY = {
     persona: 'Audience',
     locale: 'Language',
     invariant:
-      'Audience and language change the wording only. Every number comes from the match data and stays the same.',
+      'Language changes the commentary only; the controls stay in English. Audience changes the style. Every number comes from the match data and stays the same.',
   },
   connectionPrefix: 'Connection: ',
   notFound: "We couldn't find this match",
@@ -96,7 +96,7 @@ export const STAT_ROWS = [
   { key: 'passesCompleted', label: 'Passes completed' },
   { key: 'pressures', label: 'Pressures' },
   { key: 'recoveries', label: 'Recoveries' },
-  { key: 'finalThirdEntries', label: 'Final-third entries' },
+  { key: 'finalThirdEntries', label: 'Final third entries' },
   { key: 'fouls', label: 'Fouls' },
   { key: 'yellowCards', label: 'Yellow cards' },
 ] as const;

@@ -39,7 +39,7 @@ export const ON_TARGET_OUTCOMES: ReadonlySet<ShotOutcome> = new Set([
 
 export const PITCH_COPY = {
   title: 'Pitch event map',
-  description: 'Shots, goals, ball recoveries and final-third entries',
+  description: 'Shots, goals, ball recoveries and final third entries',
   svgTitle: 'Pitch event map',
   summary: (count: number, window: string | null) =>
     count === 0
@@ -55,17 +55,17 @@ export const PITCH_COPY = {
     GOAL: 'Goals',
     SHOT: 'Shots',
     RECOVERY: 'Recoveries',
-    FINAL_THIRD_ENTRY: 'Final-third entries',
+    FINAL_THIRD_ENTRY: 'Final third entries',
   },
   kind: {
     GOAL: 'Goal',
     SHOT: 'Shot',
     RECOVERY: 'Ball recovery',
-    FINAL_THIRD_ENTRY: 'Final-third entry',
+    FINAL_THIRD_ENTRY: 'Final third entry',
   },
   offTarget: 'Hollow circle: shot off target or blocked.',
   attacks: (team: string) => `${team} attack`,
-  empty: 'No shots, recoveries or final-third entries yet.',
+  empty: 'No shots, recoveries or final third entries yet.',
   hint: 'Hover a mark for details, or open the table.',
   tableToggle: 'View as table',
   columns: {

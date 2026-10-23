@@ -16,7 +16,6 @@ export const HERO = {
     'MatchIQ spots the moments that matter in seconds. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.',
   primaryCta: { label: 'Choose a match', href: '/fixtures' },
   howItWorks: { label: 'See how it works', href: '#pipeline' },
-  secondaryCta: { label: 'View source' },
   facts: [
     { value: '0', label: 'numbers made up by AI' },
     { value: '3 × 4', label: 'audiences × languages, same facts' },

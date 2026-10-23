@@ -60,7 +60,7 @@ export const METRIC_BASES: Record<
     formula: 'count(RECOVERY where location.x ≥ 60)',
   },
   finalThirdEntries: {
-    label: 'Final-third entries',
+    label: 'Final third entries',
     plain: 'Times the team carried or passed the ball into the final third',
     formula: 'count(FINAL_THIRD_ENTRY)',
   },
@@ -82,9 +82,9 @@ export const METRIC_BASES: Record<
   momentum: {
     label: 'Momentum',
     plain:
-      'Who is on top: shots, final-third entries, pressing and high ball wins in the last five minutes, compared with the match so far',
+      'Who is on top: shots, final third entries, pressing and high ball wins in the last five minutes, compared with the match so far',
     formula:
-      'Σ wₖ · clamp(z-score of countₖ per 5 min, −3, 3); w = shots .35, final-third entries .25, pressures .20, high recoveries .20',
+      'Σ wₖ · clamp(z-score of countₖ per 5 min, −3, 3); w = shots .35, final third entries .25, pressures .20, high recoveries .20',
   },
 };
 

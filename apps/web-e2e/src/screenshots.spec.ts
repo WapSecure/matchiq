@@ -1,8 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 import { FIXTURE_ID } from './support/mock-fixture';
 import { mockApi } from './support/mock-api';
+import { signIn } from './support/sign-in';
 
-const OUT_DIR = `${__dirname}/../../../docs/screenshots/premium`;
+const OUT_DIR =
+  process.env['SCREENSHOT_OUTPUT_DIR'] ??
+  `${__dirname}/../../../docs/screenshots/premium`;
 const enabled = Boolean(process.env['CAPTURE_SCREENSHOTS']);
 /** `before` captures the pre-redesign build; `after` the current one. */
 const SET = process.env['SCREENSHOT_SET'] ?? 'after';
@@ -78,7 +81,7 @@ for (const vp of VIEWPORTS) {
             colorScheme: theme === 'light' ? 'light' : 'dark',
           });
           await mockApi(page);
-          await page.goto(screen.path);
+          await signIn(page, 'harbour.producer', screen.path);
           await screen.ready(page);
           await page.screenshot({
             path: `${OUT_DIR}/${SET}/${screen.name}-${vp.name}-${theme}.png`,

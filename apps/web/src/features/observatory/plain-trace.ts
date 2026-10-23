@@ -1,5 +1,5 @@
 import type { GateRejection } from '@/lib/api/trace-schemas';
-import { languageName, PERSONA_LABELS } from '@/constants/match';
+import { englishLanguageName, PERSONA_LABELS } from '@/constants/match';
 import {
   FALLBACK_REASON_COPY,
   FALLBACK_REASON_DEFAULT,
@@ -34,7 +34,7 @@ export const describeRejection = (r: GateRejection): string => {
   const subject = [
     ITEM_LABELS[r.item],
     r.persona ? `for ${PERSONA_LABELS[r.persona]}` : null,
-    r.locale ? `in ${languageName(r.locale)}` : null,
+    r.locale ? `in ${englishLanguageName(r.locale)}` : null,
   ]
     .filter(Boolean)
     .join(' ');

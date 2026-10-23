@@ -54,7 +54,7 @@ describe('recap', () => {
     expect(moments).toHaveTextContent('Home United égalise');
     await user.click(screen.getByRole('radio', { name: /Español/ }));
     expect(moments).toHaveTextContent(
-      'Not yet available in Español, so this is in English.',
+      "The Spanish version isn't ready yet, so you're seeing English.",
     );
     await user.click(screen.getByRole('radio', { name: 'Fan' }));
     expect(moments).toHaveTextContent('No write-up for this audience');
@@ -146,7 +146,7 @@ describe('agent observatory', () => {
       '12 versions',
     ]);
     expect(second).toHaveTextContent(
-      "Write-up for fans in Français: A number that doesn't match the match data",
+      "Write-up for fans in French: A number that doesn't match the match data",
     );
     expect(within(second).getByTestId('technical-details')).toHaveTextContent(
       'UNSUPPORTED_NUMBER',

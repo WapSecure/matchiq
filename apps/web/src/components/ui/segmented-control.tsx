@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn';
 export type SegmentOption<T extends string | number> = {
   value: T;
   label: string;
+  lang?: string;
   /** Visible text when space is tight; `label` stays the accessible name. */
   short?: string;
 };
@@ -40,6 +41,7 @@ export function SegmentedControl<T extends string | number>({
         {options.map((option) => (
           <label
             key={String(option.value)}
+            lang={option.lang}
             className={cn(
               'press relative flex h-7 cursor-pointer items-center rounded-sm px-2.5 text-xs font-medium',
               'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1 has-[:focus-visible]:outline-accent',

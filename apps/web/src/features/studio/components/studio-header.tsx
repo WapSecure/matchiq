@@ -68,7 +68,7 @@ export function StudioHeader({
 }: StudioHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-md backdrop-saturate-150">
-      <div className="mx-auto flex h-14 max-w-[1920px] items-center gap-2 px-4 sm:gap-3 lg:px-6">
+      <div className="mx-auto flex min-h-14 max-w-[1920px] flex-wrap items-center gap-1 px-4 py-2 sm:h-14 sm:flex-nowrap sm:gap-3 sm:py-0 lg:px-6">
         <Link
           href={ROUTES.fixtures}
           className="press flex h-8 items-center gap-1 rounded-md px-1.5 text-xs font-medium text-ink-muted hover:bg-surface-raised hover:text-ink"
@@ -78,12 +78,15 @@ export function StudioHeader({
             {STUDIO_COPY.backToLobby}
           </span>
         </Link>
-        <span aria-hidden className="h-5 w-px shrink-0 bg-line" />
+        <span
+          aria-hidden
+          className="hidden h-5 w-px shrink-0 bg-line sm:block"
+        />
         <span className="hidden size-7 shrink-0 items-center justify-center rounded-md bg-accent text-accent-ink shadow-panel sm:flex">
           <LogoMark size={17} />
         </span>
-        <div className="min-w-0 flex-1">
-          <h1 className="sr-only truncate text-sm font-semibold tracking-tight text-ink sm:not-sr-only">
+        <div className="order-last w-full min-w-0 pt-2 sm:order-none sm:w-auto sm:flex-1 sm:pt-0">
+          <h1 className="break-words text-sm font-semibold tracking-tight text-ink sm:truncate">
             {title ?? STUDIO_COPY.title}
           </h1>
           {competition ? (
@@ -97,10 +100,7 @@ export function StudioHeader({
         </Badge>
         {status}
         <ThemeToggle />
-        {/* At phone width the studio header has no room; the lobby header keeps the account menu. */}
-        <div className="hidden sm:block">
-          <UserMenu />
-        </div>
+        <UserMenu />
       </div>
       <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
         <StudioTabs fixtureId={fixtureId} view={view} />

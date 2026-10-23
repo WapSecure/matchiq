@@ -12,7 +12,7 @@ export const RECAP_COPY = {
   metricRefs: (n: number) => `${n} stat${n === 1 ? '' : 's'} used`,
   noNarrative: 'No write-up for this audience. Here are the facts.',
   localeFallback: (language: string) =>
-    `Not yet available in ${language}, so this is in English.`,
+    `The ${language} version isn't ready yet, so you're seeing English.`,
   export: 'Download recap (JSON)',
   exportHint: 'Saves the full recap as a data file for your own tools',
   exportFile: (fixtureId: string) => `matchiq-recap-${fixtureId}.json`,
