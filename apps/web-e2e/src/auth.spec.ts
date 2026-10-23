@@ -29,7 +29,7 @@ test.describe('sign-in', () => {
       page.getByRole('heading', { level: 1, name: 'Sign in to MatchIQ' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Continue with single sign-on' }),
+      page.getByRole('link', { name: 'Continue to sign in' }),
     ).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });
@@ -66,9 +66,7 @@ test.describe('sign-in', () => {
 
   test('rejects a wrong password at the provider', async ({ page }) => {
     await page.goto('/sign-in');
-    await page
-      .getByRole('link', { name: 'Continue with single sign-on' })
-      .click();
+    await page.getByRole('link', { name: 'Continue to sign in' }).click();
     await page.locator('#username').fill('harbour.viewer');
     await page.locator('#password').fill('wrong-password');
     await page.locator('#kc-login').click();

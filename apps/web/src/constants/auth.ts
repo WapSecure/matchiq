@@ -127,14 +127,14 @@ export const AUTH_COPY = {
   signInTitle: 'Sign in to MatchIQ',
   signInLead:
     'Use your organisation account. What you can do depends on your role.',
-  continueSso: 'Continue with single sign-on',
+  continueSso: 'Continue to sign in',
   ssoUnavailable:
     "Sign-in isn't set up here. You can still use the public demo without signing in.",
-  browseAnonymously: 'Continue to the public demo',
+  browseAnonymously: 'Browse the demo without signing in',
   demoTitle: 'Demo accounts',
   demoBadge: 'Development only',
   demoLead: (password: string) =>
-    `Test accounts for trying out each role. Each opens the normal sign-in page; the password is ${password}.`,
+    `Try MatchIQ as each role. Choose an account, then sign in with the password ${password}.`,
   demoAccount: (role: string, org: string) => `${role} · ${org}`,
   userMenu: 'Account',
   signedInAs: 'Signed in as',

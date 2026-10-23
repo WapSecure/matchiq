@@ -133,6 +133,27 @@ describe('AuditView', () => {
     expect(within(table).getByText('operator-key')).toBeInTheDocument();
   });
 
+  it('keeps raw ids inside Technical details only', async () => {
+    stubApi({
+      'GET /audit-events': {
+        body: { items: [event(1)], nextCursor: null },
+      },
+    });
+    renderView();
+    const table = await screen.findByRole('table', { name: /Activity/ });
+    const [technical] = within(table).getAllByTestId('technical-details');
+    for (const id of ['operator-key', 'ov_1', event(1).id])
+      expect(technical).toHaveTextContent(id);
+  });
+
+  it('says "No activity yet" before anything has happened', async () => {
+    stubApi({
+      'GET /audit-events': { body: { items: [], nextCursor: null } },
+    });
+    renderView();
+    expect(await screen.findByText('No activity yet')).toBeInTheDocument();
+  });
+
   it('applies filters on submit', async () => {
     const api = stubApi({
       'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },

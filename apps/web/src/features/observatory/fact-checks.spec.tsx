@@ -40,6 +40,14 @@ describe('AI fact-checks overview', () => {
     ]);
   });
 
+  it('titles every summary tile in sentence case', () => {
+    render(<TraceSummary traces={traces} />);
+    const titles = screen.getAllByRole('term').map((t) => t.textContent ?? '');
+    expect(titles).toHaveLength(4);
+    for (const title of titles) expect(title).not.toBe(title.toUpperCase());
+    expect(titles).toContain('Written by AI');
+  });
+
   it('shows the share written by AI as a number and a bar', () => {
     render(<TraceSummary traces={traces} />);
     expect(screen.getByText('25%')).toBeInTheDocument();
