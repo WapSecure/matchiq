@@ -37,3 +37,5 @@ export const HEADER_LABELS = {
   homeLink: 'MatchIQ home',
   repository: 'GitHub source repository',
 } as const;
+
+export const BACK_LINK = { label: 'Back' } as const;

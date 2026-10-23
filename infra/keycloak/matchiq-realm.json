@@ -1,6 +1,7 @@
 {
   "realm": "matchiq",
   "displayName": "MatchIQ (local development)",
+  "loginTheme": "matchiq",
   "enabled": true,
   "sslRequired": "external",
   "registrationAllowed": false,
@@ -80,6 +81,7 @@
       "name": "MatchIQ web (BFF)",
       "description": "Authorization Code + PKCE. Public client for local development only.",
       "enabled": true,
+      "baseUrl": "http://localhost:4200/",
       "publicClient": true,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
