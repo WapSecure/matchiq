@@ -86,6 +86,22 @@ export const SCENARIOS: Readonly<Record<ScenarioName, ScenarioPreset>> = {
     shotSpeedAvailable: true,
     beats: [],
   },
+  'disallowed-goal': {
+    name: 'disallowed-goal',
+    description:
+      'Home side has an early goal ruled out after review, falls behind, then wins 2-1.',
+    home: { ...balanced, formation: '4-2-3-1' },
+    away: { ...balanced, formation: '4-4-2' },
+    naturalGoals: false,
+    naturalDismissals: false,
+    shotSpeedAvailable: true,
+    beats: [
+      { kind: 'ruled-out-goal', side: 'home', minute: 18 },
+      { kind: 'goal', side: 'away', minute: 33 },
+      { kind: 'goal', side: 'home', minute: 61 },
+      { kind: 'goal', side: 'home', minute: 80 },
+    ],
+  },
   'low-event': {
     name: 'low-event',
     description:

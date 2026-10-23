@@ -28,6 +28,7 @@ export {
 export {
   createMomentCursor,
   detectKeyMoments,
+  redetectMoments,
   stepMoments,
 } from './lib/moments/detect.js';
 export type { MomentCursor } from './lib/moments/types.js';

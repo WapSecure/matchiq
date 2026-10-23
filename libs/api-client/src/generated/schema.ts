@@ -1416,6 +1416,9 @@ export interface components {
                 localeFallback?: boolean;
                 citations: string[];
             }[];
+            retracted?: {
+                reason: string;
+            };
         };
         GateReport: {
             /** @enum {string} */
@@ -1449,7 +1452,7 @@ export interface components {
             gate: components["schemas"]["GateReport"] | null;
             runs: components["schemas"]["AgentRun"][];
             editorial: {
-                insight: "SUPPRESSED" | null;
+                insight: ("SUPPRESSED" | "RETRACTED") | null;
                 insightReason: string | null;
                 overlay: ("RETRACTED" | "HELD" | "SUPPRESSED") | null;
                 overlayReason: string | null;
@@ -1687,6 +1690,23 @@ export interface components {
             emittedAt: string;
             traceId?: string;
             /** @constant */
+            type: "insight.retract";
+            payload: {
+                insightId: string;
+                /** @enum {string} */
+                cause: "CORRECTION" | "LATE_EVENT";
+                causeEventId: string;
+                reason: string;
+            };
+        } | {
+            /** @constant */
+            schemaVersion: 1;
+            streamSequence: number;
+            fixtureId: string;
+            /** Format: date-time */
+            emittedAt: string;
+            traceId?: string;
+            /** @constant */
             type: "narrative.ready";
             payload: components["schemas"]["Narrative"];
         } | {
@@ -1715,7 +1735,7 @@ export interface components {
                 revision: number;
                 reason: string;
                 /** @enum {string} */
-                cause?: "EXPIRED" | "SUPERSEDED" | "PERIOD_ENDED" | "MATCH_ENDED" | "PRODUCER" | "INSIGHT_SUPPRESSED" | "KILL_SWITCH";
+                cause?: "EXPIRED" | "SUPERSEDED" | "PERIOD_ENDED" | "MATCH_ENDED" | "PRODUCER" | "INSIGHT_SUPPRESSED" | "KILL_SWITCH" | "CORRECTION";
             };
         } | {
             /** @constant */

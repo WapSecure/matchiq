@@ -1,5 +1,6 @@
 import type { MatchEvent, Player, ShotOutcome } from '@matchiq/contracts';
 import {
+  CORRECTION_REASONS,
   DURATION,
   PITCH,
   PROBABILITY,
@@ -40,15 +41,34 @@ const keeperOrDefender = (state: MatchState): Player => {
   );
 };
 
+/** The goal stands only until the review: a VOID removes it and play restarts with a free kick. */
+const ruleOut = (state: MatchState, goal: MatchEvent): void => {
+  const side = possessingSide(state);
+  state.clock.advance(sampleRange(state.rng, DURATION.goalReviewMs));
+  state.sink.emit({
+    type: 'CORRECTION',
+    correctedEventId: goal.eventId,
+    action: 'VOID',
+    reason: CORRECTION_REASONS.offside,
+  });
+  stopPlay(state, {
+    side: opponentOf(side),
+    point: { x: PITCH.goalKickX, y: CENTRE_SPOT.y },
+    gapMs: DURATION.foulRestartMs,
+    taker: (s) => s.rosters[opponentOf(side)].keeper(),
+  });
+};
+
 const scoreGoal = (
   state: MatchState,
   shot: MatchEvent,
   shooter: Player,
+  ruledOut: boolean,
 ): void => {
   const side = possessingSide(state);
   const assist =
     state.lastPass?.receiverId === shooter.playerId ? state.lastPass : null;
-  state.sink.emit({
+  const goal = state.sink.emit({
     type: 'GOAL',
     teamId: teamIdOf(state, side),
     playerId: shooter.playerId,
@@ -56,6 +76,10 @@ const scoreGoal = (
     ...(assist === null ? {} : { assistPlayerId: assist.passerId }),
     ownGoal: false,
   });
+  if (ruledOut) {
+    ruleOut(state, goal);
+    return;
+  }
   state.score[side] += 1;
   stopPlay(state, {
     side: opponentOf(side),
@@ -94,7 +118,11 @@ const converts = (state: MatchState, forcedGoal: boolean): boolean => {
   );
 };
 
-export const takeShot = (state: MatchState, forcedGoal: boolean): void => {
+export const takeShot = (
+  state: MatchState,
+  forcedGoal: boolean,
+  ruledOut = false,
+): void => {
   const side = possessingSide(state);
   const shooter = currentCarrier(state);
   const outcome: ShotOutcome = forcedGoal
@@ -117,7 +145,7 @@ export const takeShot = (state: MatchState, forcedGoal: boolean): void => {
   });
   state.clock.advance(sampleRange(state.rng, DURATION.shotToOutcomeMs));
   if (outcome === 'ON_TARGET') {
-    if (converts(state, forcedGoal)) scoreGoal(state, shot, shooter);
+    if (converts(state, forcedGoal)) scoreGoal(state, shot, shooter, ruledOut);
     else saveShot(state, shot);
   } else if (outcome === 'BLOCKED') {
     contestLooseBall(state, state.ball, PROBABILITY.blockedRecoveredByAttacker);

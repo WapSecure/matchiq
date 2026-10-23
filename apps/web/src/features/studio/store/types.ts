@@ -54,6 +54,8 @@ export type MatchData = {
   narratives: NarrativeIndex;
   overlays: Record<string, OverlayEntry>;
   retractions: Retraction[];
+  /** Insights a correction ruled out, with the reason (`insight.retract`). */
+  ruledOut: Record<string, string>;
   /** Insights this producer suppressed; the read model confirms them later. */
   suppressed: Record<string, true>;
   momentum: MomentumPoint[];

@@ -12,6 +12,7 @@ import {
   KEY_EVENT_TYPES,
   PERIOD_LABELS,
 } from '@/constants/match';
+import { CORRECTION_COPY } from '@/constants/corrections';
 import { STUDIO_COPY } from '@/constants/studio';
 import { useTickerRows } from '../hooks/use-ticker-rows';
 import { useTimelineEvents } from '../hooks/use-timeline-events';
@@ -79,6 +80,7 @@ export function TimelinePanel({
             rows={rows.slice(0, limit)}
             label={copy.title}
             voidedLabel={copy.voided}
+            voidedGoalLabel={CORRECTION_COPY.voidedGoal}
             periodLabel={periodLabel}
           />
           {older.error ? (

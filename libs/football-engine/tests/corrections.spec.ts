@@ -1,4 +1,11 @@
-import { applyEvent, project, toSnapshot } from '../src/index.js';
+import {
+  applyEvent,
+  detectKeyMoments,
+  project,
+  redetectMoments,
+  stepMoments,
+  toSnapshot,
+} from '../src/index.js';
 import { buildFixture, kickedOff, MIN } from './builders.js';
 
 const fixture = buildFixture();
@@ -65,5 +72,23 @@ describe('CORRECTION (VOID)', () => {
     const state = project(fixture, s.events);
     expect(applyEvent(state, correction)).toBe(state);
     expect(toSnapshot(state).home.shots).toBe(0);
+  });
+
+  it('re-detects moments without the voided goal and resumes from the corrected ledger', () => {
+    const s = kickedOff();
+    const shot = s.at(1, MIN).shot('home', 'ON_TARGET');
+    const goal = s.goal('home', shot.eventId);
+    const before = detectKeyMoments(project(fixture, s.events));
+    expect(before.some((i) => i.kind === 'GOAL')).toBe(true);
+    s.voids(goal.eventId);
+    const corrected = project(fixture, s.events);
+    const rescan = redetectMoments(corrected);
+    expect(rescan.insights.some((i) => i.kind === 'GOAL')).toBe(false);
+    const later = s.at(2, MIN).shot('away', 'ON_TARGET');
+    const second = s.goal('away', later.eventId);
+    const resumed = stepMoments(rescan.cursor, later, corrected.fixture).cursor;
+    const next = stepMoments(resumed, second, corrected.fixture).insights;
+    expect(next.map((i) => i.kind)).toContain('GOAL');
+    expect(next[0]?.evidence.eventIds).toContain(second.eventId);
   });
 });

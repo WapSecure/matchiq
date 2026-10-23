@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { LIMITS } from './constants.js';
-import { EditorialStatus, OverlayRetractCause } from './editorial.js';
+import {
+  EditorialStatus,
+  InsightRetraction,
+  OverlayRetractCause,
+} from './editorial.js';
 import { MatchEvent } from './events.js';
 import { Insight } from './insight.js';
 import { Narrative } from './narrative.js';
@@ -32,6 +36,7 @@ export const StreamMessage = z.discriminatedUnion('type', [
   message('match.event', MatchEvent),
   message('match.snapshot', MatchSnapshot),
   message('insight.detected', Insight),
+  message('insight.retract', InsightRetraction),
   message('narrative.ready', Narrative),
   message('overlay.publish', OverlayCue),
   message(
