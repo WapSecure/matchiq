@@ -18,6 +18,7 @@ import {
   PostgresEventReader,
   PostgresFixtureReader,
   PostgresOutboxStore,
+  PostgresPreferenceStore,
   PostgresStreamHistory,
   PostgresUnitOfWork,
 } from '@matchiq/db';
@@ -37,6 +38,7 @@ import {
   EVENT_READER,
   FIXTURE_READER,
   OUTBOX_STORE,
+  PREFERENCE_STORE,
   REDIS,
   STREAM_HISTORY,
   STREAM_PUBLISHER,
@@ -103,6 +105,7 @@ export class InfrastructureModule {
       fromDatabase(EDITORIAL_UOW, (h) => new PostgresEditorialUnitOfWork(h.db)),
       fromDatabase(EDITORIAL_READER, (h) => new PostgresEditorialReader(h.db)),
       fromDatabase(AUDIT_READER, (h) => new PostgresAuditReader(h.db)),
+      fromDatabase(PREFERENCE_STORE, (h) => new PostgresPreferenceStore(h.db)),
       fromRedis(STREAM_PUBLISHER),
       fromRedis(STREAM_SUBSCRIBER),
       { provide: CLOCK, useValue: systemClock },

@@ -79,6 +79,7 @@
     "@matchiq/api-client": "workspace:*",
     "@matchiq/config": "workspace:*",
     "@matchiq/contracts": "workspace:*",
+    "@matchiq/football-engine": "workspace:*",
     "@tanstack/react-query": "5.103.3",
     "geist": "1.8.1",
     "jose": "6.2.12",

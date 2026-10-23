@@ -3,6 +3,7 @@ import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import { type CardColour, EventGlyph } from './event-glyph';
 import { type Side, TeamSwatch } from './team-swatch';
+import { TickerFlags } from './ticker-flags';
 
 export type TickerRow = {
   id: string;
@@ -15,6 +16,8 @@ export type TickerRow = {
   highlight: boolean;
   card: CardColour | null;
   voided: string | null;
+  /** Made by the player the viewer follows. */
+  followed?: boolean;
 };
 
 type EventTickerProps = {
@@ -24,6 +27,7 @@ type EventTickerProps = {
   /** Shown instead of `voidedLabel` on a voided goal. */
   voidedGoalLabel?: string;
   periodLabel: (period: number) => string;
+  followedLabel?: string;
 };
 
 const RAIL: Record<CardColour, string> = {
@@ -38,23 +42,30 @@ const railOf = (row: TickerRow): string | null => {
   return row.card ? RAIL[row.card] : null;
 };
 
+const itemClass = (row: TickerRow, goal: boolean): string =>
+  cn(
+    'relative grid grid-cols-[2.5rem_1.5rem_minmax(0,1fr)] items-start gap-x-2.5 px-4 py-2',
+    goal && 'bg-accent-soft',
+    row.highlight && !goal && 'bg-surface-raised/60',
+    row.followed && 'ring-1 ring-inset ring-accent/50',
+  );
+
 const TickerItem = memo(function TickerItem({
   row,
   voidedLabel,
+  followedLabel,
 }: {
   row: TickerRow;
   voidedLabel: string;
+  followedLabel?: string;
 }) {
   const goal = row.type === 'GOAL' && !row.voided;
   const rail = railOf(row);
   return (
     <li
       data-event-type={row.type}
-      className={cn(
-        'relative grid grid-cols-[2.5rem_1.5rem_minmax(0,1fr)] items-start gap-x-2.5 px-4 py-2',
-        goal && 'bg-accent-soft',
-        row.highlight && !goal && 'bg-surface-raised/60',
-      )}
+      className={itemClass(row, goal)}
+      data-followed={row.followed === true}
     >
       {rail ? (
         <span
@@ -82,9 +93,11 @@ const TickerItem = memo(function TickerItem({
               {row.team.shortName}
             </span>
           ) : null}
-          {row.voided ? (
-            <span className="eyebrow text-warning">{voidedLabel}</span>
-          ) : null}
+          <TickerFlags
+            row={row}
+            voidedLabel={voidedLabel}
+            followedLabel={followedLabel}
+          />
         </p>
         {row.detail ? (
           <p className="truncate text-xs text-ink-subtle">{row.detail}</p>
@@ -101,6 +114,7 @@ export function EventTicker({
   voidedLabel,
   voidedGoalLabel = voidedLabel,
   periodLabel,
+  followedLabel,
 }: EventTickerProps) {
   return (
     <ol aria-label={label} className="flex flex-col pb-1">
@@ -113,6 +127,7 @@ export function EventTicker({
           <TickerItem
             row={row}
             voidedLabel={row.type === 'GOAL' ? voidedGoalLabel : voidedLabel}
+            followedLabel={followedLabel}
           />
         </PeriodBreak>
       ))}

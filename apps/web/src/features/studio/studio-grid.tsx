@@ -5,7 +5,9 @@ import { useMemo } from 'react';
 import { RequirePermission } from '@/components/auth/require-permission';
 import { RegionBoundary } from '@/components/feedback';
 import { REGION_NAMES as R } from '@/constants/errors';
+import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import { MAIN_CONTENT_ID } from '@/constants/site';
+import { PlayerFocusPanel } from '@/features/player-focus/player-focus-panel';
 import { EvidenceDrawer } from './components/evidence-drawer';
 import { InsightFeed } from './components/insight-feed';
 import { LiveAnnouncer } from './components/live-announcer';
@@ -36,6 +38,7 @@ const SLOT = {
   events: 'min-w-0 order-4 xl:order-none',
   stats: 'min-w-0 order-5 xl:order-none',
   pitch: 'min-w-0 order-6 xl:order-none',
+  focus: 'min-w-0 order-7 xl:order-none',
 } as const;
 
 export function StudioGrid({ fixture }: { fixture: Fixture }) {
@@ -98,6 +101,11 @@ export function StudioGrid({ fixture }: { fixture: Fixture }) {
                     homeName={fixture.home.name}
                     awayName={fixture.away.name}
                   />
+                </RegionBoundary>
+              </div>
+              <div className={SLOT.focus}>
+                <RegionBoundary region={PLAYER_FOCUS_COPY.region}>
+                  <PlayerFocusPanel fixture={fixture} />
                 </RegionBoundary>
               </div>
             </div>

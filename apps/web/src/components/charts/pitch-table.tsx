@@ -1,6 +1,7 @@
 import { Disclosure } from '@/components/ui/disclosure';
 import { PITCH_COPY } from '@/constants/pitch';
 import { EVENT_DETAIL } from '@/constants/events';
+import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import type { PitchMark } from './pitch-events';
 
 const c = PITCH_COPY.columns;
@@ -33,7 +34,14 @@ export function PitchTable({ marks }: { marks: readonly PitchMark[] }) {
                 <td className="px-2 py-1 font-mono">{m.minute}</td>
                 <td className="px-2 py-1 font-mono">{m.teamShort}</td>
                 <td className="px-2 py-1">{eventLabel(m)}</td>
-                <td className="px-2 py-1 text-ink-muted">{m.player ?? '—'}</td>
+                <td className="px-2 py-1 text-ink-muted">
+                  {m.player ?? '—'}
+                  {m.followed ? (
+                    <span className="ml-1.5 font-semibold text-accent-strong">
+                      {PLAYER_FOCUS_COPY.followedMark}
+                    </span>
+                  ) : null}
+                </td>
                 <td className="px-2 py-1 font-mono">
                   {PITCH_COPY.position(m.source.x, m.source.y)}
                 </td>

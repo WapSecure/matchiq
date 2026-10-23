@@ -144,6 +144,16 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* The saved "Reduce motion" viewing preference, for viewers whose system does not ask. */
+  :root[data-reduced-motion] *,
+  :root[data-reduced-motion] *::before,
+  :root[data-reduced-motion] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Lower third: the bar wipes in, then the copy settles. */
