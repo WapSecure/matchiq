@@ -69,7 +69,7 @@ describe('LiveStudio', () => {
     await renderStudio();
     await waitFor(() => expect(scoreText()).toContain('1'));
     expect(screen.getAllByRole('status').map((el) => el.textContent)).toContain(
-      'Stream Live',
+      'Connection: Live',
     );
     expect(metricsText()).toContain('Shots');
   });
@@ -234,9 +234,11 @@ describe('LiveStudio', () => {
       baseRoutes({ 'POST /replay': { status: 409, body: conflict } }),
     );
     await user.click(await screen.findByRole('button', { name: 'Pause' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Not allowed right now: cannot pause while PAUSED',
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(
+      "That can't be done right now. The replay may have finished, or it is already doing that.",
     );
+    expect(alert).not.toHaveTextContent(/PAUSED|409/);
   });
 
   it('resolves evidence events outside the timeline from the ledger', async () => {

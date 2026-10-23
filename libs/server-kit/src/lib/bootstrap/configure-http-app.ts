@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import {
   API_CONTENT_SECURITY_POLICY,
   API_GLOBAL_PREFIX,
+  CORS_EXPOSED_HEADERS,
   EXPRESS_SETTINGS,
 } from '../constants';
 import { ProblemDetailsFilter } from '../http/problem-details.filter';
@@ -58,6 +59,7 @@ export const configureHttpApp = (
   app.enableCors({
     origin: options.corsOrigins.length > 0 ? [...options.corsOrigins] : false,
     credentials: false,
+    exposedHeaders: [...CORS_EXPOSED_HEADERS],
   });
   app.enableShutdownHooks();
 };

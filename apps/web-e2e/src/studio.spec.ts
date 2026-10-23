@@ -29,7 +29,7 @@ test.describe('live studio', () => {
     await expect(scoreboard).toContainText('67:12');
     await expect(scoreboard).toContainText('2nd half');
     await expect(
-      page.getByRole('status').filter({ hasText: 'Stream Live' }),
+      page.getByRole('status').filter({ hasText: 'Connection: Live' }),
     ).toBeVisible();
     await expect(
       page.getByRole('article', { name: 'Northbridge seize control' }),
@@ -163,7 +163,7 @@ test.describe('live studio', () => {
     ).toBeVisible();
     await expect(page.getByText('Pressure building on the left')).toBeVisible();
     await expect(
-      page.getByRole('status').filter({ hasText: 'Stream Live' }),
+      page.getByRole('status').filter({ hasText: 'Connection: Live' }),
     ).toBeVisible();
   });
 

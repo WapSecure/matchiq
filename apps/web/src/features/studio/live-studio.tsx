@@ -2,6 +2,8 @@
 
 import { RequirePermission } from '@/components/auth/require-permission';
 import type { Fixture } from '@matchiq/contracts';
+import { RegionBoundary } from '@/components/feedback';
+import { REGION_NAMES as R } from '@/constants/errors';
 import { useEffect, useMemo } from 'react';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import type { SseTransport } from '@/lib/stream';
@@ -51,39 +53,55 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
         id={MAIN_CONTENT_ID}
         className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-4 lg:px-6"
       >
-        <ProducerControlBar />
-        <AudienceBar />
+        <RegionBoundary region={R.controls}>
+          <ProducerControlBar />
+          <AudienceBar />
+        </RegionBoundary>
         <div className={GRID}>
           <div className={COLUMN}>
-            <ScoreboardStrip fixture={fixture} />
-            <OverlayPanel
-              homeShort={fixture.home.shortName}
-              awayShort={fixture.away.shortName}
-              footer={
-                <div className="mt-4 border-t border-line pt-4">
-                  <RequirePermission permission="replay:control">
-                    <ReplayControls sessionId={fixture.fixtureId} />
-                  </RequirePermission>
-                </div>
-              }
-            />
-            <PitchPanel fixture={fixture} roster={roster} />
+            <RegionBoundary region={R.scoreboard}>
+              <ScoreboardStrip fixture={fixture} />
+            </RegionBoundary>
+            <RegionBoundary region={R.preview}>
+              <OverlayPanel
+                homeShort={fixture.home.shortName}
+                awayShort={fixture.away.shortName}
+                footer={
+                  <div className="mt-4 border-t border-line pt-4">
+                    <RequirePermission permission="replay:control">
+                      <ReplayControls sessionId={fixture.fixtureId} />
+                    </RequirePermission>
+                  </div>
+                }
+              />
+            </RegionBoundary>
+            <RegionBoundary region={R.pitch}>
+              <PitchPanel fixture={fixture} roster={roster} />
+            </RegionBoundary>
           </div>
           <div className={`${COLUMN} 2xl:contents`}>
             <div className="min-w-0 2xl:sticky 2xl:top-28">
-              <InsightFeed roster={roster} className={FEED} />
+              <RegionBoundary region={R.moments}>
+                <InsightFeed roster={roster} className={FEED} />
+              </RegionBoundary>
             </div>
             <div className={COLUMN}>
-              <TimelinePanel roster={roster} className="max-h-[30rem]" />
-              <LiveMetrics
-                homeName={fixture.home.name}
-                awayName={fixture.away.name}
-              />
+              <RegionBoundary region={R.events}>
+                <TimelinePanel roster={roster} className="max-h-[30rem]" />
+              </RegionBoundary>
+              <RegionBoundary region={R.stats}>
+                <LiveMetrics
+                  homeName={fixture.home.name}
+                  awayName={fixture.away.name}
+                />
+              </RegionBoundary>
             </div>
           </div>
         </div>
       </main>
-      <EvidenceDrawer roster={roster} />
+      <RegionBoundary region={R.evidence}>
+        <EvidenceDrawer roster={roster} />
+      </RegionBoundary>
       <LiveAnnouncer />
       <EditorialNotice />
     </>

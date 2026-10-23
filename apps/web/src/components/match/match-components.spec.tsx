@@ -178,8 +178,8 @@ describe('OverlayCanvas', () => {
 describe('ConnectionStatus', () => {
   it.each([
     ['live', 'Live'],
-    ['reconnecting', 'Reconnecting'],
-    ['stale', 'Stale'],
+    ['reconnecting', 'Reconnecting…'],
+    ['stale', 'Catching up'],
     ['offline', 'Offline'],
   ] as const)('labels the %s state in text', (state, label) => {
     render(<ConnectionStatus state={state} />);

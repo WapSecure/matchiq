@@ -51,11 +51,19 @@ export function RangeFieldGroup({
 }) {
   return (
     <Group className={cn(PICKER_GROUP, MIN_HEIGHT[size], 'flex-wrap py-1')}>
-      <DateInput slot="start" aria-label={DATE_COPY.start} />
+      <DateInput
+        slot="start"
+        aria-label={DATE_COPY.start}
+        className="min-w-fit"
+      />
       <span aria-hidden className="px-0.5 text-ink-subtle">
         –
       </span>
-      <DateInput slot="end" aria-label={DATE_COPY.end} className="flex-1" />
+      <DateInput
+        slot="end"
+        aria-label={DATE_COPY.end}
+        className="min-w-fit flex-1"
+      />
       {onClear ? (
         <Button
           // Opts out of the picker's button context, which opens the calendar.

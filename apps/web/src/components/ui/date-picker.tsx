@@ -78,7 +78,7 @@ export function DatePicker({
           errorMessage={errorMessage}
         >
           <Group className={cn(PICKER_GROUP, CONTROL_HEIGHT[size])}>
-            <DateInput className="flex-1" />
+            <DateInput className="min-w-0 flex-1" />
             <Button
               aria-label={DATE_COPY.openCalendar}
               className={PICKER_BUTTON}

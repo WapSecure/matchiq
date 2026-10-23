@@ -70,7 +70,11 @@ export const validated = async <S extends z.ZodType>(
     );
   }
   if (!result.response.ok) {
-    throw httpError(result.response.status, result.error);
+    throw httpError(
+      result.response.status,
+      result.error,
+      result.response.headers,
+    );
   }
   const parsed = schema.safeParse(result.data);
   if (!parsed.success) throw invalidResponseError(describeIssues(parsed.error));

@@ -85,7 +85,7 @@ describe('role-aware UI', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     act(() => useSession.getState().markExpired());
     expect(screen.getByRole('alert').textContent).toContain(
-      'Your session expired',
+      "You've been signed out for security",
     );
     expect(
       screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),

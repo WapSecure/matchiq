@@ -1,11 +1,11 @@
 'use client';
 
 import { REPLAY_SPEEDS, type ReplaySpeed } from '@matchiq/contracts';
+import { InlineProblem } from '@/components/feedback/inline-problem';
 import { PauseIcon, PlayIcon, RestartIcon } from '@/components/icons';
 import { Button, SegmentedControl, Tooltip } from '@/components/ui';
 import { REPLAY_COPY } from '@/constants/replay';
 import { useStartSession } from '@/features/lobby/use-start-session';
-import { describeReplayProblem } from '@/lib/api/describe-problem';
 import { useReplayTransport } from '../hooks/use-replay-transport';
 import { useSessionTemplate } from '../hooks/use-session-template';
 import { useMatchStore } from '../store';
@@ -49,18 +49,11 @@ function ProblemLine({
   t: Transport;
   restartError: unknown;
 }) {
-  if (t.error) {
-    return (
-      <p role="alert" className="text-xs text-critical">
-        {describeReplayProblem(t.error)}
-      </p>
-    );
-  }
+  if (t.error)
+    return <InlineProblem error={t.error} lead={REPLAY_COPY.failed} />;
   if (!restartError) return null;
   return (
-    <p role="alert" className="text-xs text-critical">
-      {REPLAY_COPY.restartFailed}. {describeReplayProblem(restartError)}
-    </p>
+    <InlineProblem error={restartError} lead={REPLAY_COPY.restartFailed} />
   );
 }
 

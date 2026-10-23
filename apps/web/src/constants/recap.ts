@@ -23,7 +23,7 @@ export const RECAP_COPY = {
       'The recap is built from the committed read models when the match ends. This page refreshes on its own.',
     back: 'Back to the live studio',
   },
-  error: 'The recap could not be loaded',
+  error: "We couldn't load the recap",
   loading: 'Loading recap',
   engine: (version: string) => `Engine v${version}`,
 } as const;

@@ -95,10 +95,9 @@ describe('lobby', () => {
     await user.click(
       await screen.findByRole('button', { name: /Start replay/ }),
     );
-    expect(await screen.findByText(/Too many replay starts/)).toHaveAttribute(
-      'role',
-      'alert',
-    );
+    const problem = await screen.findByTestId('inline-problem');
+    expect(problem).toHaveAttribute('role', 'alert');
+    expect(problem).toHaveTextContent(/started a lot of replays/);
     expect(push).not.toHaveBeenCalled();
   });
 
@@ -109,7 +108,7 @@ describe('lobby', () => {
     });
     renderLobby();
     expect(
-      await screen.findByText('No fixtures available'),
+      await screen.findByText('No matches to replay yet'),
     ).toBeInTheDocument();
     expect(
       await screen.findByText('No sessions yet. Start a replay above.'),
