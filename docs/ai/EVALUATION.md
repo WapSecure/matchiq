@@ -80,3 +80,7 @@ uv run python scripts/run_eval.py --provider ollama --deadline-ms 120000 \
 ## Cost
 
 `AgentRun.costEstimateUsd` comes from `AGENT_PRICE_TABLE` (USD per million input and output tokens per deployment). Local inference and the mock record 0. A cloud deployment without a configured price records no estimate rather than a misleading 0.
+
+## Handoff records
+
+Each run also returns one `AgentStep` per roster stage (ADR-0011 addendum 3). For evaluation they give, per stage, the decision and reason code, the evidence cited and the usage. `inputChecksum` is deterministic for a given request and model output, so two runs of a case can be compared stage by stage: the first differing checksum shows where they diverged. A step with reason code `BUDGET_EXCEEDED` means the per-run budget, not the model, ended the stage; such runs are reported separately and are not counted as model failures.

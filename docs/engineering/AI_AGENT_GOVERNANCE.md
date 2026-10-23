@@ -6,7 +6,7 @@ Covers both the product's runtime agents and the coding agents that build the re
 
 **Stack.** Microsoft Agent Framework (`agent-framework-core`) and `agent-framework-foundry`, using `Agent(client=FoundryChatClient(project_endpoint, model, credential))`. Settings use the framework's variable names, `FOUNDRY_PROJECT_ENDPOINT` and `FOUNDRY_MODEL`. Before using any SDK API, verify it against Microsoft Learn. `tests/test_foundry_sdk.py` guards the API surface we depend on.
 
-**Roster (spec §28):** Match Analyst → Narrative Writer → Fact Checker → Broadcast Producer → Localization.
+**Roster (spec §28):** Match Analyst → Narrative Writer → Fact Checker → Localization → Broadcast Producer.
 
 **Contracts.** Agents receive an immutable `FactPacket` (insight, evidence envelope and entity allowlist) and return `AgentResult` or `VerificationResult`. Both are typed by the generated Pydantic models.
 
@@ -31,6 +31,8 @@ Covers both the product's runtime agents and the coding agents that build the re
 **Feedback retries.** A rejected Analyst or Producer answer gets one retry that feeds back each violation with its fix, only while at least 60% of the deadline is left. On `ollama` blind retries of rejected output stay off, and a timed-out call is not retried.
 
 **Content safety.** A deterministic blocklist (profanity and abuse aimed at players, teams or officials, in all four locales) runs inside every text check, so it covers drafts, translations, overlays and templates. A hit is a forbidden claim: the persona falls back to its template without revision. `ContentSafetyScreen` is the port for a hosted classifier such as Azure AI Content Safety; none is wired until Azure exists (ADR-0003), and a configured screen fails closed.
+
+**Handoff records and budget (ADR-0011 addendum 3).** Every stage transition is an `AgentStep` with its decision, reason, input checksum and cited evidence, stored per run and served by `GET /agents/traces/{correlationId}`. A central per-run budget (`AGENT_BUDGET_MAX_HOPS`, `AGENT_BUDGET_MAX_TOKENS`, `AGENT_BUDGET_MAX_COST_USD`) stops further model calls once reached and falls back with `BUDGET_EXCEEDED`.
 
 **Cost.** `AgentRun.costEstimateUsd` comes from the `AGENT_PRICE_TABLE` setting (USD per million tokens per deployment). Local inference and the mock record 0; a cloud deployment without a price records no estimate.
 

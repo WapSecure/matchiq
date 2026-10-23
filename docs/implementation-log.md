@@ -1040,3 +1040,19 @@ The owner explicitly approved pushing `fix/MQ-055-recap-fallback`, opening its P
 ### MQ-055: Latest recap surfaces integrated
 
 After integrating the completed recap redesign from origin/dev, applied the same language metadata and translation-status notice to the story summary and readable report download. The timeline, summary and report share one notice helper. The targeted recap spec now has 8 passing cases, including story/report fallback and unknown historical status. Frontend lint and application/spec type checks passed; formatting and whitespace checks passed. No other agents' worktrees, stack processes or protected branches were changed.
+
+## MQ-064: Per-agent handoff records and traces (23 October 2026)
+
+Branch `feat/MQ-064-agent-handoff-trace`. Spec §28, §29, §46; ADR-0011 addendum 3.
+
+| Item                                                                                                                                                         | Status | Evidence                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ---------------------------------------------------------------------- |
+| `AgentStep` / `AgentStepTrace` contracts; `PipelineResult.steps` (defaults to `[]`); codegen and sample updated                                              | Done   | `libs/contracts/tests/trace.spec.ts`, `tests/test_contract_samples.py` |
+| One step per roster stage with decision, reason code, SHA-256 input checksum, cited evidence, prompt version and hash, model, tokens, latency, cost, retries | Done   | `apps/agents/tests/test_agent_steps.py`                                |
+| Central per-run budget (`AGENT_BUDGET_MAX_HOPS`, `_MAX_TOKENS`, `_MAX_COST_USD`), clean fallback with `BUDGET_EXCEEDED`                                      | Done   | hop, token and cost budget tests in `test_agent_steps.py`              |
+| OTel span per step with GenAI attributes and the correlation id; no-op without an exporter                                                                   | Done   | `test_each_step_emits_a_genai_span`                                    |
+| `agent_steps` table (migration 0008) with RLS; worker persists steps with each publication                                                                   | Done   | `apps/worker/src/app/agents/agents.integration.spec.ts`                |
+| `GET /api/v1/agents/traces/{correlationId}`, `agents:traces:read`, tenant-scoped; OpenAPI and client regenerated                                             | Done   | `apps/api/src/app/intelligence/agent-traces.integration.spec.ts`       |
+| Fact-checks page: "How the agents worked on this" timeline; technical fields in Technical details                                                            | Done   | `apps/web/src/features/observatory/agent-step-timeline.spec.tsx`       |
+
+Not changed: the publish gate, prompts and roster files. Retention relies on the fixture foreign key cascade for `agent_steps`, as migration 0002 documents for new tables; the retention audit counts are unchanged. The Foundry path is not exercised here; step records from the mock and Ollama providers only.

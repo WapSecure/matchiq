@@ -1,7 +1,10 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { buildReport } from '@/features/recap/recap-report';
+import { createQueryClient } from '@/lib/api/query-provider';
 import { fixture } from '@/test/factories';
+import { stubApi } from '@/test/stub-api';
 import { recap, run, trace } from '@/test/session-factories';
 import { FallbackNote } from './fallback-note';
 import { MomentList } from './moment-list';
@@ -28,7 +31,19 @@ const traces = [
   }),
 ];
 
+// Trace cards load their agent hand-offs; unknown routes answer 404, an empty timeline.
+const renderList = (ui: React.ReactNode) => {
+  stubApi({});
+  return render(
+    <QueryClientProvider client={createQueryClient()}>
+      {ui}
+    </QueryClientProvider>,
+  );
+};
+
 describe('AI fact-checks overview', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
   it('says a repeated reason once, with a count', () => {
     render(<FallbackNote traces={traces} />);
     const items = within(screen.getByTestId('fallback-note')).getAllByRole(
@@ -61,7 +76,7 @@ describe('AI fact-checks overview', () => {
 
   it('filters moments and keeps a minute marker per shown moment', async () => {
     const user = userEvent.setup();
-    render(<MomentList traces={traces} moments={new Map()} />);
+    renderList(<MomentList traces={traces} moments={new Map()} />);
     const list = () =>
       screen.getByRole('list', { name: 'Key moments and their checks' });
     expect(within(list()).getAllByRole('article')).toHaveLength(4);
@@ -95,7 +110,7 @@ describe('moment paging', { timeout: 20_000 }, () => {
 
   it('shows ten at a time and loads the rest on request', async () => {
     const user = userEvent.setup();
-    render(<MomentList traces={many} moments={new Map()} />);
+    renderList(<MomentList traces={many} moments={new Map()} />);
     expect(articles()).toHaveLength(10);
     await user.click(screen.getByRole('button', { name: 'Show more' }));
     expect(articles()).toHaveLength(20);
@@ -106,7 +121,7 @@ describe('moment paging', { timeout: 20_000 }, () => {
 
   it('starts again from ten when the filter changes', async () => {
     const user = userEvent.setup();
-    render(<MomentList traces={many} moments={new Map()} />);
+    renderList(<MomentList traces={many} moments={new Map()} />);
     await user.click(screen.getByRole('button', { name: 'Show more' }));
     await user.click(screen.getByRole('radio', { name: /Standard wording/ }));
     expect(articles()).toHaveLength(10);
@@ -117,7 +132,7 @@ describe('moment paging', { timeout: 20_000 }, () => {
     const user = userEvent.setup();
     const scroll = vi.fn();
     Element.prototype.scrollIntoView = scroll;
-    render(<MomentList traces={many} moments={new Map()} />);
+    renderList(<MomentList traces={many} moments={new Map()} />);
     expect(document.getElementById('moment-in_22')).toBeNull();
     const strip = screen.getByRole('list', { name: 'Key moments by minute' });
     await user.click(within(strip).getAllByRole('link')[22] as HTMLElement);
