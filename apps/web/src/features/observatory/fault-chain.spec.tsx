@@ -54,7 +54,7 @@ describe('DemoScenarioSelect', () => {
     expect(trigger).toHaveTextContent('No simulated failure');
     await user.click(trigger);
     expect(screen.getAllByRole('option')).toHaveLength(4);
-    await user.click(screen.getByRole('option', { name: 'Revise' }));
+    await user.click(screen.getByRole('option', { name: /^Revise/ }));
     expect(onChange).toHaveBeenLastCalledWith('WRITER_REVISE');
   });
 });
