@@ -1,7 +1,8 @@
 'use client';
 
 import { type FormEvent, useState } from 'react';
-import { Button, SelectField, TextField } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { SelectField, TextField } from '@/components/ui/form-fields';
 import { AUDIT_COPY, AUDIT_FILTER_OPTIONS } from '@/constants/audit';
 import {
   type AuditFilterForm,

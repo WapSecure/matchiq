@@ -2,6 +2,23 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-040 (1/2): Accessible component library and gallery
+
+| Area                                                                                                                                                                                                                                            | Status | Evidence                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------- |
+| ADR-0021: React Aria Components 1.21.1 (2026-09-04), `react-aria` 3.52.1 and `@internationalized/date` 3.12.4, exact pins; alternatives and deliberate deviations recorded                                                                      | Done   | `docs/adr/0021-accessible-component-foundation.md`                           |
+| Select (descriptions, icons, grouped options, disabled reasons, loading), Combobox (searchable, empty state), SegmentedControl rebuilt on `RadioGroup` (sizes, icons, disabled)                                                                 | Done   | `select.spec.tsx`, `controls.spec.tsx`, `live-studio.spec.tsx`               |
+| Calendar, RangeCalendar, DatePicker, DateTimePicker, DateRangePicker with presets ("Last 15 minutes", "Last hour", "Today", "Last 24 hours", "Last 7 days", "This match"), local zone shown and UTC echoed; en-GB, fr-FR, es-ES, pcm-NG → en-GB | Done   | `date-pickers.spec.tsx`, `date-time.spec.ts`                                 |
+| FileUpload: drop zone and browse, type and size checks with plain-language reasons, per-file progress (determinate and indeterminate), done and error states                                                                                    | Done   | `file-upload.spec.tsx`, `file-validation.spec.ts`                            |
+| Tooltip, HintBadge, InfoTip, Popover and PopoverPanel, Menu, Disclosure and Accordion, Switch, Checkbox (card, indeterminate, invalid), RadioCards, TextField and TextArea, ActionButton (pending)                                              | Done   | `controls.spec.tsx`                                                          |
+| Toast, Modal and Drawer reviewed: shared `ToastCard` for editorial and PWA notices, float elevation, entrance motion; every animation respects reduced motion                                                                                   | Done   | `editorial-controls.spec.tsx`                                                |
+| Sizes `sm` (32 px) and `md` (40 px), 44 px targets on coarse pointers; states from React Aria `data-*` attributes; semantic tokens only                                                                                                         | Done   | `control-styles.ts`                                                          |
+| `/design-system` gallery: every component and state in a light and a dark pane, overlays kept in their pane's theme; 404 when `APP_ENV=prod` unless demo mode                                                                                   | Done   | Playwright `design-system.spec.ts` (axe, all four theme and device projects) |
+
+Verification: CI (owner directive). Locally: Prettier, `nx lint web`, `nx typecheck web` and the touched spec files only.
+
+Limitations: hover, focus-visible and pressed states are interactive in the gallery, not frozen; a static capture shows the resting, selected, disabled, invalid and loading states. The native controls in the app are replaced in part 2.
+
 ## 2026-10-23 — MQ-035: Hackathon submission package and README
 
 | Area                                                                                                                                                                                          | Status | Evidence                                           |

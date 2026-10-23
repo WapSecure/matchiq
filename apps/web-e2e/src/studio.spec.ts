@@ -169,7 +169,7 @@ test.describe('live studio', () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openStudio(page);
-    const languages = page.getByRole('group', { name: 'Language' });
+    const languages = page.getByRole('radiogroup', { name: 'Language' });
     await expect(languages.getByRole('radio')).toHaveCount(4);
     const scoreboard = page.getByRole('region', { name: 'Scoreboard' });
     const before = (await scoreboard.textContent()) ?? '';
