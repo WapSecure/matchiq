@@ -58,8 +58,7 @@ export const COPY_PCM: LocaleCopy = {
     HIGH_REGAINS: (f) => `${f.v['high']} high recoveries for di latest spell`,
     PRESSURE_SWING: (f) =>
       `${f.v['pressures']} pressures, e don climb from ${f.v['previous']}`,
-    MOMENTUM_SHIFT: (f) =>
-      `Momentum index ${f.v['momentum']} against ${f.v['oppMomentum']}`,
+    MOMENTUM_SHIFT: (f) => `${f.team} dey on top`,
     PLAYER_MILESTONE: () => 'Milestone don land',
   },
   generic: {

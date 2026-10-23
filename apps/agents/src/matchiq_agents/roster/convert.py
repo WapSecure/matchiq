@@ -23,6 +23,7 @@ from matchiq_agents.contracts.types import (
     Persona,
 )
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
+from matchiq_agents.guard.editorial import event_line, key_refs
 from matchiq_agents.guard.text import restore_names
 from matchiq_agents.limits import OVERLAY_DURATION_MS, OVERLAY_PRIORITY
 from matchiq_agents.pipeline.diagnostics import OutputRejectedError
@@ -57,17 +58,18 @@ def facts_payload(
     `free_text=False` drops the engine's rationale and counter-evidence prose: only the Analyst
     (and the critique) reason over it, and small models otherwise copy its wording and numbers
     into drafts. `metric_refs` keeps only the metrics already cited upstream (a real packet has
-    about 28). Output is checked against the full evidence either way.
+    about 28), plus the metrics the moment's headline must state (the score after a goal).
+    Output is checked against the full evidence either way.
     """
-    metrics = {
-        ref: value
-        for ref, value in view.metrics.items()
-        if metric_refs is None or ref in metric_refs
-    }
+    keep = None if metric_refs is None else {*metric_refs, *key_refs(view)}
+    metrics = {ref: value for ref, value in view.metrics.items() if keep is None or ref in keep}
     return FactsPayload(
         insight_kind=view.kind,
         subject_team=view.team_name,
         subject_player=view.player_name,
+        subject_side=view.subject_side if view.team_name else None,
+        opponent_team=view.opponent_name,
+        event_line=event_line(view),
         computed_metrics=metrics,
         event_ids=list(view.event_ids),
         confidence_label=view.confidence,

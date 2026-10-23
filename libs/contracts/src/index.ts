@@ -3,6 +3,7 @@ export * from './lib/primitives.js';
 export * from './lib/fixture.js';
 export * from './lib/events.js';
 export * from './lib/snapshot.js';
+export * from './lib/metric-display.js';
 export * from './lib/insight.js';
 export * from './lib/faults.js';
 export * from './lib/agents.js';

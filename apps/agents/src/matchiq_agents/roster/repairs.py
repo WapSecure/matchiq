@@ -10,10 +10,11 @@ from typing import Final
 
 from matchiq_agents.contracts.types import Locale, Persona
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
+from matchiq_agents.guard.editorial_repair import EditorialCopy, repair_editorial
 from matchiq_agents.guard.repair import Repair, drop_windows, metric_windows, trim_sentences
 from matchiq_agents.guard.text import extract_numerals
 from matchiq_agents.limits import OVERLAY_LIMITS, PERSONA_LIMITS
-from matchiq_agents.roster.schemas import ClaimOut, DraftOut
+from matchiq_agents.roster.schemas import CitedValueOut, ClaimOut, DraftOut
 
 ADD_METRIC_REF: Final = "ADD_METRIC_REF"
 REF_DETAIL: Final = "overlay: listed {ref}, whose value the text states"
@@ -46,8 +47,21 @@ def repair_draft(draft: DraftOut, view: FactView, log: list[Repair]) -> DraftOut
     tag = persona.value
     headline = repair_text(draft.headline, view, values, f"{tag} headline", log)
     body = repair_text(draft.body, view, values, f"{tag} body", log)
-    body = repair_body(body, persona, f"{tag} body", log)
-    return draft.model_copy(update={"headline": headline, "body": body})
+    cited = {value.metric_ref: value.value for value in draft.cited_values}
+    copy = repair_editorial(EditorialCopy(headline, body, cited), persona, view, tag, log)
+    body = repair_body(copy.body, persona, f"{tag} body", log)
+    added = [
+        CitedValueOut(metric_ref=ref, value=value)
+        for ref, value in copy.cited.items()
+        if ref not in cited
+    ]
+    return draft.model_copy(
+        update={
+            "headline": copy.headline,
+            "body": body,
+            "cited_values": [*draft.cited_values, *added],
+        }
+    )
 
 
 def repair_claim(claim: ClaimOut, view: FactView, index: int, log: list[Repair]) -> ClaimOut:
