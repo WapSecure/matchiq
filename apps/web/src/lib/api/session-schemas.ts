@@ -5,6 +5,7 @@ import {
   InsightKind,
   InsightPriority,
   MatchSnapshot,
+  MatchStory,
   Narrative,
   OverlayCue,
   RecapNarrative as RecapNarrativeSchema,
@@ -72,6 +73,7 @@ export const RecapDocument = z.object({
   title: z.string(),
   finalSnapshot: MatchSnapshot,
   keyMoments: z.array(RecapMoment),
+  story: z.array(MatchStory).optional(),
   synthetic: z.literal(true),
 });
 

@@ -56,6 +56,7 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
               view={view}
               locale={locale}
               persona={persona}
+              breakdownLevel={4}
             />
             {view ? (
               <p className="mt-2 text-xs leading-relaxed text-ink-subtle">

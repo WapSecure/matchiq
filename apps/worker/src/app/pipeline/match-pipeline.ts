@@ -9,6 +9,7 @@ import {
   applyEvent,
   createInitialState,
   createMomentCursor,
+  momentContext,
   stepMoments,
   toSnapshot,
   type MomentCursor,
@@ -60,6 +61,7 @@ export class MatchPipeline {
   private readonly cadence = new SnapshotCadence();
   private readonly scheduler = new OverlayScheduler();
   private clock: ClockPoint = { period: 1, clockMs: 0 };
+  private readonly detected: Insight[] = [];
 
   constructor(private readonly options: MatchPipelineOptions) {
     this.projection = createInitialState(options.fixture);
@@ -118,10 +120,20 @@ export class MatchPipeline {
   }
 
   private detect(
-    insight: Insight,
+    found: Insight,
     event: MatchEvent,
     batch: PipelineBatch,
   ): void {
+    const insight: Insight = {
+      ...found,
+      context: momentContext({
+        derived: this.projection.derived,
+        fixture: this.projection.fixture,
+        insight: found,
+        prior: this.detected,
+      }),
+    };
+    this.detected.push(insight);
     const { fixture, aiEnabled } = this.options;
     batch.drafts.push(this.draft('insight.detected', insight));
     batch.insights.push({

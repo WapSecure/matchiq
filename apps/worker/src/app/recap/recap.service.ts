@@ -46,6 +46,7 @@ export class RecapService {
       snapshot,
       insights,
       narratives,
+      fixture,
     });
     await this.uow.transaction((tx) => tx.saveRecap(key, recap));
     return recap;

@@ -6,6 +6,7 @@ import type { RecapDocument } from '@/lib/api/session-schemas';
 import { formatMetric, formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { orderedMoments } from './recap-order';
+import { breakdownLines, storyLines } from './recap-report-sections';
 import { recapTranslationNotice } from './recap-translation-notice';
 
 const copy = RECAP_COPY.report;
@@ -28,13 +29,19 @@ export const buildReport = ({
   locale,
 }: ReportOptions): string => {
   const { home, away } = recap.finalSnapshot.score;
-  const moments = orderedMoments(recap.keyMoments).map((m) => {
+  const moments = orderedMoments(recap.keyMoments).flatMap((m) => {
     const picked = pickNarrative(m.narratives, persona, locale);
+    const breakdown = breakdownLines(picked);
+    const body =
+      picked && breakdown.length === 0 ? ` ${picked.narrative.body}` : '';
     const text = picked
-      ? `${picked.narrative.headline}. ${picked.narrative.body}`
+      ? `${picked.narrative.headline}.${body}`
       : INSIGHT_KIND_LABELS[m.kind];
     const notice = recapTranslationNotice(picked, locale);
-    return `${formatMinute(m.period, m.matchClockMs)}  ${text}${notice ? ` ${notice}` : ''}`;
+    return [
+      `${formatMinute(m.period, m.matchClockMs)}  ${text}${notice ? ` ${notice}` : ''}`,
+      ...breakdown,
+    ];
   });
   const stats = statRows(recap.finalSnapshot).map((r) =>
     copy.statLine(r.label, statValue(r.home), statValue(r.away)),
@@ -45,6 +52,7 @@ export const buildReport = ({
     copy.score(fixture.home.name, fixture.away.name, home, away),
     fixture.competitionLabel,
     '',
+    ...storyLines(recap, persona, locale),
     copy.moments,
     ...moments,
     '',

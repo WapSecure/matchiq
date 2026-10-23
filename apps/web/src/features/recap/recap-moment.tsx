@@ -18,6 +18,7 @@ import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { momentAnchor } from './recap-order';
 import { RecapMomentTechnical } from './recap-moment-technical';
+import { RecapMomentText } from './recap-moment-text';
 import { recapTranslationNotice } from './recap-translation-notice';
 
 type RecapMomentProps = {
@@ -128,20 +129,7 @@ export function RecapMomentItem({
             {CONFIDENCE_LABELS[moment.confidenceLabel]}
           </span>
         </header>
-        {picked ? (
-          <div className="mt-1.5" lang={picked.language}>
-            <p className="text-[15px] font-semibold leading-snug text-ink">
-              {picked.narrative.headline}
-            </p>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
-              {picked.narrative.body}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-1.5 text-xs text-ink-subtle">
-            {RECAP_COPY.noNarrative}
-          </p>
-        )}
+        <RecapMomentText picked={picked} />
         <Meta
           moment={moment}
           picked={picked}

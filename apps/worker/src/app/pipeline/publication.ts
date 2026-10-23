@@ -28,7 +28,12 @@ import {
   selectNarratives,
   type GateContext,
 } from './gate/publish-gate';
-import { templateDraft, templateDrafts } from './templates/template-narratives';
+import {
+  templateDraft,
+  templateDrafts,
+  withTemplateBreakdown,
+} from './templates/template-narratives';
+import { withGatedBreakdown } from './gate/breakdown-gate';
 
 /** Everything one insight's publication writes, decided before any I/O. */
 export interface Publication {
@@ -152,6 +157,10 @@ export const agentPublication = (input: AgentInput): Publication => {
   const { insight, fixture, result } = input;
   const ctx = { ...gateContextOf(insight, fixture), recent: input.recent };
   const agent = selectNarratives(result.narratives, ctx, 'AGENT');
+  // Agent drafts keep their own breakdown when it passed; others get the deterministic one.
+  const accepted = agent.accepted.map((d) =>
+    withGatedBreakdown(withTemplateBreakdown(d, insight, fixture), ctx),
+  );
   const templates = fillMissing(agent.accepted, insight, fixture);
   const overlayVerdict =
     result.overlay === null ? null : gateOverlay(result.overlay, ctx);
@@ -173,7 +182,7 @@ export const agentPublication = (input: AgentInput): Publication => {
     rejected,
   };
   return {
-    narratives: [...agent.accepted, ...templates].map((d) =>
+    narratives: [...accepted, ...templates].map((d) =>
       toNarrative(insight, d, input.createdAt),
     ),
     completion: {

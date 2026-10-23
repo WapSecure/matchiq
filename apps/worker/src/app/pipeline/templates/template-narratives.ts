@@ -17,6 +17,7 @@ import { COPY_ES } from './copy-es';
 import { COPY_FR } from './copy-fr';
 import { COPY_PCM } from './copy-pcm';
 import type { LocaleCopy } from './copy-types';
+import { templateBreakdown } from './template-breakdown';
 import { buildFacts, type TemplateFacts } from './template-facts';
 
 const COPY: Readonly<Record<Locale, LocaleCopy>> = {
@@ -79,8 +80,28 @@ export const templateDraft = (
     citedValues: cited,
     source: 'TEMPLATE',
     localeFallback: false,
+    ...(variant.persona === 'ANALYST' && {
+      breakdown: templateBreakdown(insight, fixture, variant.locale),
+    }),
   };
 };
+
+/** An ANALYST draft without a breakdown gets the deterministic one for its text's language. */
+export const withTemplateBreakdown = (
+  draft: NarrativeDraft,
+  insight: Insight,
+  fixture: Fixture,
+): NarrativeDraft =>
+  draft.persona !== 'ANALYST' || draft.breakdown !== undefined
+    ? draft
+    : {
+        ...draft,
+        breakdown: templateBreakdown(
+          insight,
+          fixture,
+          draft.localeFallback ? PRIMARY_LOCALE : draft.locale,
+        ),
+      };
 
 export const templateDrafts = (
   insight: Insight,

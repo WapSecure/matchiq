@@ -1,3 +1,5 @@
+import type { StoryParagraphKind } from '@matchiq/contracts';
+
 const plural = (n: number, one: string, many = `${one}s`) =>
   `${n} ${n === 1 ? one : many}`;
 
@@ -19,6 +21,10 @@ export const RECAP_COPY = {
     possession: (home: string, away: string) => `Possession ${home}–${away}`,
     shots: (home: number, away: number) => `Shots ${home}–${away}`,
     missing: '–',
+  },
+  matchStory: {
+    title: 'Match story',
+    description: 'How the match unfolded, from kick-off to the final whistle',
   },
   momentsTitle: 'Key moments',
   momentsDescription: 'Every key moment of the match, with the plays behind it',
@@ -51,6 +57,9 @@ export const RECAP_COPY = {
     heading: (title: string) => `${title} — match report`,
     score: (home: string, away: string, h: number, a: number) =>
       `Final score: ${home} ${h}–${a} ${away}`,
+    story: 'Match story',
+    storyParagraph: (heading: string, text: string) => `${heading}: ${text}`,
+    breakdownLine: (label: string, text: string) => `    ${label}: ${text}`,
     moments: 'Key moments',
     stats: 'Final stats',
     statLine: (label: string, home: string, away: string) =>
@@ -88,3 +97,10 @@ export const JSON_INDENT = 2;
 export const REPORT_RULE = '—'.repeat(24);
 
 export const UNKNOWN_COMMENTARY_LANGUAGE = 'und';
+
+export const STORY_KIND_LABELS: Record<StoryParagraphKind, string> = {
+  FIRST_HALF: 'First half',
+  SECOND_HALF: 'Second half',
+  TURNING_POINTS: 'Turning points',
+  FULL_TIME: 'Full time',
+};

@@ -18,6 +18,7 @@ import {
   PERSONA_LIMITS,
   type TextLimits,
 } from './gate.constants';
+import { citableMetrics, withGatedBreakdown } from './breakdown-gate';
 import { guardIssues, repeatIssues } from './guard-checks';
 import {
   allowedNameTokens,
@@ -72,10 +73,12 @@ const citedIssues = (
   insight: Insight,
   cited: readonly CitedValue[],
 ): GateIssue[] =>
-  verifyCitedValues(insight.evidence, cited).map((issue) => ({
-    code: 'UNSUPPORTED_NUMBER',
-    detail: GATE_DETAILS.citedValue(issue.metricRef, issue.reason),
-  }));
+  verifyCitedValues({ computedMetrics: citableMetrics(insight) }, cited).map(
+    (issue) => ({
+      code: 'UNSUPPORTED_NUMBER',
+      detail: GATE_DETAILS.citedValue(issue.metricRef, issue.reason),
+    }),
+  );
 
 interface TextInput {
   readonly headline: string;
@@ -177,7 +180,7 @@ export const gateNarrative = (
   );
   if (draft.source === 'AGENT')
     issues.push(...repeatIssues(draft, ctx.recent ?? []));
-  return verdict(draft, issues);
+  return verdict(withGatedBreakdown(draft, ctx), issues);
 };
 
 /** Overlay proposals cite metricRefs instead of values; every number must resolve through them. */

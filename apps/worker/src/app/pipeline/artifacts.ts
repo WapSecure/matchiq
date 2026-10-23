@@ -85,6 +85,7 @@ export const toNarrative = (
   citations: [...draft.evidenceEventIds],
   source: draft.source,
   localeFallback: draft.localeFallback,
+  ...(draft.breakdown && { breakdown: draft.breakdown }),
   createdAt,
 });
 
