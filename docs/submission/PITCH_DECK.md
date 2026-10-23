@@ -48,7 +48,7 @@ The evidence drawer: source events, metric values and definitions, counter-evide
 
 ## 6. Multi-agent orchestration
 
-- Match Analyst → Narrative Writer → Fact Checker → Broadcast Producer → Localization, on Microsoft Agent Framework graph workflows.
+- Match Analyst → Narrative Writer → Fact Checker → Localization → Broadcast Producer, on Microsoft Agent Framework graph workflows.
 - A typed state machine with REVISE and REJECT, deadlines, retries and circuit breakers.
 - Two independent deterministic checks: the Fact Checker in the agents service and the publish gate in the worker.
 
@@ -76,11 +76,11 @@ The same insight as Casual, Analyst and Broadcast, in EN, FR, ES and PCM.
 
 ## 10. Evidence, not claims
 
-| Measure                                     | Result                                                 |
-| ------------------------------------------- | ------------------------------------------------------ |
-| Live session (Ollama `qwen2.5:7b-instruct`) | 222 of 228 narratives agent-written; 0 gate rejections |
-| Localization after PR #40 (10 cases)        | 28% → 87% fully localised; 0 violations                |
-| CI mock evaluation and attacks              | 46 cases plus 10 attacks; 0 unsupported numbers        |
+| Measure                                     | Result                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| Live session (Ollama `qwen2.5:7b-instruct`) | 222 of 228 narratives agent-written; 0 gate rejections               |
+| Localization after PR #40 (10 cases)        | 28% (historical, before 4d977d6) → 87% fully localised; 0 violations |
+| CI mock evaluation and attacks              | 46 cases plus 13 attacks; 0 unsupported numbers                      |
 
 > **Notes:** One laptop (M1 Pro), synthetic fixtures, not a cloud benchmark. Microsoft Agent Framework is in use. Foundry, Entra ID and the Azure Bicep are implemented but have not been exercised, because there is no subscription yet.
 

@@ -22,9 +22,11 @@ Mock and template output are never counted as agent output. A narrative served i
 
 - **Golden** (`tests/eval/cases.py`, 38 cases): every insight kind, sparse and rich evidence, decimals, negative and zero values, accented, apostrophe and hyphenated names, every locale including Nigerian Pidgin, persona subsets, a tight deadline, and `real_packet_shape` (28 metrics over two windows and 38 allowlisted names, the shape the worker sends for a real fixture).
 - **Adversarial inputs** (8 cases): prompt injection in player and team names, rationale and counter-evidence (English and Pidgin), a forged data delimiter and a digit in a name.
-- **Compromised-model attacks** (`tests/eval/attacks.py`, 10 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
+- **Compromised-model attacks** (`tests/eval/attacks.py`, 13 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
 
-A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 46) plus `--case real_packet_shape`, or the full set.
+A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 46) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds 10 cases, the size of the run recorded after PR #40. A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
+
+The "28% to 87% fully localised" figure compares the run before and after commit `4d977d6` (PR #40). Only the after run is committed as a baseline; the before figure is historical, recorded in the implementation log, and has no artifact in the repository.
 
 ## Failure taxonomy
 
