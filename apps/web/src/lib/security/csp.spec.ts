@@ -121,7 +121,24 @@ describe('buildContentSecurityPolicy', () => {
     ).not.toContain('upgrade-insecure');
   });
 
-  it('relaxes only eval and the HMR websocket for next dev', () => {
+  it('keeps production styles and scripts free of unsafe-inline and unsafe-eval', () => {
+    const csp = parse(buildContentSecurityPolicy(base));
+    for (const directive of ['script-src', 'style-src']) {
+      expect(csp.get(directive)).not.toContain("'unsafe-inline'");
+      expect(csp.get(directive)).not.toContain("'unsafe-eval'");
+    }
+    expect(csp.get('style-src')).toEqual(["'self'", `'nonce-${base.nonce}'`]);
+  });
+
+  it('lets next dev tooling inject inline styles, without a nonce that would cancel it', () => {
+    const dev = parse(
+      buildContentSecurityPolicy({ ...base, development: true }),
+    );
+    expect(dev.get('style-src')).toEqual(["'self'", "'unsafe-inline'"]);
+    expect(dev.get('script-src')).not.toContain("'unsafe-inline'");
+  });
+
+  it('relaxes only eval, inline styles and the HMR websocket for next dev', () => {
     const dev = parse(
       buildContentSecurityPolicy({ ...base, development: true }),
     );

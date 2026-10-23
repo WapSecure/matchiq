@@ -81,6 +81,9 @@ const toAuditEvent = (row: AuditRow): AuditEvent => ({
   id: row.id,
   action: row.action,
   actor: { type: AuditActorType.parse(row.actorType), id: row.actor },
+  ...(row.actorDisplayName === null
+    ? {}
+    : { actorDisplayName: row.actorDisplayName }),
   target: { type: AuditTargetType.parse(row.targetType), id: row.targetId },
   fixtureId: row.fixtureId,
   reason: row.reason,

@@ -92,6 +92,17 @@ describe('audit contracts', () => {
     ).toBe(false);
   });
 
+  it('accepts rows with and without the actor display name', () => {
+    expect(AuditEvent.safeParse(event).success).toBe(true);
+    expect(
+      AuditEvent.safeParse({ ...event, actorDisplayName: 'Pat Producer' })
+        .success,
+    ).toBe(true);
+    expect(
+      AuditEvent.safeParse({ ...event, actorDisplayName: '' }).success,
+    ).toBe(false);
+  });
+
   it('defaults the page size and rejects inconsistent filters', () => {
     expect(AuditEventQuery.parse({}).limit).toBe(50);
     expect(AuditEventQuery.parse({ limit: '10' }).limit).toBe(10);
