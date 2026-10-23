@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui';
 import {
   CONFIDENCE_LABELS,
   INSIGHT_KIND_LABELS,
-  englishLanguageName,
   PRIORITY_LABELS,
 } from '@/constants/match';
 import { RECAP_COPY } from '@/constants/recap';
@@ -18,6 +17,7 @@ import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { momentAnchor } from './recap-order';
 import { RecapMomentTechnical } from './recap-moment-technical';
+import { recapTranslationNotice } from './recap-translation-notice';
 
 type RecapMomentProps = {
   moment: Moment;
@@ -54,6 +54,7 @@ function Meta({
   locale: Locale;
 }) {
   const ai = picked?.narrative.source === 'AGENT';
+  const notice = recapTranslationNotice(picked, locale);
   return (
     <>
       <p
@@ -74,11 +75,9 @@ function Meta({
         <span>{RECAP_COPY.evidence(moment.evidenceEventIds.length)}</span>
         <span>{RECAP_COPY.metricRefs(moment.metricRefs.length)}</span>
       </p>
-      {picked?.translationUnknown || picked?.fallback ? (
+      {notice ? (
         <p lang={SITE.locale} className="mt-1 text-micro text-warning">
-          {picked.translationUnknown
-            ? RECAP_COPY.translationUnknown
-            : RECAP_COPY.localeFallback(englishLanguageName(locale))}
+          {notice}
         </p>
       ) : null}
     </>

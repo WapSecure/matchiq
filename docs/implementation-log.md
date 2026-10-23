@@ -966,3 +966,7 @@ The feature branch contains origin/dev as an ancestor. No protected branch was m
 ## MQ-055: Publication authorized (23 October 2026)
 
 The owner explicitly approved pushing `fix/MQ-055-recap-fallback`, opening its PR into dev, and merging only after required checks pass. Fetched and integrated current origin/dev, including the completed branded-login and pagination work, without modifying a protected branch or another worktree. The recap patch remains limited to fallback provenance; both log histories are retained. CI status and merge outcome must be verified on GitHub before reporting completion. Earlier notes about missing publication permission are historical.
+
+### MQ-055: Latest recap surfaces integrated
+
+After integrating the completed recap redesign from origin/dev, applied the same language metadata and translation-status notice to the story summary and readable report download. The timeline, summary and report share one notice helper. The targeted recap spec now has 8 passing cases, including story/report fallback and unknown historical status. Frontend lint and application/spec type checks passed; formatting and whitespace checks passed. No other agents' worktrees, stack processes or protected branches were changed.

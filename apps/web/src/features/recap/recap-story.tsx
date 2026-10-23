@@ -2,11 +2,13 @@
 
 import type { Fixture } from '@matchiq/contracts';
 import { RECAP_COPY } from '@/constants/recap';
+import { SITE } from '@/constants/site';
 import { useStudioUi } from '@/features/studio/store';
 import type { RecapDocument } from '@/lib/api/session-schemas';
 import { formatMetric } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { orderedMoments } from './recap-order';
+import { recapTranslationNotice } from './recap-translation-notice';
 
 const copy = RECAP_COPY;
 
@@ -33,6 +35,8 @@ export function RecapStory({
 }) {
   const s = recap.finalSnapshot;
   const lede = useLede(recap);
+  const locale = useStudioUi((state) => state.locale);
+  const notice = recapTranslationNotice(lede, locale);
   const facts = [
     copy.facts.moments(recap.keyMoments.length),
     copy.facts.possession(
@@ -53,13 +57,18 @@ export function RecapStory({
       </h2>
       {lede ? (
         <p
-          lang={lede.narrative.locale}
+          lang={lede.language}
           className="text-pretty text-sm leading-relaxed text-ink-muted"
         >
           <span className="font-medium text-ink">
             {lede.narrative.headline}.
           </span>{' '}
           {lede.narrative.body}
+        </p>
+      ) : null}
+      {notice ? (
+        <p lang={SITE.locale} className="text-xs text-warning">
+          {notice}
         </p>
       ) : null}
       <ul className="mt-1 flex flex-wrap justify-center gap-1.5">

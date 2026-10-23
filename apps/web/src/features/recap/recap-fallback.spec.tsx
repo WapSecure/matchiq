@@ -1,8 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { RecapNarrative as RecapNarrativeSchema } from '@matchiq/contracts';
 import { RECAP_COPY } from '@/constants/recap';
 import { RecapDocument } from '@/lib/api/session-schemas';
 import { moment, recap } from '@/test/session-factories';
+import { fixture } from '@/test/factories';
+import { STUDIO_UI_DEFAULTS, useStudioUi } from '@/features/studio/store';
+import { RecapStory } from './recap-story';
+import { buildReport } from './recap-report';
 import { pickNarrative } from './pick-narrative';
 import { RecapMomentItem } from './recap-moment';
 
@@ -94,5 +98,42 @@ describe('recap fallback provenance', () => {
 
   it('does not cross audiences when a variant is unavailable', () => {
     expect(pickNarrative([english], 'CASUAL', 'fr-FR')).toBeNull();
+  });
+});
+
+describe('story and readable report fallback provenance', () => {
+  beforeEach(() =>
+    act(() => useStudioUi.setState({ ...STUDIO_UI_DEFAULTS, locale: 'fr-FR' })),
+  );
+  afterEach(() => act(() => useStudioUi.setState({ ...STUDIO_UI_DEFAULTS })));
+
+  it.each([
+    { flag: true, language: 'en-GB', unknown: false, fallback: true },
+    { flag: undefined, language: 'und', unknown: true, fallback: false },
+  ])('keeps the story and report honest for $language commentary', (entry) => {
+    const data = recap({
+      keyMoments: [
+        moment({
+          narratives: [
+            { ...english, locale: 'fr-FR', localeFallback: entry.flag },
+          ],
+        }),
+      ],
+    });
+    render(<RecapStory recap={data} fixture={fixture()} />);
+    expect(languageOf(screen.getByText(`${english.headline}.`))).toBe(
+      entry.language,
+    );
+    const report = buildReport({
+      recap: data,
+      fixture: fixture(),
+      persona: 'BROADCAST',
+      locale: 'fr-FR',
+    });
+    expect(report.includes(RECAP_COPY.translationUnknown)).toBe(entry.unknown);
+    expect(report.includes(RECAP_COPY.localeFallback('French'))).toBe(
+      entry.fallback,
+    );
+    expect(report).toContain(english.body);
   });
 });
