@@ -2,6 +2,17 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-052: Premium pass on AI fact-checks and recap
+
+- **AI fact-checks.** Each moment now shows four labelled facts instead of a run-on line: Commentary (AI-written or standard wording), Graphic (AI-written, standard wording or a producer action), Fact check (Passed ✓ or Caught N problems) and "Ready in 4 languages for 3 audiences". A tooltip on the last one lists the languages and audiences. The recap's write-ups are used when it exists; otherwise the full set is assumed only when the count matches it.
+- Standard-wording reasons are short per moment ("The AI service was unavailable."). A page-level note groups the repeats, for example "9 moments used standard wording because the AI was slow or unavailable."
+- The summary leads with the share written by AI as a number and a part-to-whole bar with a legend. The tiles show what the fact check caught, how many failures were simulated, and honest provider badges (now `HintBadge`, no `title` tooltips).
+- Moments can be filtered: All, Written by AI, Standard wording and Simulated failures. This uses `SegmentedControl` on wider screens and `Select` on phones. A minute strip links each marker to its card. AI-written cards carry an accent rail, a tinted header and a "Written by AI" badge.
+- Technical details keeps its opt-in disclosure. Inside, the ids sit in a bordered grid and the run steps in a cleaner table with plain column names, right-aligned numbers and outcome dots.
+- **Recap.** The page has a clear hierarchy: the score, the result in words ("Northbridge Athletic beat Harbourside Rovers 2–1"), a one-line story from the deciding major moment in the chosen audience and language, and quick facts. Key moments show a minute strip and a vertical timeline in team colours. Before full time there is a dedicated waiting state that says what the recap will contain.
+- Download is one "Download match report" menu with two choices: a readable match report (.txt) and a data file (.json). Both are named with the match code from MQ-051.
+- Evidence: `fact-checks.spec.tsx` (grouping, share, filters, report) and updated `recap-observatory.spec.tsx`. The e2e specs `judge-flow` (download menu) and `demo-faults` (grouped note) are updated, and the minute-strip markers are 24 px targets on wider screens and a picture only on phones (axe target-size). Screenshots before and after, in light and dark at 1440 and 390 px, are in `docs/screenshots/factchecks-recap/`.
+
 ## 2026-10-23 — MQ-051: A readable match code instead of the events hash
 
 - Added `lib/match-code.ts`: the two team codes plus four Crockford base32 characters from the first 20 bits of the events hash (`PEN-MAR · N7R5`). The same hash always gives the same code; the five seeded fixtures are pinned in a unit test.

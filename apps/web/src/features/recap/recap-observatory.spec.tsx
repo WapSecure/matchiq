@@ -61,9 +61,15 @@ describe('recap', () => {
     expect(
       screen.getByRole('region', { name: 'Final stats' }).textContent,
     ).toBe(metrics);
+    await user.click(
+      screen.getByRole('button', { name: 'Download match report' }),
+    );
     expect(
-      screen.getByRole('button', { name: 'Download recap (JSON)' }),
-    ).toBeEnabled();
+      screen.getByRole('menuitem', { name: /Match report/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: /Data file/ }),
+    ).toHaveTextContent('.json');
   });
 });
 
@@ -126,25 +132,39 @@ describe('agent observatory', () => {
     });
     const [first, second] = within(list).getAllByRole('article');
     expect(first).toHaveTextContent('Standard wording');
-    expect(within(first).getByTestId('trace-story')).toHaveTextContent(
-      'Fact-checked ✓',
-    );
+    const facts = (article: HTMLElement) =>
+      [
+        ...within(article)
+          .getByTestId('trace-story')
+          .querySelectorAll(':scope > div'),
+      ].map((d) => d.textContent);
+    expect(facts(first)).toEqual([
+      'CommentaryStandard wording',
+      'GraphicStandard wording',
+      'Fact checkPassed ✓',
+      expect.stringMatching(/^Ready in4 languages for 3 audiences: /),
+    ]);
     expect(first).toHaveTextContent(
-      'AI writing is switched off here, so standard wording was used.',
+      'Why standard wording: AI writing is switched off here.',
+    );
+    expect(screen.getByTestId('fallback-note')).toHaveTextContent(
+      '1 moment used standard wording because AI writing is switched off here.',
     );
     expect(within(first).getByTestId('technical-details')).toHaveTextContent(
       'AI_ENABLED=false',
     );
     expect(first).toHaveTextContent('Nothing rejected.');
-    const steps = within(within(second).getByTestId('trace-story'))
-      .getAllByRole('listitem')
-      .map((li) => li.textContent);
-    expect(steps.slice(1)).toEqual([
-      'Written by AI',
-      'Fact check caught 1 problem',
-      'Graphic updated with AI wording',
-      '12 versions',
+    expect(facts(second)).toEqual([
+      'CommentaryAI-written',
+      'GraphicAI-written',
+      'Fact checkCaught 1 problem',
+      expect.stringMatching(/^Ready in4 languages for 3 audiences: /),
     ]);
+    expect(
+      within(second).getByRole('button', {
+        name: /English, French, Spanish and Nigerian Pidgin, for fans, analysts and broadcast/,
+      }),
+    ).toBeInTheDocument();
     expect(second).toHaveTextContent(
       "Write-up for fans in French: A number that doesn't match the match data",
     );
