@@ -13833,7 +13833,11 @@
                       "FORBIDDEN_CLAIM",
                       "SCHEMA_VIOLATION",
                       "LENGTH_EXCEEDED",
-                      "UNREQUESTED_VARIANT"
+                      "UNREQUESTED_VARIANT",
+                      "INJECTION_ECHO",
+                      "UNSUPPORTED_CAUSALITY",
+                      "REPETITION",
+                      "UNSAFE_TONE"
                     ]
                   }
                 },

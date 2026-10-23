@@ -1,12 +1,18 @@
-"""Deterministic rendering from engine facts only; shared by the template fallback and the mock."""
+"""Deterministic rendering from engine facts only; shared by the template fallback and the mock.
+
+The wording follows the editorial rules (`guard/editorial.py`): a goal leads with the scoring
+side and the score, a red card with the dismissal, every headline names the subject and the
+event, and Fan and Broadcast wording never shows an internal index.
+"""
 
 from dataclasses import dataclass
 from typing import Final
 
-from matchiq_agents.contracts.types import InsightKind, Locale, Persona
-from matchiq_agents.limits import PERSONA_LIMITS
+from matchiq_agents.contracts.types import InsightKind, Locale
+from matchiq_agents.domain.story import SIDES, Window, score_of, window_of
 from matchiq_agents.roster.schemas import FactsPayload
-from matchiq_agents.templates.metric_labels import metric_label, primary_metric, side_of
+from matchiq_agents.templates.facts import Fact, Owner, StoryFacts
+from matchiq_agents.templates.metric_labels import metric_label, value_suffix
 from matchiq_agents.templates.phrasebook import Phrasebook
 from matchiq_agents.templates.phrases_en import EN_GB
 from matchiq_agents.templates.phrases_es import ES_ES
@@ -20,8 +26,7 @@ PHRASEBOOKS: Final[dict[Locale, Phrasebook]] = {
     Locale.pcm_NG: PCM_NG,
 }
 MAX_DECIMALS: Final = 2
-METRIC_SEPARATOR: Final = "; "
-ANALYST_PUNCTUATION_SLACK: Final = 12
+K = InsightKind
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +36,12 @@ class RenderedText:
     cited: tuple[tuple[str, float], ...]
 
 
+@dataclass(frozen=True, slots=True)
+class Sentence:
+    text: str
+    refs: tuple[str, ...] = ()
+
+
 def format_number(value: float, locale: Locale) -> str:
     if float(value).is_integer():
         return str(int(value))
@@ -38,114 +49,112 @@ def format_number(value: float, locale: Locale) -> str:
     return text.replace(".", PHRASEBOOKS[locale].decimal_separator)
 
 
+def capitalise(text: str) -> str:
+    return text[:1].upper() + text[1:]
+
+
 def subject_of(facts: FactsPayload, book: Phrasebook) -> str:
-    if facts.insight_kind is InsightKind.PLAYER_MILESTONE and facts.subject_player:
+    if facts.insight_kind is K.PLAYER_MILESTONE and facts.subject_player:
         return facts.subject_player
     return facts.subject_team or facts.subject_player or book.generic_subject
 
 
-def lead_of(facts: FactsPayload, locale: Locale, variant: int) -> str:
+def _who(fact: Fact, facts: FactsPayload, book: Phrasebook) -> str:
+    if fact.owner is Owner.PLAYER and facts.subject_player:
+        return facts.subject_player
+    if fact.owner is Owner.OTHER and facts.opponent_team:
+        return facts.opponent_team
+    return facts.subject_team or book.generic_subject
+
+
+def _value(ref: str, facts: FactsPayload, locale: Locale) -> str:
+    return format_number(facts.computed_metrics[ref], locale) + value_suffix(ref)
+
+
+def fact_sentence(fact: Fact, facts: FactsPayload, locale: Locale, *, caption: bool) -> Sentence:
     book = PHRASEBOOKS[locale]
-    options = book.leads[facts.insight_kind]
-    return options[variant % len(options)].format(subject=subject_of(facts, book))
+    value = facts.computed_metrics[fact.ref]
+    fields = {
+        "subject": _who(fact, facts, book),
+        "value": _value(fact.ref, facts, locale),
+        "label": metric_label(fact.ref, locale, value),
+        "window": book.windows[window_of(fact.ref)],
+    }
+    if fact.before is not None and not caption:
+        before = _value(fact.before, facts, locale)
+        text = book.rise.format(before=before, previous=book.windows[Window.PREVIOUS], **fields)
+        return Sentence(capitalise(text), fact.refs())
+    template = book.caption if caption else book.fact
+    if fact.owner is Owner.PLAYER and not caption:
+        template = book.fact_player
+    return Sentence(capitalise(template.format(**fields)), (fact.ref,))
 
 
-def labelled(metric_ref: str, locale: Locale) -> str:
-    side = side_of(metric_ref)
-    label = metric_label(metric_ref, locale)
-    return f"{label} ({PHRASEBOOKS[locale].sides[side]})" if side else label
+def _goal(facts: FactsPayload, locale: Locale, *, caption: bool) -> Sentence:
+    book, phrases = PHRASEBOOKS[locale], PHRASEBOOKS[locale].goal
+    team = subject_of(facts, book)
+    player = facts.subject_player
+    clause = (phrases.scorer if player else phrases.scorer_unnamed).format(team=team, player=player)
+    score = score_of(facts.computed_metrics, facts.subject_side)
+    if score is None:
+        if caption:
+            return Sentence(book.plain[K.GOAL][1].format(subject=player or team))
+        return Sentence(f"{clause}.")
+    refs = (score.subject_ref, score.other_ref)
+    if caption and facts.opponent_team:
+        home_first = score.side == SIDES[0]
+        home, away = (team, facts.opponent_team) if home_first else (facts.opponent_team, team)
+        text = phrases.scoreboard.format(
+            scorer=clause, home=home, away=away, h=score.home, a=score.away
+        )
+        return Sentence(text, refs)
+    state = phrases.states[score.state].format(s=score.subject, o=score.other)
+    return Sentence(f"{clause}{state}.", refs)
 
 
-def metric_item(metric_ref: str, value: float, locale: Locale) -> str:
-    return f"{labelled(metric_ref, locale)} {format_number(value, locale)}"
-
-
-def _fit_metrics(facts: FactsPayload, budget: int) -> list[str]:
-    """Metrics that fit `budget` in every locale, so translations keep the same numbers."""
-    chosen: list[str] = []
-    for ref in facts.computed_metrics:
-        candidate = [*chosen, ref]
-        if any(_metrics_length(facts, candidate, locale) > budget for locale in PHRASEBOOKS):
-            break
-        chosen.append(ref)
-    return chosen
-
-
-def _metrics_length(facts: FactsPayload, refs: list[str], locale: Locale) -> int:
-    items = [metric_item(ref, facts.computed_metrics[ref], locale) for ref in refs]
-    return len(METRIC_SEPARATOR.join(items))
-
-
-def _headline(facts: FactsPayload, persona: Persona, locale: Locale, variant: int) -> str:
-    """CASUAL leads with the story, ANALYST with the pattern and confidence, BROADCAST is terse."""
+def _red_card(facts: FactsPayload, locale: Locale, *, caption: bool) -> Sentence:
     book = PHRASEBOOKS[locale]
-    short = book.shorts[facts.insight_kind]
-    if persona is Persona.BROADCAST:
-        return short
-    if persona is Persona.ANALYST:
-        confidence = book.confidence_labels[facts.confidence_label]
-        return f"{short} ({book.confidence_title.lower()}: {confidence})"
-    lead = lead_of(facts, locale, variant)
-    return lead if len(lead) <= PERSONA_LIMITS[persona].headline_max else short
+    phrases = book.red_card
+    team, player = subject_of(facts, book), facts.subject_player
+    if caption:
+        template = phrases.caption if player else phrases.caption_unnamed
+    else:
+        template = phrases.casual if player else phrases.casual_unnamed
+    return Sentence(template.format(team=team, player=player))
 
 
-def _casual(facts: FactsPayload, locale: Locale, variant: int) -> tuple[str, list[str]]:
+def lead_sentence(
+    facts: FactsPayload, story: StoryFacts, locale: Locale, *, caption: bool
+) -> Sentence:
+    """The one-line story: the event for goals and red cards, else the leading fact."""
+    sentence = _story_sentence(facts, story, locale, caption=caption)
+    return Sentence(capitalise(sentence.text), sentence.refs)
+
+
+def _story_sentence(
+    facts: FactsPayload, story: StoryFacts, locale: Locale, *, caption: bool
+) -> Sentence:
+    if facts.insight_kind is K.GOAL:
+        return _goal(facts, locale, caption=caption)
+    if facts.insight_kind is K.RED_CARD:
+        return _red_card(facts, locale, caption=caption)
+    if story.lead is not None:
+        return fact_sentence(story.lead, facts, locale, caption=caption)
     book = PHRASEBOOKS[locale]
-    lead = lead_of(facts, locale, variant)
-    ref = primary_metric(facts.insight_kind, list(facts.computed_metrics))
-    if ref is None:
-        return book.qualitative.format(lead=lead), []
-    value = format_number(facts.computed_metrics[ref], locale)
-    return book.with_value.format(lead=lead, value=value, label=labelled(ref, locale)), [ref]
+    plain = book.plain[facts.insight_kind][1 if caption else 0]
+    return Sentence(plain.format(subject=subject_of(facts, book)))
 
 
-def _analyst_tail(facts: FactsPayload, book: Phrasebook) -> list[str]:
-    tail = [f"{book.confidence_title}: {book.confidence_labels[facts.confidence_label]}."]
-    if facts.counter_evidence:
-        tail.append(book.counter_note)
-    if facts.data_coverage < 1:
-        tail.append(book.partial_coverage)
-    tail.append(book.limitation)
-    return tail
-
-
-def _analyst_budget(facts: FactsPayload) -> int:
-    """Worst case over locales and lead variants, so every locale cites the same metrics."""
-    fixed = max(
-        len(lead.format(subject=subject_of(facts, book)))
-        + len(" ".join(_analyst_tail(facts, book)))
-        + len(book.metrics_title)
-        for book in PHRASEBOOKS.values()
-        for lead in book.leads[facts.insight_kind]
+def index_sentence(facts: FactsPayload, refs: tuple[str, ...], locale: Locale) -> Sentence:
+    book = PHRASEBOOKS[locale]
+    label = capitalise(metric_label(refs[0], locale))
+    subject = facts.subject_team or book.generic_subject
+    values = [format_number(facts.computed_metrics[ref], locale) for ref in refs]
+    if len(refs) == 1:
+        return Sentence(
+            book.index_single.format(label=label, subject=subject, value=values[0]), refs
+        )
+    text = book.index_pair.format(
+        label=label, subject=subject, value=values[0], other=facts.opponent_team, before=values[1]
     )
-    return PERSONA_LIMITS[Persona.ANALYST].body_max - fixed - ANALYST_PUNCTUATION_SLACK
-
-
-def _analyst(facts: FactsPayload, locale: Locale, variant: int) -> tuple[str, list[str]]:
-    book = PHRASEBOOKS[locale]
-    refs = _fit_metrics(facts, _analyst_budget(facts))
-    parts = [f"{lead_of(facts, locale, variant)}."]
-    if refs:
-        items = [metric_item(ref, facts.computed_metrics[ref], locale) for ref in refs]
-        parts.append(f"{book.metrics_title}: {METRIC_SEPARATOR.join(items)}.")
-    return " ".join([*parts, *_analyst_tail(facts, book)]), refs
-
-
-def _broadcast(facts: FactsPayload, locale: Locale, variant: int) -> tuple[str, list[str]]:
-    refs = _fit_metrics(facts, PERSONA_LIMITS[Persona.BROADCAST].body_max - 1)
-    if not refs:
-        return PHRASEBOOKS[locale].shorts[facts.insight_kind] + ".", []
-    items = [metric_item(ref, facts.computed_metrics[ref], locale) for ref in refs]
-    body = METRIC_SEPARATOR.join(items)
-    return body[:1].upper() + body[1:], refs
-
-
-_BODIES: Final = {Persona.CASUAL: _casual, Persona.ANALYST: _analyst, Persona.BROADCAST: _broadcast}
-
-
-def render_text(
-    facts: FactsPayload, persona: Persona, locale: Locale, variant: int = 0
-) -> RenderedText:
-    body, refs = _BODIES[persona](facts, locale, variant)
-    cited = tuple((ref, facts.computed_metrics[ref]) for ref in refs)
-    return RenderedText(_headline(facts, persona, locale, variant), body, cited)
+    return Sentence(text, refs)

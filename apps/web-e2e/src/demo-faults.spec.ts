@@ -6,7 +6,7 @@ import {
 import { mockApi } from './support/mock-api';
 import { FIXTURE_ID } from './support/mock-fixture';
 
-test.describe('demo failure scenarios in the AI fact-checks (ADR-0020)', () => {
+test.describe('demo failure scenarios in the Fact-checks (ADR-0020)', () => {
   test('labels simulated failures and shows each recovery chain', async ({
     page,
   }, info) => {
@@ -25,11 +25,11 @@ test.describe('demo failure scenarios in the AI fact-checks (ADR-0020)', () => {
     await expect(chains.nth(0)).toContainText(
       'The fact checker caught it and the writer corrected it.',
     );
-    await expect(chains.nth(0)).toContainText('What went on air: AI wording');
+    await expect(chains.nth(0)).toContainText('What went on air: Auto-written');
     await expect(chains.nth(0)).not.toContainText('REVISE');
 
     await expect(chains.nth(1)).toContainText(
-      'Simulated failure (demo): AI timed out',
+      'Simulated failure (demo): Timed out',
     );
     await expect(chains.nth(1)).toContainText(
       'Standard wording went on air on time',
@@ -42,7 +42,7 @@ test.describe('demo failure scenarios in the AI fact-checks (ADR-0020)', () => {
     await expect(notes.nth(1)).toContainText('Circuit breaker open');
 
     await expect(page.getByTestId('fallback-note')).toContainText(
-      '1 moment used standard wording because the AI was slow or unavailable.',
+      '1 moment used standard wording because the writing service was slow or unavailable.',
     );
 
     // Traces without a fault plan carry no badge.

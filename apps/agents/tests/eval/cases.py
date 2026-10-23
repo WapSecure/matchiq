@@ -23,6 +23,19 @@ RICH = {
 }
 
 
+# The worker's real packet shape around a moment: both teams, current and previous window.
+REAL_WINDOWS = {
+    f"{family}.{side}.{window}": value
+    for family, value in (("shots", 2), ("shotsOnTarget", 1), ("pressures", 4),
+                          ("highRecoveries", 1), ("finalThirdEntries", 2))
+    for side in ("home", "away") for window in ("rolling5m", "previous5m")
+}  # fmt: skip
+REAL_MOMENTUM = {
+    "momentum.home.rolling5m": -0.19, "momentum.away.rolling5m": -1.21,
+    "momentum.home.previous5m": -1.06, "momentum.away.previous5m": -0.23,
+}  # fmt: skip
+
+
 def _case(name: str, *tags: str, **changes: object) -> EvalCase:
     return EvalCase(name=name, spec=replace(BASE, **changes), tags=tags)  # pyright: ignore[reportArgumentType]
 
@@ -85,6 +98,17 @@ GOLDEN: tuple[EvalCase, ...] = (
     _case("zero_coverage_sparse", "sparse", coverage=0.0, metrics={}),
     _case("single_event", event_ids=("ev_00500",)),
     # Shape of a real comeback packet: 28 metrics (two windows, both teams) and 38 names.
+    # Editorial regression shapes (MQ-060): the late winner, an away equaliser, a red card with
+    # the player named, and a momentum shift between two negative indices.
+    _case("goal_real_shape", "editorial", kind="GOAL", priority="P0", player_id=STAR,
+          confidence="high", metrics={**REAL_WINDOWS, **REAL_MOMENTUM, "goals.home": 3,
+                                      "goals.away": 2}),
+    _case("goal_equaliser_away", "editorial", kind="GOAL", priority="P0", team_id=AWAY,
+          metrics={**REAL_WINDOWS, "goals.home": 1, "goals.away": 1}),
+    _case("red_card_real_shape", "editorial", kind="RED_CARD", priority="P0", player_id=STAR,
+          metrics={**REAL_WINDOWS, "redCards.home": 1, "fouls.home": 9}),
+    _case("momentum_real_shape", "editorial", kind="MOMENTUM_SHIFT", confidence="high",
+          metrics={**REAL_WINDOWS, **REAL_MOMENTUM}),
     _case("real_packet_shape", "rich", kind="SHOT_BURST", team_id=AWAY, squad_players=36,
           coverage=0.83, confidence="high", counter_evidence=(),
           metrics={f"{family}.{side}.{window}": value

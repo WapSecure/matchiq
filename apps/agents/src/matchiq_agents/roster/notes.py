@@ -25,6 +25,15 @@ FIXES: Final[dict[str, str]] = {
     "TOO_LONG": "Shorten it to fit the limit",
     "TOO_MANY_SENTENCES": "Merge or drop sentences to meet the limit",
     "MISSING_PERSONA": "Return a draft for this persona",
+    "EVENT_NOT_LEAD": "Use `eventLine` as the headline",
+    "OFF_TOPIC_HEADLINE": "Name the subject team and the moment's event in the headline",
+    "SECONDARY_STAT": "Use `eventLine` as the headline; the only numbers are the score",
+    "WRONG_DIRECTION": "The subject is rising: say they are on top or pushing, never falling",
+    "MISSING_SCORELINE": "Give the score from goals.home and goals.away, as in 2\u20131",
+    "GOAL_TALLY": "Give the score from goals.home and goals.away, never a count of goals",
+    "MISSING_PLAYER": "Name the player from `subjectPlayer`",
+    "RAW_INDEX": "Describe momentum in words ('are on top'); write no index number",
+    "UNLABELLED_INDEX": "Write the value as 'a momentum index of' the number",
 }
 
 

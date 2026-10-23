@@ -6,7 +6,7 @@ import type {
 } from '@matchiq/contracts';
 import type { FixtureKey, LedgerTransaction } from './ports.js';
 
-/** A stored cue with the copy and slot a producer reviews (ADR-0022). */
+/** A stored cue with the copy and slot a producer reviews (ADR-0023). */
 export interface ReviewCueRow {
   readonly overlayId: string;
   readonly insightId: string | null;

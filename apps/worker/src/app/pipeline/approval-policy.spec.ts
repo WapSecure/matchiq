@@ -65,7 +65,7 @@ const manual = (
 const reviewOf = (batch: PipelineBatch) =>
   batch.drafts.filter((d) => d.type === 'overlay.review').map((d) => d.payload);
 
-describe('applyEditorialPolicy in MANUAL (ADR-0022)', () => {
+describe('applyEditorialPolicy in MANUAL (ADR-0023)', () => {
   it('holds a gated cue as AWAITING_APPROVAL and announces it without copy', () => {
     const batch = emptyBatch();
     publish(batch, cue());

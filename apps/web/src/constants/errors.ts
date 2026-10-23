@@ -141,7 +141,7 @@ export const REGION_NAMES = {
   matches: 'The list of matches',
   replays: 'Recent replays',
   recap: 'The recap',
-  checks: 'The AI fact-checks',
+  checks: 'The fact-checks',
   activity: 'The activity log',
 } as const;
 

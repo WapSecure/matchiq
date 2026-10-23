@@ -1,6 +1,6 @@
 # ADR-0016: Editorial control, kill switch, audit trail and the permission seam
 
-- Status: Accepted (2026-10-22). Implements the backend of MQ-017 (subset) and audit item P0-4. Refines spec §5, §26, §28, §40, §41, §44, §45, §48 and §50 (runbook 3). Builds on ADR-0002, ADR-0005, ADR-0010 and ADR-0013. Extended by ADR-0022: a session in MANUAL holds each gated cue for producer approval before air; AUTO keeps the behaviour described here.
+- Status: Accepted (2026-10-22). Implements the backend of MQ-017 (subset) and audit item P0-4. Refines spec §5, §26, §28, §40, §41, §44, §45, §48 and §50 (runbook 3). Builds on ADR-0002, ADR-0005, ADR-0010 and ADR-0013. Extended by ADR-0023: a session in MANUAL holds each gated cue for producer approval before air; AUTO keeps the behaviour described here.
 
 ## Context
 
@@ -54,3 +54,4 @@ Every editorial command takes the same fixture row lock as the worker's batch wr
 - New migration `0003_editorial_control_audit` (after `0002_session_retention`) adds `editorial_controls`, columns on `audit_events`, `insights` and `overlay_cues`, the indexes and the append-only trigger. It backfills `actor_type` (anonymous and `system:*` actors) and `fixture_id` for existing rows. Retention (ADR-0015) never deletes audit rows, so it is unaffected by the trigger. Like the earlier migrations it is forward-only, and a rollback is a restore.
 - `StreamMessage` gains `editorial.status`, and `overlay.retract` gains an optional `cause`. The studio store records the latest editorial status. The UI controls come in a later PR.
 - The shared key still grants every permission, so `403` is reachable only through the seam (a unit test covers it). Tenancy stays as described in ADR-0007.
+- Superseded in part by ADR-0018: the shared key no longer grants every permission by default. It is disabled unless `AUTH_OPERATOR_KEY_ENABLED=true`, and OIDC roles map to permissions. Tenancy is now enforced as described in ADR-0018, not ADR-0007.

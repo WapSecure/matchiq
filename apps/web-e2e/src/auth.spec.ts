@@ -87,7 +87,7 @@ test.describe('sign-in', () => {
 });
 
 test.describe('role-aware UI', () => {
-  test('a viewer sees an accessible 403 state on the AI fact-checks', async ({
+  test('a viewer sees an accessible 403 state on the Fact-checks', async ({
     page,
   }) => {
     await mockApi(page);
@@ -101,7 +101,7 @@ test.describe('role-aware UI', () => {
     await expectNoBlockingA11yViolations(page);
   });
 
-  test('a producer can open the AI fact-checks and replay controls', async ({
+  test('a producer can open the Fact-checks and replay controls', async ({
     page,
   }) => {
     await mockApi(page);
@@ -109,7 +109,7 @@ test.describe('role-aware UI', () => {
     await expect(
       page.getByRole('group', { name: 'Replay controls' }),
     ).toBeVisible();
-    await page.getByRole('link', { name: 'AI fact-checks' }).click();
+    await page.getByRole('link', { name: 'Fact-checks' }).click();
     await expect(page.getByTestId('access-denied')).toHaveCount(0);
   });
 

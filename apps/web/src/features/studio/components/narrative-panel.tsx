@@ -1,16 +1,18 @@
-import type { Insight } from '@matchiq/contracts';
+import type { Insight, Persona } from '@matchiq/contracts';
 import { HintBadge } from '@/components/ui';
 import { englishLanguageName } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { SITE } from '@/constants/site';
 import { cn } from '@/lib/cn';
 import { narrativeLanguage } from '@/lib/narrative-language';
+import { showSource } from '../lib/show-source';
 import type { NarrativeView } from '../store';
 
 type NarrativePanelProps = {
   insight: Insight;
   view: NarrativeView | null;
   locale: string;
+  persona: Persona;
   clamp?: boolean;
 };
 
@@ -19,6 +21,7 @@ export function NarrativePanel({
   insight,
   view,
   locale,
+  persona,
   clamp = false,
 }: NarrativePanelProps) {
   if (!view) {
@@ -51,14 +54,16 @@ export function NarrativePanel({
         lang={SITE.locale}
         className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-micro text-ink-subtle"
       >
-        <HintBadge
-          tone={narrative.source === 'AGENT' ? 'accent' : 'neutral'}
-          dot={narrative.source === 'AGENT'}
-          hint={STUDIO_COPY.insights.sourceHint[narrative.source]}
-          className="normal-case"
-        >
-          {STUDIO_COPY.insights.source[narrative.source]}
-        </HintBadge>
+        {showSource(narrative.source, persona) ? (
+          <HintBadge
+            tone={narrative.source === 'AGENT' ? 'accent' : 'neutral'}
+            dot={narrative.source === 'AGENT'}
+            hint={STUDIO_COPY.insights.sourceHint[narrative.source]}
+            className="normal-case"
+          >
+            {STUDIO_COPY.insights.source[narrative.source]}
+          </HintBadge>
+        ) : null}
         {localeFallback ? (
           <span className="text-warning" lang={SITE.locale}>
             {STUDIO_COPY.insights.localeFallback(englishLanguageName(locale))}

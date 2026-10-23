@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/agents/src",
   "tags": ["scope:agents", "type:app"],
-  "implicitDependencies": ["contracts"],
+  "implicitDependencies": ["contracts", "narrative-guard"],
   "targets": {
     "install": {
       "command": "uv sync --frozen",
@@ -19,9 +19,13 @@
         {
           "projects": ["contracts"],
           "target": "export-json-schema"
+        },
+        {
+          "projects": ["narrative-guard"],
+          "target": "export-lexicon"
         }
       ],
-      "command": "rm -rf src/matchiq_agents/contracts/generated && uv run --frozen datamodel-codegen",
+      "command": "rm -rf src/matchiq_agents/contracts/generated && uv run --frozen datamodel-codegen && cp ../../libs/narrative-guard/generated/narrative-lexicon.json src/matchiq_agents/contracts/generated/narrative_lexicon.json",
       "options": {
         "cwd": "{projectRoot}"
       },
@@ -66,7 +70,8 @@
       "inputs": [
         "{projectRoot}/**/*.py",
         "{projectRoot}/pyproject.toml",
-        "{workspaceRoot}/libs/contracts/samples/**/*"
+        "{workspaceRoot}/libs/contracts/samples/**/*",
+        "{workspaceRoot}/libs/narrative-guard/generated/**/*"
       ],
       "cache": true,
       "dependsOn": ["codegen"]

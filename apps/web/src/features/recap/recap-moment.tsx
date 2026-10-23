@@ -10,6 +10,7 @@ import {
 import { RECAP_COPY } from '@/constants/recap';
 import { SITE } from '@/constants/site';
 import { STUDIO_COPY } from '@/constants/studio';
+import { showSource } from '@/features/studio/lib/show-source';
 import type { RosterTeam } from '@/features/studio/lib/roster';
 import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
@@ -48,10 +49,12 @@ function Meta({
   moment,
   picked,
   locale,
+  persona,
 }: {
   moment: Moment;
   picked: Picked;
   locale: Locale;
+  persona: Persona;
 }) {
   const ai = picked?.narrative.source === 'AGENT';
   const notice = recapTranslationNotice(picked, locale);
@@ -61,7 +64,7 @@ function Meta({
         lang={SITE.locale}
         className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-micro text-ink-subtle"
       >
-        {picked ? (
+        {picked && showSource(picked.narrative.source, persona) ? (
           <span
             className={cn(
               'inline-flex items-center gap-1 font-medium',
@@ -139,7 +142,12 @@ export function RecapMomentItem({
             {RECAP_COPY.noNarrative}
           </p>
         )}
-        <Meta moment={moment} picked={picked} locale={locale} />
+        <Meta
+          moment={moment}
+          picked={picked}
+          locale={locale}
+          persona={persona}
+        />
         <RecapMomentTechnical moment={moment} />
       </article>
     </li>

@@ -1,6 +1,6 @@
 import type { PublishPolicy } from '@matchiq/contracts';
 
-/** Producer approve-before-air copy (ADR-0022), in plain producer language. */
+/** Producer approve-before-air copy (ADR-0023), in plain producer language. */
 export const APPROVAL_COPY = {
   title: 'Waiting for your OK',
   description:

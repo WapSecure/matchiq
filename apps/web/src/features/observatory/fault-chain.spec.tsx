@@ -31,11 +31,11 @@ describe('FaultChain', () => {
     ];
     render(<FaultChain runs={runs} publication="TEMPLATE" />);
     expect(
-      screen.getByText('Simulated failure (demo): AI timed out'),
+      screen.getByText('Simulated failure (demo): Timed out'),
     ).toBeInTheDocument();
     const chain = screen.getByTestId('fault-chain');
     expect(chain).toHaveTextContent(
-      'We deliberately made the AI time out to show what happens when it is slow.',
+      'We deliberately made the writer time out to show what happens when it is slow.',
     );
     expect(chain).toHaveTextContent('Standard wording went on air on time');
     expect(chain).toHaveTextContent('What went on air: Standard wording');
@@ -66,7 +66,7 @@ describe('FaultChain', () => {
     expect(steps[1]).toHaveTextContent('Circuit breaker open');
   });
 
-  it('tells the writer-revise story with the corrected AI wording on air', () => {
+  it('tells the writer-revise story with the corrected wording on air', () => {
     render(
       <FaultChain
         runs={[run({ faultInjected: 'WRITER_REVISE', faultNote: 'x' })]}
@@ -74,7 +74,7 @@ describe('FaultChain', () => {
       />,
     );
     expect(screen.getByTestId('fault-chain')).toHaveTextContent(
-      "We deliberately planted a wrong number in the AI's draft to show the safety net. The fact checker caught it and the writer corrected it.",
+      'We deliberately planted a wrong number in the draft to show the safety net. The fact checker caught it and the writer corrected it.',
     );
   });
 });

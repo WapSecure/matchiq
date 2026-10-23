@@ -46,7 +46,7 @@ function Body({
 }
 
 /**
- * Producer approval queue (spec §31.4, ADR-0022). Hidden from roles that
+ * Producer approval queue (spec §31.4, ADR-0023). Hidden from roles that
  * cannot approve; the API enforces the same permission.
  */
 export function ApprovalQueue() {

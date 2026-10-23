@@ -43,7 +43,7 @@ interface ReviewTarget {
 const TARGET_STATE = { APPROVE: 'APPROVED', REJECT: 'REJECTED' } as const;
 
 /**
- * Approve-before-air (spec §29, §45; ADR-0022). Each review takes the fixture
+ * Approve-before-air (spec §29, §45; ADR-0023). Each review takes the fixture
  * row lock the worker's batch write takes, so a cue whose slot closes is
  * either expired by the worker first or aired by the approval first, never both.
  */

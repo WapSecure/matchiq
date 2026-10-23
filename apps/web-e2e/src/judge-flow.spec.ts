@@ -68,7 +68,7 @@ test.describe('judge quick-start', () => {
     ).toBeVisible();
     await checkScreen(page);
 
-    await page.getByRole('link', { name: 'AI fact-checks' }).click();
+    await page.getByRole('link', { name: 'Fact-checks' }).click();
     const traces = page.getByRole('list', {
       name: 'Key moments and their checks',
     });

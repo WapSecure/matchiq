@@ -38,7 +38,7 @@ export interface EditorialControlWrite {
 export interface EditorialControls {
   readonly freeze: EditorialControlRow | null;
   readonly killSwitch: EditorialControlRow | null;
-  /** Active means the session publishes in MANUAL (ADR-0022). */
+  /** Active means the session publishes in MANUAL (ADR-0023). */
   readonly approval: EditorialControlRow | null;
 }
 

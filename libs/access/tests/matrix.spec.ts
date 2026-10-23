@@ -46,7 +46,7 @@ describe('role → permission matrix (spec §40)', () => {
     expect(rolesGranting('editorial:publish')).toEqual(['producer']);
   });
 
-  it('lets producers and tenant owners set a session publish policy (ADR-0022)', () => {
+  it('lets producers and tenant owners set a session publish policy (ADR-0023)', () => {
     expect(rolesGranting('policy:configure')).toEqual([
       'tenant-owner',
       'producer',

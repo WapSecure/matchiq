@@ -31,7 +31,7 @@ jest.setTimeout(30_000);
 const ORG_B = 'org_northbank';
 const PROBLEM = 'urn:matchiq:problem:';
 
-describe('Producer approve-before-air (integration, ADR-0022)', () => {
+describe('Producer approve-before-air (integration, ADR-0023)', () => {
   let t: TestApp;
   let fixtureId: string;
 
@@ -56,10 +56,10 @@ describe('Producer approve-before-air (integration, ADR-0022)', () => {
   const review = (
     insightId: string,
     body: Record<string, unknown>,
-    headers = AUTH_HEADER,
+    headers: Record<string, string> = AUTH_HEADER,
   ) => postJson(`${t.baseUrl}/insights/${insightId}/review`, body, headers);
 
-  const setPolicy = (policy: string, headers = AUTH_HEADER) =>
+  const setPolicy = (policy: string, headers: Record<string, string> = AUTH_HEADER) =>
     postJson(
       `${t.baseUrl}/fixtures/${fixtureId}/editorial/publish-policy`,
       { policy, reason: reason.reason },

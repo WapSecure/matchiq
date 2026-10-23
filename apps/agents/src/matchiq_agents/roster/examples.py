@@ -153,5 +153,51 @@ PRODUCER_EXAMPLE: Final = {
 }
 
 
+# One correct headline and body per moment type (MQ-060). Each lists the metrics it uses; the
+# score after a goal is cited from both `goals` metrics. `tests/test_prompts.py` runs each one
+# through the checks and the editorial rules for a matching moment. Ivo Marren is fictional.
+EXAMPLE_PLAYER: Final = "Ivo Marren"
+MOMENT_EXAMPLES: Final = [
+    {
+        "insightKind": "GOAL",
+        "computedMetrics": {"goals.home": 2, "goals.away": 1},
+        "eventLine": "GOAL \u2014 Kestrel Vale lead 2\u20131",
+        "headline": "GOAL \u2014 Kestrel Vale lead 2\u20131",
+        "body": "Ivo Marren scores for Kestrel Vale, and they lead 2\u20131.",
+    },
+    {
+        "insightKind": "RED_CARD",
+        "computedMetrics": {"redCards.home": 1},
+        "eventLine": "Red card for Kestrel Vale",
+        "headline": "Red card for Kestrel Vale",
+        "body": "Ivo Marren is sent off for Kestrel Vale.",
+    },
+    {
+        "insightKind": "MOMENTUM_SHIFT",
+        "computedMetrics": {"momentum.home.rolling5m": 0.62},
+        "headline": "Momentum swings to Kestrel Vale",
+        "body": "Kestrel Vale are on top.",
+    },
+    {
+        "insightKind": "PRESSURE_SWING",
+        "computedMetrics": {"pressures.home.rolling5m": 14, "pressures.home.previous5m": 6},
+        "headline": "Kestrel Vale turn up the pressure",
+        "body": "Kestrel Vale have 14 pressures recently, up from 6 in the previous spell.",
+    },
+    {
+        "insightKind": "SHOT_BURST",
+        "computedMetrics": {"shots.home.rolling5m": 6},
+        "headline": "Kestrel Vale pile on the shots",
+        "body": "6 shots for Kestrel Vale recently.",
+    },
+    {
+        "insightKind": "HIGH_REGAINS",
+        "computedMetrics": {"highRecoveries.home.rolling5m": 5},
+        "headline": "Kestrel Vale press high",
+        "body": "5 high recoveries for Kestrel Vale recently.",
+    },
+]
+
+
 def compact(example: object) -> str:
     return json.dumps(example, ensure_ascii=False, separators=(",", ":"))

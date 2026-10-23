@@ -73,6 +73,10 @@ export const RecapDocument = z.strictObject({
 export const GateIssueCode = z.enum([
   ...VerificationIssueCode.options,
   'UNREQUESTED_VARIANT',
+  'INJECTION_ECHO',
+  'UNSUPPORTED_CAUSALITY',
+  'REPETITION',
+  'UNSAFE_TONE',
 ]);
 
 export const GateRejection = z.strictObject({
@@ -97,7 +101,7 @@ export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 
 /**
  * RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its
- * insight was suppressed. The rest are the MANUAL review states (ADR-0022);
+ * insight was suppressed. The rest are the MANUAL review states (ADR-0023);
  * only APPROVED and RETRACTED cues ever aired.
  */
 export const OverlayEditorialState = z.enum([

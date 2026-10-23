@@ -22,7 +22,7 @@ import {
 import { TABLES } from '../constants.js';
 import { createdAt, fixtureId, orgId, sha256, utc } from './columns.js';
 
-/** ADR-0007: every business table carries org_id; isolation is not enforced. */
+/** ADR-0007: every business table carries org_id; isolation is enforced by Postgres RLS (ADR-0018). */
 export const fixtures = pgTable(
   TABLES.fixtures,
   {
