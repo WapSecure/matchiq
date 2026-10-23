@@ -6,7 +6,7 @@ import { ChevronLeftIcon, LogoMark } from '@/components/icons';
 import { UserMenu } from '@/components/auth/user-menu';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { MatchCodeChip } from '@/components/match/match-code-chip';
-import { Badge } from '@/components/ui';
+import { Badge, HintBadge } from '@/components/ui';
 import { MATCH_CODE_COPY } from '@/constants/match-code';
 import {
   ROUTES,
@@ -14,6 +14,7 @@ import {
   STUDIO_TABS_LABEL,
   type StudioView,
 } from '@/constants/navigation';
+import { SYNTHETIC_DISCLOSURE } from '@/constants/site';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 
@@ -98,17 +99,36 @@ export function StudioHeader({
           {competition ? (
             <p className="hidden truncate text-micro text-ink-subtle sm:block">
               {competition}
-              {replay ? ` · ${MATCH_CODE_COPY.replay(replay)}` : ''}
+              {replay ? (
+                <span className="lg:hidden">
+                  {` · ${MATCH_CODE_COPY.replay(replay)}`}
+                </span>
+              ) : null}
             </p>
           ) : null}
         </div>
         {matchCode ? (
-          <MatchCodeChip code={matchCode} compact className="hidden lg:flex" />
+          <div className="hidden items-center gap-1.5 lg:flex">
+            <MatchCodeChip code={matchCode} compact />
+            {replay ? <Badge>{MATCH_CODE_COPY.replay(replay)}</Badge> : null}
+          </div>
         ) : null}
-        <Badge tone="synthetic" dot data-watermark="">
-          {WATERMARK}
-        </Badge>
-        {status}
+        <span
+          aria-hidden
+          className="hidden h-5 w-px shrink-0 bg-line lg:block"
+        />
+        <div className="flex shrink-0 items-center gap-1.5">
+          {/* The one page-level disclosure; the preview carries its own on-air burn-in. */}
+          <HintBadge
+            tone="synthetic"
+            dot
+            hint={SYNTHETIC_DISCLOSURE.text}
+            data-watermark=""
+          >
+            {WATERMARK}
+          </HintBadge>
+          {status}
+        </div>
         <ThemeToggle />
         <UserMenu />
       </div>

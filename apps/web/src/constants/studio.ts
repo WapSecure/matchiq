@@ -62,7 +62,7 @@ export const STUDIO_COPY = {
     persona: 'Audience',
     locale: 'Language',
     invariant:
-      'Language changes the commentary only; the controls stay in English. Audience changes the style. Every number comes from the match data and stays the same.',
+      'Changes the wording of key moments and graphics. The numbers never change.',
   },
   connectionPrefix: 'Connection: ',
   notFound: "We couldn't find this match",

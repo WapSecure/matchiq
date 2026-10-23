@@ -13,7 +13,8 @@ import { useEditorialCommand } from './use-editorial-command';
 
 /**
  * Organisation-wide: activation takes every live cue off air in every active
- * session, so it asks for a reason and then a typed confirmation.
+ * session, so it asks for a reason and then a typed confirmation. Calm when
+ * idle: only the icon carries the danger colour; the dialog carries the weight.
  */
 export function KillSwitchControl() {
   const active = useMatchStore((s) => s.editorial?.killSwitch.active ?? false);
@@ -27,9 +28,8 @@ export function KillSwitchControl() {
     <>
       <GatedButton
         permission="editorial:publish"
-        variant={active ? 'secondary' : 'danger'}
         aria-haspopup="dialog"
-        leadingIcon={<PowerIcon size={14} />}
+        leadingIcon={<PowerIcon size={14} className="text-critical" />}
         onClick={command.start}
       >
         {active ? RELEASE_COPY.action : KILL_COPY.action}

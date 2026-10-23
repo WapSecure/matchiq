@@ -217,6 +217,67 @@
   @apply text-micro font-medium uppercase text-ink-subtle;
 }
 
+/* Range with a transparent track and a 16px thumb, drawn over a custom track (studio scrubber). */
+@utility scrub-input {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 1.75rem;
+  &::-webkit-slider-runnable-track {
+    height: 6px;
+    background: transparent;
+  }
+  &::-moz-range-track {
+    height: 6px;
+    background: transparent;
+  }
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+    border-radius: 9999px;
+    border: 2px solid var(--mq-accent);
+    background: var(--mq-surface);
+    box-shadow:
+      0 0 0 3px color-mix(in oklab, var(--mq-accent) 18%, transparent),
+      var(--mq-shadow-panel);
+    transition: transform 150ms ease-out;
+  }
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    border: 2px solid var(--mq-accent);
+    background: var(--mq-surface);
+  }
+  &:hover::-webkit-slider-thumb,
+  &:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+  &:focus-visible {
+    outline: none;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--mq-accent);
+    outline-offset: 2px;
+  }
+  &:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--mq-accent);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+  }
+  &:disabled::-webkit-slider-thumb {
+    border-color: var(--mq-line-strong);
+    box-shadow: none;
+  }
+  @media (pointer: coarse) {
+    height: 2.75rem;
+  }
+}
+
 /* Native range input with house track and thumb; `--range-fill` is the filled share. */
 @utility range-input {
   appearance: none;

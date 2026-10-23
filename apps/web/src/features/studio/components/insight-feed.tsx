@@ -10,6 +10,7 @@ import { STUDIO_COPY } from '@/constants/studio';
 import { useInsightMarks } from '../editorial/use-insight-marks';
 import type { Roster } from '../lib/roster';
 import { selectNarrative, useMatchStore, useStudioUi } from '../store';
+import { AudienceBar } from './audience-controls';
 import { KeyMomentCard } from './key-moment-card';
 
 export function InsightFeed({
@@ -39,6 +40,7 @@ export function InsightFeed({
       bodyClassName="p-0"
       scrollable
     >
+      <AudienceBar variant="toolbar" className="sticky top-0 z-10" />
       {insights.length === 0 ? (
         <EmptyState compact title={STUDIO_COPY.insights.empty} />
       ) : (

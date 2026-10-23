@@ -47,7 +47,6 @@ export const OVERLAY_COPY = {
   held: 'Kept on screen',
   heldHint: (seconds: number) =>
     `Its moment has passed, but it stays on screen for at least ${seconds} s so viewers can read it.`,
-  priority: (p: number) => `Priority ${p}`,
   source: { AGENT: 'AI wording', TEMPLATE: 'Standard wording' },
   sourceHint:
     'Each graphic goes out first with standard wording, then switches to AI wording once that passes the fact check.',
@@ -56,10 +55,16 @@ export const OVERLAY_COPY = {
   lastAired: (headline: string) => `Last on air: ${headline}`,
   onAir: 'On air',
   standbyTally: 'Off air',
-  programNote: 'The preview always uses broadcast colours',
+  programNote: 'Always dark, like the on-air picture',
   programNoteHint:
-    'It stands in for the on-air picture, so it stays dark in light mode too.',
+    'The preview stands in for the broadcast picture, so it keeps broadcast colours in the light and dark themes.',
+  nothingOnAir: 'Nothing on air',
+  hold: {
+    FROZEN: { label: 'Paused by producer', note: 'New graphics are held' },
+    KILLED: { label: 'Emergency stop', note: 'All graphics are held' },
+  },
   holdLegend: 'Minimum time on screen',
+  holdShort: 'On screen for at least',
   holdOptions: [
     {
       value: 'standard',
