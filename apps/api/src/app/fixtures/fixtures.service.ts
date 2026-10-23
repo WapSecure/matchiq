@@ -13,6 +13,7 @@ import { actorDetails } from '../auth/audit-trail.service';
 import { AUDIT_TARGETS, IDEMPOTENCY_SCOPES } from '../constants';
 import type { CallerContext } from '../http/caller-context';
 import { type IdempotentResult, withIdempotency } from '../http/idempotency';
+import { readPage } from '../http/cursor-page';
 import { problem } from '../http/problems';
 import {
   EVENT_READER,
@@ -82,8 +83,8 @@ export class FixturesService {
     return fixture;
   }
 
-  async list(orgId: string, { limit }: FixtureListQuery): Promise<FixtureList> {
-    return { items: await this.fixtures.list(orgId, limit) };
+  list(orgId: string, query: FixtureListQuery): Promise<FixtureList> {
+    return readPage(() => this.fixtures.page(orgId, query));
   }
 
   async listEvents(key: FixtureKey, query: EventPageQuery): Promise<EventPage> {

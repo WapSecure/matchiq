@@ -2,7 +2,8 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { Principal } from '@matchiq/access';
 import type { ApiEnv } from '@matchiq/config';
 import {
-  type ItemList,
+  type CursorPage,
+  type CursorPageQuery,
   ReplayStatus,
   type FaultPlan,
   type ReplayCommand,
@@ -25,6 +26,7 @@ import {
   IDEMPOTENCY_SCOPES,
   REPLAY_CAPACITY,
 } from '../constants';
+import { readPage } from '../http/cursor-page';
 import type { IdempotencyScope, IdempotentResult } from '../http/idempotency';
 import { IdempotencyService } from '../http/idempotency.service';
 import { problem } from '../http/problems';
@@ -74,17 +76,18 @@ export class ReplayService {
     private readonly idempotency: IdempotencyService,
   ) {}
 
-  async listTemplates(
+  listTemplates(
     orgId: string,
-  ): Promise<ItemList<FixtureTemplateSummary>> {
-    return { items: await this.stores.templates.list(orgId) };
+    query: CursorPageQuery,
+  ): Promise<CursorPage<FixtureTemplateSummary>> {
+    return readPage(() => this.stores.templates.page(orgId, query));
   }
 
-  async listSessions(
+  listSessions(
     orgId: string,
-    limit: number,
-  ): Promise<ItemList<ReplaySessionView>> {
-    return { items: await this.stores.sessions.list(orgId, limit) };
+    query: CursorPageQuery,
+  ): Promise<CursorPage<ReplaySessionView>> {
+    return readPage(() => this.stores.sessions.page(orgId, query));
   }
 
   createSession(

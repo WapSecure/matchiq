@@ -54,6 +54,7 @@ export const LIMITS = {
   auditPageDefault: 50,
   auditPageMax: 200,
   auditCursorMax: 512,
+  pageCursorMax: 512,
   auditIdentifierMax: 128,
   faultEveryNthMax: 50,
   faultNoteMax: 300,

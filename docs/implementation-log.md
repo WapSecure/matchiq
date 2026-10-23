@@ -13,6 +13,20 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - Download is one "Download match report" menu with two choices: a readable match report (.txt) and a data file (.json). Both are named with the match code from MQ-051.
 - Evidence: `fact-checks.spec.tsx` (grouping, share, filters, report) and updated `recap-observatory.spec.tsx`. The e2e specs `judge-flow` (download menu) and `demo-faults` (grouped note) are updated, and the minute-strip markers are 24 px targets on wider screens and a picture only on phones (axe target-size). Screenshots before and after, in light and dark at 1440 and 390 px, are in `docs/screenshots/factchecks-recap/`.
 
+## 2026-10-23 — MQ-053 (1/2): Keyset pagination for the lobby and fixture lists
+
+| Area                                                                                                                                                                                                                                                                  | Status | Evidence                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------- |
+| `CursorPage` envelope (`{ items, nextCursor, total? }`) and `CursorPageQuery` (`cursor`, `limit`) in `libs/contracts`; `FixtureList`, `FixtureTemplateList` and `ReplaySessionList` now use it. `items` stays at the top level, so `{ items }` clients keep working   | Done   | `libs/contracts/src/lib/paging.ts`                  |
+| `cursor` + `limit` on `GET /replay-sessions` (newest first, 20 / 100, `total`), `GET /fixture-templates` (by id, 100 / 100 so the old unpaged call still gets everything, `total`) and `GET /fixtures` (kickoff order, 50 / 100)                                      | Done   | `lobby-paging.integration.spec.ts`                  |
+| Base64url keyset cursors tagged with their list (`libs/db` `keyset-cursor.ts`), the same approach as audit; a tampered or foreign cursor is `400 invalid-cursor` through one `readPage` helper, which the audit controller now shares. Reads stay tenant-scoped (RLS) | Done   | `keyset-cursor.spec.ts`, integration spec           |
+| Tests: order stability under a concurrent insert, last page, totals, cross-tenant isolation (including a replayed cursor), five bad-cursor shapes, limit bounds                                                                                                       | Done   | 11 integration tests green locally against Postgres |
+| OpenAPI registry entries, `docs/api/openapi.json` and `libs/api-client` regenerated; Spectral clean; README pagination table                                                                                                                                          | Done   | `docs/api/README.md`                                |
+
+No Python contracts changed (the lobby schemas are not exported to the agents service), so `agents:codegen` is not affected.
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for `contracts`, `db`, `api`, `api-client` and `worker`, plus the touched API integration specs.
+
 ## 2026-10-23 — MQ-050 (1/2): Date pickers and calendars redesigned
 
 - **Closed state:** `DatePicker`, `DateTimePicker` and `DateRangePicker` are button-style triggers with a calendar icon well and a readable summary ("Sat, 24 Oct 2026", "Sat 24 Oct, 15:00", "Today, 14:00–15:30", "Last hour", "Any time"), plus a × clear button. No segment masks or seconds are shown; `granularity="second"` now picks to the minute.

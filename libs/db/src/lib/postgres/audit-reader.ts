@@ -8,6 +8,7 @@ import {
 import { and, desc, eq, gte, lte, sql, type SQL } from 'drizzle-orm';
 import { AUDIT_CURSOR } from '../constants.js';
 import type { Database } from '../client.js';
+import { InvalidCursorError } from './keyset-cursor.js';
 import type {
   AuditPage,
   AuditReader,
@@ -28,7 +29,7 @@ interface Cursor {
   readonly id: string;
 }
 
-export class InvalidAuditCursorError extends Error {}
+export class InvalidAuditCursorError extends InvalidCursorError {}
 
 export const encodeAuditCursor = (cursor: Cursor): string =>
   Buffer.from(JSON.stringify([cursor.at, cursor.id])).toString(

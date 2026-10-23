@@ -12,8 +12,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List fixtures, newest first (bounded by `limit`, no cursor)
-         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * List fixtures in kickoff order
+         * @description Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.
+         *
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listFixtures"];
         put?: never;
@@ -207,7 +209,9 @@ export interface paths {
         };
         /**
          * List replayable fixture templates (the lobby)
-         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * @description By template id. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.
+         *
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listFixtureTemplates"];
         put?: never;
@@ -227,7 +231,9 @@ export interface paths {
         };
         /**
          * List recent replay sessions to join
-         * @description Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * @description Newest first. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.
+         *
+         *     Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listReplaySessions"];
         put?: never;
@@ -1503,6 +1509,8 @@ export interface components {
         };
         FixtureList: {
             items: components["schemas"]["Fixture"][];
+            nextCursor: string | null;
+            total?: number;
         };
         EventPage: {
             items: components["schemas"]["MatchEvent"][];
@@ -1517,9 +1525,13 @@ export interface components {
         };
         FixtureTemplateList: {
             items: components["schemas"]["FixtureTemplateSummary"][];
+            nextCursor: string | null;
+            total?: number;
         };
         ReplaySessionList: {
             items: components["schemas"]["ReplaySessionView"][];
+            nextCursor: string | null;
+            total?: number;
         };
         CreatedSession: {
             fixture: components["schemas"]["Fixture"];
@@ -1748,6 +1760,7 @@ export interface operations {
     listFixtures: {
         parameters: {
             query?: {
+                cursor?: string;
                 limit?: number;
             };
             header?: {
@@ -1759,7 +1772,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Fixtures */
+            /** @description One page of fixtures */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -1767,6 +1780,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FixtureList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
@@ -2707,7 +2730,10 @@ export interface operations {
     };
     listFixtureTemplates: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
@@ -2717,7 +2743,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Templates */
+            /** @description One page of templates, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2725,6 +2751,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FixtureTemplateList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
@@ -2739,6 +2775,16 @@ export interface operations {
             };
             /** @description `forbidden`: You do not have permission for this action */
             403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -2784,6 +2830,7 @@ export interface operations {
     listReplaySessions: {
         parameters: {
             query?: {
+                cursor?: string;
                 limit?: number;
             };
             header?: {
@@ -2795,7 +2842,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Sessions, most recent first */
+            /** @description One page of sessions, newest first, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -2803,6 +2850,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReplaySessionList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
