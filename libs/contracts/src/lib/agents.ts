@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LIMITS, PATTERNS } from './constants.js';
+import { FaultScenario } from './faults.js';
 import { Insight } from './insight.js';
 import {
   ConfidenceLabel,
@@ -132,6 +133,10 @@ export const AgentRun = z.strictObject({
     )
     .max(LIMITS.maxRepairsPerRun)
     .optional(),
+  /** Set only on runs of a non-production demo fault plan (ADR-0017); never real inference. */
+  faultInjected: FaultScenario.optional(),
+  /** What the simulated fault did, or the Fact Checker notes the revision answered. */
+  faultNote: z.string().min(1).max(LIMITS.faultNoteMax).optional(),
 });
 
 export type AgentName = z.infer<typeof AgentName>;

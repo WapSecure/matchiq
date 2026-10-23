@@ -3140,6 +3140,9 @@
                         "const": 30
                       }
                     ]
+                  },
+                  "faultPlan": {
+                    "$ref": "#/components/schemas/FaultPlan"
                   }
                 },
                 "required": [
@@ -3235,9 +3238,10 @@
             }
           },
           "403": {
-            "description": "`forbidden`: You do not have permission for this action",
+            "description": "`forbidden`: You do not have permission for this action; `demo-faults-disabled`: Demo fault scenarios are disabled here",
             "x-problem-types": [
-              "urn:matchiq:problem:forbidden"
+              "urn:matchiq:problem:forbidden",
+              "urn:matchiq:problem:demo-faults-disabled"
             ],
             "headers": {
               "X-Request-ID": {
@@ -3255,6 +3259,14 @@
                     "value": {
                       "type": "urn:matchiq:problem:forbidden",
                       "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  },
+                  "demo-faults-disabled": {
+                    "summary": "Demo fault scenarios are disabled here",
+                    "value": {
+                      "type": "urn:matchiq:problem:demo-faults-disabled",
+                      "title": "Demo fault scenarios are disabled here",
                       "status": 403
                     }
                   }
@@ -9121,6 +9133,47 @@
         ],
         "additionalProperties": false
       },
+      "FaultPlan": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/FaultScenario"
+          },
+          "insightKinds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "GOAL",
+                "RED_CARD",
+                "SHOT_BURST",
+                "HIGH_REGAINS",
+                "PRESSURE_SWING",
+                "MOMENTUM_SHIFT",
+                "PLAYER_MILESTONE"
+              ]
+            }
+          },
+          "everyNth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "required": [
+          "scenario"
+        ],
+        "additionalProperties": false
+      },
+      "FaultScenario": {
+        "type": "string",
+        "enum": [
+          "WRITER_REVISE",
+          "MODEL_TIMEOUT",
+          "GATE_REJECT"
+        ]
+      },
       "TeamMatchMetrics": {
         "type": "object",
         "properties": {
@@ -11650,6 +11703,14 @@
               ],
               "additionalProperties": false
             }
+          },
+          "faultInjected": {
+            "$ref": "#/components/schemas/FaultScenario"
+          },
+          "faultNote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
           }
         },
         "required": [
@@ -12036,6 +12097,9 @@
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "faultPlan": {
+            "$ref": "#/components/schemas/FaultPlan"
           }
         },
         "required": [

@@ -4,6 +4,7 @@ import type { ApiEnv } from '@matchiq/config';
 import {
   type ItemList,
   ReplayStatus,
+  type FaultPlan,
   type ReplayCommand,
   type ReplaySpeed,
 } from '@matchiq/contracts';
@@ -87,19 +88,31 @@ export class ReplayService {
   }
 
   createSession(
-    request: ReplayRequest & { templateId: string; speed: ReplaySpeed },
+    request: ReplayRequest & {
+      templateId: string;
+      speed: ReplaySpeed;
+      faultPlan?: FaultPlan;
+    },
   ): Promise<IdempotentResult<CreatedSession>> {
-    const { templateId, speed } = request;
+    const { templateId, speed, faultPlan } = request;
+    // Simulated failures exist only where the operator enabled them (ADR-0017).
+    if (faultPlan !== undefined && !this.env.DEMO_FAULTS_ENABLED)
+      return Promise.reject(problem('demoFaultsDisabled'));
     return this.idempotent(
       request,
       {
         scope: IDEMPOTENCY_SCOPES.createSession,
-        request: { templateId, speed },
+        request: { templateId, speed, ...(faultPlan && { faultPlan }) },
         parse: (body) => CreatedSessionResponse.parse(body),
       },
       async () => ({
         status: HttpStatus.CREATED,
-        body: await this.create(request.principal, templateId, speed),
+        body: await this.create(
+          request.principal,
+          templateId,
+          speed,
+          faultPlan,
+        ),
       }),
     );
   }
@@ -147,6 +160,7 @@ export class ReplayService {
     principal: Principal,
     templateId: string,
     speed: ReplaySpeed,
+    faultPlan?: FaultPlan,
   ): Promise<CreatedSession> {
     let created: CreatedSession | null;
     try {
@@ -159,6 +173,7 @@ export class ReplayService {
         },
         templateId,
         speed,
+        ...(faultPlan === undefined ? {} : { faultPlan }),
         capacity: {
           max: this.env.REPLAY_MAX_ACTIVE_SESSIONS,
           idleMs: this.env.REPLAY_IDLE_TIMEOUT_MS,

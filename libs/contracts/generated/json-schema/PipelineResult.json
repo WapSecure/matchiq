@@ -337,6 +337,14 @@
                   ],
                   "additionalProperties": false
                 }
+              },
+              "faultInjected": {
+                "$ref": "#/$defs/FaultScenario"
+              },
+              "faultNote": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
               }
             },
             "required": [
@@ -512,6 +520,14 @@
         "metricRefs"
       ],
       "additionalProperties": false
+    },
+    "FaultScenario": {
+      "type": "string",
+      "enum": [
+        "WRITER_REVISE",
+        "MODEL_TIMEOUT",
+        "GATE_REJECT"
+      ]
     }
   }
 }

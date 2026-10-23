@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReplaySpeed } from '@matchiq/contracts';
+import type { FaultPlanInput, ReplaySpeed } from '@matchiq/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
@@ -21,10 +21,10 @@ export const useStartSession = () => {
   const { mutate } = mutation;
 
   const start = useCallback(
-    (templateId: string, speed: ReplaySpeed) => {
+    (templateId: string, speed: ReplaySpeed, faultPlan?: FaultPlanInput) => {
       setSpeed(speed);
       mutate(
-        { templateId, speed },
+        { templateId, speed, ...(faultPlan && { faultPlan }) },
         {
           onSuccess: ({ fixture, session }) => {
             queryClient.setQueryData(

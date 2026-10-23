@@ -9,7 +9,7 @@ from matchiq_agents.constants import SERVICE_NAME
 from matchiq_agents.models.port import ModelPort
 from matchiq_agents.settings import Settings
 from matchiq_agents.telemetry import RequestContextMiddleware, TelemetrySettings, configure_tracing
-from matchiq_agents.wiring import build_orchestrator
+from matchiq_agents.wiring import build_service
 
 
 def create_app(
@@ -22,7 +22,7 @@ def create_app(
     resolved = settings or Settings()  # pyright: ignore[reportCallIssue]
     app = FastAPI(title=SERVICE_NAME, version=resolved.app_version, docs_url=None, redoc_url=None)
     app.state.settings = resolved
-    app.state.orchestrator = build_orchestrator(resolved, clock or SystemClock(), model)
+    app.state.orchestrator = build_service(resolved, clock or SystemClock(), model)
     install_problem_handlers(app)
     install_auth_handlers(app)
     app.include_router(health.router)

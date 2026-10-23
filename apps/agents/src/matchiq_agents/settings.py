@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     # JSON: {"<deployment>": {"inputPerMTok": 0.15, "outputPerMTok": 0.6}} in USD. Local
     # inference costs 0; a cloud deployment missing here gets no estimate (docs/ai/EVALUATION.md).
     agent_price_table: dict[str, Price] = Field(default_factory=dict[str, Price])
+    # Honours `PipelineRequest.fault` (ADR-0017). Simulated failures only; refused in prod.
+    demo_faults_enabled: bool = False
 
     @property
     def is_local(self) -> bool:
@@ -93,5 +95,8 @@ class Settings(BaseSettings):
             raise ValueError(msg)
         if self.model_provider is ModelProvider.MOCK and self.app_env is AppEnvironment.PROD:
             msg = "MODEL_PROVIDER=mock is not permitted in prod"
+            raise ValueError(msg)
+        if self.demo_faults_enabled and self.app_env is AppEnvironment.PROD:
+            msg = "DEMO_FAULTS_ENABLED is not permitted in prod"
             raise ValueError(msg)
         return self

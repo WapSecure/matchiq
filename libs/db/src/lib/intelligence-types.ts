@@ -2,6 +2,7 @@ import type {
   AgentRun,
   AuditActorType,
   CreatedSession,
+  FaultPlan,
   Fixture,
   FixtureTemplateSummary,
   GateReport,
@@ -169,6 +170,7 @@ export interface CreateSessionCommand {
   };
   readonly templateId: string;
   readonly speed: ReplayStatus['speed'];
+  readonly faultPlan?: FaultPlan;
   /** When set, creation fails with `SessionCapacityExceeded` at the limit. */
   readonly capacity?: SessionCapacity;
 }

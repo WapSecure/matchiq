@@ -109,6 +109,13 @@ export const GATE_DETAILS = {
   metricRef: (ref: string) => `metricRef ${ref} is not in the envelope`,
 } as const;
 
+/** Demo fault scenarios (ADR-0017); a metric the engine never computes. */
+export const DEMO_FAULTS = {
+  injectedCitation: { metricRef: 'fault.injected', value: 99 },
+  gateNote: (persona: string, locale: string) =>
+    `Simulated failure (demo): the ${persona} ${locale} draft was altered to cite fault.injected = 99 before the publish gate`,
+} as const;
+
 export const FALLBACK_REASONS = {
   aiDisabled: 'AI_ENABLED=false: deterministic templates only',
   circuitOpen: 'agents circuit breaker open',

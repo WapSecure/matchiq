@@ -739,6 +739,13 @@ export interface components {
             x: number;
             y: number;
         };
+        FaultPlan: {
+            scenario: components["schemas"]["FaultScenario"];
+            insightKinds?: ("GOAL" | "RED_CARD" | "SHOT_BURST" | "HIGH_REGAINS" | "PRESSURE_SWING" | "MOMENTUM_SHIFT" | "PLAYER_MILESTONE")[];
+            everyNth?: number;
+        };
+        /** @enum {string} */
+        FaultScenario: "WRITER_REVISE" | "MODEL_TIMEOUT" | "GATE_REJECT";
         TeamMatchMetrics: {
             goals: number;
             shots: number;
@@ -1296,6 +1303,8 @@ export interface components {
                 code: string;
                 detail: string;
             }[];
+            faultInjected?: components["schemas"]["FaultScenario"];
+            faultNote?: string;
         };
         ReplayCommand: {
             /** @constant */
@@ -1366,6 +1375,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            faultPlan?: components["schemas"]["FaultPlan"];
         };
         RecapMoment: {
             insightId: string;
@@ -2876,6 +2886,7 @@ export interface operations {
             content: {
                 "application/json": {
                     speed: 1 | 5 | 20 | 30;
+                    faultPlan?: components["schemas"]["FaultPlan"];
                 };
             };
         };
@@ -2911,7 +2922,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `forbidden`: You do not have permission for this action */
+            /** @description `forbidden`: You do not have permission for this action; `demo-faults-disabled`: Demo fault scenarios are disabled here */
             403: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];

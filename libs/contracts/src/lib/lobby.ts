@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PATTERNS } from './constants.js';
+import { FaultPlan } from './faults.js';
 import { Fixture, Team } from './fixture.js';
 import { FixtureId, TeamId, UtcTimestamp } from './primitives.js';
 import { ReplayStatus } from './replay.js';
@@ -46,6 +47,8 @@ export const ReplaySessionView = z.strictObject({
   status: ReplayStatus,
   createdAt: UtcTimestamp,
   updatedAt: UtcTimestamp,
+  /** Present only on demo sessions created with simulated failures (ADR-0017). */
+  faultPlan: FaultPlan.optional(),
 });
 
 /** `201` of `POST /fixtures/:templateId/sessions`: the session's own fixture and view. */

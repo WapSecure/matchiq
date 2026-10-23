@@ -186,6 +186,10 @@ export const PROBLEMS = {
     slug: 'insight-already-published',
   },
   invalidCursor: { title: 'Invalid pagination cursor', slug: 'invalid-cursor' },
+  demoFaultsDisabled: {
+    title: 'Demo fault scenarios are disabled here',
+    slug: 'demo-faults-disabled',
+  },
 } as const;
 
 /** Stream copy for `overlay.retract.reason`; the operator's own reason stays in the audit row. */

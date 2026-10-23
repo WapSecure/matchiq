@@ -55,6 +55,8 @@ export const LIMITS = {
   auditPageMax: 200,
   auditCursorMax: 512,
   auditIdentifierMax: 128,
+  faultEveryNthMax: 50,
+  faultNoteMax: 300,
 } as const;
 
 export const MESSAGES = {

@@ -1,5 +1,6 @@
 import type {
   AgentRun,
+  FaultPlan,
   Fixture,
   Insight,
   MatchEvent,
@@ -75,6 +76,8 @@ export const replaySessions = pgTable(
     appliedSequence: integer('applied_sequence').notNull().default(-1),
     period: smallint('period'),
     matchClockMs: integer('match_clock_ms').notNull().default(0),
+    /** Demo-only simulated failures (ADR-0017); null for every ordinary session. */
+    faultPlan: jsonb('fault_plan').$type<FaultPlan>(),
     createdAt: createdAt(),
     updatedAt: utc('updated_at').notNull().defaultNow(),
   },

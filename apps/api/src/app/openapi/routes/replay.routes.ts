@@ -69,6 +69,7 @@ export const REPLAY_ROUTES: readonly ApiRoute[] = [
       'replayCapacity',
       'invalidHeader',
       'idempotencyMismatch',
+      'demoFaultsDisabled',
     ],
   },
   {

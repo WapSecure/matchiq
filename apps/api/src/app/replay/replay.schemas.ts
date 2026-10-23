@@ -1,14 +1,15 @@
 import {
+  CreateReplaySession,
+  FaultPlan,
   Fixture,
   FixtureId,
-  ReplaySpeed,
   ReplayStatus,
   UtcTimestamp,
 } from '@matchiq/contracts';
 import { z } from 'zod';
 import { API_LIMITS } from '../constants';
 
-export const CreateSessionBody = z.strictObject({ speed: ReplaySpeed });
+export const CreateSessionBody = CreateReplaySession;
 
 export const SessionListQuery = z.strictObject({
   limit: z.coerce
@@ -30,6 +31,7 @@ export const CreatedSessionResponse = z.strictObject({
     status: ReplayStatus,
     createdAt: UtcTimestamp,
     updatedAt: UtcTimestamp,
+    faultPlan: FaultPlan.optional(),
   }),
 });
 

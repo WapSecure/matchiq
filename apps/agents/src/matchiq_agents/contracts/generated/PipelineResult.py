@@ -140,27 +140,6 @@ class Repair(BaseModel):
     detail: Annotated[str, Field(max_length=160, min_length=1)]
 
 
-class Run(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    runId: Annotated[str, Field(pattern="^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
-    correlationId: UUID
-    agent: Agent
-    provider: Provider
-    modelDeployment: Annotated[str | None, Field(max_length=128, min_length=1)] = None
-    promptVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
-    startedAt: AwareDatetime
-    latencyMs: Annotated[int, Field(ge=0, le=9007199254740991)]
-    tokensIn: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
-    tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
-    retries: Annotated[int, Field(ge=0, le=2)]
-    outcome: Outcome
-    promptHash: Annotated[str | None, Field(pattern="^[0-9a-f]{64}$")] = None
-    costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
-    repairs: Annotated[list[Repair] | None, Field(max_length=16)] = None
-
-
 class Persona(StrEnum):
     CASUAL = "CASUAL"
     ANALYST = "ANALYST"
@@ -210,6 +189,35 @@ class OverlayProposal(BaseModel):
     body: Annotated[str, Field(max_length=140)]
     evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
     metricRefs: list[MetricRef]
+
+
+class FaultScenario(StrEnum):
+    WRITER_REVISE = "WRITER_REVISE"
+    MODEL_TIMEOUT = "MODEL_TIMEOUT"
+    GATE_REJECT = "GATE_REJECT"
+
+
+class Run(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    runId: Annotated[str, Field(pattern="^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
+    correlationId: UUID
+    agent: Agent
+    provider: Provider
+    modelDeployment: Annotated[str | None, Field(max_length=128, min_length=1)] = None
+    promptVersion: Annotated[str, Field(pattern="^\\d+\\.\\d+\\.\\d+$")]
+    startedAt: AwareDatetime
+    latencyMs: Annotated[int, Field(ge=0, le=9007199254740991)]
+    tokensIn: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
+    tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
+    retries: Annotated[int, Field(ge=0, le=2)]
+    outcome: Outcome
+    promptHash: Annotated[str | None, Field(pattern="^[0-9a-f]{64}$")] = None
+    costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
+    repairs: Annotated[list[Repair] | None, Field(max_length=16)] = None
+    faultInjected: FaultScenario | None = None
+    faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None
 
 
 class PipelineResult(BaseModel):

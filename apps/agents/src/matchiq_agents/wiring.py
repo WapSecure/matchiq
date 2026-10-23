@@ -14,6 +14,7 @@ from matchiq_agents.constants import (
     WORKFLOW_GRACE_MS,
 )
 from matchiq_agents.contracts.types import RunProvider
+from matchiq_agents.faults.orchestrator import FaultAwareOrchestrator
 from matchiq_agents.models.agent_framework import AgentFrameworkModel
 from matchiq_agents.models.mock import MockModel
 from matchiq_agents.models.port import ModelPort
@@ -103,4 +104,19 @@ def build_orchestrator(
     )
     return PipelineOrchestrator(
         model or build_model(settings), breaker, clock, pipeline_config(settings), timer
+    )
+
+
+def build_service(
+    settings: Settings, clock: Clock, model: ModelPort | None = None
+) -> FaultAwareOrchestrator:
+    """The orchestrator plus demo fault routing (ADR-0017); a faulted run never shares state."""
+    config = pipeline_config(settings)
+    attempts = config.retry.max_retries + 1 if config.retry.retry_timeouts else 1
+    return FaultAwareOrchestrator(
+        build_orchestrator(settings, clock, model),
+        enabled=settings.demo_faults_enabled,
+        faulted=lambda faulty, isolated: PipelineOrchestrator(faulty, isolated, clock, config),
+        # Opens once one call has spent every attempt, so the next stage is short-circuited.
+        breaker=lambda: CircuitBreaker(clock, attempts, settings.agent_circuit_reset_ms),
     )

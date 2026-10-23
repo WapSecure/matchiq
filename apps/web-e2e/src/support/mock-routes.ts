@@ -15,6 +15,7 @@ import {
   mockTemplates,
   mockTraces,
 } from './mock-session';
+import { mockFaultTraces } from './mock-faults';
 
 /** The public API and the signed-in BFF share one mock. */
 const API_PREFIX = /^\/(api\/v1|bff)/;
@@ -58,6 +59,8 @@ export type MockApiOptions = {
   recap?: 'ready' | 'notReady';
   /** Serve insights, narratives and cues from the read models (late join). */
   hydrate?: boolean;
+  /** Add traces of demo fault scenarios (ADR-0017) to the observatory. */
+  faults?: boolean;
 };
 
 export type Recorder = {
@@ -89,7 +92,9 @@ const READS: Reads = {
   '/insights': (_, o) => ({ items: o.hydrate ? [mockInsight()] : [] }),
   '/narratives': (url, o) => ({ items: o.hydrate ? narrativesFor(url) : [] }),
   '/overlays': (_, o) => ({ items: o.hydrate ? [mockCue()] : [] }),
-  '/agent-runs': () => ({ items: mockTraces() }),
+  '/agent-runs': (_, o) => ({
+    items: o.faults ? [...mockTraces(), ...mockFaultTraces()] : mockTraces(),
+  }),
 };
 
 const handlePost = (

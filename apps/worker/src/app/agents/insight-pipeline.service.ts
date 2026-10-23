@@ -1,7 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { WorkerEnv } from '@matchiq/config';
-import type { Fixture, Insight } from '@matchiq/contracts';
-import type { InsightPipelineJob } from '@matchiq/db';
+import type {
+  FaultScenario,
+  Fixture,
+  Insight,
+  PipelineResult,
+} from '@matchiq/contracts';
+import type { FixtureKey, InsightPipelineJob } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
 import { FALLBACK_REASONS } from '../constants';
 import type { AgentPipelineDeps } from '../infrastructure/bundles';
@@ -20,6 +25,7 @@ import {
   WorkerMetrics,
 } from '../telemetry/worker-metrics';
 import { CircuitBreaker } from './circuit-breaker';
+import { faultFor, tamperForGate } from './demo-faults';
 
 export interface JobAttempt {
   /** Attempts already made before this one (BullMQ `attemptsMade`). */
@@ -84,6 +90,7 @@ export class InsightPipelineService {
       fixture,
       job,
       attempt,
+      fault: await this.faultOf(key, pending.insightId),
     });
     return this.sessions.publish(key, { insight: pending, ...decided });
   }
@@ -98,8 +105,9 @@ export class InsightPipelineService {
     fixture: Fixture;
     job: InsightPipelineJob;
     attempt: JobAttempt;
+    fault: FaultScenario | undefined;
   }): Promise<Decided> {
-    const { insight, fixture, job, attempt } = input;
+    const { insight, fixture, attempt } = input;
     const createdAt = this.deps.clock.now().toISOString();
     const fallback = (reason: string): Decided => ({
       claim: 'TEMPLATE',
@@ -119,15 +127,7 @@ export class InsightPipelineService {
     const started = performance.now();
     const elapsed = () => (performance.now() - started) / 1_000;
     try {
-      const result = await this.deps.client.run(
-        buildPipelineRequest({
-          orgId: job.orgId,
-          fixture,
-          insight,
-          revision: job.revision,
-          deadlineMs: this.env.AGENT_TIMEOUT_MS,
-        }),
-      );
+      const result = await this.callAgents(input);
       this.breaker.recordSuccess();
       this.metrics.pipelineCall('success', elapsed());
       const publication = agentPublication({
@@ -149,5 +149,37 @@ export class InsightPipelineService {
       if (call?.retriable === true && !lastAttempt) throw error;
       return fallback(call?.message ?? FALLBACK_REASONS.unreachable);
     }
+  }
+
+  private async callAgents(input: {
+    insight: Insight;
+    fixture: Fixture;
+    job: InsightPipelineJob;
+    fault: FaultScenario | undefined;
+  }): Promise<PipelineResult> {
+    const { fault, job } = input;
+    const answer = await this.deps.client.run(
+      buildPipelineRequest({
+        orgId: job.orgId,
+        fixture: input.fixture,
+        insight: input.insight,
+        revision: job.revision,
+        deadlineMs: this.env.AGENT_TIMEOUT_MS,
+        ...(fault && { fault }),
+      }),
+    );
+    return fault === 'GATE_REJECT' ? tamperForGate(answer) : answer;
+  }
+
+  /** Demo faults apply only where enabled, to sessions created with a plan. */
+  private async faultOf(
+    key: FixtureKey,
+    insightId: string,
+  ): Promise<FaultScenario | undefined> {
+    if (!this.env.DEMO_FAULTS_ENABLED) return undefined;
+    const session = await this.deps.sessions.get(key);
+    if (session?.faultPlan === undefined) return undefined;
+    const insights = await this.deps.reader.insights(key);
+    return faultFor(session.faultPlan, insights, insightId);
   }
 }

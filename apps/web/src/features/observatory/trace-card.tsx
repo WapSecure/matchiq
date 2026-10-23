@@ -4,6 +4,7 @@ import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { OBSERVATORY_COPY, PUBLICATION_LABELS } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { formatClock, formatMinute } from '@/lib/format';
+import { FaultChain } from './fault-chain';
 import { GateReportView } from './gate-report';
 import { RunTable } from './run-table';
 
@@ -63,6 +64,7 @@ export function TraceCard({ trace, period }: TraceCardProps) {
             {trace.fallbackReason ?? copy.notApplicable}
           </Field>
         </dl>
+        <FaultChain runs={trace.runs} publication={trace.publication} />
         <section>
           <h4 className="eyebrow mb-1.5">{copy.gate}</h4>
           <GateReportView report={trace.gate} />

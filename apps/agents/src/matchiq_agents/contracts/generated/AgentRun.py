@@ -38,6 +38,12 @@ class Repair(BaseModel):
     detail: Annotated[str, Field(max_length=160, min_length=1)]
 
 
+class FaultScenario(StrEnum):
+    WRITER_REVISE = "WRITER_REVISE"
+    MODEL_TIMEOUT = "MODEL_TIMEOUT"
+    GATE_REJECT = "GATE_REJECT"
+
+
 class AgentRun(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -57,3 +63,5 @@ class AgentRun(BaseModel):
     promptHash: Annotated[str | None, Field(pattern="^[0-9a-f]{64}$")] = None
     costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
     repairs: Annotated[list[Repair] | None, Field(max_length=16)] = None
+    faultInjected: FaultScenario | None = None
+    faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None

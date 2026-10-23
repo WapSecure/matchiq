@@ -20,6 +20,7 @@ import {
   port,
   secret,
 } from './fields.js';
+import { checkDemoFaults, DemoFaultFields } from './demo-faults-env.js';
 import { AppEnvironment } from './environment.js';
 import { AuthFields, checkAuthEnv } from './auth-env.js';
 import {
@@ -120,7 +121,10 @@ export const ApiEnv = CommonEnv.extend({
     .int()
     .positive()
     .default(ENV_LIMITS.replayRateLimitPerMinute),
-}).superRefine(checkAuthEnv);
+  ...DemoFaultFields,
+})
+  .superRefine(checkAuthEnv)
+  .superRefine(checkDemoFaults);
 
 export const WorkerEnv = CommonEnv.extend({
   ...DatabaseEnv.shape,
@@ -167,7 +171,8 @@ export const WorkerEnv = CommonEnv.extend({
     ENV_LIMITS.agentCircuitCooldownMaxMs,
     ENV_LIMITS.agentCircuitCooldownDefaultMs,
   ),
-});
+  ...DemoFaultFields,
+}).superRefine(checkDemoFaults);
 
 export const WebPublicEnv = z.object({
   NEXT_PUBLIC_API_BASE_URL: z.url().default(DEFAULT_URLS.apiBase),

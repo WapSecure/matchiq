@@ -1,14 +1,21 @@
 'use client';
 
-import { REPLAY_SPEEDS, ReplaySpeed } from '@matchiq/contracts';
+import {
+  REPLAY_SPEEDS,
+  ReplaySpeed,
+  type FaultScenario,
+} from '@matchiq/contracts';
 import { useId, useState } from 'react';
 import { PlayIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
 import { HTTP_STATUS } from '@/constants/api';
+import { demoFaultPlan } from '@/constants/demo-faults';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { REPLAY_COPY } from '@/constants/replay';
 import { useStudioUi } from '@/features/studio/store';
 import { isApiError } from '@/lib/api/api-error';
+import { PUBLIC_ENV } from '@/lib/env';
+import { DemoScenarioSelect } from './demo-scenario-select';
 import { useStartSession } from './use-start-session';
 
 const failureText = (error: unknown): string => {
@@ -27,6 +34,7 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
   const [speed, setSpeed] = useState<ReplaySpeed>(
     () => useStudioUi.getState().speed,
   );
+  const [fault, setFault] = useState<FaultScenario | null>(null);
   const session = useStartSession();
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -50,7 +58,13 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
       </select>
       <Button
         variant="primary"
-        onClick={() => session.start(templateId, speed)}
+        onClick={() =>
+          session.start(
+            templateId,
+            speed,
+            fault ? demoFaultPlan(fault) : undefined,
+          )
+        }
         disabled={session.pending}
         aria-label={LOBBY_COPY.startLabel(title)}
         aria-describedby={session.error ? errorId : undefined}
@@ -59,6 +73,9 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
       >
         {session.pending ? LOBBY_COPY.starting : LOBBY_COPY.start}
       </Button>
+      {PUBLIC_ENV.NEXT_PUBLIC_DEMO_MODE ? (
+        <DemoScenarioSelect title={title} value={fault} onChange={setFault} />
+      ) : null}
       {session.error ? (
         <p id={errorId} role="alert" className="w-full text-xs text-critical">
           {failureText(session.error)}

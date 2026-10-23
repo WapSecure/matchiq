@@ -46,6 +46,7 @@ export class ReplayController {
       ...caller,
       templateId,
       speed: body.speed,
+      ...(body.faultPlan && { faultPlan: body.faultPlan }),
     });
     return respond(res, result);
   }
