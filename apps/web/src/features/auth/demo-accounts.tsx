@@ -23,7 +23,7 @@ export function DemoAccounts({ returnTo }: { returnTo: string }) {
   return (
     <section
       aria-labelledby="demo-accounts-title"
-      className="rounded-lg border border-synthetic/30 bg-synthetic-soft/40 p-5"
+      className="rounded-lg border border-dashed border-synthetic/40 bg-synthetic-soft/40 p-4 sm:p-5"
     >
       <div className="flex flex-wrap items-center gap-2">
         <h2 id="demo-accounts-title" className="text-sm font-semibold text-ink">
@@ -34,23 +34,23 @@ export function DemoAccounts({ returnTo }: { returnTo: string }) {
       <p className="mt-2 text-sm text-ink-muted">
         {AUTH_COPY.demoLead(DEMO_PASSWORD)}
       </p>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+      <ul className="mt-4 grid gap-2">
         {DEMO_ACCOUNTS.map((account) => (
           <li key={account.username}>
             <a
               href={signInHref(account.username, returnTo)}
-              className="press flex items-center gap-3 rounded-md border border-line bg-surface px-3 py-2.5 hover:border-control hover:bg-surface-raised"
+              className="press flex min-h-11 items-center gap-3 rounded-md border border-line bg-surface px-3 py-2 outline-none hover:border-control hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <UserIcon size={16} className="shrink-0 text-ink-muted" />
               <span className="min-w-0">
-                <span className="block truncate font-mono text-[13px] text-ink">
-                  {account.username}
-                </span>
-                <span className="block text-xs text-ink-muted">
+                <span className="block text-[13px] font-medium text-ink">
                   {AUTH_COPY.demoAccount(
                     ROLE_LABELS[account.role],
                     account.org,
                   )}
+                </span>
+                <span className="block truncate font-mono text-micro text-ink-subtle">
+                  {account.username}
                 </span>
               </span>
             </a>

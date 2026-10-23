@@ -50,6 +50,22 @@ describe('MatchIQ Keycloak login theme', () => {
     for (const [, key] of used) expect(keys).toContain(key);
   });
 
+  it('keeps template comments and a repeated brand out of the tab title', () => {
+    const frame = readFileSync(join(THEME, 'template.ftl'), 'utf8');
+    const title = frame.match(/<title>(.*?)<\/title>/)?.[1] ?? '';
+    expect(title).not.toContain('<#nested');
+    expect(title).toContain('${tabTitle');
+    expect(frame).toMatch(/pageHeading\?markup_string\?replace\("<!--/);
+    expect(frame).toMatch(/tabTitle = pageHeading\?replace\(" \(to\|of\)/);
+    for (const f of readdirSync(THEME).filter((n) => n.endsWith('.ftl'))) {
+      const html = readFileSync(join(THEME, f), 'utf8').replace(
+        /<#--[\s\S]*?-->/g,
+        '',
+      );
+      expect(html, f).not.toMatch(/<title>[^<]*<!--/);
+    }
+  });
+
   it('self-hosts its font and stylesheet', () => {
     expect(
       existsSync(join(THEME, 'resources/fonts/Geist-Variable.woff2')),

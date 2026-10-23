@@ -59,8 +59,17 @@ function AuditResults({
       />
     );
   }
-  if (events.length === 0)
-    return <EmptyState Icon={AuditIcon} title={copy.empty} />;
+  if (events.length === 0) {
+    const filtered =
+      JSON.stringify(form) !== JSON.stringify(EMPTY_AUDIT_FILTERS);
+    return (
+      <EmptyState
+        Icon={AuditIcon}
+        title={filtered ? copy.emptyFiltered : copy.empty}
+        description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
+      />
+    );
+  }
   return (
     <div className="flex flex-col gap-3">
       <AuditTable events={events} hasMore={audit.hasNextPage} nowMs={nowMs} />

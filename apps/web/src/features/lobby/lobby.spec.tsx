@@ -3,7 +3,12 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { fixture } from '@/test/factories';
-import { SESSION, sessionView, template } from '@/test/session-factories';
+import {
+  SESSION,
+  sessionView,
+  status,
+  template,
+} from '@/test/session-factories';
 import { callsTo, stubApi } from '@/test/stub-api';
 import { RecentSessions } from './recent-sessions';
 import { TemplateLobby } from './template-lobby';
@@ -47,13 +52,75 @@ describe('lobby', () => {
     const cards = within(list).getAllByRole('article');
     expect(cards[0]).toHaveTextContent('Late comeback');
     expect(cards[0]).toHaveTextContent('Recommended replay');
-    expect(cards[0]).toHaveTextContent('1,470');
+    expect(cards[0]).toHaveTextContent(
+      'What to expect: The visitors build a lead before the break.',
+    );
     expect(cards[1]).toHaveTextContent('High press');
-    const sessions = await screen.findByRole('list', {
+    const sessions = await screen.findByRole('group', {
       name: 'Recent replays',
     });
-    expect(sessions).toHaveTextContent('Playing');
+    expect(sessions).toHaveTextContent('Live');
     expect(sessions).toHaveTextContent("11' · 20×");
+  });
+
+  it('keeps one simulated-data disclosure, outside the cards', async () => {
+    stubApi({
+      'GET /fixture-templates': {
+        body: {
+          items: [
+            template({
+              competitionLabel: 'MatchIQ Synthetic League (simulated data)',
+            }),
+          ],
+        },
+      },
+      'GET /replay-sessions': { body: { items: [] } },
+    });
+    renderLobby();
+    const card = await screen.findByRole('article');
+    expect(card).toHaveTextContent('MatchIQ Synthetic League');
+    expect(card).not.toHaveTextContent(/simulated/i);
+    expect(
+      within(card).getByRole('heading', { name: 'Home United vs Away City' }),
+    ).toBeInTheDocument();
+  });
+
+  it('lists live replays above finished ones, with how long ago each moved', async () => {
+    vi.useFakeTimers({
+      toFake: ['Date'],
+      now: Date.parse('2026-10-21T17:33:51Z'),
+    });
+    stubApi({
+      'GET /fixture-templates': { body: { items: [template()] } },
+      'GET /replay-sessions': {
+        body: {
+          items: [
+            sessionView({
+              sessionId: 'fx_test_s2',
+              sessionNumber: 2,
+              status: status({
+                state: 'COMPLETED',
+                period: 2,
+                matchClockMs: 2_700_000,
+              }),
+            }),
+            sessionView({ status: status({ state: 'PAUSED' }) }),
+          ],
+        },
+      },
+    });
+    renderLobby();
+    const [live, finished] = await screen.findAllByRole('list', {
+      name: /Live now|Finished/,
+    });
+    expect(live).toHaveAccessibleName('Live now');
+    expect(live).toHaveTextContent('Replay 1');
+    expect(live).toHaveTextContent('Paused');
+    expect(live).toHaveTextContent('12 min ago');
+    expect(finished).toHaveAccessibleName('Finished');
+    expect(finished).toHaveTextContent('Replay 2');
+    expect(finished).toHaveTextContent('Full time');
+    vi.useRealTimers();
   });
 
   it('starts a session at the chosen speed and opens its studio', async () => {

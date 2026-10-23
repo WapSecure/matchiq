@@ -21,12 +21,33 @@ test.describe('match lobby', () => {
     await expect(cards.first()).toContainText('Late comeback');
     await expect(cards.first()).toContainText('Recommended replay');
     await expect(cards.first()).toContainText('Northbridge Athletic');
-    await expect(cards.first()).toContainText('Simulated match');
+    await expect(cards.first()).toContainText('What to expect');
+    await expect(cards.first()).not.toContainText(/simulated/i);
     await expect(cards.first()).toContainText('4207');
     await expect(cards.nth(1)).toContainText('High press');
-    const sessions = page.getByRole('list', { name: 'Recent replays' });
-    await expect(sessions).toContainText('Replay 1 · NBA-HSR · NANA');
-    await expect(sessions).toContainText('Playing');
+    const live = page.getByRole('list', { name: 'Live now' });
+    await expect(live).toContainText('Replay 1 · NBA-HSR · NANA');
+    await expect(live).toContainText('Live');
+  });
+
+  test('keeps the start controls on one row on desktop', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name.startsWith('mobile'), 'stacked on phones');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await mockApi(page);
+    await page.goto('/fixtures');
+    const card = page.getByRole('article').first();
+    const speed = await card
+      .getByRole('button', { name: /Replay speed/ })
+      .boundingBox();
+    const start = await card
+      .getByRole('button', { name: /Start replay/ })
+      .boundingBox();
+    expect(Math.abs((speed?.y ?? 0) - (start?.y ?? 100))).toBeLessThan(2);
+    await expect(
+      card.getByRole('button', { name: /Replay speed/ }),
+    ).not.toContainText('About');
   });
 
   test('starts a session at the chosen speed and opens its studio', async ({

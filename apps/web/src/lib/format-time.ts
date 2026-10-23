@@ -8,7 +8,13 @@ const UNITS: readonly Unit[] = [
   SECOND,
 ];
 
-const RELATIVE = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
+const RELATIVE = {
+  long: new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' }),
+  short: new Intl.RelativeTimeFormat('en-GB', {
+    numeric: 'auto',
+    style: 'short',
+  }),
+} as const;
 
 const ABSOLUTE = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
@@ -20,11 +26,15 @@ const ABSOLUTE = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 });
 
-/** "3 minutes ago"; the largest whole unit, never finer than seconds. */
-export const formatRelative = (iso: string, nowMs: number): string => {
+/** "3 minutes ago" (or "3 min ago" when short); the largest whole unit, never finer than seconds. */
+export const formatRelative = (
+  iso: string,
+  nowMs: number,
+  style: keyof typeof RELATIVE = 'long',
+): string => {
   const delta = Date.parse(iso) - nowMs;
   const [unit, size] = UNITS.find(([, ms]) => Math.abs(delta) >= ms) ?? SECOND;
-  return RELATIVE.format(Math.round(delta / size), unit);
+  return RELATIVE[style].format(Math.round(delta / size), unit);
 };
 
 /** Absolute UTC timestamp, to the second. */

@@ -27,6 +27,8 @@ export const RECAP_COPY = {
   metricsTitle: 'Final stats',
   evidence: (n: number) => `${n} play${n === 1 ? '' : 's'} behind it`,
   metricRefs: (n: number) => `${n} stat${n === 1 ? '' : 's'} used`,
+  translationUnknown:
+    "This older recap doesn't record whether the commentary was translated.",
   noNarrative: 'No write-up for this audience. Here are the facts.',
   localeFallback: (language: string) =>
     `The ${language} version isn't ready yet, so you're seeing English.`,
@@ -82,3 +84,5 @@ export const JSON_MEDIA_TYPE = 'application/json';
 export const TEXT_MEDIA_TYPE = 'text/plain;charset=utf-8';
 export const JSON_INDENT = 2;
 export const REPORT_RULE = '—'.repeat(24);
+
+export const UNKNOWN_COMMENTARY_LANGUAGE = 'und';

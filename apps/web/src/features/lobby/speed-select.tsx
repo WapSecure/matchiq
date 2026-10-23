@@ -8,6 +8,7 @@ import {
   speedChoiceLabel,
 } from '@/constants/control-options';
 import { LOBBY_COPY } from '@/constants/lobby';
+import { ControlCaption } from './control-caption';
 
 const OPTIONS: ChoiceOption[] = REPLAY_SPEEDS.map((speed) => ({
   id: String(speed),
@@ -22,20 +23,23 @@ type SpeedSelectProps = {
   onChange: (speed: ReplaySpeed) => void;
 };
 
-/** Replay speed as option cards that say how long the match will take. */
+/** Replay speed; the open list says how long the match will take. */
 export function SpeedSelect({ title, value, onChange }: SpeedSelectProps) {
   return (
-    <Select
-      label={LOBBY_COPY.speedFor(title)}
-      hideLabel
-      value={String(value)}
-      onChange={(id) => {
-        const parsed = ReplaySpeed.safeParse(Number(id));
-        if (parsed.success) onChange(parsed.data);
-      }}
-      options={OPTIONS}
-      popoverWidth="wide"
-      className="min-w-40"
-    />
+    <div className="flex min-w-0 flex-col gap-1 @lg:w-44">
+      <ControlCaption text={LOBBY_COPY.speedLabel} />
+      <Select
+        label={LOBBY_COPY.speedFor(title)}
+        hideLabel
+        size="md"
+        value={String(value)}
+        onChange={(id) => {
+          const parsed = ReplaySpeed.safeParse(Number(id));
+          if (parsed.success) onChange(parsed.data);
+        }}
+        options={OPTIONS}
+        popoverWidth="wide"
+      />
+    </div>
   );
 }

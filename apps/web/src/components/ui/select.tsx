@@ -31,7 +31,30 @@ export type SelectProps<K extends string> = FieldProps &
     isLoading?: boolean;
     /** Wider popover for descriptive option cards. */
     popoverWidth?: 'trigger' | 'wide';
+    /** Repeats the option's description in the closed field; off keeps triggers compact. */
+    showDescriptionInTrigger?: boolean;
   };
+
+function ChoicePopover<K extends string>({
+  source,
+  width,
+}: {
+  source: ChoiceSource<K>;
+  width: 'trigger' | 'wide';
+}) {
+  return (
+    <Popover
+      className={cn(
+        'min-w-(--trigger-width) p-1.5',
+        width === 'wide' && 'w-[min(26rem,calc(100vw-2rem))]',
+      )}
+    >
+      <ListBox className="outline-none">
+        <ChoiceItems source={source} />
+      </ListBox>
+    </Popover>
+  );
+}
 
 /** Single choice from a list; options can carry descriptions, icons and disabled reasons. */
 export function Select<K extends string>(props: SelectProps<K>) {
@@ -48,6 +71,7 @@ export function Select<K extends string>(props: SelectProps<K>) {
     onChange,
     placeholder = UI_COPY.selectPlaceholder,
     popoverWidth = 'trigger',
+    showDescriptionInTrigger = false,
   } = props;
   const source = (
     props.sections ? { sections: props.sections } : { options: props.options }
@@ -87,7 +111,11 @@ export function Select<K extends string>(props: SelectProps<K>) {
         >
           <SelectValue className="flex min-w-0 flex-1">
             {() => (
-              <SelectedValue option={selected} placeholder={placeholder} />
+              <SelectedValue
+                option={selected}
+                placeholder={placeholder}
+                showDescription={showDescriptionInTrigger}
+              />
             )}
           </SelectValue>
           {isLoading ? (
@@ -100,16 +128,7 @@ export function Select<K extends string>(props: SelectProps<K>) {
           )}
         </Button>
       </FieldFrame>
-      <Popover
-        className={cn(
-          'min-w-(--trigger-width) p-1.5',
-          popoverWidth === 'wide' && 'w-[min(26rem,calc(100vw-2rem))]',
-        )}
-      >
-        <ListBox className="outline-none">
-          <ChoiceItems source={source} />
-        </ListBox>
-      </Popover>
+      <ChoicePopover source={source} width={popoverWidth} />
     </AriaSelect>
   );
 }

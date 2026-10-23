@@ -17,6 +17,20 @@ Caveat: web clients read the first page only. A match with more than 500 narrati
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for the touched projects, plus the touched spec files.
 
+## 2026-10-23 — MQ-055: Premium pass on the match lobby
+
+| Area                                                                                                                                                                                                                                                                                                                                                                              | Status | Evidence                                               |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------ |
+| Shared `Select`: new `showDescriptionInTrigger` prop (default off). Closed fields show only the option label, and descriptions stay in the open list. This fixes the wide speed and demo-failure triggers that pushed "Start replay" onto its own line, and keeps activity-log and pagination triggers compact. A label with no description is no longer cut at 70% ("No demo …") | Done   | `select.spec.tsx`                                      |
+| Match card: storyline and "Recommended replay" badges with the league name; the matchup as the hero (large monograms, home and away, "vs"); a spoiler-free "What to expect" line for each storyline; the match code chip; event count, seed and hash moved into Technical details. Accent focus ring and raised hover on the card                                                 | Done   | `lobby.spec.tsx`, `lobby.spec.ts`                      |
+| One simulated-data disclosure: the global notice stays on every page (style guide §8). The per-card "Simulated match" badge and the "(simulated data)" league suffix are gone, and the studio watermark is unchanged                                                                                                                                                              | Done   | `lobby.spec.tsx` "keeps one simulated-data disclosure" |
+| Start footer: speed, demo failure (demo mode only, with its explanation in an InfoTip) and "Start replay" share one row when the card is wide enough (container query) and stack on phones                                                                                                                                                                                        | Done   | `lobby.spec.ts` "keeps the start controls on one row"  |
+| Recent replays: "Live now" lists sit above "Finished" ones on each page. Each row has the matchup, "Replay 8 · code", a status chip (Live / Paused / Full time / Ready), minute and speed, a relative time ("12 min ago") and Open. Stacked on phones; cursor pagination and the empty state are kept                                                                             | Done   | `lobby.spec.tsx`, `lobby-paging.spec.ts`               |
+| Header: shorter intro, and "How replays work" moved into an InfoTip. Two-column grid from 768 px                                                                                                                                                                                                                                                                                  | Done   | Screenshots                                            |
+| Both themes at 1440 and 390 px, one local production build with demo mode on; no horizontal overflow, axe clean                                                                                                                                                                                                                                                                   | Done   | `docs/screenshots/lobby-polish/{before,after}/`        |
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for `web` and `web-e2e`, the touched Vitest specs, and the lobby, lobby-paging and judge-flow Playwright specs on the screenshot build.
+
 ## 2026-10-23 — MQ-053 (2/2): One pagination family across every list
 
 | Area                                                                                                                                                                                                                                                                                                                                      | Status   | Evidence                                     |
@@ -32,6 +46,20 @@ Verification: CI (owner directive). Locally: format, lint and typecheck for the 
 | `/design-system` gallery: a Pagination section with every variant and state; screenshots in both themes at 1440 and 390 px from one local production build                                                                                                                                                                                | Done     | `docs/screenshots/design-system/pagination/` |
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for `web` and `web-e2e`, plus the touched spec files.
+
+## 2026-10-23 — MQ-057: Consistency sweep
+
+| Item                                                                                                                                                                                                 | Status | Evidence                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------ |
+| AI fact-checks: every summary tile heading is sentence case; minute-strip markers within about 2.5% of the timeline stack into up to three lanes, keeping 24 px targets                              | Done   | `minute-strip-lanes.spec.ts`, `fact-checks.spec.tsx`                     |
+| AI fact-checks: `LoadMore` over a client-side window of 10 moments, reset on filter change; a strip link to an unloaded moment widens the window and scrolls to it                                   | Done   | `fact-checks.spec.tsx`                                                   |
+| Activity log: rows become stacked cards below 768 px, plain field names and values in changes, "No activity yet" empty state, Technical details holds action key, actor, item, entry and request ids | Done   | `audit.spec.tsx`                                                         |
+| Shared `Select`: the selected label no longer truncates when it has no description                                                                                                                   | Done   | `select.spec.tsx`                                                        |
+| Landing: removed "safe areas" and tightened trust copy; sign-in: branded card matching the hosted page, role-first demo accounts, plain button labels                                                | Done   | `apps/web-e2e` sign-in helpers                                           |
+| Keycloak theme: dev-mode template comment and the repeated brand no longer reach `<title>`, which now reads "Sign in · MatchIQ"                                                                      | Done   | `keycloak-theme.spec.ts` (static; not exercised against a live Keycloak) |
+| Screenshots, before and after, light and dark at 1440 and 390                                                                                                                                        | Done   | `docs/screenshots/consistency-sweep/`                                    |
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for `web`, plus the touched specs.
 
 ## 2026-10-23 — MQ-054: Branded sign-in pages and back navigation
 
@@ -904,3 +932,84 @@ Wire the engine into the worker projection and the deterministic publish gate, a
 ### Next
 
 M1: MQ-003 seeded generator, MQ-004 ledger and idempotent ingest, MQ-005 deterministic metrics, MQ-006 SSE and snapshot reconciliation.
+
+## MQ-040: Enterprise review and frontend copy polish (23 October 2026)
+
+Stream E, branch `fix/MQ-040-enterprise-polish`, isolated worktree cut from `dev`.
+
+- Reviewed the enterprise product addendum, ADRs and frontend source. The prioritized review, acceptance evidence and next three tickets are in `apps/web/docs/enterprise-readiness-review.md`.
+- Reworked landing, lobby, studio and diagnostic copy around producer tasks; removed unsupported speed claims, judge-facing labels, prose dashes and unnecessary final third hyphens. Kept synthetic, template and real-provider disclosures.
+- Simplified the landing hero and labeled its static sample explicitly. Updated frontend assertions and added sample-label coverage.
+- Prepared `apps/web/docs/qa-label-migration.patch` for stream F because three existing Playwright selectors reference changed labels. `git apply --check` passes; the patch has not been applied to QA-owned files.
+- Frontend lint, typecheck, source formatting and diff whitespace checks passed under Node 22.22.3. Shell default Node 18 cannot start this Vitest version. Two concurrent suite runs encountered different 5-second test timeouts; the observatory test passed independently without changing its timeout. Final serial run: all 197 tests in 30 files passed. Existing auth tests emit React act warnings.
+- Standard Turbopack build could not resolve Next.js outside the isolated worktree through reused dependency symlinks. Webpack production compilation, type checking and page generation passed with standalone tracing warnings. Landing Playwright: 20 passed across four viewport/theme projects, including axe. Screenshot inspection found mobile clipping; explicit mobile grid sizing and a shrinkable preview address it, with a proposed QA regression test. Deployment packaging and the full browser suite remain unqualified. No enterprise deployment, licensed feed or external graphics integration was claimed.
+
+## MQ-041: Frontend browser validation (23 October 2026)
+
+Stream F, branch `fix/MQ-041-frontend-validation` cut from `dev` after MQ-040 merged locally. Updated three browser selectors for the reviewed product labels and added a viewport-bounds regression for the static preview. Screenshot capture now accepts an output directory and signs in as the test producer, allowing protected audit and editorial screens to render without bypassing permissions. No product code comments were added.
+
+Validation: 128 public-demo browser tests passed across desktop/mobile and light/dark projects. All 24 authenticated screenshot captures passed using the local OIDC test issuer and mocked API/stream fixtures. The initial anonymous capture failed four audit-table assertions because access was correctly denied; sign-in fixed the capture setup. QA TypeScript check passed. QA lint passed with existing warnings; the new bounds test uses unconditional assertions. Authentication/editorial suite: 64 passed across all four projects using the local test issuer.
+
+Next: preserve match identity and account access on mobile; finish global interface localization; qualify real feed and production identity integrations. Browser fixtures and the test issuer do not certify production integrations.
+
+## MQ-044: Mobile studio polish (23 October 2026)
+
+Stream E, branch `fix/MQ-044-mobile-studio-polish` cut from `dev`. Screenshot review found hidden mobile fixture identity/account access, an empty observatory summary cell and truncated panel descriptions. The studio header now wraps the fixture title onto a dedicated mobile row and retains the account menu; panel headings/descriptions wrap; all six summary tiles use the available grid cells. Recap waiting/export copy now describes user outcomes. Removed the applied MQ-041 patch artifact and updated the readiness report. No code comments were added; the obsolete phone-header comment was removed.
+
+Validation: web lint and typecheck passed; 18 affected unit tests passed; 56 mobile studio/authentication/editorial browser checks passed, including axe and keyboard flows; all 24 producer screenshot captures passed and revised mobile studio/recap/observatory images were inspected. Formatting and diff whitespace checks passed. Webpack production compilation, type checking and page generation passed, with the same standalone tracing limitation from reused dependency symlinks. No deployment or real external integration was verified.
+
+Next three tickets: permanent mobile identity/account browser regression; full interface localization and native editorial review; licensed feed and operational qualification for a paid pilot.
+
+## MQ-045: Mobile identity regression (23 October 2026)
+
+Stream F, branch `test/MQ-045-mobile-studio-identity` cut from `dev`. Added browser coverage at 320px and 390px for a readable, viewport-contained fixture heading and an accessible producer account menu, including organisation, sign-out and Escape dismissal. Initial assertions used the wrong organisation display name; corrected them to the existing synthetic test account without changing application behavior or weakening the check.
+
+Validation: all 8 browser cases passed across the configured projects, QA TypeScript and new-file lint passed, and formatting/diff whitespace checks passed. No code comments were added. The local test issuer and mocked API remain test infrastructure, not production integration proof.
+
+Next three tickets: complete interface localization; obtain native editorial review for supported narrative languages; qualify licensed live data and production operations with a paid pilot.
+
+## MQ-046: Commentary language boundaries (23 October 2026)
+
+Stream E, branch `fix/MQ-046-commentary-language-boundaries` cut from `dev`. The product owner selected independent interface and commentary languages. The audience bar now states that the picker affects commentary, while operator controls remain English. Native language choices carry language tags; English narrative source/fallback labels no longer inherit French, Spanish or Pidgin pronunciation. Overlay copy uses the actual cue locale. English provider fallback is tagged using `localeFallback` rather than the requested locale.
+
+Live announcements now throttle text and its actual language as one value, retain the previous pair until the next message airs, select the latest pending moment, and cancel timers on removal/unmount. Added 13 regressions covering these boundaries and timing. No code comments or dependencies were added.
+
+Commands/results under Node 22.22.3: `pnpm nx run web:lint --output-style=static` passed; `pnpm nx run web:typecheck --output-style=static` passed; `pnpm exec vitest run --config apps/web/vitest.config.mts --maxWorkers=1` passed 210 tests in 33 files; Prettier source checks and `git diff --check` passed. `NODE_ENV=production pnpm exec next build --webpack` compiled, typechecked and generated pages, with the known 27 standalone-tracing omissions caused by reused external dependency symlinks. The existing studio/judge-flow Playwright suite passed all 60 checks across four theme/viewport projects, including axe, keyboard controls, commentary switching and unchanged match figures. Existing auth unit tests still emit React act warnings. No checks were weakened or skipped.
+
+Known limitations: interface translation and native editorial approval are not delivered by this change. Recap contracts/building omit the provider fallback flag, so an English fallback filed under a requested locale cannot always be identified in recaps. No protected contracts/backend files were changed. The concrete handoff is `apps/web/docs/language-readiness.md`.
+
+Next three tickets: MQ-047 independent interface localization; MQ-048 preserve recap fallback provenance across contracts/backend/UI; MQ-049 native football editorial review of French, Spanish and Pidgin. Production packaging and licensed-feed qualification remain open.
+
+## MQ-054A: Recap fallback contract (23 October 2026)
+
+Stream A, initially `fix/MQ-048-recap-fallback-contract` from `dev`, renamed to `fix/MQ-054-recap-fallback` after origin/dev integration showed that MQ-048 was already taken. Added optional `RecapNarrative.localeFallback`; absence remains unknown for existing documents rather than defaulting to successful translation. Regenerated the committed OpenAPI document and TypeScript API client. The cross-language schema registry excludes recap reads, so regenerating its 15 schemas produces no JSON Schema/Python contract changes. No code comments or dependencies were added.
+
+Validation: contracts test/lint/typecheck/schema-export targets passed (66 tests); server-kit prerequisite build passed; OpenAPI generation and all 7 OpenAPI document checks passed with `--watchman=false --runInBand` after the default Watchman socket was denied by the sandbox. API client typecheck passed. Contract test formatting was corrected; diff whitespace checks passed. This change lets current readers accept legacy documents; consumers pinned to an older strict response schema must upgrade before receiving the new field. No remote CI or production integration was claimed.
+
+Next: worker preservation and regression coverage; frontend fallback/legacy language handling; independent interface localization. GitHub CLI authentication is unavailable, so changes are local and no remote PR was created.
+
+## MQ-054: Recap translation provenance end to end (23 October 2026)
+
+Feature branch `fix/MQ-054-recap-fallback` contains the platform contract update, backend preservation and frontend consumption as separate reviewable changes. The original ticket proposal MQ-048 was already taken; open PRs #54 (recap presentation) and #57 (pagination) were inspected, and this change is limited to fallback provenance rather than their redesigns. Integrated current `origin/dev` on the feature branch and preserved both implementation-log histories. The updated Git workflow prohibits local protected-branch merges; no new change was merged into local dev after that rule was read.
+
+The worker now copies each published narrative's optional recap fallback marker. The web reader uses the canonical recap narrative schema, retaining the marker for both rendering and JSON export. A confirmed fallback has English language metadata and a plain-language notice; a confirmed translation retains its own locale. Existing non-English records without the field stay readable, use the undetermined language tag and show that translation status was not recorded. No historical record is rewritten or assigned an invented flag. The new commentary component keeps the existing shared UI and Technical details treatment within function-size limits. No code comments, dependencies or database migrations were added.
+
+Current-branch validation follows the updated local-check policy: contracts/API-client/worker lint passed; web lint passed after extracting the commentary block rather than relaxing the line limit. Declaration-only type checks passed for contracts, API client and worker; web application and spec type checks passed after refreshing dependency declarations. Targeted specs passed: recap contract 6 cases, worker recap builder 2 cases, frontend recap fallback 6 cases, OpenAPI document 7 cases. Formatting and diff whitespace checks passed. No full suite, browser run, build, deployment or cloud integration is claimed on the updated base; full CI remains required before merge. Earlier validation recorded in MQ-054A preceded the updated policy and origin integration.
+
+Remote handoff is pending explicit approval. GitHub keyring authentication works when read outside the sandbox, correcting the earlier sandbox-only auth diagnosis. Automatic approval review rejected pushing private code and creating a remote branch because remote publication was not explicitly authorized; no push or PR creation was attempted through a workaround. The prepared PR description is `/private/tmp/matchiq-recap-pr.md`.
+
+Known limits: older strict response consumers must upgrade before writers emit the optional field; historical translation outcomes cannot be recovered by guessing. Interface localization and native editorial qualification remain independent work. Next three tickets: independent operator-interface language preference and complete catalogs; native editorial review of supported commentary languages; licensed-feed and production operational pilot qualification.
+
+## MQ-055: Move recap work to a current feature branch (23 October 2026)
+
+Reread the current AGENTS.md and checked open PRs and local worktrees. MQ-054 is now claimed by the branded-login branch, so the recap fix was moved to `fix/MQ-055-recap-fallback` in `/private/tmp/matchiq-enterprise-polish`, starting directly from `origin/dev` at `d8c1c9e`. Only the three recap commits were cherry-picked; the old feature branch is preserved. Both implementation-log histories were retained. Conflicts were resolved to keep the current recap timeline, metadata treatment and report constants, adding only the fallback flag/language/unknown-status behavior. The earlier extracted commentary component is unnecessary with the current redesign and was not carried over.
+
+The feature branch contains origin/dev as an ancestor. No protected branch was moved, no code was pushed, and no PR was opened. Authors remain `wapsecure` without co-author trailers. Local validation uses only formatting, lint, type checks and the single recap-fallback regression spec; full suites, browser runs and builds remain for CI. Next three tickets: owner-approved PR publication and CI validation; independent interface localization; native editorial qualification.
+
+## MQ-055: Publication authorized (23 October 2026)
+
+The owner explicitly approved pushing `fix/MQ-055-recap-fallback`, opening its PR into dev, and merging only after required checks pass. Fetched and integrated current origin/dev, including the completed branded-login and pagination work, without modifying a protected branch or another worktree. The recap patch remains limited to fallback provenance; both log histories are retained. CI status and merge outcome must be verified on GitHub before reporting completion. Earlier notes about missing publication permission are historical.
+
+### MQ-055: Latest recap surfaces integrated
+
+After integrating the completed recap redesign from origin/dev, applied the same language metadata and translation-status notice to the story summary and readable report download. The timeline, summary and report share one notice helper. The targeted recap spec now has 8 passing cases, including story/report fallback and unknown historical status. Frontend lint and application/spec type checks passed; formatting and whitespace checks passed. No other agents' worktrees, stack processes or protected branches were changed.

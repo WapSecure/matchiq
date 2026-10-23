@@ -1413,6 +1413,7 @@ export interface components {
                 body: string;
                 /** @enum {string} */
                 source: "AGENT" | "TEMPLATE";
+                localeFallback?: boolean;
                 citations: string[];
             }[];
         };
