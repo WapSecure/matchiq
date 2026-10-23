@@ -1,5 +1,11 @@
-import type { Fixture, Team } from '@matchiq/contracts';
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
+import type {
+  CursorPage,
+  CursorPageQuery,
+  Fixture,
+  Team,
+} from '@matchiq/contracts';
+import { and, asc, count, eq, gt, ne, sql } from 'drizzle-orm';
+import { PAGE_CURSOR } from '../constants.js';
 import type { Database } from '../client.js';
 import type {
   FixtureTemplate,
@@ -10,6 +16,7 @@ import type {
   TemplateUpsertOutcome,
 } from '../intelligence-types.js';
 import { fixtureTemplates } from '../schema/intelligence-tables.js';
+import { cursorAfter, decodeCursor } from './keyset-cursor.js';
 import { withTenant } from './tenant-scope.js';
 
 const t = fixtureTemplates;
@@ -125,5 +132,38 @@ export class PostgresTemplateStore implements TemplateStore {
         .orderBy(asc(t.templateId)),
     );
     return rows.map(toSummary);
+  }
+
+  /** By template id, which is unique per organisation, so the order is stable. */
+  async page(
+    orgId: string,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<FixtureTemplateSummary>> {
+    const kind = PAGE_CURSOR.kinds.templates;
+    const [after] =
+      query.cursor === undefined
+        ? []
+        : decodeCursor(query.cursor, kind, ['fixtureId']);
+    const { rows, total } = await withTenant(this.db, orgId, async (tx) => ({
+      rows: await tx
+        .select(summaryColumns)
+        .from(t)
+        .where(
+          and(
+            eq(t.orgId, orgId),
+            after === undefined ? undefined : gt(t.templateId, after),
+          ),
+        )
+        .orderBy(asc(t.templateId))
+        .limit(query.limit + 1),
+      total: await tx.select({ n: count() }).from(t).where(eq(t.orgId, orgId)),
+    }));
+    const { page, nextCursor } = cursorAfter(
+      rows,
+      query.limit,
+      (row) => [row.templateId],
+      kind,
+    );
+    return { items: page.map(toSummary), nextCursor, total: total[0]?.n ?? 0 };
   }
 }

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { PATTERNS } from './constants.js';
 import { FaultPlan } from './faults.js';
 import { Fixture, Team } from './fixture.js';
+import { CursorPage } from './paging.js';
 import { FixtureId, TeamId, UtcTimestamp } from './primitives.js';
 import { ReplayStatus } from './replay.js';
 
@@ -11,7 +12,8 @@ export const ItemList = <T extends z.ZodType>(item: T) =>
 
 export type ItemList<T> = { items: T[] };
 
-export const FixtureList = ItemList(Fixture);
+/** `GET /fixtures`: kickoff order. No `total`, because session fixtures grow unbounded. */
+export const FixtureList = CursorPage(Fixture);
 
 export const TeamSummary = z.strictObject({
   teamId: TeamId,
@@ -57,8 +59,10 @@ export const CreatedSession = z.strictObject({
   session: ReplaySessionView,
 });
 
-export const FixtureTemplateList = ItemList(FixtureTemplateSummary);
-export const ReplaySessionList = ItemList(ReplaySessionView);
+/** `GET /fixture-templates`: by template id, with `total`. */
+export const FixtureTemplateList = CursorPage(FixtureTemplateSummary);
+/** `GET /replay-sessions`: newest first, with `total`. */
+export const ReplaySessionList = CursorPage(ReplaySessionView);
 
 export type FixtureList = z.infer<typeof FixtureList>;
 export type TeamSummary = z.infer<typeof TeamSummary>;

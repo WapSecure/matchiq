@@ -19,7 +19,6 @@ export const DB_LIMITS = {
   sha256HexLength: 64,
   idempotencyKeyMaxLength: 255,
   streamReadPageMax: 1_000,
-  sessionListMax: 100,
   /** Upper bound on sessions a kill switch locks and notifies in one transaction. */
   killSwitchFixturesMax: 100,
 } as const;
@@ -53,6 +52,13 @@ export const AUDIT_TARGET_TYPES = {
 export const AUDIT_CURSOR = {
   encoding: 'base64url',
   idPattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+} as const;
+
+/** Keyset cursors for `GET /fixtures`, `/fixture-templates` and `/replay-sessions`. */
+export const PAGE_CURSOR = {
+  encoding: 'base64url',
+  kinds: { fixtures: 'f', templates: 't', sessions: 's' },
+  timestampPattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
 } as const;
 
 export const RETENTION = {
