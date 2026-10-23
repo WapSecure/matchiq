@@ -8,7 +8,7 @@ import { useStudioUi } from '../store';
 const MS_PER_SECOND = 1_000;
 const FIRST_REVISION = 1;
 
-/** Kind, priority, copy source and hold state of the cue on air. */
+/** Kind, copy source and hold state of the cue on air. */
 export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
   const dwellMs = CUE_HOLD_MS[useStudioUi((s) => s.cueHold)];
   const { cue } = onAir;
@@ -17,12 +17,11 @@ export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
   return (
     <div
       data-testid="on-air-meta"
-      className="mb-2 flex flex-wrap items-center gap-1.5"
+      className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5"
     >
       <Badge tone="accent" dot>
         {OVERLAY_KIND_LABELS[cue.kind]}
       </Badge>
-      <Badge>{OVERLAY_COPY.priority(cue.priority)}</Badge>
       <HintBadge hint={OVERLAY_COPY.sourceHint}>
         {OVERLAY_COPY.source[source]}
       </HintBadge>

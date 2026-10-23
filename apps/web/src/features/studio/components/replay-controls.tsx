@@ -6,8 +6,11 @@ import { PauseIcon, PlayIcon, RestartIcon } from '@/components/icons';
 import { Button, SegmentedControl, Tooltip } from '@/components/ui';
 import { REPLAY_COPY } from '@/constants/replay';
 import { useStartSession } from '@/features/lobby/use-start-session';
+import { cn } from '@/lib/cn';
 import { useReplayTransport } from '../hooks/use-replay-transport';
+import { useSeekMarks } from '../hooks/use-seek-marks';
 import { useSessionTemplate } from '../hooks/use-session-template';
+import type { Roster } from '../lib/roster';
 import { useMatchStore } from '../store';
 import { SeekBar } from './seek-bar';
 
@@ -17,6 +20,12 @@ const SPEED_OPTIONS = REPLAY_SPEEDS.map((value) => ({
   value,
   label: REPLAY_COPY.speedOption(value),
 }));
+
+const STATE_DOT: Record<string, string> = {
+  PLAYING: 'bg-positive motion-safe:animate-pulse',
+  PAUSED: 'bg-warning',
+  COMPLETED: 'bg-ink-muted',
+};
 
 function statusText(t: Transport): string {
   if (t.pending) return REPLAY_COPY.pending;
@@ -57,9 +66,27 @@ function ProblemLine({
   );
 }
 
+function StatusLine({ t }: { t: Transport }) {
+  const dot = t.replay ? STATE_DOT[t.replay.state] : undefined;
+  return (
+    <p className="ml-auto flex items-center gap-2 text-xs text-ink-muted">
+      <span
+        aria-hidden
+        className={cn('size-1.5 rounded-full', dot ?? 'bg-line-strong')}
+      />
+      <span role="status" className="tabular">
+        {statusText(t)}
+      </span>
+    </p>
+  );
+}
+
+type ReplayControlsProps = { sessionId: string; roster?: Roster };
+
 /** Transport for one session; every state shown comes from the server. */
-export function ReplayControls({ sessionId }: { sessionId: string }) {
+export function ReplayControls({ sessionId, roster }: ReplayControlsProps) {
   const t = useReplayTransport(sessionId);
+  const marks = useSeekMarks(roster);
   const template = useSessionTemplate(sessionId);
   const restart = useStartSession();
   const applied = useMatchStore((s) =>
@@ -88,23 +115,28 @@ export function ReplayControls({ sessionId }: { sessionId: string }) {
             {restart.pending ? REPLAY_COPY.restarting : REPLAY_COPY.restart}
           </Button>
         </Tooltip>
-        <SegmentedControl<ReplaySpeed>
-          legend={REPLAY_COPY.speed}
-          hideLegend
-          options={SPEED_OPTIONS}
-          value={t.speed}
-          onChange={t.changeSpeed}
-          disabled={locked}
-        />
-        <p role="status" className="tabular ml-auto text-xs text-ink-muted">
-          {statusText(t)}
-        </p>
+        <span aria-hidden className="hidden h-5 w-px bg-line sm:block" />
+        <div className="flex items-center gap-2">
+          <span aria-hidden className="text-micro text-ink-subtle">
+            {REPLAY_COPY.speedShort}
+          </span>
+          <SegmentedControl<ReplaySpeed>
+            legend={REPLAY_COPY.speed}
+            hideLegend
+            options={SPEED_OPTIONS}
+            value={t.speed}
+            onChange={t.changeSpeed}
+            disabled={locked}
+          />
+        </div>
+        <StatusLine t={t} />
       </div>
       <SeekBar
         total={template?.eventCount ?? applied + 1}
         applied={applied}
         onCommit={t.seek}
         disabled={locked || !template}
+        marks={marks}
       />
       <ProblemLine t={t} restartError={restart.error} />
     </div>

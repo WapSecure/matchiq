@@ -7,7 +7,6 @@ import { REGION_NAMES as R } from '@/constants/errors';
 import { useEffect, useMemo } from 'react';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import type { SseTransport } from '@/lib/stream';
-import { AudienceBar } from './components/audience-controls';
 import {
   ConnectionBanner,
   LiveConnection,
@@ -55,7 +54,6 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
       >
         <RegionBoundary region={R.controls}>
           <ProducerControlBar />
-          <AudienceBar />
         </RegionBoundary>
         <div className={GRID}>
           <div className={COLUMN}>
@@ -69,7 +67,10 @@ function StudioGrid({ fixture }: { fixture: Fixture }) {
                 footer={
                   <div className="mt-4 border-t border-line pt-4">
                     <RequirePermission permission="replay:control">
-                      <ReplayControls sessionId={fixture.fixtureId} />
+                      <ReplayControls
+                        sessionId={fixture.fixtureId}
+                        roster={roster}
+                      />
                     </RequirePermission>
                   </div>
                 }
