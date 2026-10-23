@@ -16,7 +16,7 @@ import {
 } from './api-error';
 
 export type RequestOptions = {
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'PUT';
   body?: unknown;
   headers?: Record<string, string>;
   signal?: AbortSignal;

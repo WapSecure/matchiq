@@ -67,16 +67,19 @@
   ],
   "references": [
     {
+      "path": "../../libs/football-engine"
+    },
+    {
       "path": "../../libs/contracts"
     },
     {
       "path": "../../libs/config"
     },
     {
-      "path": "../../libs/access"
+      "path": "../../libs/api-client"
     },
     {
-      "path": "../../libs/api-client"
+      "path": "../../libs/access"
     }
   ]
 }

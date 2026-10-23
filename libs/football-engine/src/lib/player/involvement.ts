@@ -1,4 +1,4 @@
-import type { Insight, MatchEvent, MatchEventOf } from '@matchiq/contracts';
+import type { MatchEvent, MatchEventOf } from '@matchiq/contracts';
 import type {
   PlayerAction,
   PlayerActionKind,
@@ -145,14 +145,15 @@ export const playerInvolvement = (
 };
 
 /** Key moments that name the player or cite one of their events as evidence. */
-export const momentsInvolvingPlayer = <T extends Insight>(
-  insights: readonly T[],
+export const momentsInvolvingPlayer = <T extends { playerId?: string }>(
+  moments: readonly T[],
   involvement: Pick<PlayerInvolvement, 'playerId' | 'actions'>,
+  evidenceOf: (moment: T) => readonly string[],
 ): T[] => {
   const own = new Set(involvement.actions.map((a) => a.eventId));
-  return insights.filter(
-    (insight) =>
-      insight.playerId === involvement.playerId ||
-      insight.evidence.eventIds.some((id) => own.has(id)),
+  return moments.filter(
+    (moment) =>
+      moment.playerId === involvement.playerId ||
+      evidenceOf(moment).some((id) => own.has(id)),
   );
 };

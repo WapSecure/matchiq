@@ -144,6 +144,7 @@ describe('momentsInvolvingPlayer', () => {
         moment('in_c', [theirs.eventId], FOCUS),
       ],
       involvement,
+      (i) => i.evidence.eventIds,
     );
     expect(kept.map((i) => i.insightId)).toEqual(['in_a', 'in_c']);
   });

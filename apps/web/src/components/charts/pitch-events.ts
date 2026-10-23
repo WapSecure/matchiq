@@ -30,6 +30,8 @@ export type PitchMark = {
   /** Shots only; `true` fills the mark. */
   onTarget: boolean | null;
   outcome: ShotOutcome | null;
+  /** By the player the viewer follows. */
+  followed?: boolean;
 };
 
 /**
@@ -67,6 +69,7 @@ const toMark = (
   event: Plottable,
   roster: PitchRoster,
   goals: Set<string>,
+  followedPlayerId: string | null,
 ): PitchMark | null => {
   const team = roster.team(event.teamId);
   if (!team) return null;
@@ -82,6 +85,7 @@ const toMark = (
     ...toScreen(event.location, team.side),
     onTarget: shot ? ON_TARGET_OUTCOMES.has(shot.outcome) : null,
     outcome: shot ? shot.outcome : null,
+    followed: followedPlayerId !== null && event.playerId === followedPlayerId,
   };
 };
 
@@ -90,12 +94,13 @@ export const buildPitchMarks = (
   events: readonly MatchEvent[],
   roster: PitchRoster,
   voided: Record<string, string> = {},
+  followedPlayerId: string | null = null,
 ): PitchMark[] => {
   const goals = scoringShots(events, voided);
   const marks: PitchMark[] = [];
   for (const event of events) {
     if (!isPlottable(event) || voided[event.eventId]) continue;
-    const mark = toMark(event, roster, goals);
+    const mark = toMark(event, roster, goals, followedPlayerId);
     if (mark) marks.push(mark);
   }
   return marks;

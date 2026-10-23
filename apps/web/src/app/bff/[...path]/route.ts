@@ -75,3 +75,4 @@ const forward = async (request: NextRequest, context: Context) => {
 
 export const GET = forward;
 export const POST = forward;
+export const PUT = forward;

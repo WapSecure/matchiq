@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/feedback';
 import { PitchIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { PITCH_COPY } from '@/constants/pitch';
+import { useFocusedPlayer } from '@/features/player-focus/use-focused-player';
 import type { Roster } from '../lib/roster';
 import { useMatchStore } from '../store';
 
@@ -21,9 +22,10 @@ type PitchPanelProps = {
 export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
   const timeline = useMatchStore((s) => s.timeline);
   const voided = useMatchStore((s) => s.voided);
+  const { playerId } = useFocusedPlayer(fixture);
   const marks = useMemo(
-    () => buildPitchMarks(timeline, roster, voided),
-    [timeline, roster, voided],
+    () => buildPitchMarks(timeline, roster, voided, playerId),
+    [timeline, roster, voided, playerId],
   );
   const { pitch } = fixture;
   const first = marks[0];

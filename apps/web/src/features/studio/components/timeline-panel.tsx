@@ -12,7 +12,9 @@ import {
   KEY_EVENT_TYPES,
   PERIOD_LABELS,
 } from '@/constants/match';
+import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import { STUDIO_COPY } from '@/constants/studio';
+import { useFollowedRows } from '@/features/player-focus/use-followed-rows';
 import { useTickerRows } from '../hooks/use-ticker-rows';
 import { useTimelineEvents } from '../hooks/use-timeline-events';
 import type { Roster } from '../lib/roster';
@@ -40,11 +42,15 @@ export function TimelinePanel({
   const [all, setAll] = useState(false);
   const [limit, setLimit] = useState<number>(copy.pageSize);
   const older = useTimelineEvents(fixtureId);
-  const rows = useTickerRows(
+  const rows = useFollowedRows(
+    useTickerRows(
+      older.events,
+      voided,
+      roster,
+      all ? KEY_EVENT_TYPES : HEADLINE_EVENT_TYPES,
+    ),
     older.events,
-    voided,
-    roster,
-    all ? KEY_EVENT_TYPES : HEADLINE_EVENT_TYPES,
+    (id) => roster.player(id) !== null,
   );
   const shown = Math.min(limit, rows.length);
   const more = () => {
@@ -80,6 +86,7 @@ export function TimelinePanel({
             label={copy.title}
             voidedLabel={copy.voided}
             periodLabel={periodLabel}
+            followedLabel={PLAYER_FOCUS_COPY.followedMark}
           />
           {older.error ? (
             <div className="px-4 pt-2">

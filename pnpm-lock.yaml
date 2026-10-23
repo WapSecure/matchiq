@@ -298,6 +298,9 @@ importers:
       '@matchiq/contracts':
         specifier: workspace:*
         version: link:../../libs/contracts
+      '@matchiq/football-engine':
+        specifier: workspace:*
+        version: link:../../libs/football-engine
       '@tanstack/react-query':
         specifier: 5.103.3
         version: 5.103.3(react@19.3.1)
