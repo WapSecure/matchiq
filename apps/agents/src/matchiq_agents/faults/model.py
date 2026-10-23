@@ -40,6 +40,7 @@ class FaultInjectingModel:
         self._inner = inner
         self._scenario = scenario
         self.calls: Counter[AgentName] = Counter()
+        self.simulated_timeouts = 0
         self.corruption_note: str | None = None
         self.revision_notes: tuple[str, ...] = ()
 
@@ -66,6 +67,7 @@ class FaultInjectingModel:
         self.calls[agent_name] += 1
         if self._scenario is FaultScenario.MODEL_TIMEOUT:
             # Raised at once: the runner treats it exactly like an expired per-call budget.
+            self.simulated_timeouts += 1
             raise TimeoutError(SIMULATED_TIMEOUT)
         parsed, usage = await self._inner.generate(
             agent_name, instructions, payload, response_model, deadline
