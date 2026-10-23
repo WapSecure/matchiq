@@ -12,6 +12,7 @@ export const PROBLEM_COPY: Record<string, ErrorCopy | ErrorKind> = {
   unauthorized: 'sessionExpired',
   forbidden: 'forbidden',
   'not-found': 'notFound',
+  'trace-not-found': 'notFound',
   conflict: 'conflict',
   'rate-limited': 'rateLimited',
   'internal-error': 'server',
