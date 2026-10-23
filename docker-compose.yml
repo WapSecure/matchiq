@@ -195,6 +195,8 @@ services:
       AGENTS_PORT: '8000'
       AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
       MODEL_PROVIDER: mock
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${COMPOSE_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      LOG_FORMAT: ${LOG_FORMAT:-json}
     ports:
       - '127.0.0.1:${AGENTS_PORT:-8000}:8000'
 

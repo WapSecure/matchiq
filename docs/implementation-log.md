@@ -17,6 +17,18 @@ Verification ran in CI only, by owner directive (the machine was overloaded). Lo
 
 Limitations: simulated timeouts are raised at once, so their latency is not representative. The lobby select needs `NEXT_PUBLIC_DEMO_MODE=true` at build time. With `ollama` or `foundry` the revision is real model output and could itself fail its checks; that case falls back to the persona's template, which is also a valid chain.
 
+## 2026-10-23 — MQ-029 (2/2): Agents service logs and tracing
+
+| Area                                                                                                                                                                                           | Status   | Evidence                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------- |
+| JSON logs from Python `logging` (uvicorn included) with the Node line shape: service, version, env, context, requestId, correlationId, traceId, spanId; pretty only when `APP_ENV=local`       | Done     | `tests/test_telemetry.py`          |
+| Redaction mirroring server-kit (secret-named keys, bearer/URL/`Key=value` text)                                                                                                                | Done     | same                               |
+| `RequestContextMiddleware`: well-formed `x-request-id` echoed or issued, `x-correlation-id` bound, one access line per request with the route template                                         | Done     | same                               |
+| OpenTelemetry FastAPI instrumentation when `OTEL_EXPORTER_OTLP_ENDPOINT` is set; the worker's `traceparent` parents the request span; SDK not imported otherwise; `OTEL_SDK_DISABLED` honoured | Done     | in-memory exporter test            |
+| Spans per model call; agents `/metrics`                                                                                                                                                        | Not done | Worker counts outcomes and latency |
+
+Only `apps/agents` bootstrap (`app.py`, `__main__.py`), a new `telemetry` package and its test changed. Verification ran in CI; locally only `ruff check`, `ruff format` and `pyright` (0 errors).
+
 ## 2026-10-22 — MQ-028: Producer editorial controls and audit trail (web)
 
 | Area                                                                                                                                                                                                                                                                                                                               | Status | Evidence                                                                                                  |
@@ -42,7 +54,7 @@ Verification ran in CI (owner directive: no local test runs). Locally: `nx run-m
 | `/metrics` on an internal listener (API 9464, worker 9465): RED per route, SSE gauge, outbox backlog and lag, queue depth and job durations, sessions by state, agent outcomes and latency by provider, gate rejections, retention deletions | Done      | `metrics.spec.ts`, `worker-metrics.spec.ts`                                                                                               |
 | `observability` compose profile (collector, Tempo, Prometheus, Grafana; pinned by digest), 4 dashboards, 10 SLO alert rules, `docs/operations/OBSERVABILITY.md`                                                                              | Partial   | Validated statically: `docker compose config`, `promtool check config` / `check rules` (10 rules), `otelcol validate`. Not run end to end |
 | Azure Monitor                                                                                                                                                                                                                                | Seam only | Collector variant `otel-collector.azure.yaml`; not exercised                                                                              |
-| Agents service logs and tracing                                                                                                                                                                                                              | Next      | MQ-029 (2/2)                                                                                                                              |
+| Agents service logs and tracing (see 2/2)                                                                                                                                                                                                    | Next      | MQ-029 (2/2)                                                                                                                              |
 
 Verification ran in CI per the owner's directive. Locally only `typecheck` and `lint` ran, for api, worker, server-kit, config and db, plus the static stack checks above.
 
