@@ -1,4 +1,5 @@
 import type { Insight } from '@matchiq/contracts';
+import { HintBadge } from '@/components/ui';
 import { englishLanguageName } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { SITE } from '@/constants/site';
@@ -48,9 +49,16 @@ export function NarrativePanel({
       </p>
       <p
         lang={SITE.locale}
-        className="flex flex-wrap gap-x-2 text-micro text-ink-subtle"
+        className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-micro text-ink-subtle"
       >
-        <span>{STUDIO_COPY.insights.source[narrative.source]}</span>
+        <HintBadge
+          tone={narrative.source === 'AGENT' ? 'accent' : 'neutral'}
+          dot={narrative.source === 'AGENT'}
+          hint={STUDIO_COPY.insights.sourceHint[narrative.source]}
+          className="normal-case"
+        >
+          {STUDIO_COPY.insights.source[narrative.source]}
+        </HintBadge>
         {localeFallback ? (
           <span className="text-warning" lang={SITE.locale}>
             {STUDIO_COPY.insights.localeFallback(englishLanguageName(locale))}

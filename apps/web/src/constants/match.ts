@@ -58,6 +58,20 @@ export const KEY_EVENT_TYPES: ReadonlySet<MatchEventType> = new Set([
   'CORRECTION',
 ]);
 
+/** The timeline's default view: what changes a match, without the build-up. */
+export const HEADLINE_EVENT_TYPES: ReadonlySet<MatchEventType> = new Set([
+  'MATCH_STARTED',
+  'PERIOD_STARTED',
+  'PERIOD_ENDED',
+  'MATCH_ENDED',
+  'SHOT',
+  'GOAL',
+  'SAVE',
+  'CARD',
+  'SUBSTITUTION',
+  'CORRECTION',
+]);
+
 export const HIGHLIGHT_EVENT_TYPES: ReadonlySet<MatchEventType> = new Set([
   'GOAL',
   'CARD',

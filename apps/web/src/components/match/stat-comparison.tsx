@@ -39,14 +39,14 @@ function Bars({ row }: { row: StatRow }) {
   const pair = shares(row);
   if (!pair) return null;
   return (
-    <div aria-hidden className="mt-1 grid grid-cols-2 gap-1">
-      <div className="flex h-1 justify-end rounded-full bg-surface-sunken">
+    <div aria-hidden className="mt-1.5 flex w-full gap-0.5">
+      <div className="flex h-1.5 flex-1 justify-end rounded-full bg-surface-sunken">
         <span
           className={cn('rounded-full', SIDE_BG.home)}
           style={{ width: `${pair[0]}%` }}
         />
       </div>
-      <div className="flex h-1 rounded-full bg-surface-sunken">
+      <div className="flex h-1.5 flex-1 rounded-full bg-surface-sunken">
         <span
           className={cn('rounded-full', SIDE_BG.away)}
           style={{ width: `${pair[1]}%` }}
@@ -72,6 +72,11 @@ export function StatComparison({
   return (
     <table className="w-full table-fixed text-sm">
       <caption className="sr-only">{caption}</caption>
+      <colgroup>
+        <col className="w-14" />
+        <col />
+        <col className="w-14" />
+      </colgroup>
       <thead className="sr-only">
         <tr>
           <th scope="col">{homeName}</th>
@@ -82,17 +87,17 @@ export function StatComparison({
       <tbody>
         {rows.map((row) => (
           <tr key={row.key} className="border-b border-line/60 last:border-0">
-            <td className="w-16 py-1.5 text-left align-top font-semibold text-ink">
+            <td className="tabular w-14 py-2 text-left align-bottom font-semibold text-ink">
               <Value row={row} side="home" />
             </td>
             <th
               scope="row"
-              className="py-1.5 text-center align-top text-xs font-normal text-ink-muted"
+              className="px-2 py-2 text-center align-top text-xs font-normal text-ink-muted"
             >
               {row.label}
               <Bars row={row} />
             </th>
-            <td className="w-16 py-1.5 text-right align-top font-semibold text-ink">
+            <td className="tabular w-14 py-2 text-right align-bottom font-semibold text-ink">
               <Value row={row} side="away" />
             </td>
           </tr>

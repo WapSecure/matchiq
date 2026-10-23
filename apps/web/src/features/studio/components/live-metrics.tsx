@@ -39,6 +39,7 @@ export function LiveMetrics({
     <Panel
       id="metrics"
       title={m.title}
+      description={m.description}
       Icon={ChartIcon}
       className={className}
       bodyClassName="@container"

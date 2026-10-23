@@ -6,6 +6,7 @@ import {
   type PitchTeamFilter,
 } from '@/constants/pitch';
 import { cn } from '@/lib/cn';
+import { TeamSwatch } from '@/components/match/team-swatch';
 import { GlyphSwatch } from './pitch-glyph';
 
 type PitchFiltersProps = {
@@ -72,7 +73,20 @@ export function PitchFilters({
             );
           })}
         </div>
-        <p className="mt-2 text-micro text-ink-subtle">
+        <ul
+          aria-label={PITCH_COPY.teamKey}
+          className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-micro text-ink-muted"
+        >
+          <li className="flex items-center gap-1.5">
+            <TeamSwatch side="home" className="size-2" />
+            {homeShort}
+          </li>
+          <li className="flex items-center gap-1.5">
+            <TeamSwatch side="away" className="size-2" />
+            {awayShort}
+          </li>
+        </ul>
+        <p className="mt-1.5 text-micro text-ink-subtle">
           {PITCH_COPY.offTarget}
         </p>
       </fieldset>

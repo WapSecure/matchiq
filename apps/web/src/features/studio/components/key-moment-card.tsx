@@ -121,7 +121,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
         )}
         <Button
           size="xs"
-          variant="ghost"
+          variant="secondary"
           leadingIcon={<EvidenceIcon size={14} />}
           aria-label={STUDIO_COPY.insights.openEvidence(headline)}
           aria-haspopup="dialog"

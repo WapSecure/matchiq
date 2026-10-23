@@ -24,7 +24,7 @@ export const EVIDENCE_COPY = {
     insightId: 'Insight id',
     method: 'Method version',
     reason: 'Reason code',
-    status: 'Pipeline status',
+    status: 'Where this moment is',
     generated: 'Generated',
     events: 'Event ids',
     metrics: 'Metric refs and formulas',

@@ -24,6 +24,18 @@ type EventTickerProps = {
   periodLabel: (period: number) => string;
 };
 
+const RAIL: Record<CardColour, string> = {
+  YELLOW: 'bg-card-yellow',
+  SECOND_YELLOW: 'bg-card-yellow',
+  RED: 'bg-card-red',
+};
+
+const railOf = (row: TickerRow): string | null => {
+  if (row.voided) return null;
+  if (row.type === 'GOAL') return 'bg-accent';
+  return row.card ? RAIL[row.card] : null;
+};
+
 const TickerItem = memo(function TickerItem({
   row,
   voidedLabel,
@@ -32,6 +44,7 @@ const TickerItem = memo(function TickerItem({
   voidedLabel: string;
 }) {
   const goal = row.type === 'GOAL' && !row.voided;
+  const rail = railOf(row);
   return (
     <li
       data-event-type={row.type}
@@ -41,10 +54,10 @@ const TickerItem = memo(function TickerItem({
         row.highlight && !goal && 'bg-surface-raised/60',
       )}
     >
-      {goal ? (
+      {rail ? (
         <span
           aria-hidden
-          className="absolute inset-y-0 left-0 w-0.5 bg-accent"
+          className={cn('absolute inset-y-0 left-0 w-[3px]', rail)}
         />
       ) : null}
       <span className="tabular pt-1 text-right font-mono text-xs text-ink-muted">
@@ -55,7 +68,7 @@ const TickerItem = memo(function TickerItem({
         <p className="flex min-w-0 items-center gap-2 text-[13px] leading-5 text-ink">
           <span
             className={cn(
-              goal ? 'font-semibold' : 'font-medium',
+              goal ? 'text-sm font-semibold' : 'font-medium',
               row.voided && 'text-ink-muted line-through',
             )}
           >
