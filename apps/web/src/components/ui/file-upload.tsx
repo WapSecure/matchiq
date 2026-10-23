@@ -92,7 +92,7 @@ export function FileUpload({
           invalid ? 'border-critical' : 'border-line-strong',
           'data-hovered:border-control data-drop-target:border-solid data-drop-target:border-accent data-drop-target:bg-accent-soft data-drop-target:ring-4 data-drop-target:ring-accent/12',
           'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent',
-          'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-none data-disabled:opacity-70',
+          'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-none',
         )}
       >
         {({ isDropTarget }) => (

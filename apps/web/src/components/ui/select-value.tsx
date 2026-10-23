@@ -29,10 +29,7 @@ export function SelectedValue<K extends string>({
         {option.label}
       </span>
       {option.description ? (
-        <span
-          aria-hidden
-          className="hidden min-w-0 flex-1 truncate text-ink-subtle sm:inline"
-        >
+        <span className="hidden min-w-0 flex-1 truncate text-ink-subtle sm:inline">
           {option.description}
         </span>
       ) : null}
