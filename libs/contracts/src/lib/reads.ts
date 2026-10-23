@@ -40,6 +40,7 @@ export const RecapNarrative = z.strictObject({
   headline: z.string().min(1),
   body: z.string().min(1),
   source: NarrativeSource,
+  localeFallback: z.boolean().optional(),
   citations: z.array(z.string()),
 });
 
