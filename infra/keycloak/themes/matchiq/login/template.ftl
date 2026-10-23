@@ -21,6 +21,10 @@
 
 <#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false>
 <#assign isSignInPage = ["login", "login-username", "login-password"]?seq_contains(pageId)>
+<#-- Keycloak in dev mode prefixes each template's output with an HTML comment; keep it out of the heading and the tab title. -->
+<#assign pageHeading><#nested "header"></#assign>
+<#assign pageHeading = pageHeading?markup_string?replace("<!--[\\s\\S]*?-->", "", "r")?trim>
+<#assign tabTitle = pageHeading?replace(" (to|of) " + msg("mqProductName") + "$", "", "r")>
 <!DOCTYPE html>
 <html lang="${lang}"<#if realm.internationalizationEnabled> dir="${(locale.rtl)?then('rtl','ltr')}"</#if>>
 <head>
@@ -28,7 +32,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title><#nested "header"> · ${msg("mqProductName")}</title>
+  <title>${tabTitle?no_esc} · ${msg("mqProductName")}</title>
   <link rel="icon" href="${url.resourcesPath}/img/favicon.ico">
   <link rel="preload" href="${url.resourcesPath}/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <#if properties.styles?has_content>
@@ -99,7 +103,7 @@
         <span class="mq-logo-tile"><span class="mq-icon mq-icon-logo"></span></span>
         <span class="mq-wordmark">${msg("mqProductName")}</span>
       </div>
-      <h1 id="kc-page-title" class="mq-title"><#nested "header"></h1>
+      <h1 id="kc-page-title" class="mq-title">${pageHeading?no_esc}</h1>
       <#if isSignInPage>
         <p class="mq-lead">${msg("mqLoginLead")}</p>
       </#if>

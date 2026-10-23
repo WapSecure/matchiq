@@ -28,7 +28,7 @@ function ShareOfAi({ s }: { s: Summary }) {
   );
   return (
     <div className="col-span-2 flex flex-col gap-3 bg-surface px-4 py-4 sm:px-5 lg:col-span-1">
-      <dt className="eyebrow">{copy.share.title}</dt>
+      <dt className="text-xs font-medium text-ink-muted">{copy.share.title}</dt>
       <dd className="flex flex-col gap-3">
         <p className="flex flex-wrap items-baseline gap-x-2.5">
           <span className="tabular font-mono text-3xl font-semibold tracking-tight text-ink">

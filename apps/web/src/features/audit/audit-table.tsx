@@ -1,10 +1,11 @@
 import type { AuditEvent } from '@matchiq/contracts';
+import type { ReactNode } from 'react';
+import { TechnicalDetails } from '@/components/ui';
 import {
   ACTOR_TYPE_LABELS,
   AUDIT_ACTION_LABELS,
   AUDIT_COPY,
 } from '@/constants/audit';
-import { TechnicalDetails } from '@/components/ui';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
 import { AuditDiff } from './audit-diff';
 import { AuditTargetCell } from './audit-target-cell';
@@ -16,7 +17,26 @@ type AuditTableProps = {
 };
 
 const columns = AUDIT_COPY.columns;
-const CELL = 'px-3 py-2.5 align-top';
+const CELL = 'px-3 py-3 align-top';
+/** Below md each row is a card; the column name comes from `data-label`. */
+const CARD_CELL =
+  'max-md:flex max-md:items-baseline max-md:justify-between max-md:gap-4 max-md:p-0 max-md:before:shrink-0 max-md:before:text-xs max-md:before:text-ink-subtle max-md:before:content-[attr(data-label)]';
+
+function Cell({
+  label,
+  className = '',
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <td data-label={label} className={`${CELL} ${CARD_CELL} ${className}`}>
+      <div className="max-md:text-right">{children}</div>
+    </td>
+  );
+}
 
 /** The person's name first, then who they are; raw ids live in Technical details. */
 function AuditActorCell({ event }: { event: AuditEvent }) {
@@ -24,7 +44,7 @@ function AuditActorCell({ event }: { event: AuditEvent }) {
   const name = event.actorDisplayName;
   return (
     <>
-      <span className="block text-ink">{name ?? type}</span>
+      <span className="block font-medium text-ink">{name ?? type}</span>
       {name ? (
         <span className="block text-micro text-ink-subtle">{type}</span>
       ) : null}
@@ -34,14 +54,17 @@ function AuditActorCell({ event }: { event: AuditEvent }) {
 
 function AuditTechnical({ event }: { event: AuditEvent }) {
   const t = AUDIT_COPY.technical;
+  const rows = [
+    [t.action, event.action],
+    [t.actor, event.actor.id],
+    [t.target, event.target.id],
+    [t.entry, event.id],
+    [t.request, event.requestId],
+  ].filter((row): row is [string, string] => Boolean(row[1]));
   return (
-    <TechnicalDetails className="mt-1.5 font-normal">
+    <TechnicalDetails className="mt-2 text-left font-normal">
       <dl className="grid gap-1 font-mono text-micro">
-        {[
-          [t.action, event.action],
-          [t.actor, event.actor.id],
-          [t.target, event.target.id],
-        ].map(([label, value]) => (
+        {rows.map(([label, value]) => (
           <div key={label}>
             <dt className="text-ink-subtle">{label}</dt>
             <dd className="break-all text-ink">{value}</dd>
@@ -54,38 +77,43 @@ function AuditTechnical({ event }: { event: AuditEvent }) {
 
 function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
   return (
-    <tr className="border-t border-line">
-      <td className={CELL}>
+    <tr className="border-t border-line max-md:flex max-md:flex-col max-md:gap-2.5 max-md:px-4 max-md:py-3.5">
+      <Cell label={columns.time}>
         <time dateTime={event.at} className="block whitespace-nowrap text-ink">
           {formatRelative(event.at, nowMs)}
         </time>
         <span className="tabular block whitespace-nowrap font-mono text-micro text-ink-subtle">
           {formatTimestamp(event.at)}
         </span>
-      </td>
-      <th scope="row" className={`${CELL} text-left font-medium text-ink`}>
+      </Cell>
+      <th
+        scope="row"
+        className={`${CELL} text-left text-[13px] font-semibold text-ink max-md:order-first max-md:p-0`}
+      >
         {AUDIT_ACTION_LABELS[event.action] ?? event.action}
       </th>
-      <td className={CELL}>
+      <Cell label={columns.actor}>
         <AuditActorCell event={event} />
-      </td>
-      <td className={CELL}>
+      </Cell>
+      <Cell label={columns.target}>
         <AuditTargetCell target={event.target} />
-      </td>
-      <td className={`${CELL} max-w-[22rem] text-ink`}>
-        {event.reason ?? (
+      </Cell>
+      <Cell label={columns.reason} className="md:max-w-[22rem]">
+        {event.reason ? (
+          <span className="text-ink">{event.reason}</span>
+        ) : (
           <span className="text-ink-subtle">{AUDIT_COPY.noReason}</span>
         )}
-      </td>
-      <td className={CELL}>
+      </Cell>
+      <Cell label={columns.changes}>
         <AuditDiff event={event} />
         <AuditTechnical event={event} />
-      </td>
+      </Cell>
     </tr>
   );
 }
 
-/** A real table; it scrolls inside its own focusable region on narrow screens. */
+/** A real table on wide screens; each row stacks into a card on phones. */
 export function AuditTable({ events, hasMore, nowMs }: AuditTableProps) {
   return (
     <div
@@ -94,20 +122,24 @@ export function AuditTable({ events, hasMore, nowMs }: AuditTableProps) {
       tabIndex={0}
       className="overflow-x-auto rounded-lg border border-line bg-surface shadow-panel"
     >
-      <table className="w-full min-w-[56rem] border-collapse text-left text-xs">
+      <table className="w-full border-collapse text-left text-xs max-md:block md:min-w-[56rem]">
         <caption className="sr-only">
           {AUDIT_COPY.tableCaption(events.length, hasMore)}
         </caption>
-        <thead className="bg-surface-raised text-ink-muted">
+        <thead className="bg-surface-raised text-ink-muted max-md:sr-only">
           <tr>
             {Object.values(columns).map((label) => (
-              <th key={label} scope="col" className="eyebrow px-3 py-2">
+              <th
+                key={label}
+                scope="col"
+                className="px-3 py-2.5 text-xs font-medium"
+              >
                 {label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="max-md:block">
           {events.map((event) => (
             <AuditRow key={event.id} event={event} nowMs={nowMs} />
           ))}

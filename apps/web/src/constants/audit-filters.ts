@@ -5,10 +5,10 @@ import type { DatePresetId } from './ui';
 export const AUDIT_FILTER_COPY = {
   when: 'When',
   actionPlaceholder: 'Search actions',
-  groups: { editorial: 'Editorial decisions', platform: 'Sessions and data' },
+  groups: { editorial: 'Editorial decisions', platform: 'Replays and data' },
   scopeHints: {
-    fixture: 'Only this replay session.',
-    org: 'Every session in your organisation.',
+    fixture: 'Only this replay.',
+    org: 'Every replay in your organisation.',
   },
 } as const;
 
