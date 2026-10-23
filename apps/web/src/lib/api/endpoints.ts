@@ -44,7 +44,8 @@ export const fetchTemplates = async (signal?: AbortSignal) => {
   const items: FixtureTemplateSummary[] = [];
   let cursor: string | undefined;
   for (let page = 0; page < API_LIMITS.templatePagesMax; page += 1) {
-    const query = { limit: API_LIMITS.templatePageMax, cursor };
+    // The API's default page is its maximum, so the first request needs no query.
+    const query = cursor === undefined ? {} : { cursor };
     const next = await validated(
       (client) =>
         client.GET('/fixture-templates', { signal, params: { query } }),

@@ -59,8 +59,6 @@ export const API_LIMITS = {
   evidencePagesMax: 8,
   /** The API's largest `/replay-sessions` page, searched for one session's times. */
   sessionLookupMax: 100,
-  /** The API's `/fixture-templates` maximum page size. */
-  templatePageMax: 100,
   /** Pages followed when loading the whole match catalogue. */
   templatePagesMax: 10,
   queryStaleMs: 15_000,
