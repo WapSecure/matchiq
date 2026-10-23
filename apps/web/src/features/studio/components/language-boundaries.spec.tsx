@@ -17,6 +17,7 @@ describe('commentary language boundaries', () => {
   it('tags translated commentary separately from English source labels', () => {
     render(
       <NarrativePanel
+        persona="ANALYST"
         insight={insight()}
         locale="fr-FR"
         view={{
@@ -33,7 +34,7 @@ describe('commentary language boundaries', () => {
     expect(languageOf(screen.getByText('Trois tirs en cinq minutes.'))).toBe(
       'fr-FR',
     );
-    expect(languageOf(screen.getByText('Written by AI · fact-checked'))).toBe(
+    expect(languageOf(screen.getByText('Fact-checked'))).toBe(
       'en-GB',
     );
   });
@@ -41,6 +42,7 @@ describe('commentary language boundaries', () => {
   it('tags provider fallback text as English even when filed under French', () => {
     render(
       <NarrativePanel
+        persona="ANALYST"
         insight={insight()}
         locale="fr-FR"
         view={{
@@ -64,6 +66,7 @@ describe('commentary language boundaries', () => {
   it('tags the actual English variant when Spanish commentary is unavailable', () => {
     render(
       <NarrativePanel
+        persona="ANALYST"
         insight={insight()}
         locale="es-ES"
         view={{ narrative: narrative(), localeFallback: true }}
@@ -75,10 +78,18 @@ describe('commentary language boundaries', () => {
   });
 
   it('keeps recap source labels in English inside French commentary', () => {
+    const base = moment();
+    const checked = {
+      ...base,
+      narratives: base.narratives.map((n) => ({
+        ...n,
+        source: 'AGENT' as const,
+      })),
+    };
     render(
       <ul>
         <RecapMomentItem
-          moment={moment()}
+          moment={checked}
           team={null}
           persona="BROADCAST"
           locale="fr-FR"
@@ -86,7 +97,7 @@ describe('commentary language boundaries', () => {
       </ul>,
     );
     expect(languageOf(screen.getByText('Home United égalise'))).toBe('fr-FR');
-    expect(languageOf(screen.getByText('Standard wording'))).toBe('en-GB');
+    expect(languageOf(screen.getByText('Fact-checked'))).toBe('en-GB');
   });
 
   it('tags overlay text with the cue locale', () => {

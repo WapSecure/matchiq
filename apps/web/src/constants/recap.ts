@@ -55,8 +55,9 @@ export const RECAP_COPY = {
     statLine: (label: string, home: string, away: string) =>
       `${label}: ${home}–${away}`,
     unavailable: 'not available',
-    footer:
-      'Simulated match. Every number comes from the match data, never from AI.',
+    footer: 'Simulated match. Every number comes from the match data.',
+    disclosure:
+      'Commentary auto-generated from the match data and fact-checked.',
   },
   notReady: {
     title: 'The recap is ready at full time',
