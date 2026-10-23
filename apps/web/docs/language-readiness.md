@@ -19,7 +19,7 @@ Render the selected interface locale on the server, using an allowlisted prefere
 
 Release evidence: complete catalog keys checked by TypeScript; independent preference behavior through navigation and refresh; English fallback; translated error states and dialogs; long-label layout at 320/390/768/1440px; keyboard and screen-reader checks; locale-aware interface number/date formatting with explicit audit timezone. Canonical facts, IDs, evidence exports and stored numeric values remain unchanged. Review architectural changes with the platform owner before introducing routing or a new shared library.
 
-## MQ-055: Preserve recap fallback provenance (local implementation, pending PR)
+## MQ-055: Preserve recap fallback provenance (PR validation)
 
 The recap read contract now accepts optional `localeFallback`, and the worker copies it from each published narrative when building a recap. OpenAPI and the generated TypeScript client retain the field. The web reader uses the canonical recap narrative schema, so it no longer discards the indicator before display or export.
 
@@ -29,7 +29,7 @@ No database schema migration or bulk rewriting of historical recap JSON is requi
 
 Rollout: upgrade strict schema consumers before enabling writers that emit the new field. The optional marker allows the current reader to load older records; an older reader pinned to a strict response schema may reject newly added properties. JSON export preserves a supplied flag and leaves an absent flag absent.
 
-Validation and changes are recorded under MQ-055 in the implementation log. Local format, lint and type checks plus targeted regression specs follow the updated repository workflow. CI must run the full suites and browser checks before a PR merges. The branch has not been pushed; remote publication requires the owner's explicit approval after automatic review rejected that action.
+Validation and changes are recorded under MQ-055 in the implementation log. Local format, lint and type checks plus targeted regression specs follow the updated repository workflow. CI must run the full suites and browser checks before a PR merges. The owner has explicitly authorized branch publication, PR creation and merging after all required CI checks pass. Earlier publication-blocker notes in the implementation log describe the prior state.
 
 ## MQ-051: Native editorial qualification (product and D)
 
