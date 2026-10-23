@@ -11,6 +11,7 @@ import {
 import { EDITORIAL_COPY, MODE_VIEW } from '@/constants/editorial';
 import { ROUTES } from '@/constants/navigation';
 import { cn } from '@/lib/cn';
+import { PublishPolicySwitch } from '../approval/publish-policy-switch';
 import { useMatchStore } from '../store';
 import { useEditorialMode } from './editorial-status';
 import { FreezeControl } from './freeze-control';
@@ -72,6 +73,8 @@ export function ProducerControlBar() {
         </Badge>
       </div>
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+        <PublishPolicySwitch />
+        <Divider />
         <FreezeControl />
         <KillSwitchControl />
         <Divider />

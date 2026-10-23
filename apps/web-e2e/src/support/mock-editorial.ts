@@ -99,6 +99,7 @@ export const handleEditorial = (
     return json(route, status(IDLE, IDLE));
   if (path === '/editorial/kill-switch')
     return json(route, { killSwitch: IDLE });
+  if (path.endsWith('/overlay-reviews')) return json(route, { items: [] });
   const command =
     path.startsWith('/overlays/') ||
     path.startsWith('/insights/') ||

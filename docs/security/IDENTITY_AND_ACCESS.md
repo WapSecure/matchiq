@@ -28,7 +28,7 @@ Roles are the spec §40 names. A route needs exactly one permission. `anonymous`
 | audit:read           |                   |      ✓       |    ✓     |         |           |        |           |
 | preferences:write    |                   |      ✓       |    ✓     |    ✓    |           |   ✓    |           |
 | members:manage       |                   |      ✓       |          |         |           |        |           |
-| policy:configure     |                   |      ✓       |          |         |           |        |           |
+| policy:configure     |                   |      ✓       |    ✓     |         |           |        |           |
 | billing:read         |                   |      ✓       |          |         |           |        |           |
 | platform:diagnostics |         ✓         |              |          |         |           |        |           |
 | platform:config      |         ✓         |              |          |         |           |        |           |

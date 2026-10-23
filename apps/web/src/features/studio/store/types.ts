@@ -54,6 +54,8 @@ export type MatchData = {
   narratives: NarrativeIndex;
   overlays: Record<string, OverlayEntry>;
   retractions: Retraction[];
+  /** Bumped by every `overlay.review`; the approval queue refetches on change. */
+  reviewVersion: number;
   /** Insights this producer suppressed; the read model confirms them later. */
   suppressed: Record<string, true>;
   momentum: MomentumPoint[];

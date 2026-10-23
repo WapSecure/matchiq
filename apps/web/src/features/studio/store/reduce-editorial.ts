@@ -16,7 +16,11 @@ const stamp = (control: EditorialControl): number =>
   control.changedAt ? Date.parse(control.changedAt) : 0;
 
 const latestChange = (status: EditorialStatus): number =>
-  Math.max(stamp(status.freeze), stamp(status.killSwitch));
+  Math.max(
+    stamp(status.freeze),
+    stamp(status.killSwitch),
+    stamp({ active: true, changedAt: status.publishPolicy?.changedAt ?? null }),
+  );
 
 /** The kill switch outranks a session freeze (ADR-0016). */
 export const modeOf = (
@@ -53,10 +57,12 @@ export const withKillSwitch = (
   killSwitch: EditorialControl,
 ): EditorialStatus => {
   const freeze = state.editorial?.freeze ?? INACTIVE_CONTROL;
+  const publishPolicy = state.editorial?.publishPolicy;
   return {
     fixtureId: state.fixtureId,
     freeze,
     killSwitch,
     mode: modeOf(freeze, killSwitch),
+    ...(publishPolicy ? { publishPolicy } : {}),
   };
 };
