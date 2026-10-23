@@ -90,7 +90,7 @@ describe('theme', () => {
     it('offers light, dark and system as a labelled radio group', async () => {
       const user = userEvent.setup();
       render(<ThemeToggle />);
-      const group = screen.getByRole('group', { name: 'Colour theme' });
+      const group = screen.getByRole('radiogroup', { name: 'Colour theme' });
       expect(group).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: 'System' })).toBeChecked();
       await user.click(screen.getByRole('radio', { name: 'Dark' }));

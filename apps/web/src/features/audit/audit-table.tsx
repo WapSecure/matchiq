@@ -5,6 +5,7 @@ import {
   AUDIT_COPY,
   TARGET_TYPE_LABELS,
 } from '@/constants/audit';
+import { Tooltip } from '@/components/ui';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
 import { AuditDiff } from './audit-diff';
 
@@ -24,12 +25,21 @@ function AuditActorCell({ event }: { event: AuditEvent }) {
   return (
     <>
       <span className="block text-ink">{name ?? type}</span>
-      <span
-        title={event.actor.id}
-        className="block break-all font-mono text-micro text-ink-subtle"
-      >
-        {name ? AUDIT_COPY.actorDetail(type, event.actor.id) : event.actor.id}
-      </span>
+      {name ? (
+        <Tooltip content={event.actor.id}>
+          <button
+            type="button"
+            className="block cursor-help rounded-sm text-left font-mono text-micro text-ink-subtle underline decoration-dotted underline-offset-2 hover:text-ink-muted"
+          >
+            <span>{AUDIT_COPY.actorDetail(type, event.actor.id)}</span>
+            <span className="sr-only"> ({event.actor.id})</span>
+          </button>
+        </Tooltip>
+      ) : (
+        <span className="block break-all font-mono text-micro text-ink-subtle">
+          {event.actor.id}
+        </span>
+      )}
     </>
   );
 }

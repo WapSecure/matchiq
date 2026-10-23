@@ -1,7 +1,7 @@
 'use client';
 
 import { DownloadIcon } from '@/components/icons';
-import { Button } from '@/components/ui';
+import { Button, Tooltip } from '@/components/ui';
 import { JSON_INDENT, JSON_MEDIA_TYPE, RECAP_COPY } from '@/constants/recap';
 import type { RecapDocument } from '@/lib/api/session-schemas';
 
@@ -25,14 +25,15 @@ export function ExportRecap({
   className?: string;
 }) {
   return (
-    <Button
-      size="sm"
-      title={RECAP_COPY.exportHint}
-      onClick={() => download(recap)}
-      leadingIcon={<DownloadIcon size={14} />}
-      className={className}
-    >
-      {RECAP_COPY.export}
-    </Button>
+    <Tooltip content={RECAP_COPY.exportHint}>
+      <Button
+        size="sm"
+        onClick={() => download(recap)}
+        leadingIcon={<DownloadIcon size={14} />}
+        className={className}
+      >
+        {RECAP_COPY.export}
+      </Button>
+    </Tooltip>
   );
 }

@@ -26,7 +26,6 @@ export {
 export { Accordion, Disclosure } from './disclosure';
 export { Drawer } from './drawer';
 export { FeatureCard } from './feature-card';
-export { SelectField } from './form-fields';
 export { FileUpload, type FileUploadProps } from './file-upload';
 export { type UploadItem } from './file-upload-list';
 export { HintBadge } from './hint-badge';

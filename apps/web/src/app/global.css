@@ -214,6 +214,73 @@
   @apply text-micro font-medium uppercase text-ink-subtle;
 }
 
+/* Native range input with house track and thumb; `--range-fill` is the filled share. */
+@utility range-input {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 1.5rem;
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      var(--mq-accent) var(--range-fill, 0%),
+      var(--mq-line-strong) var(--range-fill, 0%)
+    );
+  }
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border-radius: 9999px;
+    border: 2px solid var(--mq-accent);
+    background: var(--mq-surface);
+    box-shadow: var(--mq-shadow-panel);
+    transition: transform 150ms ease-out;
+  }
+  &::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--mq-line-strong);
+  }
+  &::-moz-range-progress {
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--mq-accent);
+  }
+  &::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    border: 2px solid var(--mq-accent);
+    background: var(--mq-surface);
+  }
+  &:hover::-webkit-slider-thumb,
+  &:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  &:focus-visible {
+    outline: none;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--mq-accent);
+    outline-offset: 2px;
+  }
+  &:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--mq-accent);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  @media (pointer: coarse) {
+    height: 2.75rem;
+  }
+}
+
 @utility press {
   @apply transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out active:translate-y-px;
 }

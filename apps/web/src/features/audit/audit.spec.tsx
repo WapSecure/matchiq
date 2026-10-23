@@ -127,8 +127,10 @@ describe('AuditView', () => {
     renderView();
     const table = await screen.findByRole('table', { name: /Audit events/ });
     expect(within(table).getByText('Pat Producer')).toBeInTheDocument();
-    const detail = within(table).getByText('User · da1bb4b2…');
-    expect(detail).toHaveAttribute('title', id);
+    expect(within(table).getByText('User · da1bb4b2…')).toBeInTheDocument();
+    expect(
+      within(table).getByRole('button', { name: new RegExp(id) }),
+    ).toBeInTheDocument();
     expect(within(table).getByText('operator-key')).toBeInTheDocument();
   });
 
@@ -138,7 +140,8 @@ describe('AuditView', () => {
     });
     renderView();
     await screen.findByRole('table', { name: /Audit events/ });
-    await userEvent.selectOptions(screen.getByLabelText('Actor'), 'SYSTEM');
+    await userEvent.click(screen.getByRole('button', { name: /Actor$/ }));
+    await userEvent.click(screen.getByRole('option', { name: 'System' }));
     await userEvent.click(
       screen.getByRole('button', { name: 'Apply filters' }),
     );
@@ -147,6 +150,32 @@ describe('AuditView', () => {
       expect(new URL(String(last)).searchParams.get('actorType')).toBe(
         'SYSTEM',
       );
+    });
+  });
+
+  it('sends a date preset as a UTC window', async () => {
+    const api = stubApi({
+      'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },
+    });
+    renderView();
+    await screen.findByRole('table', { name: /Audit events/ });
+    const when = screen.getAllByRole('group', { name: /When/ })[0];
+    await userEvent.click(
+      within(when as HTMLElement).getByRole('button', { name: /calendar/i }),
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Last 15 minutes' }),
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Apply filters' }),
+    );
+    await waitFor(() => {
+      const last = callsTo(api, '/audit-events').at(-1)?.[0];
+      const params = new URL(String(last)).searchParams;
+      const from = Date.parse(params.get('from') ?? '');
+      const to = Date.parse(params.get('to') ?? '');
+      expect(params.get('to')).toMatch(/Z$/);
+      expect(to - from).toBe(15 * 60 * 1000);
     });
   });
 });

@@ -64,7 +64,6 @@ export function DateRangePicker({
         onOpenChange={setOpen}
         isDisabled={isDisabled}
         isInvalid={Boolean(errorMessage)}
-        aria-label={hideLabel ? label : undefined}
         className={cn(FIELD_ROOT, className)}
       >
         <FieldFrame

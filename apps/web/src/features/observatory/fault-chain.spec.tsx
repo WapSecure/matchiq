@@ -43,16 +43,18 @@ describe('FaultChain', () => {
 
 describe('DemoScenarioSelect', () => {
   it('offers no failure by default and each simulated scenario', async () => {
+    const user = userEvent.setup();
     const onChange = vi.fn();
     render(
       <DemoScenarioSelect title="Comeback" value={null} onChange={onChange} />,
     );
-    const select = screen.getByRole('combobox', {
-      name: 'Demo scenario for Comeback',
+    const trigger = screen.getByRole('button', {
+      name: /Demo scenario for Comeback/,
     });
-    expect(select).toHaveValue('');
+    expect(trigger).toHaveTextContent('No simulated failure');
+    await user.click(trigger);
     expect(screen.getAllByRole('option')).toHaveLength(4);
-    await userEvent.selectOptions(select, 'WRITER_REVISE');
+    await user.click(screen.getByRole('option', { name: 'Revise' }));
     expect(onChange).toHaveBeenLastCalledWith('WRITER_REVISE');
   });
 });

@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MomentumChart } from '@/components/charts/momentum-chart';
 import { OverlayCanvas } from '@/components/overlay/overlay-canvas';
 import { available, cue, unavailable } from '@/test/factories';
@@ -94,7 +95,7 @@ describe('unavailable metrics', () => {
 });
 
 describe('MomentumChart', () => {
-  it('exposes a labelled SVG and a data table with gaps marked unavailable', () => {
+  it('exposes a labelled SVG and a data table with gaps marked unavailable', async () => {
     render(
       <MomentumChart
         title="Momentum"
@@ -109,6 +110,9 @@ describe('MomentumChart', () => {
       />,
     );
     expect(screen.getByRole('img', { name: /Momentum/ })).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'View as table' }),
+    );
     const table = screen.getByRole('table');
     expect(within(table).getAllByText('Not available')).toHaveLength(2);
     expect(within(table).getByText('55.5')).toBeInTheDocument();

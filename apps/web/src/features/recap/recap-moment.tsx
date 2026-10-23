@@ -1,6 +1,6 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import { TeamSwatch } from '@/components/match/team-swatch';
-import { Badge } from '@/components/ui';
+import { Badge, Disclosure } from '@/components/ui';
 import {
   CONFIDENCE_LABELS,
   INSIGHT_KIND_LABELS,
@@ -76,16 +76,21 @@ export function RecapMomentItem({
             {RECAP_COPY.noNarrative}
           </p>
         )}
-        <details className="mt-2 text-micro text-ink-subtle">
-          <summary className="cursor-pointer">
-            {RECAP_COPY.evidence(moment.evidenceEventIds.length)} ·{' '}
-            {RECAP_COPY.metricRefs(moment.metricRefs.length)}
-          </summary>
-          <p className="mt-1 break-all font-mono">
+        <Disclosure
+          className="mt-2"
+          panelClassName="pt-1 text-micro text-ink-subtle"
+          title={
+            <span className="font-normal text-ink-subtle">
+              {RECAP_COPY.evidence(moment.evidenceEventIds.length)} ·{' '}
+              {RECAP_COPY.metricRefs(moment.metricRefs.length)}
+            </span>
+          }
+        >
+          <p className="break-all font-mono">
             {moment.evidenceEventIds.join(', ')}
           </p>
           <p className="mt-1 font-mono text-ink-subtle">{moment.reasonCode}</p>
-        </details>
+        </Disclosure>
       </article>
     </li>
   );

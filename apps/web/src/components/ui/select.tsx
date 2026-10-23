@@ -36,7 +36,6 @@ export type SelectProps<K extends string> = FieldProps &
     isLoading?: boolean;
     /** Wider popover for descriptive option cards. */
     popoverWidth?: 'trigger' | 'wide';
-    'aria-label'?: string;
   };
 
 function SelectedValue<K extends string>({
@@ -87,7 +86,6 @@ export function Select<K extends string>(props: SelectProps<K>) {
       }}
       isDisabled={isDisabled || isLoading}
       isInvalid={Boolean(errorMessage)}
-      aria-label={hideLabel ? label : props['aria-label']}
       aria-busy={isLoading || undefined}
       placeholder={placeholder}
       className={cn(FIELD_ROOT, className)}

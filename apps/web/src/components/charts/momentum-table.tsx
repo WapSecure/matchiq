@@ -1,3 +1,4 @@
+import { Disclosure } from '@/components/ui/disclosure';
 import { NOT_AVAILABLE } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { formatMinute } from '@/lib/format';
@@ -29,11 +30,8 @@ export function MomentumTable({
   data,
 }: MomentumTableProps) {
   return (
-    <details className="group text-xs">
-      <summary className="cursor-pointer select-none text-ink-subtle hover:text-ink">
-        {label}
-      </summary>
-      <div className="mt-2 max-h-48 overflow-auto rounded-md border border-line">
+    <Disclosure title={label} panelClassName="pt-2 text-xs">
+      <div className="max-h-48 overflow-auto rounded-md border border-line">
         <table className="w-full text-left">
           <thead className="sticky top-0 bg-surface-raised text-ink-muted">
             <tr>
@@ -64,6 +62,6 @@ export function MomentumTable({
           </tbody>
         </table>
       </div>
-    </details>
+    </Disclosure>
   );
 }

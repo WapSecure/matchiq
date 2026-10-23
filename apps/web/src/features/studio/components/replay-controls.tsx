@@ -2,7 +2,7 @@
 
 import { REPLAY_SPEEDS, type ReplaySpeed } from '@matchiq/contracts';
 import { PauseIcon, PlayIcon, RestartIcon } from '@/components/icons';
-import { Button, SegmentedControl } from '@/components/ui';
+import { Button, SegmentedControl, Tooltip } from '@/components/ui';
 import { REPLAY_COPY } from '@/constants/replay';
 import { useStartSession } from '@/features/lobby/use-start-session';
 import { describeReplayProblem } from '@/lib/api/describe-problem';
@@ -83,17 +83,18 @@ export function ReplayControls({ sessionId }: { sessionId: string }) {
     >
       <div className="flex flex-wrap items-center gap-3">
         <PrimaryButton t={t} disabled={busy} />
-        <Button
-          variant={completed ? 'primary' : 'secondary'}
-          title={REPLAY_COPY.restartHint}
-          onClick={() =>
-            template && restart.start(template.templateId, t.speed)
-          }
-          disabled={busy || !template}
-          leadingIcon={<RestartIcon size={14} />}
-        >
-          {restart.pending ? REPLAY_COPY.restarting : REPLAY_COPY.restart}
-        </Button>
+        <Tooltip content={REPLAY_COPY.restartHint}>
+          <Button
+            variant={completed ? 'primary' : 'secondary'}
+            onClick={() =>
+              template && restart.start(template.templateId, t.speed)
+            }
+            disabled={busy || !template}
+            leadingIcon={<RestartIcon size={14} />}
+          >
+            {restart.pending ? REPLAY_COPY.restarting : REPLAY_COPY.restart}
+          </Button>
+        </Tooltip>
         <SegmentedControl<ReplaySpeed>
           legend={REPLAY_COPY.speed}
           hideLegend

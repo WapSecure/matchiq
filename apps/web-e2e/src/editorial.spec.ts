@@ -126,6 +126,36 @@ test.describe('editorial controls', () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test('filters the audit trail with custom pickers', async ({ page }) => {
+    await mockApi(page);
+    await signIn(page, 'harbour.producer', `${STUDIO}/audit`);
+    await expect(
+      page.getByRole('table', { name: /Audit events/ }),
+    ).toBeVisible();
+    const filters = page.getByRole('form', { name: 'Filter the audit trail' });
+    await filters.getByRole('button', { name: /Actor$/ }).click();
+    await page.getByRole('option', { name: 'System' }).click();
+    await filters.getByRole('combobox', { name: 'Action' }).fill('kill');
+    await page.getByRole('option', { name: 'Kill switch activated' }).click();
+    await filters
+      .getByRole('group', { name: /When/ })
+      .first()
+      .getByRole('button', { name: /calendar/i })
+      .click();
+    await page.getByRole('button', { name: 'Last hour' }).click();
+    await expect(filters.getByText(/ UTC$/)).toBeVisible();
+    const request = page.waitForRequest(
+      (r) =>
+        r.url().includes('/audit-events') &&
+        r.url().includes('actorType=SYSTEM'),
+    );
+    await filters.getByRole('button', { name: 'Apply filters' }).click();
+    const url = new URL((await request).url());
+    expect(url.searchParams.get('action')).toBe('kill-switch.activated');
+    expect(url.searchParams.get('from')).toMatch(/Z$/);
+    await expectNoBlockingA11yViolations(page);
+  });
+
   test('explains locked controls on the signed-out public demo', async ({
     page,
   }) => {

@@ -35,7 +35,8 @@ test.describe('fixture lobby', () => {
     const api = await mockApi(page);
     await page.goto('/fixtures');
     const card = page.getByRole('article').first();
-    await card.getByLabel(/Replay speed/).selectOption('30');
+    await card.getByRole('button', { name: /Replay speed/ }).click();
+    await page.getByRole('option', { name: /30×/ }).click();
     await card.getByRole('button', { name: /Start replay/ }).click();
     await expect(page).toHaveURL(new RegExp(`/studio/${FIXTURE_ID}$`));
     expect(api.sessionStarts).toEqual([{ speed: 30 }]);

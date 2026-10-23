@@ -2,7 +2,7 @@
 
 import type { Fixture } from '@matchiq/contracts';
 import { Scoreboard } from '@/components/match/scoreboard';
-import { Badge } from '@/components/ui';
+import { HintBadge } from '@/components/ui';
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 import { useMatchStore } from '../store';
@@ -22,9 +22,9 @@ function Provenance() {
         {STUDIO_COPY.algorithm(snapshot.algorithmVersion)}
       </span>
       {snapshot.provisional ? (
-        <Badge tone="warning" title={STUDIO_COPY.provisionalHint}>
+        <HintBadge tone="warning" hint={STUDIO_COPY.provisionalHint}>
           {STUDIO_COPY.provisional}
-        </Badge>
+        </HintBadge>
       ) : null}
     </span>
   );

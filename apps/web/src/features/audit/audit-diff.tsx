@@ -1,4 +1,5 @@
 import type { AuditEvent } from '@matchiq/contracts';
+import { Disclosure } from '@/components/ui';
 import { AUDIT_COPY } from '@/constants/audit';
 import { diffStates } from './audit-query';
 
@@ -12,11 +13,15 @@ export function AuditDiff({ event }: { event: AuditEvent }) {
     return <span className="text-ink-subtle">{AUDIT_COPY.noChanges}</span>;
   }
   return (
-    <details className="group">
-      <summary className="cursor-pointer text-accent-strong hover:underline">
-        {AUDIT_COPY.viewChanges(changes.length)}
-      </summary>
-      <table className="mt-2 w-full border-collapse text-left font-mono text-micro">
+    <Disclosure
+      title={
+        <span className="text-accent-strong">
+          {AUDIT_COPY.viewChanges(changes.length)}
+        </span>
+      }
+      panelClassName="pt-1"
+    >
+      <table className="w-full border-collapse text-left font-mono text-micro">
         <thead>
           <tr className="text-ink-subtle">
             <th scope="col" className="pr-3 font-medium">
@@ -44,6 +49,6 @@ export function AuditDiff({ event }: { event: AuditEvent }) {
           ))}
         </tbody>
       </table>
-    </details>
+    </Disclosure>
   );
 }

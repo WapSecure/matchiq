@@ -2,6 +2,21 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-040 (2/2): Native controls replaced across the app
+
+| Area                                                                                                                                                                                                                                                                            | Status | Evidence                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------ |
+| Lobby replay speed and demo scenario: Select with descriptive option cards ("Highlights (30×): about 3 minutes…")                                                                                                                                                               | Done   | `lobby.spec.tsx`, `fault-chain.spec.tsx`, Playwright `lobby.spec.ts`           |
+| Audit filters: scope, actor and target Select; action Combobox grouped by editorial and platform; target id TextField; from/to replaced by a DateRangePicker with "Last 15 minutes", "Last hour", "Today" and "This match" (the session's lifetime), local zone shown, UTC sent | Done   | `audit.spec.tsx`, Playwright `editorial.spec.ts`                               |
+| Every `title=` tooltip replaced: gated buttons, restart, export recap, programme note (InfoTip), on-air source and hold, provisional, provider badges (HintBadge), audit actor id, theme toggle (ToggleButtonGroup with tooltips)                                               | Done   | `controls.spec.tsx`, `theme.spec.tsx`, `recap-observatory.spec.tsx`            |
+| Every `<details>` replaced by Disclosure: audit diff, recap evidence, pitch-map and momentum tables                                                                                                                                                                             | Done   | `pitch-map.spec.tsx`, `match-components.spec.tsx`, Playwright `studio.spec.ts` |
+| Seek bar keeps its native range semantics with a custom track and thumb (`range-input`), 44 px on touch                                                                                                                                                                         | Done   | Playwright `studio.spec.ts`                                                    |
+| `form-fields.tsx` (native select) removed                                                                                                                                                                                                                                       | Done   | `nx lint web`, `nx typecheck web`                                              |
+
+Verification: CI (owner directive). Locally: Prettier, `nx lint web web-e2e`, `nx typecheck web` and the touched spec files only.
+
+Limitations: the pitch-filter chips, the confirmation phrase input and the reason textarea were already custom-styled native inputs and are unchanged. `alert`, `confirm` and `prompt` were not used anywhere.
+
 ## 2026-10-23 — MQ-040 (1/2): Accessible component library and gallery
 
 | Area                                                                                                                                                                                                                                            | Status | Evidence                                                                     |

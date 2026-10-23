@@ -2,7 +2,7 @@ import type { AuditFilters } from '@/lib/api/editorial-endpoints';
 
 export type AuditScope = 'fixture' | 'org';
 
-/** Form state; empty strings mean "any". Times are `datetime-local` values. */
+/** Form state; empty strings mean "any". `from`/`to` are UTC instants from the range picker. */
 export type AuditFilterForm = {
   action: string;
   actorType: string;
@@ -23,7 +23,7 @@ export const EMPTY_AUDIT_FILTERS: AuditFilterForm = {
   to: '',
 };
 
-/** A `datetime-local` value is wall time in the viewer's zone; the API wants UTC. */
+/** Normalises a parseable time (an ISO instant, or local wall time) to a UTC ISO string. */
 export const toUtc = (local: string): string | undefined => {
   if (!local) return undefined;
   const ms = Date.parse(local);
