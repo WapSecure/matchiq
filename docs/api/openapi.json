@@ -12368,6 +12368,9 @@
                     "TEMPLATE"
                   ]
                 },
+                "localeFallback": {
+                  "type": "boolean"
+                },
                 "citations": {
                   "type": "array",
                   "items": {

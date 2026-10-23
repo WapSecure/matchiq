@@ -111,6 +111,7 @@ export const moment = (overrides: Partial<RecapMoment> = {}): RecapMoment => ({
       headline: 'Home United level it',
       body: 'A header from the corner.',
       source: 'TEMPLATE',
+      localeFallback: false,
       citations: ['ev_3'],
     },
     {
@@ -119,6 +120,7 @@ export const moment = (overrides: Partial<RecapMoment> = {}): RecapMoment => ({
       headline: 'Home United égalise',
       body: 'Une tête sur corner.',
       source: 'TEMPLATE',
+      localeFallback: false,
       citations: ['ev_3'],
     },
   ],

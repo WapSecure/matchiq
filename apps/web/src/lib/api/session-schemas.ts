@@ -4,12 +4,10 @@ import {
   Insight,
   InsightKind,
   InsightPriority,
-  Locale,
   MatchSnapshot,
   Narrative,
-  NarrativeSource,
   OverlayCue,
-  Persona,
+  RecapNarrative as RecapNarrativeSchema,
   ReplayStatus,
 } from '@matchiq/contracts';
 import { z } from 'zod';
@@ -53,15 +51,6 @@ export const CreatedSession = z.object({
   session: ReplaySessionView,
 });
 
-const RecapNarrative = z.object({
-  persona: Persona,
-  locale: Locale,
-  headline: z.string(),
-  body: z.string(),
-  source: NarrativeSource,
-  citations: z.array(z.string()),
-});
-
 export const RecapMoment = z.object({
   insightId: z.string(),
   kind: InsightKind,
@@ -74,7 +63,7 @@ export const RecapMoment = z.object({
   confidenceLabel: ConfidenceLabel,
   evidenceEventIds: z.array(z.string()),
   metricRefs: z.array(z.string()),
-  narratives: z.array(RecapNarrative),
+  narratives: z.array(RecapNarrativeSchema),
 });
 
 export const RecapDocument = z.object({
@@ -107,7 +96,7 @@ export const OverlayList = itemsOf(OverlayCue);
 export type FixtureTemplateSummary = z.output<typeof FixtureTemplateSummary>;
 export type ReplaySessionView = z.output<typeof ReplaySessionView>;
 export type CreatedSession = z.output<typeof CreatedSession>;
-export type RecapNarrative = z.output<typeof RecapNarrative>;
+export type RecapNarrative = z.output<typeof RecapNarrativeSchema>;
 export type RecapMoment = z.output<typeof RecapMoment>;
 export type RecapDocument = z.output<typeof RecapDocument>;
 export type SessionPage = z.infer<typeof SessionPage>;

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AlertIcon, ShieldIcon } from '@/components/icons';
+import { AlertIcon, LogoMark } from '@/components/icons';
 import {
   BackLink,
   SiteFooter,
@@ -42,36 +42,44 @@ export default async function SignInPage({ searchParams }: PageProps) {
       <SyntheticNotice />
       <SiteHeader />
       <main id={MAIN_CONTENT_ID} className="min-h-[60dvh]">
-        <Container className="max-w-2xl py-6 sm:py-10">
+        <Container className="max-w-xl py-6 sm:py-10">
           <BackLink />
-          <span className="mt-6 flex size-10 items-center justify-center rounded-md bg-accent-soft text-accent-strong">
-            <ShieldIcon size={20} />
-          </span>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            {AUTH_COPY.signInTitle}
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-            {sso ? AUTH_COPY.signInLead : AUTH_COPY.ssoUnavailable}
-          </p>
-          {error ? (
-            <p
-              role="alert"
-              className="mt-4 flex items-center gap-2 rounded-md border border-critical/30 bg-critical/5 px-3 py-2 text-sm text-ink"
-            >
-              <AlertIcon size={16} className="shrink-0 text-critical" />
-              {error}
+          <div className="mt-4 rounded-lg border border-line bg-surface p-6 shadow-float sm:p-8">
+            <span className="flex size-9 items-center justify-center rounded-md bg-accent text-accent-ink shadow-panel">
+              <LogoMark size={20} />
+            </span>
+            <h1 className="mt-5 text-2xl font-semibold tracking-tight text-ink">
+              {AUTH_COPY.signInTitle}
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              {sso ? AUTH_COPY.signInLead : AUTH_COPY.ssoUnavailable}
             </p>
-          ) : null}
-          <div className="mt-6 flex flex-wrap gap-3">
-            {sso ? (
-              <ButtonLink href={ssoHref}>{AUTH_COPY.continueSso}</ButtonLink>
+            {error ? (
+              <p
+                role="alert"
+                className="mt-4 flex items-center gap-2 rounded-md border border-critical/30 bg-critical/5 px-3 py-2 text-sm text-ink"
+              >
+                <AlertIcon size={16} className="shrink-0 text-critical" />
+                {error}
+              </p>
             ) : null}
-            <ButtonLink href={ROUTES.fixtures} variant="secondary">
-              {AUTH_COPY.browseAnonymously}
-            </ButtonLink>
+            <div className="mt-6 flex flex-col gap-2">
+              {sso ? (
+                <ButtonLink href={ssoHref} className="w-full">
+                  {AUTH_COPY.continueSso}
+                </ButtonLink>
+              ) : null}
+              <ButtonLink
+                href={ROUTES.fixtures}
+                variant={sso ? 'ghost' : 'primary'}
+                className="w-full"
+              >
+                {AUTH_COPY.browseAnonymously}
+              </ButtonLink>
+            </div>
           </div>
           {sso && PUBLIC_ENV.NEXT_PUBLIC_DEMO_MODE ? (
-            <div className="mt-10">
+            <div className="mt-6">
               <DemoAccounts returnTo={returnTo} />
             </div>
           ) : null}

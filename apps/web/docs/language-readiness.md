@@ -19,11 +19,17 @@ Render the selected interface locale on the server, using an allowlisted prefere
 
 Release evidence: complete catalog keys checked by TypeScript; independent preference behavior through navigation and refresh; English fallback; translated error states and dialogs; long-label layout at 320/390/768/1440px; keyboard and screen-reader checks; locale-aware interface number/date formatting with explicit audit timezone. Canonical facts, IDs, evidence exports and stored numeric values remain unchanged. Review architectural changes with the platform owner before introducing routing or a new shared library.
 
-## MQ-050: Preserve recap fallback provenance (A and C, then E)
+## MQ-055: Preserve recap fallback provenance (PR validation)
 
-The agent's `serve_original` keeps the requested locale and sets `localeFallback: true`. `apps/worker/src/app/pipeline/recap-builder.ts` currently copies commentary without this flag; `RecapNarrative` in `libs/contracts/src/lib/reads.ts` and the web's local recap schema also omit it. Therefore a recap may contain English text filed under another language without sufficient metadata to identify the fallback.
+The recap read contract now accepts optional `localeFallback`, and the worker copies it from each published narrative when building a recap. OpenAPI and the generated TypeScript client retain the field. The web reader uses the canonical recap narrative schema, so it no longer discards the indicator before display or export.
 
-Proposed acceptance: add a compatible fallback indicator to the canonical read contract; regenerate dependent schemas; preserve it in recap construction and storage; define behavior for existing stored recaps; update the web recap selector and language tag. Prove that a rejected French translation is displayed and announced as English with a visible fallback notice in both the live studio and recap. Include contract, worker and frontend regression coverage. Do not guess language by comparing or classifying text. No changes to these owned contract/backend paths were made in MQ-046.
+A confirmed fallback is displayed with English language metadata and the existing plain-language notice. A confirmed translation keeps its own locale. Existing stored recaps remain readable: when a non-English entry lacks the flag, its language is marked `und` and the UI says that the older recap does not record whether it was translated. Text is preserved; no classifier or text comparison guesses provenance. English entries and missing-variant fallback to English remain English.
+
+No database schema migration or bulk rewriting of historical recap JSON is required. New recaps and the existing rebuild path preserve the flag. Older recaps are not assigned a guessed value or silently treated as confirmed translations. Native language quality remains a separate editorial qualification.
+
+Rollout: upgrade strict schema consumers before enabling writers that emit the new field. The optional marker allows the current reader to load older records; an older reader pinned to a strict response schema may reject newly added properties. JSON export preserves a supplied flag and leaves an absent flag absent.
+
+Validation and changes are recorded under MQ-055 in the implementation log. Local format, lint and type checks plus targeted regression specs follow the updated repository workflow. CI must run the full suites and browser checks before a PR merges. The owner has explicitly authorized branch publication, PR creation and merging after all required CI checks pass. Earlier publication-blocker notes in the implementation log describe the prior state.
 
 ## MQ-051: Native editorial qualification (product and D)
 

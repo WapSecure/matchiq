@@ -6,6 +6,7 @@ import type { RecapDocument } from '@/lib/api/session-schemas';
 import { formatMetric, formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { orderedMoments } from './recap-order';
+import { recapTranslationNotice } from './recap-translation-notice';
 
 const copy = RECAP_COPY.report;
 
@@ -32,7 +33,8 @@ export const buildReport = ({
     const text = picked
       ? `${picked.narrative.headline}. ${picked.narrative.body}`
       : INSIGHT_KIND_LABELS[m.kind];
-    return `${formatMinute(m.period, m.matchClockMs)}  ${text}`;
+    const notice = recapTranslationNotice(picked, locale);
+    return `${formatMinute(m.period, m.matchClockMs)}  ${text}${notice ? ` ${notice}` : ''}`;
   });
   const stats = statRows(recap.finalSnapshot).map((r) =>
     copy.statLine(r.label, statValue(r.home), statValue(r.away)),

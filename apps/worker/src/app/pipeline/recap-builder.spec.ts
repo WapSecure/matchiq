@@ -1,3 +1,4 @@
+import { RecapDocument } from '@matchiq/contracts';
 import { project, toSnapshot } from '@matchiq/football-engine';
 import { goldenMoments } from '../../test/golden';
 import { LOCALES, PERSONAS } from '../constants';
@@ -55,5 +56,38 @@ describe('buildRecap', () => {
         narratives,
       }),
     ).toEqual(recap);
+  });
+
+  it('preserves fallback provenance without changing the match facts', async () => {
+    const { fixture, events, insights } = await goldenMoments('comeback');
+    const snapshot = toSnapshot(project(fixture, events));
+    const narratives = insights.flatMap((insight) =>
+      templateDrafts(insight, fixture, {
+        personas: PERSONAS,
+        locales: LOCALES,
+      }).map((draft) => ({
+        ...toNarrative(insight, draft, '2026-10-24T15:00:00.000Z'),
+        localeFallback: draft.locale === 'fr-FR',
+      })),
+    );
+    const original = JSON.stringify(narratives);
+    const recap = buildRecap({
+      fixtureId: fixture.fixtureId,
+      title: fixture.title,
+      snapshot,
+      insights: insights.map((insight) => ({ insight, period: 1 })),
+      narratives,
+    });
+    const variants = recap.keyMoments.flatMap((moment) => moment.narratives);
+    expect(variants.length).toBe(narratives.length);
+    expect(variants.filter((n) => n.locale === 'fr-FR').length).toBeGreaterThan(
+      0,
+    );
+    for (const variant of variants) {
+      expect(variant.localeFallback).toBe(variant.locale === 'fr-FR');
+    }
+    expect(RecapDocument.parse(recap)).toEqual(recap);
+    expect(recap.finalSnapshot).toEqual(snapshot);
+    expect(JSON.stringify(narratives)).toBe(original);
   });
 });
