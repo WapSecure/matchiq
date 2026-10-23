@@ -1,106 +1,109 @@
 'use client';
 
-import type { ZonedDateTime } from '@internationalized/date';
 import type { Locale } from '@matchiq/contracts';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Dialog, I18nProvider } from 'react-aria-components';
 import {
-  DateRangePicker as AriaDateRangePicker,
-  Dialog,
-  I18nProvider,
-} from 'react-aria-components';
-import type { DatePresetId } from '@/constants/ui';
-import { cn } from '@/lib/cn';
+  DATE_COPY,
+  DATE_PRESET_LABELS,
+  type DatePresetId,
+} from '@/constants/ui';
+import { summarizeRange } from '@/lib/date-summary';
 import {
   dateLocaleFor,
   type InstantRange,
   rangeToZoned,
-  zonedToRange,
 } from '@/lib/date-time';
 import { useTimeZone } from '@/lib/use-time-zone';
-import { RangeCalendar } from './calendar';
-import { DatePresets } from './date-presets';
-import { midnight, RangeFieldGroup, UtcEcho } from './date-range-parts';
-import { FIELD_ROOT, FieldFrame, type FieldProps } from './field';
+import type { CalendarExtraProps } from './calendar';
+import { RangePanel } from './date-range-panel';
+import { PickerField } from './date-trigger';
+import type { FieldProps } from './field';
 import { Popover } from './popover';
 
-export type DateRangePickerProps = FieldProps & {
-  /** UTC instants (ISO 8601); edited in the viewer's time zone. */
-  value: InstantRange | null;
-  onChange: (value: InstantRange | null) => void;
-  presets?: readonly DatePresetId[];
-  matchWindow?: InstantRange | null;
-  granularity?: 'minute' | 'second';
-  locale?: Locale;
-};
+export type DateRangePickerProps = FieldProps &
+  CalendarExtraProps & {
+    /** UTC instants (ISO 8601); edited in the viewer's time zone. */
+    value: InstantRange | null;
+    onChange: (value: InstantRange | null) => void;
+    presets?: readonly DatePresetId[];
+    matchWindow?: InstantRange | null;
+    /** Kept for compatibility; times are always picked to the minute. */
+    granularity?: 'minute' | 'second';
+    locale?: Locale;
+  };
+
+type Picked = { id: DatePresetId; range: InstantRange };
+
+const samePicked = (picked: Picked | null, value: InstantRange | null) =>
+  picked &&
+  value &&
+  picked.range.start === value.start &&
+  picked.range.end === value.end
+    ? picked.id
+    : null;
 
 /** A local-time window with quick presets; the parent only sees UTC instants. */
 export function DateRangePicker({
-  label,
-  hideLabel,
-  description,
-  errorMessage,
-  isDisabled,
-  size = 'sm',
-  className,
   value,
   onChange,
   presets = [],
   matchWindow,
-  granularity = 'minute',
   locale,
+  markedDates,
+  markLabel,
+  unavailableReason,
+  granularity: _granularity,
+  ...field
 }: DateRangePickerProps) {
   const timeZone = useTimeZone();
+  const dateLocale = dateLocaleFor(locale);
   const [open, setOpen] = useState(false);
+  const [picked, setPicked] = useState<Picked | null>(null);
+  const anchor = useRef<HTMLDivElement>(null);
+  const activePreset = samePicked(picked, value);
   const zoned = rangeToZoned(value, timeZone);
+  const summary = activePreset
+    ? DATE_PRESET_LABELS[activePreset]
+    : zoned && summarizeRange(zoned, { locale: dateLocale, timeZone });
   return (
-    <I18nProvider locale={dateLocaleFor(locale)}>
-      <AriaDateRangePicker<ZonedDateTime>
-        value={zoned}
-        onChange={(r) => onChange(r ? zonedToRange(r) : null)}
-        placeholderValue={midnight(timeZone)}
-        granularity={granularity}
-        // The zone is stated in the help text, which keeps the field narrow on phones.
-        hideTimeZone
+    <I18nProvider locale={dateLocale}>
+      <PickerField
+        {...field}
+        summary={summary || null}
+        placeholder={DATE_COPY.anyTime}
         isOpen={open}
         onOpenChange={setOpen}
-        isDisabled={isDisabled}
-        isInvalid={Boolean(errorMessage)}
-        aria-label={hideLabel ? label : undefined}
-        className={cn(FIELD_ROOT, className)}
+        onClear={() => onChange(null)}
+        clearLabel={DATE_COPY.clear}
+        anchorRef={anchor}
       >
-        <FieldFrame
-          label={label}
-          hideLabel={hideLabel}
-          description={
-            description ?? <UtcEcho value={value} timeZone={timeZone} />
-          }
-          errorMessage={errorMessage}
-        >
-          <RangeFieldGroup
-            size={size}
-            onClear={value ? () => onChange(null) : undefined}
-          />
-        </FieldFrame>
         <Popover
-          placement="bottom end"
-          className="max-w-[calc(100vw-1rem)] p-3"
+          triggerRef={anchor}
+          placement="bottom start"
+          fit="panel"
+          className="max-w-[calc(100vw-1rem)]"
         >
-          <Dialog className="flex flex-col gap-3 outline-none sm:flex-row">
-            {presets.length > 0 ? (
-              <DatePresets
-                presets={presets}
-                timeZone={timeZone}
-                matchWindow={matchWindow}
-                onPick={(range) => {
-                  onChange(zonedToRange(range));
-                  setOpen(false);
-                }}
-              />
-            ) : null}
-            <RangeCalendar />
+          <Dialog aria-label={field.label} className="outline-none">
+            <RangePanel
+              value={value}
+              timeZone={timeZone}
+              presets={presets}
+              activePreset={activePreset}
+              matchWindow={matchWindow}
+              markedDates={markedDates}
+              markLabel={markLabel}
+              unavailableReason={unavailableReason}
+              onApply={(range, id) => {
+                setPicked(range && id ? { id, range } : null);
+                onChange(range);
+                setOpen(false);
+              }}
+              onCancel={() => setOpen(false)}
+            />
           </Dialog>
         </Popover>
-      </AriaDateRangePicker>
+      </PickerField>
     </I18nProvider>
   );
 }

@@ -27,6 +27,7 @@
   --color-accent-strong: var(--mq-accent-strong);
   --color-accent-ink: var(--mq-accent-ink);
   --color-accent-soft: var(--mq-accent-soft);
+  --color-accent-band: var(--mq-accent-band);
   --color-home: var(--mq-home);
   --color-away: var(--mq-away);
   --color-positive: var(--mq-positive);
@@ -74,6 +75,8 @@
   --mq-accent-strong: light-dark(#05667d, #6fdcf2);
   --mq-accent-ink: light-dark(#ffffff, #03161b);
   --mq-accent-soft: light-dark(rgb(8 115 139 / 0.1), rgb(44 203 232 / 0.12));
+  /* Calendar range band: strong enough to read as one shape, ink stays AA on it. */
+  --mq-accent-band: light-dark(rgb(8 115 139 / 0.14), rgb(44 203 232 / 0.17));
   --mq-home: light-dark(#2563eb, #4d8dff);
   --mq-away: light-dark(#b45a09, #c98500);
   --mq-positive: light-dark(#0b6e45, #4ade9b);

@@ -1,23 +1,19 @@
 'use client';
 
-import type { DOMAttributes, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import {
   Tooltip as AriaTooltip,
-  Focusable,
   OverlayArrow,
   TooltipTrigger,
 } from 'react-aria-components';
 import { OverlayArrowIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { OVERLAY_MOTION } from './control-styles';
+import { type TargetElement, TooltipTarget } from './tooltip-target';
 
 const OPEN_DELAY_MS = 450;
 const CLOSE_DELAY_MS = 120;
 const TOOLTIP_OFFSET = 8;
-
-// Focusable is typed for intrinsic elements; app components that spread DOM
-// props and `ref` onto their root element (Button, Badge) behave the same.
-type FocusableChild = ReactElement<DOMAttributes<Element>, string>;
 
 type Placement = 'top' | 'bottom' | 'start' | 'end';
 
@@ -54,7 +50,7 @@ export function Tooltip({
       {ariaChild ? (
         children
       ) : (
-        <Focusable>{children as FocusableChild}</Focusable>
+        <TooltipTarget>{children as TargetElement}</TooltipTarget>
       )}
       <AriaTooltip
         placement={placement}

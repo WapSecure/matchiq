@@ -30,6 +30,39 @@ describe('Tooltip', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
+  it('mounts triggers without React Aria warnings, even while hidden', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const error = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    render(
+      <div hidden>
+        <HintBadge hint="May change">Provisional</HintBadge>
+        <Tooltip content="Copy the match code">
+          <button type="button">NB-HR-0424</button>
+        </Tooltip>
+      </div>,
+    );
+    expect(warn).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
+    warn.mockRestore();
+    error.mockRestore();
+  });
+
+  it('makes a plain trigger focusable so keyboard users reach the hint', async () => {
+    const user = userEvent.setup();
+    render(
+      <Tooltip content="Figures may change">
+        <span>Updating</span>
+      </Tooltip>,
+    );
+    await user.tab();
+    expect(screen.getByText('Updating')).toHaveFocus();
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Figures may change',
+    );
+  });
+
   it('gives a hint badge a name that includes its hint', () => {
     render(<HintBadge hint="May change">Provisional</HintBadge>);
     expect(
