@@ -17,7 +17,8 @@ describe('web app manifest', () => {
       background_color: '#080a0e',
       theme_color: '#080a0e',
     });
-    expect(m.description).toMatch(/synthetic/i);
+    expect(m.description).toMatch(/simulated/i);
+    expect(m.description).toMatch(/not affiliated with the Premier League/);
     expect(m.shortcuts?.[0]).toMatchObject({ url: '/fixtures' });
   });
 

@@ -29,11 +29,11 @@ describe('RunTable', () => {
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(runs.length + 1);
-    expect(
-      screen.getAllByRole('rowheader', { name: 'Match analyst' }),
-    ).toHaveLength(2);
-    expect(rows[1]).toHaveTextContent('Timed out');
-    expect(rows[2]).toHaveTextContent('Template');
+    expect(screen.getAllByRole('rowheader', { name: 'Analyst' })).toHaveLength(
+      2,
+    );
+    expect(rows[1]).toHaveTextContent('Took too long');
+    expect(rows[2]).toHaveTextContent('Standard wording (no AI)');
     const keyWarnings = errors.mock.calls.filter((args) =>
       args.some((a) => String(a).includes('same key')),
     );

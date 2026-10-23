@@ -94,7 +94,7 @@ describe('AuditView', () => {
     renderView();
     const table = await screen.findByRole('table', { name: /1 shown, more/ });
     expect(
-      within(table).getByRole('rowheader', { name: /Cue retracted/ }),
+      within(table).getByRole('rowheader', { name: /Graphic taken off air/ }),
     ).toBeInTheDocument();
     expect(within(table).getByText('Reason 1')).toBeInTheDocument();
     expect(within(table).getByText('1 field changed')).toBeInTheDocument();
@@ -105,7 +105,7 @@ describe('AuditView', () => {
     await waitFor(() =>
       expect(screen.getByText('Reason 2')).toBeInTheDocument(),
     );
-    expect(screen.getByText('End of the audit trail.')).toBeInTheDocument();
+    expect(screen.getByText('End of the activity log.')).toBeInTheDocument();
   });
 
   it('names a person by display name and keeps the id as detail', async () => {
@@ -125,10 +125,11 @@ describe('AuditView', () => {
       },
     });
     renderView();
-    const table = await screen.findByRole('table', { name: /Audit events/ });
+    const table = await screen.findByRole('table', { name: /Activity/ });
     expect(within(table).getByText('Pat Producer')).toBeInTheDocument();
-    const detail = within(table).getByText('User · da1bb4b2…');
-    expect(detail).toHaveAttribute('title', id);
+    expect(within(table).getAllByText('Person')[0]).toBeInTheDocument();
+    const technical = within(table).getAllByTestId('technical-details');
+    expect(technical[0]).toHaveTextContent(id);
     expect(within(table).getByText('operator-key')).toBeInTheDocument();
   });
 
@@ -137,8 +138,8 @@ describe('AuditView', () => {
       'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },
     });
     renderView();
-    await screen.findByRole('table', { name: /Audit events/ });
-    await userEvent.selectOptions(screen.getByLabelText('Actor'), 'SYSTEM');
+    await screen.findByRole('table', { name: /Activity/ });
+    await userEvent.selectOptions(screen.getByLabelText('Who'), 'SYSTEM');
     await userEvent.click(
       screen.getByRole('button', { name: 'Apply filters' }),
     );

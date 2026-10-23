@@ -1,9 +1,10 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import { TeamSwatch } from '@/components/match/team-swatch';
-import { Badge } from '@/components/ui';
+import { Badge, TechnicalDetails } from '@/components/ui';
 import {
   CONFIDENCE_LABELS,
   INSIGHT_KIND_LABELS,
+  englishLanguageName,
   PRIORITY_LABELS,
 } from '@/constants/match';
 import { RECAP_COPY } from '@/constants/recap';
@@ -70,7 +71,7 @@ export function RecapMomentItem({
               </span>
               {picked.fallback ? (
                 <span className="text-warning" lang={SITE.locale}>
-                  {RECAP_COPY.localeFallback(locale)}
+                  {RECAP_COPY.localeFallback(englishLanguageName(locale))}
                 </span>
               ) : null}
             </p>
@@ -80,16 +81,21 @@ export function RecapMomentItem({
             {RECAP_COPY.noNarrative}
           </p>
         )}
-        <details className="mt-2 text-micro text-ink-subtle">
-          <summary className="cursor-pointer">
-            {RECAP_COPY.evidence(moment.evidenceEventIds.length)} ·{' '}
-            {RECAP_COPY.metricRefs(moment.metricRefs.length)}
-          </summary>
-          <p className="mt-1 break-all font-mono">
-            {moment.evidenceEventIds.join(', ')}
+        <p className="mt-2 text-micro text-ink-subtle">
+          {RECAP_COPY.evidence(moment.evidenceEventIds.length)} ·{' '}
+          {RECAP_COPY.metricRefs(moment.metricRefs.length)}
+        </p>
+        <TechnicalDetails className="mt-2">
+          <p className="break-all font-mono text-ink-muted">
+            {RECAP_COPY.technical.events}: {moment.evidenceEventIds.join(', ')}
           </p>
-          <p className="mt-1 font-mono text-ink-subtle">{moment.reasonCode}</p>
-        </details>
+          <p className="break-all font-mono text-ink-muted">
+            {moment.metricRefs.join(', ')}
+          </p>
+          <p className="font-mono text-ink-muted">
+            {RECAP_COPY.technical.reason}: {moment.reasonCode}
+          </p>
+        </TechnicalDetails>
       </article>
     </li>
   );

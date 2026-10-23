@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn';
 import { withUniqueKeys } from '@/lib/unique-keys';
 import { ProviderBadge } from './provider-badge';
 
-const copy = OBSERVATORY_COPY;
+const copy = OBSERVATORY_COPY.technical;
 const COLUMNS = [
   copy.columns.agent,
   copy.columns.provider,
@@ -72,7 +72,7 @@ export function RunTable({
                 <ProviderBadge provider={run.provider} />
               </td>
               <td className="py-1.5 pr-3 font-mono text-ink-muted">
-                {run.modelDeployment ?? copy.notApplicable}
+                {run.modelDeployment ?? OBSERVATORY_COPY.notApplicable}
               </td>
               <td className="py-1.5 pr-3 font-mono text-ink-muted">
                 v{run.promptVersion}

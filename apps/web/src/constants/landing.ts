@@ -10,61 +10,61 @@ import {
 } from '@/components/icons';
 
 export const HERO = {
-  eyebrow: 'Broadcast intelligence platform',
-  title: 'Football insight. Ready for editorial review.',
+  eyebrow: 'Football intelligence for live broadcast',
+  title: 'One trusted match feed. Every audience, every language.',
   description:
-    'Follow the match, inspect the evidence and control what goes on air. MatchIQ brings match analytics, commentary and broadcast overlay previews into one workspace.',
-  primaryCta: { label: 'Explore the demo', href: '/fixtures' },
-  howItWorks: { label: 'How it works', href: '#pipeline' },
+    'MatchIQ spots the moments that matter in seconds. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.',
+  primaryCta: { label: 'Choose a match', href: '/fixtures' },
+  howItWorks: { label: 'See how it works', href: '#pipeline' },
   facts: [
-    { value: 'Evidence', label: 'Trace insights to match events' },
-    { value: 'Control', label: 'Hold or retract broadcast cues' },
-    { value: 'Replay', label: 'Review the same match together' },
+    { value: '0', label: 'numbers made up by AI' },
+    { value: '3 × 4', label: 'audiences × languages, same facts' },
+    { value: '16:9', label: 'on-air preview with safe areas' },
   ],
   disclosure:
-    'Demo runs on seeded synthetic matches. No real clubs, players or league marks.',
+    'The demo uses fictional, simulated matches. No real clubs, players or league marks.',
 } as const;
 
 export const PIPELINE = {
   id: 'pipeline',
-  eyebrow: 'Match workflow',
-  title: 'Five stages, one source of truth',
+  eyebrow: 'How it works',
+  title: 'Five steps from the pitch to the screen',
   description:
-    'Follow each insight from its source events to the screen. Match statistics remain the reference for every audience and language.',
+    'Every fact is worked out once from the match data. AI explains the facts but never changes them.',
   stages: [
     {
       key: 'ingest',
-      title: 'Ingest',
+      title: 'Collect',
       description:
-        'Validate incoming events, preserve their source and keep them in match order.',
+        'Every pass, shot and tackle is recorded once, in order, with where it came from.',
       Icon: IngestIcon,
     },
     {
       key: 'interpret',
-      title: 'Interpret',
+      title: 'Understand',
       description:
-        'Track match statistics and identify changes with supporting events.',
+        'Live score, possession, momentum and other stats, worked out the same way every time.',
       Icon: InterpretIcon,
     },
     {
       key: 'explain',
       title: 'Explain',
       description:
-        'Agents propose commentary. Automated checks verify numbers, names and citations before publication.',
+        'AI analyst, writer and fact checker turn key moments into words, each tied to the plays behind it.',
       Icon: ExplainIcon,
     },
     {
       key: 'render',
-      title: 'Render',
+      title: 'Show',
       description:
-        'Preview timed graphics and retract a cue when editorial judgment calls for it.',
+        'On-air graphics timed to the match, kept inside safe areas, and removable in one click.',
       Icon: RenderIcon,
     },
     {
       key: 'personalize',
-      title: 'Personalize',
+      title: 'Personalise',
       description:
-        'Casual, analyst and broadcast variants in multiple languages from the same facts.',
+        'Versions for fans, analysts and broadcast, in English, French, Spanish and Nigerian Pidgin, from the same facts.',
       Icon: PersonalizeIcon,
     },
   ],
@@ -72,28 +72,28 @@ export const PIPELINE = {
 
 export const PRINCIPLES = {
   id: 'principles',
-  eyebrow: 'Editorial confidence',
-  title: 'Check the evidence. Keep control.',
+  eyebrow: 'Why you can trust it',
+  title: 'Built to be trusted on air',
   items: [
     {
       key: 'evidence',
-      title: 'Traceable claims',
+      title: 'Every claim shows its evidence',
       description:
-        'Inspect the source events and metric definitions behind each published number.',
+        'Each number on screen links back to the plays and the stat it came from. If it cannot, it does not air.',
       Icon: EvidenceIcon,
     },
     {
       key: 'deterministic',
-      title: 'Consistent match facts',
+      title: 'Same match, same numbers',
       description:
-        'Replay the same fixture with reproducible statistics. Commentary does not change the underlying facts.',
+        'Stats are worked out by tested rules, not AI. Replay a match and you get exactly the same figures.',
       Icon: DeterministicIcon,
     },
     {
       key: 'resilience',
-      title: 'Continuity during model outages',
+      title: 'Keeps going if AI fails',
       description:
-        'Match playback continues without a model connection. Verified templates provide fallback commentary.',
+        'Scores and stats never depend on AI. If the AI is slow or wrong, standard wording goes on air instead.',
       Icon: ResilienceIcon,
     },
   ],

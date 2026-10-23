@@ -18,6 +18,7 @@ import {
   EvidenceMetrics,
   EvidenceSection,
   EvidenceSummary,
+  EvidenceTechnical,
 } from './evidence-sections';
 import { NarrativePanel } from './narrative-panel';
 
@@ -77,6 +78,7 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
           <p className="pt-2 text-xs leading-relaxed text-ink-subtle">
             {EVIDENCE_COPY.caveat}
           </p>
+          <EvidenceTechnical insight={insight} />
         </>
       ) : null}
     </Drawer>

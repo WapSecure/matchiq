@@ -6,19 +6,24 @@ test.describe('landing page', () => {
     await page.goto('/');
   });
 
-  test('presents the product and the synthetic-data disclosure', async ({
+  test('presents the product and the simulated-data disclosure', async ({
     page,
   }) => {
     await expect(page).toHaveTitle(/MatchIQ/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('note')).toContainText('Synthetic match data');
+    await expect(page.getByRole('note')).toContainText('Simulated match data');
+    await expect(page.getByRole('note')).toContainText(
+      'not affiliated with or endorsed by the Premier League',
+    );
   });
 
-  test('navigates to the pipeline section', async ({ page }) => {
-    await page.getByRole('link', { name: 'How it works' }).click();
+  test('navigates to the how-it-works section', async ({ page }) => {
+    await page.getByRole('link', { name: 'See how it works' }).click();
     await expect(page).toHaveURL(/#pipeline$/);
     await expect(
-      page.getByRole('heading', { name: 'Five stages, one source of truth' }),
+      page.getByRole('heading', {
+        name: 'Five steps from the pitch to the screen',
+      }),
     ).toBeInViewport();
   });
 

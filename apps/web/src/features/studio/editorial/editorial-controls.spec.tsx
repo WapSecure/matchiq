@@ -43,7 +43,7 @@ const renderControl = (ui: ReactNode, routes: Routes, allowed = true) => {
 };
 
 const notice = () =>
-  screen.getByRole('status', { name: 'Editorial notifications' });
+  screen.getByRole('status', { name: 'Producer notifications' });
 
 describe('editorial controls', () => {
   beforeEach(() => useEditorialNotice.setState({ notice: null }));
@@ -55,13 +55,11 @@ describe('editorial controls', () => {
         body: { status: frozen, changed: true, auditId: AUDIT_ID },
       },
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Freeze auto-publish' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Pause graphics' }));
     const dialog = screen.getByRole('dialog', {
-      name: 'Freeze auto-publish for this session',
+      name: 'Pause new graphics for this match',
     });
-    await user.click(within(dialog).getByRole('button', { name: 'Freeze' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Pause' }));
     expect(within(dialog).getByText(/at least 3 characters/)).toBeVisible();
     expect(callsTo(api, '/freeze')).toHaveLength(0);
 
@@ -69,7 +67,7 @@ describe('editorial controls', () => {
       within(dialog).getByLabelText('Reason'),
       'Goal under VAR review',
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Freeze' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Pause' }));
     await waitFor(() =>
       expect(store.getState().editorial?.mode).toBe('FROZEN'),
     );
@@ -80,9 +78,9 @@ describe('editorial controls', () => {
     expect(
       (init?.headers as Record<string, string>)['Idempotency-Key'],
     ).toMatch(/^[0-9a-f-]{36}$/);
-    expect(notice()).toHaveTextContent('Auto-publish frozen');
+    expect(notice()).toHaveTextContent('Graphics paused');
     expect(
-      screen.getByRole('button', { name: 'Resume auto-publish' }),
+      screen.getByRole('button', { name: 'Resume graphics' }),
     ).toBeInTheDocument();
   });
 
@@ -92,13 +90,11 @@ describe('editorial controls', () => {
         body: { status: frozen, changed: false, auditId: null },
       },
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Freeze auto-publish' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Pause graphics' }));
     await user.type(screen.getByLabelText('Reason'), 'Second operator');
-    await user.click(screen.getByRole('button', { name: 'Freeze' }));
+    await user.click(screen.getByRole('button', { name: 'Pause' }));
     await waitFor(() =>
-      expect(notice()).toHaveTextContent('Auto-publish was already frozen'),
+      expect(notice()).toHaveTextContent('Graphics were already paused'),
     );
   });
 
@@ -114,11 +110,9 @@ describe('editorial controls', () => {
         },
       },
     });
-    await user.click(
-      screen.getByRole('button', { name: 'Freeze auto-publish' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Pause graphics' }));
     await user.type(screen.getByLabelText('Reason'), 'Wrong scorer');
-    await user.click(screen.getByRole('button', { name: 'Freeze' }));
+    await user.click(screen.getByRole('button', { name: 'Pause' }));
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent(/Sign in again as a producer/);
     expect(alert).toHaveTextContent(/Nothing was changed/);
@@ -141,23 +135,19 @@ describe('editorial controls', () => {
         },
       },
     });
-    await user.click(screen.getByRole('button', { name: 'Kill switch' }));
+    await user.click(screen.getByRole('button', { name: 'Emergency stop' }));
     await user.type(screen.getByLabelText('Reason'), 'Feed compromised');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     const phrase = screen.getByLabelText('Confirmation');
     expect(phrase).toHaveFocus();
-    await user.type(phrase, 'kill');
-    await user.click(
-      screen.getByRole('button', { name: 'Activate kill switch' }),
-    );
-    expect(screen.getByText(/Type KILL exactly/)).toBeVisible();
+    await user.type(phrase, 'stop');
+    await user.click(screen.getByRole('button', { name: 'Stop all graphics' }));
+    expect(screen.getByText(/Type STOP exactly/)).toBeVisible();
     expect(callsTo(api, '/activate')).toHaveLength(0);
 
     await user.clear(phrase);
-    await user.type(phrase, 'KILL');
-    await user.click(
-      screen.getByRole('button', { name: 'Activate kill switch' }),
-    );
+    await user.type(phrase, 'STOP');
+    await user.click(screen.getByRole('button', { name: 'Stop all graphics' }));
     await waitFor(() =>
       expect(store.getState().editorial?.mode).toBe('KILLED'),
     );
@@ -166,7 +156,7 @@ describe('editorial controls', () => {
 
   it('disables controls without permission and says why', async () => {
     const { user } = renderControl(<FreezeControl />, {}, false);
-    const button = screen.getByRole('button', { name: 'Freeze auto-publish' });
+    const button = screen.getByRole('button', { name: 'Pause graphics' });
     expect(button).toHaveAttribute('aria-disabled', 'true');
     expect(button).toHaveAccessibleDescription(/Producer/);
     await user.click(button);

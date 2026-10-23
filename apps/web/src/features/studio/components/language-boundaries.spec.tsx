@@ -33,7 +33,9 @@ describe('commentary language boundaries', () => {
     expect(languageOf(screen.getByText('Trois tirs en cinq minutes.'))).toBe(
       'fr-FR',
     );
-    expect(languageOf(screen.getByText('Agent narrative'))).toBe('en-GB');
+    expect(languageOf(screen.getByText('Written by AI · fact-checked'))).toBe(
+      'en-GB',
+    );
   });
 
   it('tags provider fallback text as English even when filed under French', () => {
@@ -50,9 +52,13 @@ describe('commentary language boundaries', () => {
     expect(languageOf(screen.getByText('Home pile on the pressure'))).toBe(
       'en-GB',
     );
-    expect(languageOf(screen.getByText(/fr-FR variant unavailable/))).toBe(
-      'en-GB',
-    );
+    expect(
+      languageOf(
+        screen.getByText(
+          "The French version isn't ready yet, so you're seeing English.",
+        ),
+      ),
+    ).toBe('en-GB');
   });
 
   it('tags the actual English variant when Spanish commentary is unavailable', () => {
@@ -80,9 +86,7 @@ describe('commentary language boundaries', () => {
       </ul>,
     );
     expect(languageOf(screen.getByText('Home United égalise'))).toBe('fr-FR');
-    expect(languageOf(screen.getByText('Deterministic template'))).toBe(
-      'en-GB',
-    );
+    expect(languageOf(screen.getByText('Standard wording'))).toBe('en-GB');
   });
 
   it('tags overlay text with the cue locale', () => {
@@ -116,7 +120,7 @@ describe('commentary language boundaries', () => {
       screen.getByRole('radiogroup', { name: 'Audience' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Language changes commentary, not the controls/),
+      screen.getByText(/Language changes the commentary only/),
     ).toBeInTheDocument();
   });
 });

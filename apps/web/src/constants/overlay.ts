@@ -41,29 +41,34 @@ export const NATURAL_CUE_ENDS: ReadonlySet<string> = new Set([
 ]);
 
 export const OVERLAY_COPY = {
-  cueLog: 'Cue log',
-  ending: { EXPIRED: 'Expired', RETRACTED: 'Retracted' },
-  held: 'Held for display',
+  cueLog: 'Recent graphics',
+  ending: { EXPIRED: 'Finished', RETRACTED: 'Taken off air' },
+  untitled: 'Untitled graphic',
+  held: 'Kept on screen',
   heldHint: (seconds: number) =>
-    `Its match-clock window has passed; shown for at least ${seconds} s of real time.`,
+    `Its moment has passed, but it stays on screen for at least ${seconds} s so viewers can read it.`,
   priority: (p: number) => `Priority ${p}`,
-  source: { AGENT: 'Agent copy', TEMPLATE: 'Template copy' },
+  source: { AGENT: 'AI wording', TEMPLATE: 'Standard wording' },
   sourceHint:
-    'Revision 1 uses the deterministic broadcast template; later revisions carry agent copy that passed the publish gate.',
-  localeFallback: 'en-GB graphic',
+    'Each graphic goes out first with standard wording, then switches to AI wording once that passes the fact check.',
+  localeFallback: 'English graphic',
   standby: 'Standing by',
   lastAired: (headline: string) => `Last on air: ${headline}`,
   onAir: 'On air',
-  standbyTally: 'Standby',
-  programNote: 'Program preview · always in broadcast colours',
+  standbyTally: 'Off air',
+  programNote: 'The preview always uses broadcast colours',
   programNoteHint:
-    'The preview stands in for on-air video, so it stays dark in both themes.',
-  holdLegend: 'Cue hold',
+    'It stands in for the on-air picture, so it stays dark in light mode too.',
+  holdLegend: 'Minimum time on screen',
   holdOptions: [
-    { value: 'standard', label: 'Standard cue hold, 4 seconds', short: '4 s' },
+    {
+      value: 'standard',
+      label: 'Standard: at least 4 seconds on screen',
+      short: '4 s',
+    },
     {
       value: 'extended',
-      label: 'Extended cue hold for demos, 10 seconds',
+      label: 'Demo: at least 10 seconds on screen',
       short: '10 s',
     },
   ],

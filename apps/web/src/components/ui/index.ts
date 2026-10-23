@@ -41,6 +41,7 @@ export { SectionHeader } from './section-header';
 export { SegmentedControl, type SegmentOption } from './segmented-control';
 export { Select, type SelectProps } from './select';
 export { Skeleton } from './skeleton';
+export { TechnicalDetails } from './technical-details';
 export { Switch } from './switch';
 export { TextArea, TextField } from './text-field';
 export { ToastCard, type ToastTone } from './toast';

@@ -57,7 +57,7 @@ const renderStudio = async (routes: Routes = baseRoutes()) => {
 };
 
 const metricsText = () =>
-  screen.getByRole('region', { name: 'Live metrics' }).textContent;
+  screen.getByRole('region', { name: 'Match stats' }).textContent;
 const scoreText = () =>
   screen.getByRole('region', { name: 'Scoreboard' }).textContent;
 
@@ -87,7 +87,7 @@ describe('LiveStudio', () => {
       await screen.findByRole('article', { name: 'Home pile on the pressure' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('group', { name: /1 cue on air/ }),
+      screen.getByRole('group', { name: /1 graphic on air/ }),
     ).toHaveTextContent('Shot burst');
     await push(
       message('insight.detected', insight(), 1),
@@ -134,7 +134,7 @@ describe('LiveStudio', () => {
       screen.getByRole('article', { name: 'Home pile on the pressure' }),
     ).toBeInTheDocument();
     expect(screen.getByTestId('on-air-meta')).toHaveTextContent(
-      /Key moment.*Priority 50.*Template copy/,
+      /Key moment.*Priority 50.*Standard wording/,
     );
   });
 
@@ -161,7 +161,7 @@ describe('LiveStudio', () => {
 
     await user.click(screen.getByRole('radio', { name: /Français/ }));
     expect(await screen.findByText('Les locaux poussent')).toBeInTheDocument();
-    await user.click(screen.getByRole('radio', { name: 'Casual' }));
+    await user.click(screen.getByRole('radio', { name: 'Fan' }));
     await waitFor(() =>
       expect(
         callsTo(api, '/narratives').some(([u]) =>
@@ -169,9 +169,7 @@ describe('LiveStudio', () => {
         ),
       ).toBe(true),
     );
-    expect(
-      await screen.findByText(/Commentary is pending/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Write-up on its way/)).toBeInTheDocument();
     expect(metricsText()).toBe(before.metrics);
     expect(scoreText()).toBe(before.score);
   });
@@ -216,7 +214,7 @@ describe('LiveStudio', () => {
     const pause = await screen.findByRole('button', { name: 'Pause' });
     await user.click(pause);
     expect(
-      await screen.findByText(/Waiting for the replay worker/),
+      await screen.findByText(/Waiting for the replay to respond/),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
     await push(message('replay.status', status({ state: 'PAUSED' }), 1));
@@ -254,17 +252,24 @@ describe('LiveStudio', () => {
     });
     await renderStudio(routes);
     await user.click(
-      await screen.findByRole('button', { name: /open evidence/i }),
+      await screen.findByRole('button', { name: /see the evidence/i }),
     );
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Triggering events')).toBeInTheDocument();
+    expect(within(dialog).getByText('The plays behind it')).toBeInTheDocument();
     await waitFor(() =>
       expect(within(dialog).getAllByText('Shot')).toHaveLength(2),
     );
     expect(
-      within(dialog).getByText('Shots (home, latest 5 min)'),
+      within(dialog).getByText('Shots (home, last 5 min)'),
     ).toBeInTheDocument();
-    expect(within(dialog).getByText('count(SHOT)')).toBeInTheDocument();
+    expect(
+      within(dialog).getByText('Every attempt at goal'),
+    ).toBeInTheDocument();
+    expect(
+      within(within(dialog).getByTestId('technical-details')).getByText(
+        /count\(SHOT\)/,
+      ),
+    ).toBeInTheDocument();
     await user.click(
       within(dialog).getByRole('button', { name: 'Close evidence' }),
     );
@@ -283,7 +288,7 @@ describe('LiveStudio', () => {
       }),
     );
     expect(
-      await screen.findByText(/appear once the engine publishes/),
+      await screen.findByText(/appear once play begins/),
     ).toBeInTheDocument();
     await push(message('match.snapshot', snapshot(), 1));
     expect(metricsText()).toContain('Shots');
@@ -296,7 +301,7 @@ describe('LiveStudio', () => {
       message('overlay.publish', cue(), 2),
     );
     expect(
-      screen.getByRole('group', { name: /1 cue on air/ }),
+      screen.getByRole('group', { name: /1 graphic on air/ }),
     ).toBeInTheDocument();
     await push(
       message(

@@ -18,13 +18,13 @@ export const DEMO = {
   clock: '78:41',
   insight: {
     kind: 'Momentum shift',
-    priority: 'High',
+    priority: 'Notable',
     headline: 'Penbrook increase pressure',
     body: 'Six regains in the final third in eight minutes, three shots and the equaliser.',
-    evidence: '7 events · 3 metrics · high confidence',
+    evidence: '7 plays · 3 stats · strong evidence',
   },
   label:
-    'Product preview: the live studio with scoreboard, broadcast lower third, pitch event map and an evidence-linked insight, rendered from the app’s own components with synthetic data.',
+    'Product preview: the live studio with the scoreboard, an on-air graphic, the pitch map and a key moment with its evidence, drawn with the app’s own components and simulated data.',
 } as const;
 
 export const DEMO_CUE: OverlayCue = {
