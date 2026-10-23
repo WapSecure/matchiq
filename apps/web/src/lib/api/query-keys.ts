@@ -20,5 +20,7 @@ export const queryKeys = {
     ['fixtures', fixtureId, 'agent-runs'] as const,
   editorial: (fixtureId: string) =>
     ['fixtures', fixtureId, 'editorial'] as const,
+  overlayReviews: (fixtureId: string, version: number) =>
+    ['fixtures', fixtureId, 'overlay-reviews', version] as const,
   auditEvents: (filters: AuditFilters) => ['audit-events', filters] as const,
 };

@@ -1,5 +1,5 @@
 {
-  "id": "0e564ee8-e2d6-4af7-8545-5166444270a7",
+  "id": "f0f179f2-ebcf-427e-bf20-59102233d3af",
   "prevId": "b1875ce7-fa96-4e2e-bd4c-69083e29819e",
   "version": "7",
   "dialect": "postgresql",
@@ -1422,6 +1422,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "retracted_at": {
+          "name": "retracted_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp (3) with time zone",
@@ -1941,83 +1947,6 @@
         "editorial_controls_scope_valid": {
           "name": "editorial_controls_scope_valid",
           "value": "\"editorial_controls\".\"scope_type\" in ('ORG', 'FIXTURE')"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.preference_profiles": {
-      "name": "preference_profiles",
-      "schema": "",
-      "columns": {
-        "org_id": {
-          "name": "org_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "persona": {
-          "name": "persona",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "locale": {
-          "name": "locale",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "favourite_team_id": {
-          "name": "favourite_team_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "followed_player_ids": {
-          "name": "followed_player_ids",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::jsonb"
-        },
-        "reduced_motion": {
-          "name": "reduced_motion",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp (3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "preference_profiles_pk": {
-          "name": "preference_profiles_pk",
-          "columns": [
-            "org_id",
-            "user_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "preference_profiles_followed_is_array": {
-          "name": "preference_profiles_followed_is_array",
-          "value": "jsonb_typeof(\"preference_profiles\".\"followed_player_ids\") = 'array'"
         }
       },
       "isRLSEnabled": false

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { LIMITS } from './constants.js';
-import { EditorialStatus, OverlayRetractCause } from './editorial.js';
+import {
+  EditorialStatus,
+  InsightRetraction,
+  OverlayRetractCause,
+} from './editorial.js';
 import { MatchEvent } from './events.js';
 import { Insight } from './insight.js';
 import { Narrative } from './narrative.js';
@@ -12,6 +16,7 @@ import {
   UtcTimestamp,
 } from './primitives.js';
 import { ReplayStatus } from './replay.js';
+import { OverlayReviewNotice } from './review.js';
 import { MatchSnapshot } from './snapshot.js';
 
 const EnvelopeBase = z.strictObject({
@@ -32,6 +37,7 @@ export const StreamMessage = z.discriminatedUnion('type', [
   message('match.event', MatchEvent),
   message('match.snapshot', MatchSnapshot),
   message('insight.detected', Insight),
+  message('insight.retract', InsightRetraction),
   message('narrative.ready', Narrative),
   message('overlay.publish', OverlayCue),
   message(
@@ -44,6 +50,7 @@ export const StreamMessage = z.discriminatedUnion('type', [
       cause: OverlayRetractCause.optional(),
     }),
   ),
+  message('overlay.review', OverlayReviewNotice),
   message('replay.status', ReplayStatus),
   message('editorial.status', EditorialStatus),
   message('heartbeat', z.strictObject({})),

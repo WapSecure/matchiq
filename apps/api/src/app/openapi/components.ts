@@ -79,6 +79,8 @@ export const NAMED_SCHEMAS = {
   Narrative: contracts.Narrative,
   OverlayCue: contracts.OverlayCue,
   AgentRun: contracts.AgentRun,
+  AgentStep: contracts.AgentStep,
+  AgentStepTrace: contracts.AgentStepTrace,
   ReplayCommand: contracts.ReplayCommand,
   ReplayStatus: contracts.ReplayStatus,
   FixtureTemplateSummary: contracts.FixtureTemplateSummary,

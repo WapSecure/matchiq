@@ -90,6 +90,7 @@ def pipeline_config(settings: Settings) -> PipelineConfig:
         critique_enabled=settings.critique_enabled,
         grace_ms=LOCAL_WORKFLOW_GRACE_MS if settings.is_local else WORKFLOW_GRACE_MS,
         prices=PriceTable(settings.agent_price_table),
+        budget=settings.run_budget,
     )
 
 

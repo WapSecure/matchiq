@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type {
+  AgentStepTrace,
   CursorPage,
   CursorPageQuery,
   Insight,
@@ -74,6 +75,17 @@ export class IntelligenceService {
   ): Promise<CursorPage<InsightTrace>> {
     const known = await this.known(key);
     return readPage(() => this.reader.tracePage(known, query));
+  }
+
+  /** Every agent handoff of one run; another organisation's run answers 404 (ADR-0018). */
+  async stepTrace(
+    orgId: string,
+    correlationId: string,
+  ): Promise<AgentStepTrace> {
+    const trace = await this.reader.stepTrace(orgId, correlationId);
+    if (trace === null)
+      throw problem('traceNotFound', { detail: correlationId });
+    return trace;
   }
 
   /** Another organisation's fixture answers the same 404 as a missing one. */

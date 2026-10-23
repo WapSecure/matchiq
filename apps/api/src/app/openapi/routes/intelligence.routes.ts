@@ -1,4 +1,6 @@
 import {
+  AgentStepTrace,
+  CorrelationId,
   InsightList,
   InsightTraceList,
   MatchSnapshot,
@@ -6,6 +8,7 @@ import {
   OverlayList,
   RecapDocument,
 } from '@matchiq/contracts';
+import { z } from 'zod';
 import { API_LIMITS } from '../../constants';
 import {
   MatchListQuery,
@@ -14,6 +17,8 @@ import {
 import { KEYSET_TEXT, TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
 import { FixturePath } from './fixture.routes';
+
+const TracePath = z.strictObject({ correlationId: CorrelationId });
 
 const MATCH_LIST_TEXT = `${KEYSET_TEXT} A cursor is bound to its match. \`limit\` defaults to and is capped at ${API_LIMITS.matchListMax}, so a call without a cursor returns the whole list for matches up to that size.`;
 
@@ -119,5 +124,22 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
       body: json(InsightTraceList),
     },
     problems: ['validation', 'fixtureNotFound', 'invalidCursor'],
+  },
+  {
+    operationId: 'getAgentTrace',
+    method: 'get',
+    path: '/agents/traces/{correlationId}',
+    tag: TAGS.intelligence,
+    summary: 'Every agent handoff of one pipeline run',
+    description:
+      "One record per roster stage, in order: decision and reason, input checksum, cited evidence, prompt version, model, tokens, latency and cost estimate. Holds no prompts or model output text. The correlation id is `runs[].correlationId` from the agent-runs list; another organisation's run answers 404.",
+    auth: 'agents:traces:read',
+    params: TracePath,
+    success: {
+      status: 200,
+      description: 'The handoff records of the run',
+      body: json(AgentStepTrace),
+    },
+    problems: ['validation', 'traceNotFound'],
   },
 ];

@@ -1,6 +1,7 @@
 import type { Insight, Persona } from '@matchiq/contracts';
 import { memo } from 'react';
 import { EvidenceIcon } from '@/components/icons';
+import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { TeamSwatch } from '@/components/match/team-swatch';
 import { Badge, Button } from '@/components/ui';
 import {
@@ -77,7 +78,7 @@ export const KeyMomentCard = memo(function KeyMomentCard({
       className={cn(
         'flex flex-col gap-2.5 border-b border-line px-4 py-3.5 transition-colors last:border-0 hover:bg-surface-raised/50',
         PRIORITY_RAIL[insight.priority],
-        mark.suppressed && 'bg-surface-sunken/60',
+        (mark.suppressed || mark.retracted) && 'bg-surface-sunken/60',
       )}
     >
       <header className="flex flex-wrap items-center gap-2">
@@ -102,19 +103,23 @@ export const KeyMomentCard = memo(function KeyMomentCard({
           {formatMinute(insight.period, insight.matchClockMs)}
         </span>
       </header>
-      <NarrativePanel
-        insight={insight}
-        view={view}
-        locale={locale}
-        persona={persona}
-        clamp={persona === 'BROADCAST'}
-      />
+      {mark.retracted ? (
+        <RuledOutNote kind={insight.kind} reason={mark.retractedReason} />
+      ) : (
+        <NarrativePanel
+          insight={insight}
+          view={view}
+          locale={locale}
+          persona={persona}
+          clamp={persona === 'BROADCAST'}
+        />
+      )}
       {persona === 'ANALYST' ? <AnalystFacts insight={insight} /> : null}
       <footer className="flex items-center gap-2">
         <span className="mr-auto text-micro text-ink-subtle">
           {CONFIDENCE_LABELS[insight.evidence.confidenceLabel]}
         </span>
-        {mark.suppressed || mark.published ? null : (
+        {mark.suppressed || mark.published || mark.retracted ? null : (
           <SuppressInsightButton
             insightId={insight.insightId}
             headline={headline}

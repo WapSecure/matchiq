@@ -19,6 +19,7 @@ export * from './lib/postgres/intelligence-reader.js';
 export * from './lib/messaging/job-queues.js';
 export * from './lib/seed/seed-templates.js';
 export * from './lib/editorial-types.js';
+export * from './lib/review-types.js';
 export * as editorialSchema from './lib/schema/editorial-tables.js';
 export * from './lib/postgres/editorial-transaction.js';
 export * from './lib/postgres/audit-reader.js';

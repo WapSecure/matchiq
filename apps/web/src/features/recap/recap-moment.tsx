@@ -16,6 +16,7 @@ import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
+import { RecapMomentBody } from './recap-moment-body';
 import { momentAnchor } from './recap-order';
 import { RecapMomentTechnical } from './recap-moment-technical';
 import { recapTranslationNotice } from './recap-translation-notice';
@@ -128,20 +129,7 @@ export function RecapMomentItem({
             {CONFIDENCE_LABELS[moment.confidenceLabel]}
           </span>
         </header>
-        {picked ? (
-          <div className="mt-1.5" lang={picked.language}>
-            <p className="text-[15px] font-semibold leading-snug text-ink">
-              {picked.narrative.headline}
-            </p>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
-              {picked.narrative.body}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-1.5 text-xs text-ink-subtle">
-            {RECAP_COPY.noNarrative}
-          </p>
-        )}
+        <RecapMomentBody moment={moment} picked={picked} />
         <Meta
           moment={moment}
           picked={picked}

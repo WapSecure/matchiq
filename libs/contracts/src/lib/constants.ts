@@ -59,6 +59,7 @@ export const LIMITS = {
   faultEveryNthMax: 50,
   faultNoteMax: 300,
   followedPlayersMax: 3,
+  reviewQueueMax: 20,
 } as const;
 
 export const MESSAGES = {
@@ -77,4 +78,5 @@ export const MESSAGES = {
   auditRange: 'from must not be after to',
   auditTarget: 'targetId requires targetType',
   duplicateFollowedPlayer: 'each followed player may appear once',
+  reviewOverrides: 'duration and priority apply to an approval only',
 } as const;

@@ -37,7 +37,7 @@ describe('replay sessions with AI disabled (integration)', () => {
       ORG,
       findFixturesFolder(),
     );
-    expect(again.map((r) => r.outcome)).toEqual(Array(5).fill('unchanged'));
+    expect(again.map((r) => r.outcome)).toEqual(Array(6).fill('unchanged'));
     const templates = await new PostgresTemplateStore(t.db.db).list(ORG);
     expect(templates.map((x) => x.templateId)).toContain(TEMPLATE);
   });

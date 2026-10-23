@@ -10,6 +10,7 @@ export const TABLES = {
   narratives: 'narratives',
   overlayCues: 'overlay_cues',
   agentRuns: 'agent_runs',
+  agentSteps: 'agent_steps',
   matchSnapshots: 'match_snapshots',
   matchRecaps: 'match_recaps',
   editorialControls: 'editorial_controls',

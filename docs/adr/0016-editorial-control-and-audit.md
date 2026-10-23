@@ -1,6 +1,6 @@
 # ADR-0016: Editorial control, kill switch, audit trail and the permission seam
 
-- Status: Accepted (2026-10-22). Implements the backend of MQ-017 (subset) and audit item P0-4. Refines spec §5, §26, §28, §40, §41, §44, §45, §48 and §50 (runbook 3). Builds on ADR-0002, ADR-0005, ADR-0010 and ADR-0013.
+- Status: Accepted (2026-10-22). Implements the backend of MQ-017 (subset) and audit item P0-4. Refines spec §5, §26, §28, §40, §41, §44, §45, §48 and §50 (runbook 3). Builds on ADR-0002, ADR-0005, ADR-0010 and ADR-0013. Extended by ADR-0023: a session in MANUAL holds each gated cue for producer approval before air; AUTO keeps the behaviour described here.
 
 ## Context
 

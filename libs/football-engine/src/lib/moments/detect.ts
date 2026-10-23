@@ -72,7 +72,7 @@ const buildInput = (
  * Advances the detector by one countable event (sequence order) and returns
  * the insights it triggers. Sustained-pattern rules are debounced per kind and
  * side for `WINDOWS.debounceMs` within a period. CORRECTIONs are ignored here:
- * after a correction or a late event, re-run `detectKeyMoments` on the projection.
+ * after a correction or a late event, call `redetectMoments` on the projection.
  */
 export const stepMoments = (
   cursor: MomentCursor,
@@ -105,11 +105,13 @@ export const stepMoments = (
 };
 
 /**
- * All key moments for the projection's current ledger (voided events
- * excluded), in sequence order then rule order. Deterministic: the same
- * ledger always yields the same insights, ids and evidence.
+ * Re-scans the projection's current ledger from the start and returns every
+ * key moment plus the cursor positioned after the last countable event, so
+ * in-order detection can continue from a corrected or reordered ledger.
  */
-export const detectKeyMoments = (state: ProjectionState): Insight[] => {
+export const redetectMoments = (
+  state: ProjectionState,
+): { cursor: MomentCursor; insights: Insight[] } => {
   let cursor = createMomentCursor();
   const insights: Insight[] = [];
   for (const event of countableEvents(state)) {
@@ -117,5 +119,13 @@ export const detectKeyMoments = (state: ProjectionState): Insight[] => {
     cursor = step.cursor;
     insights.push(...step.insights);
   }
-  return insights;
+  return { cursor, insights };
 };
+
+/**
+ * All key moments for the projection's current ledger (voided events
+ * excluded), in sequence order then rule order. Deterministic: the same
+ * ledger always yields the same insights, ids and evidence.
+ */
+export const detectKeyMoments = (state: ProjectionState): Insight[] =>
+  redetectMoments(state).insights;

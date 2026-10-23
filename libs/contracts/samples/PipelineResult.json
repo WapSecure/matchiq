@@ -58,5 +58,26 @@
       "retries": 0,
       "outcome": "SUCCEEDED"
     }
+  ],
+  "steps": [
+    {
+      "stepIndex": 0,
+      "role": "MATCH_ANALYST",
+      "runId": "run_fx42_0012",
+      "correlationId": "5b0f3d4e-8c6a-4a51-9a3e-2f1d7c9b6e10",
+      "agentVersion": { "promptVersion": "1.0.0" },
+      "provider": "mock",
+      "fromStatus": "DETECTED",
+      "toStatus": "ANALYZED",
+      "decision": "PASS",
+      "reasonCode": "GROUNDED",
+      "reason": "analysis grounded in the evidence",
+      "inputChecksum": "3f1c9a5e2b7d4c6f8a0e1d2c3b4a59687f6e5d4c3b2a1908f7e6d5c4b3a29180",
+      "evidenceEventIds": ["ev_00101", "ev_00112", "ev_00127"],
+      "metricRefs": ["highRecoveries.home.rolling5m"],
+      "startedAt": "2026-10-20T20:02:23Z",
+      "latencyMs": 4,
+      "retries": 0
+    }
   ]
 }

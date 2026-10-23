@@ -4,6 +4,7 @@ import {
   type AuditEvent,
   type AuditEventQuery,
   type EditorialStatus,
+  type OverlayReview,
 } from '@matchiq/contracts';
 import { and, desc, eq, gte, lte, sql, type SQL } from 'drizzle-orm';
 import { AUDIT_CURSOR } from '../constants.js';
@@ -20,6 +21,7 @@ import type { FixtureKey } from '../ports.js';
 import { auditEvents, fixtures } from '../schema/tables.js';
 import { fixtureMatch } from './ledger-transaction.js';
 import { readControl, readControls } from './editorial-queries.js';
+import { readReviews } from './review-queries.js';
 import { withTenant } from './tenant-scope.js';
 
 const a = auditEvents;
@@ -135,6 +137,16 @@ export class PostgresEditorialReader implements EditorialReader {
         .where(fixtureMatch(key));
       if (fixture === undefined) return null;
       return toEditorialStatus(key.fixtureId, await readControls(tx, key));
+    });
+  }
+
+  reviews(key: FixtureKey): Promise<OverlayReview[] | null> {
+    return withTenant(this.db, key.orgId, async (tx) => {
+      const [fixture] = await tx
+        .select({ fixtureId: fixtures.fixtureId })
+        .from(fixtures)
+        .where(fixtureMatch(key));
+      return fixture === undefined ? null : readReviews(tx, key);
     });
   }
 

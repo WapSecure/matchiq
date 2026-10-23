@@ -2,7 +2,11 @@ import type { ReplayStatus, StreamMessage } from '@matchiq/contracts';
 import { INITIAL_CONNECTION } from '@/lib/stream';
 import { reduceEditorial, type StatusSource } from './reduce-editorial';
 import { reduceEvents } from './reduce-events';
-import { reduceInsight, reduceNarrative } from './reduce-insights';
+import {
+  reduceInsight,
+  reduceInsightRetract,
+  reduceNarrative,
+} from './reduce-insights';
 import { reducePublish, reduceRetract } from './reduce-overlays';
 import { reduceSnapshot } from './reduce-snapshot';
 import type { MatchData } from './types';
@@ -20,7 +24,9 @@ export const initialMatchData = (fixtureId: string): MatchData => ({
   narratives: {},
   overlays: {},
   retractions: [],
+  ruledOut: {},
   suppressed: {},
+  reviewVersion: 0,
   momentum: [],
   connection: INITIAL_CONNECTION,
   hydrationToken: 0,
@@ -69,6 +75,8 @@ export const reduceMessage = (
       return reduceSnapshot(state, message.payload);
     case 'insight.detected':
       return reduceInsight(state, message.payload);
+    case 'insight.retract':
+      return reduceInsightRetract(state, message.payload);
     case 'narrative.ready':
       return reduceNarrative(state, message.payload);
     case 'overlay.publish':
@@ -79,6 +87,8 @@ export const reduceMessage = (
       return reduceReplay(state, message.payload);
     case 'editorial.status':
       return reduceEditorial(state, message.payload);
+    case 'overlay.review':
+      return { reviewVersion: state.reviewVersion + 1 };
     case 'heartbeat':
       return {};
   }

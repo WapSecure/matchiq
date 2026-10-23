@@ -1,4 +1,5 @@
 import { SparkIcon } from '@/components/icons';
+import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { Badge } from '@/components/ui';
 import { FACT_CHECKS_COPY } from '@/constants/fact-checks';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
@@ -6,6 +7,7 @@ import { OBSERVATORY_COPY } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { cn } from '@/lib/cn';
 import { formatClock, formatMinute } from '@/lib/format';
+import { AgentStepTimeline } from './agent-step-timeline';
 import { FaultChain } from './fault-chain';
 import { describeRejection, plainFallbackReasons } from './plain-trace';
 import { traceFacts, type Variants } from './trace-facts';
@@ -95,11 +97,18 @@ export function TraceCard({ trace, period, variants }: TraceCardProps) {
         <PublicationBadge trace={trace} />
       </header>
       <div className="flex flex-col gap-3 py-3 pl-5 pr-4">
+        {trace.editorial?.insight === 'RETRACTED' ? (
+          <RuledOutNote
+            kind={trace.kind}
+            reason={trace.editorial.insightReason}
+          />
+        ) : null}
         <TraceFactsRow
           facts={traceFacts(trace, variants)}
           label={copy.label(kind, minute)}
         />
         <FaultChain runs={trace.runs} publication={trace.publication} />
+        <AgentStepTimeline trace={trace} moment={`${kind} ${minute}`} />
         <Notes title={copy.why} items={why} />
         {caught.length > 0 ? (
           <section>

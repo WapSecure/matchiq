@@ -12,6 +12,7 @@ import {
   KEY_EVENT_TYPES,
   PERIOD_LABELS,
 } from '@/constants/match';
+import { CORRECTION_COPY } from '@/constants/corrections';
 import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import { STUDIO_COPY } from '@/constants/studio';
 import { useFollowedRows } from '@/features/player-focus/use-followed-rows';
@@ -85,6 +86,7 @@ export function TimelinePanel({
             rows={rows.slice(0, limit)}
             label={copy.title}
             voidedLabel={copy.voided}
+            voidedGoalLabel={CORRECTION_COPY.voidedGoal}
             periodLabel={periodLabel}
             followedLabel={PLAYER_FOCUS_COPY.followedMark}
           />

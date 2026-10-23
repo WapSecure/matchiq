@@ -38,9 +38,15 @@ export const withInsightStatus = (row: {
   status: PipelineStatus.parse(row.status),
 });
 
-const NEVER_AIRED: OverlayEditorialState[] = ['HELD', 'SUPPRESSED'];
+const NEVER_AIRED: OverlayEditorialState[] = [
+  'HELD',
+  'SUPPRESSED',
+  'AWAITING_APPROVAL',
+  'REJECTED',
+  'APPROVAL_EXPIRED',
+];
 
-/** Held and suppressed cues never aired; viewers see only what went on air. */
+/** Held, suppressed and unapproved cues never aired; viewers see only what went on air. */
 export const onAir = (): SQL | undefined =>
   or(
     isNull(overlayCues.editorialState),

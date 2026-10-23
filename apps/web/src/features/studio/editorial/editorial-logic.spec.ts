@@ -97,6 +97,8 @@ describe('insight marks', () => {
     expect(markOf('in_held')).toEqual({
       labels: ['Held: graphics paused'],
       suppressed: false,
+      retracted: false,
+      retractedReason: null,
       published: false,
     });
     expect(markOf('in_pub').published).toBe(true);
@@ -107,6 +109,8 @@ describe('insight marks', () => {
     expect(markOf('in_unknown')).toEqual({
       labels: [],
       suppressed: false,
+      retracted: false,
+      retractedReason: null,
       published: false,
     });
   });

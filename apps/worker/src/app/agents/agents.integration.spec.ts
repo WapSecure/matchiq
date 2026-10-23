@@ -91,6 +91,27 @@ describe('agents pipeline with AI enabled (integration)', () => {
     ]);
   });
 
+  it('persists the agent handoff steps under the run correlation id, per tenant', async () => {
+    const [first] = await t.reader.insights(key);
+    if (!first) throw new Error('no insight');
+    const request = agents.requests.find(
+      (r) => r.packet.insight.insightId === first.insightId,
+    );
+    if (!request) throw new Error('no request');
+    const { correlationId } = request.packet;
+    const trace = await t.reader.stepTrace(key.orgId, correlationId);
+    expect(trace).toMatchObject({
+      correlationId,
+      fixtureId: key.fixtureId,
+      insightId: first.insightId,
+    });
+    expect(trace?.steps.map((s) => s.role)).toEqual([
+      'MATCH_ANALYST',
+      'NARRATIVE_WRITER',
+    ]);
+    expect(await t.reader.stepTrace('org_other', correlationId)).toBeNull();
+  });
+
   it('does not publish twice when a job is delivered again', async () => {
     const [first] = await t.reader.insights(key);
     if (!first) throw new Error('no insight');

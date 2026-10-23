@@ -53,7 +53,7 @@ const playBeat = (state: MatchState, beat: ScriptedBeat): boolean => {
     return true;
   }
   if (state.ball.x >= PITCH.boxX) {
-    takeShot(state, true);
+    takeShot(state, true, beat.kind === 'ruled-out-goal');
     state.activeBeat = null;
     return true;
   }

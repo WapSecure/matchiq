@@ -1,5 +1,7 @@
 import type {
   AgentRun,
+  AgentStep,
+  AgentStepTrace,
   AuditActorType,
   CreatedSession,
   CursorPage,
@@ -10,6 +12,7 @@ import type {
   GateReport,
   Insight,
   InsightPublication,
+  InsightRetraction,
   InsightTrace,
   Locale,
   MatchEvent,
@@ -61,6 +64,13 @@ export interface InsightRecord {
   readonly publication: InsightPublication;
 }
 
+export interface OverlayEndWrite {
+  readonly status: OverlayCue['status'];
+  readonly reason: string;
+  /** Set when a cue that never aired closes under review (ADR-0023). */
+  readonly editorial?: OverlayRecord['editorial'];
+}
+
 export interface OverlayRecord {
   readonly cue: OverlayCue;
   /** Lifecycle status stored for reads; the published cue keeps its approval status. */
@@ -77,6 +87,8 @@ export interface OverlayRecord {
 export interface InsightWithPeriod {
   readonly insight: Insight;
   readonly period: number;
+  /** Set when a correction ruled the insight out (editorial state RETRACTED). */
+  readonly retraction?: { readonly reason: string };
 }
 
 export interface InsightCompletion {
@@ -128,12 +140,17 @@ export interface PipelineTransaction extends LedgerTransaction {
   endOverlay(
     key: FixtureKey,
     overlayId: string,
-    end: { status: OverlayCue['status']; reason: string },
+    end: OverlayEndWrite,
   ): Promise<void>;
   insertAgentRuns(
     key: FixtureKey,
     insightId: string,
     runs: readonly AgentRun[],
+  ): Promise<void>;
+  insertAgentSteps(
+    key: FixtureKey,
+    insightId: string,
+    steps: readonly AgentStep[],
   ): Promise<void>;
   saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void>;
   updateSession(key: FixtureKey, status: ReplayStatus): Promise<void>;
@@ -143,6 +160,15 @@ export interface PipelineTransaction extends LedgerTransaction {
     progress: SessionProgress,
   ): Promise<void>;
   saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void>;
+  /**
+   * Rules an insight out after a correction: the insight becomes REJECTED and
+   * RETRACTED, its narratives are withdrawn and its cue row is marked so no
+   * later revision airs. Idempotent; true when anything changed.
+   */
+  retractInsight(
+    key: FixtureKey,
+    retraction: InsightRetraction,
+  ): Promise<boolean>;
 }
 
 export interface PipelineUnitOfWork {
@@ -202,6 +228,11 @@ export interface IntelligenceReader {
   overlays(key: FixtureKey): Promise<OverlayCue[]>;
   recap(key: FixtureKey): Promise<RecapDocument | null>;
   traces(key: FixtureKey): Promise<InsightTrace[]>;
+  /** Every handoff of one pipeline run, by correlation id, within the organisation. */
+  stepTrace(
+    orgId: string,
+    correlationId: string,
+  ): Promise<AgentStepTrace | null>;
   /** Detection order, `(detectedSequence, insightId)`. */
   insightPage(
     key: FixtureKey,

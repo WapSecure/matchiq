@@ -1,26 +1,28 @@
 import type {
   Fixture,
   Insight,
+  InsightRetraction,
   MatchEvent,
   OverlayProposal,
+  OverlayRetractCause,
   ReplayStatus,
 } from '@matchiq/contracts';
 import {
   applyEvent,
   createInitialState,
-  createMomentCursor,
-  stepMoments,
   toSnapshot,
-  type MomentCursor,
   type ProjectionState,
 } from '@matchiq/football-engine';
 import {
   FALLBACK_REASONS,
   INSIGHT_REVISION,
   OVERLAY_END_REASONS,
+  OVERLAY_TIMING,
+  RETRACTION_REASONS,
 } from '../constants';
 import { toOverlayCue } from './artifacts';
 import { gateOverlay } from './gate/publish-gate';
+import { MomentTracker } from './moment-tracker';
 import {
   OverlayScheduler,
   type ClockPoint,
@@ -48,15 +50,16 @@ export interface MatchPipelineOptions {
 
 /**
  * The per-session intelligence pipeline as a deterministic state machine:
- * project each event, emit snapshots on cadence, detect key moments, schedule
- * overlays and (with AI disabled) publish template narratives. It performs no
+ * project each event, emit snapshots on cadence, detect key moments (and
+ * retract those a correction rules out), schedule overlays and (with AI
+ * disabled) publish template narratives. It performs no
  * I/O; callers write each batch in one transaction. Replaying the same events
  * into a fresh instance rebuilds identical state, which is how a restarted
  * worker resumes a session.
  */
 export class MatchPipeline {
   private projection: ProjectionState;
-  private cursor: MomentCursor = createMomentCursor();
+  private readonly moments = new MomentTracker();
   private readonly cadence = new SnapshotCadence();
   private readonly scheduler = new OverlayScheduler();
   private clock: ClockPoint = { period: 1, clockMs: 0 };
@@ -72,9 +75,10 @@ export class MatchPipeline {
   step(event: MatchEvent, batch: PipelineBatch): void {
     batch.events.push(event);
     batch.drafts.push(this.draft('match.event', event));
+    const inOrder =
+      event.sequence > (this.projection.ledger.at(-1)?.sequence ?? -1);
     this.projection = applyEvent(this.projection, event);
-    const moments = stepMoments(this.cursor, event, this.projection.fixture);
-    this.cursor = moments.cursor;
+    const moments = this.moments.step(this.projection, event, inOrder);
     this.clock = { period: event.period, clockMs: event.matchClockMs };
     this.applyOverlays(this.scheduler.advance(this.clock), event, batch);
     if (this.cadence.shouldSnapshot(event)) {
@@ -82,7 +86,9 @@ export class MatchPipeline {
       batch.drafts.push(this.draft('match.snapshot', snapshot));
       batch.snapshot = snapshot;
     }
-    for (const insight of moments.insights) this.detect(insight, event, batch);
+    for (const insight of moments.retracted)
+      this.retract(insight, event, batch);
+    for (const insight of moments.detected) this.detect(insight, event, batch);
     if (event.type === 'PERIOD_ENDED' || event.type === 'MATCH_ENDED') {
       const reason =
         event.type === 'MATCH_ENDED'
@@ -135,7 +141,7 @@ export class MatchPipeline {
       templateOverlay(insight, fixture),
       gateContextOf(insight, fixture),
     );
-    if (proposal.ok) {
+    if (proposal.ok && this.isCurrent(insight)) {
       const cue = toOverlayCue(insight, proposal.value, 1);
       this.applyOverlays(this.scheduler.offer(cue, this.clock), event, batch);
     }
@@ -148,6 +154,36 @@ export class MatchPipeline {
       reason: FALLBACK_REASONS.aiDisabled,
     });
     this.publish(insight, publication, batch);
+  }
+
+  /** A moment found by a re-scan may lie in the past; its cue is never aired late. */
+  private isCurrent(insight: Insight): boolean {
+    return (
+      insight.period === this.clock.period &&
+      this.clock.clockMs - insight.matchClockMs <= OVERLAY_TIMING.maxQueueWaitMs
+    );
+  }
+
+  /** The editorial retraction path (ADR-0016) with the correction as its cause. */
+  private retract(
+    insight: Insight,
+    event: MatchEvent,
+    batch: PipelineBatch,
+  ): void {
+    const correction = event.type === 'CORRECTION' ? event : null;
+    const retraction: InsightRetraction = {
+      insightId: insight.insightId,
+      cause: correction ? 'CORRECTION' : 'LATE_EVENT',
+      causeEventId: event.eventId,
+      reason: correction?.reason ?? RETRACTION_REASONS.lateEvent,
+    };
+    batch.drafts.push(this.draft('insight.retract', retraction));
+    batch.retractions.push(retraction);
+    const actions = this.scheduler.withdraw(
+      insight.insightId,
+      OVERLAY_END_REASONS.corrected,
+    );
+    this.applyOverlays(actions, event, batch, 'CORRECTION');
   }
 
   private reviseOverlay(
@@ -176,6 +212,7 @@ export class MatchPipeline {
     actions: readonly OverlayAction[],
     event: MatchEvent,
     batch: PipelineBatch,
+    cause?: OverlayRetractCause,
   ): void {
     for (const action of actions) {
       if (action.kind === 'publish') {
@@ -192,6 +229,7 @@ export class MatchPipeline {
             overlayId: action.cue.overlayId,
             revision: action.cue.revision,
             reason: action.reason,
+            ...(cause === undefined ? {} : { cause }),
           }),
         );
         batch.overlayEnds.push({

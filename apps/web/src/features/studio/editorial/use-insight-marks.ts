@@ -12,6 +12,7 @@ import { insightMarks } from './insight-marks';
 export const useInsightMarks = () => {
   const fixtureId = useMatchStore((s) => s.fixtureId);
   const suppressed = useMatchStore((s) => s.suppressed);
+  const ruledOut = useMatchStore((s) => s.ruledOut);
   const traces = useQuery({
     queryKey: queryKeys.agentRuns(fixtureId),
     queryFn: ({ signal }) => fetchAgentRuns(fixtureId, signal),
@@ -19,7 +20,7 @@ export const useInsightMarks = () => {
     retry: false,
   });
   return useMemo(
-    () => insightMarks(traces.data, suppressed),
-    [traces.data, suppressed],
+    () => insightMarks(traces.data, suppressed, ruledOut),
+    [traces.data, suppressed, ruledOut],
   );
 };

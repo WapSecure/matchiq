@@ -2,10 +2,12 @@
 
 import asyncio
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from matchiq_agents.clock import MS_PER_SECOND, Clock, Deadline
+from matchiq_agents.constants import DEFAULT_RUN_BUDGET
 from matchiq_agents.contracts.types import (
+    AgentStepRole,
     PipelineRequest,
     PipelineResult,
     PipelineStatus,
@@ -18,10 +20,13 @@ from matchiq_agents.models.port import ModelPort
 from matchiq_agents.models.pricing import EMPTY_PRICES, PriceTable
 from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy, StageTimer
 from matchiq_agents.pipeline import reasons
+from matchiq_agents.pipeline import step_reasons as outcomes
+from matchiq_agents.pipeline.budget import BudgetLimits, RunBudget
 from matchiq_agents.pipeline.recorder import RunScope
 from matchiq_agents.pipeline.result import build_result, rejected_result
 from matchiq_agents.pipeline.runner import ModelRunner
 from matchiq_agents.pipeline.state import PipelineState, Route
+from matchiq_agents.pipeline.steps import StepOutcome, StepRecorder, checksum
 from matchiq_agents.pipeline.workflow import build_workflow
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.fact_checker import decide, deterministic_issues
@@ -38,6 +43,7 @@ class PipelineConfig:
     grace_ms: float
     prices: PriceTable = EMPTY_PRICES
     safety: ContentSafetyScreen | None = None
+    budget: BudgetLimits = DEFAULT_RUN_BUDGET
 
 
 class PipelineOrchestrator:
@@ -74,13 +80,16 @@ class PipelineOrchestrator:
             deadline,
             self._config.prices,
             self._timer,
+            RunBudget(self._config.budget),
         )
+        request_checksum = checksum(request.model_dump(mode="json", exclude_none=True))
         return AgentContext(
             view,
             runner,
             TemplateFallback(view),
             self._config.critique_enabled,
             self._config.safety,
+            recorder=StepRecorder(runner, request_checksum),
         )
 
     async def run(self, request: PipelineRequest) -> PipelineResult:
@@ -102,6 +111,18 @@ class PipelineOrchestrator:
 
 async def emergency_result(agents: AgentContext) -> PipelineResult:
     """Template-only result used when the workflow itself fails or overruns its deadline."""
+    recorder = agents.recorder
+
+    async def work(_: PipelineState) -> tuple[PipelineState, StepOutcome]:
+        return await _emergency_state(agents), outcomes.EMERGENCY
+
+    # Runs of the failed workflow are not carried over, so the step counts only its own usage.
+    before = replace(recorder.last, runs=()) if recorder.last else PipelineState()
+    final = await recorder.record(AgentStepRole.TEMPLATE_FALLBACK, before, work)
+    return build_result(agents.view, final, recorder.steps)
+
+
+async def _emergency_state(agents: AgentContext) -> PipelineState:
     fallback = agents.fallback
     canonical = fallback.drafts(agents.canonical_personas, CANONICAL_LOCALE)
     issues = deterministic_issues(agents, None, canonical)
@@ -114,9 +135,9 @@ async def emergency_result(agents: AgentContext) -> PipelineResult:
         fallback_reasons=(reasons.ORCHESTRATION_ERROR,),
     )
     if verification.verdict is not Verdict.PASS:
-        return build_result(agents.view, state.advance(PipelineStatus.REJECTED, Route.FINALISE))
+        return state.advance(PipelineStatus.REJECTED, Route.FINALISE)
     localised, runs = await localise_all(agents, canonical, agents.view.locales)
-    final = PipelineState(
+    return PipelineState(
         status=state.status,
         route=state.route,
         analysis=state.analysis,
@@ -126,4 +147,3 @@ async def emergency_result(agents: AgentContext) -> PipelineResult:
         fallback_reasons=state.fallback_reasons,
         runs=runs,
     )
-    return build_result(agents.view, final)

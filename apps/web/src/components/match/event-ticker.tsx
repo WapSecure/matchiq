@@ -24,6 +24,8 @@ type EventTickerProps = {
   rows: readonly TickerRow[];
   label: string;
   voidedLabel: string;
+  /** Shown instead of `voidedLabel` on a voided goal. */
+  voidedGoalLabel?: string;
   periodLabel: (period: number) => string;
   followedLabel?: string;
 };
@@ -110,6 +112,7 @@ export function EventTicker({
   rows,
   label,
   voidedLabel,
+  voidedGoalLabel = voidedLabel,
   periodLabel,
   followedLabel,
 }: EventTickerProps) {
@@ -123,7 +126,7 @@ export function EventTicker({
         >
           <TickerItem
             row={row}
-            voidedLabel={voidedLabel}
+            voidedLabel={row.type === 'GOAL' ? voidedGoalLabel : voidedLabel}
             followedLabel={followedLabel}
           />
         </PeriodBreak>
