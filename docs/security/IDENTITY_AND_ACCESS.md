@@ -1,6 +1,6 @@
 # Identity and access
 
-How MatchIQ authenticates people and services, what each role may do, how tenants are kept apart and how to run it locally. The decision record is [ADR-0015](../adr/0015-identity-authorisation-and-tenant-isolation.md).
+How MatchIQ authenticates people and services, what each role may do, how tenants are kept apart and how to run it locally. The decision record is [ADR-0018](../adr/0018-identity-authorisation-and-tenant-isolation.md).
 
 ## Model
 

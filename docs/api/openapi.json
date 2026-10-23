@@ -1818,7 +1818,7 @@
       "post": {
         "operationId": "issueStreamTicket",
         "summary": "Issue a short-lived ticket that opens this fixture stream",
-        "description": "`EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0015).\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "`EventSource` cannot send headers: pass the ticket as `?ticket=` on `/stream`. Bound to the caller, organisation and fixture; valid for `STREAM_TICKET_TTL_SECONDS` (ADR-0018).\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Stream"
         ],
@@ -13891,7 +13891,7 @@
       "oidc": {
         "type": "openIdConnect",
         "openIdConnectUrl": "https://issuer.example/.well-known/openid-configuration",
-        "description": "OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0015). Roles map to permissions; a token `scope` naming MatchIQ permissions narrows them."
+        "description": "OIDC access token from `OIDC_ISSUER_URL`, sent as `Authorization: Bearer <JWT>` (ADR-0018). Roles map to permissions; a token `scope` naming MatchIQ permissions narrows them."
       },
       "operatorKey": {
         "type": "http",

@@ -109,7 +109,7 @@ export const GATE_DETAILS = {
   metricRef: (ref: string) => `metricRef ${ref} is not in the envelope`,
 } as const;
 
-/** Demo fault scenarios (ADR-0017); a metric the engine never computes. */
+/** Demo fault scenarios (ADR-0020); a metric the engine never computes. */
 export const DEMO_FAULTS = {
   injectedCitation: { metricRef: 'fault.injected', value: 99 },
   gateNote: (persona: string, locale: string) =>

@@ -41,7 +41,7 @@ export interface AgentPipelineDeps {
   readonly reader: IntelligenceReader;
   readonly fixtures: FixtureReader;
   readonly clock: Clock;
-  /** Read for the session's demo fault plan (ADR-0017). */
+  /** Read for the session's demo fault plan (ADR-0020). */
   readonly sessions: SessionStore;
 }
 

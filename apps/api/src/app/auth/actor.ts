@@ -1,7 +1,7 @@
 import type { Permission, Principal } from '@matchiq/access';
 import type { AuditActorType } from '@matchiq/contracts';
 
-/** Who is calling, as editorial services and audit rows see it (ADR-0015, ADR-0016). */
+/** Who is calling, as editorial services and audit rows see it (ADR-0018, ADR-0016). */
 export interface Actor {
   readonly type: AuditActorType;
   readonly id: string;

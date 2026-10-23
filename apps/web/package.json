@@ -29,6 +29,9 @@
         ]
       },
       "dev": {
+        "dependsOn": [
+          "^build"
+        ],
         "options": {
           "port": 4200
         }

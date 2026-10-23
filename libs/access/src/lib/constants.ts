@@ -8,7 +8,7 @@ export const ROLE_NAMES = [
   'viewer',
 ] as const;
 
-/** Built in, never assignable in the identity provider (ADR-0015). */
+/** Built in, never assignable in the identity provider (ADR-0018). */
 export const ANONYMOUS_ROLE = 'anonymous';
 
 /** Spec §45 scopes plus the product permissions they leave out. */

@@ -4,7 +4,7 @@ import type { Request } from 'express';
 import { type Actor, actorFromPrincipal } from './actor';
 
 /**
- * One permission system (ADR-0015): `RequirePermission` is the global
+ * One permission system (ADR-0018): `RequirePermission` is the global
  * guards' declaration from `@matchiq/auth`; this module only adapts the
  * authenticated principal to the editorial `Actor`.
  */

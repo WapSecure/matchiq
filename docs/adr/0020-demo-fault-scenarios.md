@@ -1,4 +1,4 @@
-# ADR-0017: Deterministic demo fault scenarios
+# ADR-0020: Deterministic demo fault scenarios
 
 - Status: Accepted (2026-10-22). Implements spec §28 ("trace one failure and recovery chain in the demo"), §31.8 and §33; closes audit item P0-7. Complements ADR-0011 (orchestration) and ADR-0002 (deterministic gate).
 

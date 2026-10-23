@@ -110,7 +110,7 @@ def build_orchestrator(
 def build_service(
     settings: Settings, clock: Clock, model: ModelPort | None = None
 ) -> FaultAwareOrchestrator:
-    """The orchestrator plus demo fault routing (ADR-0017); a faulted run never shares state."""
+    """The orchestrator plus demo fault routing (ADR-0020); a faulted run never shares state."""
     config = pipeline_config(settings)
     attempts = config.retry.max_retries + 1 if config.retry.retry_timeouts else 1
     return FaultAwareOrchestrator(

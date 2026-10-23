@@ -55,7 +55,7 @@ export const HEADERS = {
   correlationId: 'x-correlation-id',
 } as const;
 
-/** Audit actions the API records with the real actor (ADR-0015). */
+/** Audit actions the API records with the real actor (ADR-0018). */
 export const API_AUDIT_ACTIONS = {
   replayCommand: 'replay.command.accepted',
   signedIn: 'auth.signed-in',

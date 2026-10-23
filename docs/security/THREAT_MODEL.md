@@ -1,6 +1,6 @@
 # Threat model
 
-STRIDE over the deployed MatchIQ architecture (spec §48). It covers what runs today plus the OIDC sign-in that is landing (ADR-0015). Each threat maps to a mitigation and the evidence for it: **[test]** is an automated test, **[ci]** is a CI gate, **[config]** is configuration under review, and **[planned]** is not implemented. MatchIQ makes no compliance claims.
+STRIDE over the deployed MatchIQ architecture (spec §48). It covers what runs today plus the OIDC sign-in that is landing (ADR-0018). Each threat maps to a mitigation and the evidence for it: **[test]** is an automated test, **[ci]** is a CI gate, **[config]** is configuration under review, and **[planned]** is not implemented. MatchIQ makes no compliance claims.
 
 Owner for every row: the platform team (`.github/CODEOWNERS`). Review this document whenever a trust boundary changes (a new service, ingress, identity provider or data source).
 
@@ -62,7 +62,7 @@ Owner for every row: the platform team (`.github/CODEOWNERS`). Review this docum
 
 | #   | Threat                                     | Mitigation                                                                                                            | Evidence                                                                                                    |
 | --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| I1  | Cross-tenant reads (IDOR)                  | Organisation taken only from the token principal; tenant-pinned transactions and Postgres RLS on every `org_id` table | **[test]** `apps/api` `tenancy.integration.spec.ts`, `libs/db/tests/tenancy.integration.spec.ts` (ADR-0015) |
+| I1  | Cross-tenant reads (IDOR)                  | Organisation taken only from the token principal; tenant-pinned transactions and Postgres RLS on every `org_id` table | **[test]** `apps/api` `tenancy.integration.spec.ts`, `libs/db/tests/tenancy.integration.spec.ts` (ADR-0018) |
 | I2  | Stack traces or secrets in errors and logs | RFC 9457 problems hide internals; env errors name variables, never values                                             | **[test]** `http-kit.spec.ts`, `libs/config`                                                                |
 | I3  | Secrets committed to the public repository | gitleaks over reachable history; GitHub secret scanning and push protection                                           | **[ci]** `security` job                                                                                     |
 | I4  | Cross-origin reads of API data             | CORS allowlist of exact origins (wildcards and paths rejected at startup); CORP `same-origin`                         | **[test]** `load-env.spec.ts`, `http-kit.spec.ts`                                                           |

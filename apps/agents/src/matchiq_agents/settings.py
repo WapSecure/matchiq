@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     # JSON: {"<deployment>": {"inputPerMTok": 0.15, "outputPerMTok": 0.6}} in USD. Local
     # inference costs 0; a cloud deployment missing here gets no estimate (docs/ai/EVALUATION.md).
     agent_price_table: dict[str, Price] = Field(default_factory=dict[str, Price])
-    # Honours `PipelineRequest.fault` (ADR-0017). Simulated failures only; refused in prod.
+    # Honours `PipelineRequest.fault` (ADR-0020). Simulated failures only; refused in prod.
     demo_faults_enabled: bool = False
 
     @property

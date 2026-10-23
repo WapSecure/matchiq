@@ -22,7 +22,7 @@ export const actorDetails = (principal: Principal) => ({
 
 /**
  * Writes audit rows with the real actor in the actor's own organisation
- * (ADR-0015). Also receives every 403 for an authenticated caller; those are
+ * (ADR-0018). Also receives every 403 for an authenticated caller; those are
  * recorded best-effort so a database hiccup never turns a 403 into a 500.
  */
 @Injectable()

@@ -36,7 +36,7 @@ export const countActiveSessions = async (
   return row?.n ?? 0;
 };
 
-/** Runs as the owner role across organisations (system scope, ADR-0015). */
+/** Runs as the owner role across organisations (system scope, ADR-0018). */
 export const listSessionsInState = (
   db: Executor,
   input: { state: ReplayState; limit: number },

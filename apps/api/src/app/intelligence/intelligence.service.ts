@@ -17,7 +17,7 @@ import { problem } from '../http/problems';
 import { FIXTURE_READER, INTELLIGENCE_READER } from '../infrastructure/tokens';
 import type { ItemList } from '../replay/replay.service';
 
-/** Read models the worker's pipeline maintains, scoped to the caller's organisation (ADR-0015). */
+/** Read models the worker's pipeline maintains, scoped to the caller's organisation (ADR-0018). */
 @Injectable()
 export class IntelligenceService {
   constructor(

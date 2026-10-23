@@ -21,7 +21,7 @@ const profileOf = (principal: Principal): AccessProfile => ({
   permissions: [...principal.permissions],
 });
 
-/** The caller itself. Sign-in and sign-out are recorded by the web BFF (ADR-0015). */
+/** The caller itself. Sign-in and sign-out are recorded by the web BFF (ADR-0018). */
 @Controller(ROUTES.me)
 export class MeController {
   constructor(private readonly audit: AuditTrail) {}

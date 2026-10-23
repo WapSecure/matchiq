@@ -81,7 +81,7 @@ module api 'container-app.bicep' = {
       { name: 'API_PORT', value: '3000' }
       { name: 'API_PUBLIC_URL', value: apiOrigin }
       { name: 'CORS_ALLOWED_ORIGINS', value: webOrigin }
-      // ADR-0015: the public demo tenant; add OIDC_ISSUER_URL and OIDC_AUDIENCE for Entra ID sign-in.
+      // ADR-0018: the public demo tenant; add OIDC_ISSUER_URL and OIDC_AUDIENCE for Entra ID sign-in.
       { name: 'AUTH_ANONYMOUS_DEMO_ENABLED', value: 'true' }
       { name: 'OTEL_SERVICE_NAME', value: 'matchiq-api' }
     ])

@@ -67,7 +67,7 @@ Errors are RFC 9457 `application/problem+json` with `type = urn:matchiq:problem:
 
 ## Authentication
 
-Every operation names its permission in `x-matchiq-permission` (ADR-0015), and its `security` lists the ways in:
+Every operation names its permission in `x-matchiq-permission` (ADR-0018), and its `security` lists the ways in:
 
 - **OIDC (`oidc`):** `Authorization: Bearer <access token>` from `OIDC_ISSUER_URL`. Roles map to permissions. A token `scope` that names MatchIQ permissions narrows them.
 - **Operator key (`operatorKey`):** `Authorization: Bearer <OPERATOR_API_KEY>`, a dev and CI fallback behind `AUTH_OPERATOR_KEY_ENABLED` that is refused in prod. It acts as developer + producer.

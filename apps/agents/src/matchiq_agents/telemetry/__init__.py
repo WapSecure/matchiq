@@ -1,4 +1,4 @@
-"""Structured logs and optional OpenTelemetry tracing (ADR-0017)."""
+"""Structured logs and optional OpenTelemetry tracing (ADR-0019)."""
 
 from matchiq_agents.telemetry.logging import configure_logging
 from matchiq_agents.telemetry.middleware import RequestContextMiddleware

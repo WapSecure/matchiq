@@ -19,7 +19,7 @@ import type { AddressInfo } from 'node:net';
 import { AppModule } from '../app/app.module';
 import { configureApiApp } from '../app/configure-api-app';
 
-/** The dev/CI operator-key fallback (ADR-0015): a developer + producer in `org_demo`. */
+/** The dev/CI operator-key fallback (ADR-0018): a developer + producer in `org_demo`. */
 export const OPERATOR_KEY = 'operator-test-key-'.padEnd(48, 'x');
 export const AUTH_HEADER = { authorization: `Bearer ${OPERATOR_KEY}` };
 export const DEMO_ORG = 'org_demo';

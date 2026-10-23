@@ -18,7 +18,7 @@ export const AUTH_ENV_MESSAGES = {
   issuerAudiencePair: 'OIDC_ISSUER_URL and OIDC_AUDIENCE must be set together',
   operatorKeyMissing:
     'is required when AUTH_OPERATOR_KEY_ENABLED=true (openssl rand -hex 32)',
-  operatorKeyInProd: 'must be false when APP_ENV=prod (ADR-0015)',
+  operatorKeyInProd: 'must be false when APP_ENV=prod (ADR-0018)',
   httpsInProd: 'must use https when APP_ENV=prod',
   noAccessPath:
     'set OIDC_ISSUER_URL or AUTH_ANONYMOUS_DEMO_ENABLED=true, otherwise nothing can call the API',

@@ -1,6 +1,6 @@
 # Observability
 
-Structured logs, OpenTelemetry traces and Prometheus metrics for the API and worker, plus logs and traces for the agents service (ADR-0017). Everything is vendor neutral and local first. With no telemetry settings, the services run exactly as before: JSON logs, tracing off, and metrics on an internal listener.
+Structured logs, OpenTelemetry traces and Prometheus metrics for the API and worker, plus logs and traces for the agents service (ADR-0019). Everything is vendor neutral and local first. With no telemetry settings, the services run exactly as before: JSON logs, tracing off, and metrics on an internal listener.
 
 ## Configuration
 
@@ -169,7 +169,7 @@ The spec's database-degraded, compromised-credential and licence-expired runbook
 
 ## Azure Monitor
 
-Not exercised; do not claim it works (ADR-0003, ADR-0017). The services export OTLP only. To forward traces to Application Insights, run the collector with `infra/observability/otel-collector.azure.yaml` (contrib `azuremonitor` exporter, `APPLICATIONINSIGHTS_CONNECTION_STRING` from the environment) and point `OTEL_EXPORTER_OTLP_ENDPOINT` at it. The services do not use the connection string themselves.
+Not exercised; do not claim it works (ADR-0003, ADR-0019). The services export OTLP only. To forward traces to Application Insights, run the collector with `infra/observability/otel-collector.azure.yaml` (contrib `azuremonitor` exporter, `APPLICATIONINSIGHTS_CONNECTION_STRING` from the environment) and point `OTEL_EXPORTER_OTLP_ENDPOINT` at it. The services do not use the connection string themselves.
 
 ## Limits
 

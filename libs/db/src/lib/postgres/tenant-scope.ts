@@ -11,7 +11,7 @@ export class CrossTenantError extends Error {
 
 /**
  * Makes the rest of the transaction run as the non-owner `matchiq_app` role
- * with `app.org_id` set, so row-level security applies (ADR-0015). Both
+ * with `app.org_id` set, so row-level security applies (ADR-0018). Both
  * settings are transaction-local and vanish at commit or rollback.
  */
 export const enterTenant = async (

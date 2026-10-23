@@ -1,7 +1,7 @@
 import { STREAM_TICKET_PARAM } from '@/constants/api';
 import { fetchSseTransport, type SseTransport } from './sse-transport';
 
-/** Returns a fresh short-lived stream ticket for the fixture (ADR-0015). */
+/** Returns a fresh short-lived stream ticket for the fixture (ADR-0018). */
 export type TicketSource = () => Promise<string>;
 
 /**

@@ -59,7 +59,7 @@ export type MockApiOptions = {
   recap?: 'ready' | 'notReady';
   /** Serve insights, narratives and cues from the read models (late join). */
   hydrate?: boolean;
-  /** Add traces of demo fault scenarios (ADR-0017) to the observatory. */
+  /** Add traces of demo fault scenarios (ADR-0020) to the observatory. */
   faults?: boolean;
 };
 

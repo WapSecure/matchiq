@@ -51,7 +51,7 @@ const auditValues = (entry: AuditEntry) => ({
 /**
  * Extended by the worker's pipeline transaction (see pipeline-transaction.ts).
  * Every operation pins the transaction to its organisation first, so all of
- * its statements run under row-level security for that tenant (ADR-0015).
+ * its statements run under row-level security for that tenant (ADR-0018).
  */
 export class PostgresLedgerTransaction implements LedgerTransaction {
   constructor(

@@ -14,7 +14,7 @@ param enablePurgeProtection bool = false
 
 @secure()
 @minLength(32)
-@description('Signs short-lived SSE stream tickets (STREAM_TICKET_SECRET, ADR-0015).')
+@description('Signs short-lived SSE stream tickets (STREAM_TICKET_SECRET, ADR-0018).')
 param streamTicketSecret string
 
 @secure()

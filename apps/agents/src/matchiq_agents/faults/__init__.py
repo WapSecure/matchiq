@@ -1,1 +1,1 @@
-"""Deterministic demo fault scenarios (ADR-0017). Never enabled in prod."""
+"""Deterministic demo fault scenarios (ADR-0020). Never enabled in prod."""

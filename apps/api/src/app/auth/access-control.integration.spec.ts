@@ -14,7 +14,7 @@ jest.setTimeout(30_000);
 
 const OTHER_ORG = 'org_northbank';
 
-/** ADR-0015 authentication and authorisation, end to end through the real API. */
+/** ADR-0018 authentication and authorisation, end to end through the real API. */
 describe('access control (integration)', () => {
   let t: TestApp;
 

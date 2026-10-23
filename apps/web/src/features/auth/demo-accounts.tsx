@@ -16,7 +16,7 @@ const signInHref = (username: string, returnTo: string) =>
   }).toString()}`;
 
 /**
- * Seeded local accounts (ADR-0015). Each link starts the normal OIDC flow
+ * Seeded local accounts (ADR-0018). Each link starts the normal OIDC flow
  * with `login_hint`; the password is shown, never submitted for the user.
  */
 export function DemoAccounts({ returnTo }: { returnTo: string }) {

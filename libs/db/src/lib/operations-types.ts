@@ -33,7 +33,7 @@ export interface SessionActivity {
   countActive(query: ActiveSessionQuery): Promise<number>;
   /**
    * Every organisation's sessions in `state`, most recently updated first.
-   * System scope (ADR-0015): only the worker's boot scan calls it.
+   * System scope (ADR-0018): only the worker's boot scan calls it.
    */
   systemListInState(
     state: ReplayState,
@@ -72,7 +72,7 @@ export interface RetentionStore {
   /** Deletes the session fixtures and, by cascade, every row that depends on them. */
   deleteSessions(keys: readonly FixtureKey[]): Promise<RetentionCounts>;
   pruneIdempotencyKeys(cutoff: Date, limit: number): Promise<number>;
-  /** Every organisation's pending insights, oldest first (system scope, ADR-0015). */
+  /** Every organisation's pending insights, oldest first (system scope, ADR-0018). */
   systemPendingInsights(limit: number): Promise<PendingInsightRef[]>;
   audit(entry: AuditEntry): Promise<void>;
 }

@@ -62,7 +62,7 @@ const timeoutChain = (r: PipelineRequest, fixture: Fixture): PipelineResult => {
   };
 };
 
-describe('demo fault plans through the worker (integration, ADR-0017)', () => {
+describe('demo fault plans through the worker (integration, ADR-0020)', () => {
   let agents: FakeAgentsServer;
   let t: TestWorker;
   let fixture: Fixture;

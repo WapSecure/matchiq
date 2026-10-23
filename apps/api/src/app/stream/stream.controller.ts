@@ -80,7 +80,7 @@ export class StreamController {
     });
   }
 
-  /** Short-lived, bound to this fixture and organisation (ADR-0015). */
+  /** Short-lived, bound to this fixture and organisation (ADR-0018). */
   @Post(ROUTES.streamTickets)
   @HttpCode(HttpStatus.CREATED)
   @RequirePermission('fixtures:read')

@@ -6,7 +6,7 @@ import {
 import { mockApi } from './support/mock-api';
 import { FIXTURE_ID } from './support/mock-fixture';
 
-test.describe('demo fault scenarios in the agent observatory (ADR-0017)', () => {
+test.describe('demo fault scenarios in the agent observatory (ADR-0020)', () => {
   test('labels simulated failures and shows each recovery chain', async ({
     page,
   }, info) => {

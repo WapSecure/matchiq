@@ -5,7 +5,7 @@ export type AuthEvent = 'sign-in' | 'sign-out';
 
 /**
  * Records sign-in and sign-out in the API's audit trail with the user's own
- * token (ADR-0015). Best effort: an unreachable API never blocks signing in.
+ * token (ADR-0018). Best effort: an unreachable API never blocks signing in.
  */
 export const notifyApi = async (
   env: OidcSettings,
