@@ -5,17 +5,15 @@ import type { Request } from 'express';
 import { actorOf } from '../auth/permissions.guard';
 import { HEADERS } from '../constants';
 import { parseIdempotencyKey } from '../http/idempotency';
-import type { CommandContext } from './editorial-writes';
+import type { CommandContext, RequestContext } from './editorial-writes';
 
 const commandPipe = new ZodValidationPipe(EditorialCommand);
 
-export const commandContextOf = (req: Request): CommandContext => {
-  const command = commandPipe.transform(req.body);
+export const requestContextOf = (req: Request): RequestContext => {
   const requestId = req.header(HEADERS.requestId);
   const correlation = req.header(HEADERS.correlationId);
   return {
     actor: actorOf(req),
-    reason: command.reason,
     requestId,
     correlationId:
       correlation && REQUEST_ID_PATTERN.test(correlation)
@@ -24,6 +22,17 @@ export const commandContextOf = (req: Request): CommandContext => {
     idempotencyKey: parseIdempotencyKey(req.header(HEADERS.idempotencyKey)),
   };
 };
+
+export const commandContextOf = (req: Request): CommandContext => {
+  const command = commandPipe.transform(req.body);
+  return { ...requestContextOf(req), reason: command.reason };
+};
+
+/** Headers and actor only, for commands whose body the handler validates itself. */
+export const RequestCommandContext = createParamDecorator(
+  (_: unknown, context: ExecutionContext): RequestContext =>
+    requestContextOf(context.switchToHttp().getRequest<Request>()),
+);
 
 /**
  * The admitted actor, the validated `{ reason }` body and the request,

@@ -27,6 +27,9 @@ export const ROUTES = {
   overlayRetract: ':overlayId/retract',
   insightResource: 'insights',
   insightSuppress: ':insightId/suppress',
+  insightReview: ':insightId/review',
+  overlayReviews: ':fixtureId/overlay-reviews',
+  publishPolicy: ':fixtureId/editorial/publish-policy',
   editorial: ':fixtureId/editorial',
   editorialFreeze: ':fixtureId/editorial/freeze',
   editorialResume: ':fixtureId/editorial/resume',
@@ -105,6 +108,8 @@ export const IDEMPOTENCY_SCOPES = {
   ingestBatch: 'POST /fixtures/events:batch',
   retractOverlay: 'POST /overlays/retract',
   suppressInsight: 'POST /insights/suppress',
+  reviewInsight: 'POST /insights/review',
+  publishPolicy: 'POST /fixtures/editorial/publish-policy',
   freeze: 'POST /fixtures/editorial/freeze',
   resume: 'POST /fixtures/editorial/resume',
   killSwitchActivate: 'POST /editorial/kill-switch/activate',
@@ -195,6 +200,22 @@ export const PROBLEMS = {
     slug: 'insight-already-published',
   },
   invalidCursor: { title: 'Invalid pagination cursor', slug: 'invalid-cursor' },
+  overlayNotAwaiting: {
+    title: 'The cue is not waiting for approval',
+    slug: 'overlay-not-awaiting-approval',
+  },
+  approvalExpired: {
+    title: 'The cue waited past its slot and can no longer air',
+    slug: 'overlay-approval-expired',
+  },
+  reviewStale: {
+    title: 'The cue has newer copy than the one reviewed',
+    slug: 'overlay-revision-stale',
+  },
+  airPaused: {
+    title: 'Graphics are frozen or the kill switch is on',
+    slug: 'editorial-air-paused',
+  },
   demoFaultsDisabled: {
     title: 'Demo fault scenarios are disabled here',
     slug: 'demo-faults-disabled',
@@ -207,6 +228,12 @@ export const RETRACT_REASONS = {
   PRODUCER: 'retracted by producer',
   INSIGHT_SUPPRESSED: 'insight suppressed by producer',
   KILL_SWITCH: 'editorial kill switch activated',
+} as const;
+
+export const REVIEW_DETAILS = {
+  noCue: (insightId: string) => `${insightId} has no overlay cue`,
+  revision: (seen: number, current: number) =>
+    `reviewed revision ${seen}, current revision is ${current}`,
 } as const;
 
 export const EDITORIAL_DETAILS = {

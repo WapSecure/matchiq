@@ -2,11 +2,16 @@ import type { MatchSnapshot, ReplayStatus } from '@matchiq/contracts';
 import { and, eq, sql } from 'drizzle-orm';
 import type { Transaction } from '../client.js';
 import { sha256Hex } from '../hash.js';
-import type { RecapDocument, SessionProgress } from '../intelligence-types.js';
+import type {
+  OverlayEndWrite,
+  RecapDocument,
+  SessionProgress,
+} from '../intelligence-types.js';
 import type { FixtureKey } from '../ports.js';
 import {
   matchRecaps,
   matchSnapshots,
+  overlayCues,
   replaySessions,
 } from '../schema/intelligence-tables.js';
 
@@ -77,4 +82,34 @@ export const updateSessionProgress = async (
     .update(replaySessions)
     .set({ ...progress, updatedAt: sql`now()` })
     .where(sessionOf(key));
+};
+
+/** Ends a cue; a cue that lapsed under review also records its editorial state. */
+export const endOverlay = async (
+  tx: Transaction,
+  key: FixtureKey,
+  overlayId: string,
+  end: OverlayEndWrite,
+): Promise<void> => {
+  const state = end.editorial
+    ? {
+        editorialState: end.editorial.state,
+        editorialReason: end.editorial.reason,
+      }
+    : {};
+  await tx
+    .update(overlayCues)
+    .set({
+      status: end.status,
+      endReason: end.reason,
+      ...state,
+      updatedAt: sql`now()`,
+    })
+    .where(
+      and(
+        eq(overlayCues.orgId, key.orgId),
+        eq(overlayCues.fixtureId, key.fixtureId),
+        eq(overlayCues.overlayId, overlayId),
+      ),
+    );
 };

@@ -1,9 +1,33 @@
-import type { AgentStep, AgentStepTrace } from '@matchiq/contracts';
+import type { AgentRun, AgentStep, AgentStepTrace } from '@matchiq/contracts';
 import { and, asc, eq } from 'drizzle-orm';
 import type { Database, Transaction } from '../client.js';
 import type { FixtureKey } from '../ports.js';
 import { agentSteps } from '../schema/agent-steps-table.js';
+import { agentRuns } from '../schema/intelligence-tables.js';
 import { withTenant } from './tenant-scope.js';
+
+export const insertAgentRuns = async (
+  tx: Transaction,
+  key: FixtureKey,
+  insightId: string,
+  runs: readonly AgentRun[],
+): Promise<void> => {
+  if (runs.length === 0) return;
+  await tx.insert(agentRuns).values(
+    runs.map((run) => ({
+      orgId: key.orgId,
+      fixtureId: key.fixtureId,
+      insightId,
+      runId: run.runId,
+      correlationId: run.correlationId,
+      agent: run.agent,
+      provider: run.provider,
+      outcome: run.outcome,
+      latencyMs: run.latencyMs,
+      payload: run,
+    })),
+  );
+};
 
 /** Steps are immutable; a retried write of the same run keeps the first copy. */
 export const insertAgentSteps = async (

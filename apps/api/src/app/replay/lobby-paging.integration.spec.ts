@@ -128,8 +128,8 @@ describe('lobby paging (integration)', () => {
       '/fixture-templates?limit=2',
       a,
     );
-    expect(pages.map((p) => p.items.length)).toEqual([2, 2, 1]);
-    expect(pages.every((p) => p.total === 5)).toBe(true);
+    expect(pages.map((p) => p.items.length)).toEqual([2, 2, 2]);
+    expect(pages.every((p) => p.total === 6)).toBe(true);
     const ids = pages.flatMap((p) => p.items.map((i) => i.templateId));
     expect(ids).toEqual([...ids].sort());
 

@@ -61,8 +61,22 @@
     {
       "idx": 8,
       "version": "7",
-      "when": 1792777021267,
-      "tag": "0008_agent_steps",
+      "when": 1792775836876,
+      "tag": "0008_ledger_immutability",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792778725396,
+      "tag": "0009_approval_publish_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792779142824,
+      "tag": "0010_agent_steps",
       "breakpoints": true
     }
   ]

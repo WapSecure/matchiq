@@ -12,6 +12,7 @@ import {
   gateAudits,
 } from '../pipeline/editorial-policy';
 import type { PipelineBatch } from '../pipeline/pipeline-batch';
+import { writeRetractions } from '../pipeline/retractions';
 
 export type WriteOutcome = 'written' | 'already-applied' | 'already-published';
 
@@ -118,7 +119,8 @@ export class PipelineWriter {
         const effective = await editorialBatch(tx, key, batch);
         await tx.appendStreamMessages(key, effective.batch.drafts);
         await writeArtifacts(tx, key, effective.batch);
-        await tx.appendAudits(effective.audits);
+        const retracted = await writeRetractions(tx, key, effective.batch);
+        await tx.appendAudits([...effective.audits, ...retracted]);
       });
     } catch (error) {
       if (error instanceof SkipBatch) return error.outcome;

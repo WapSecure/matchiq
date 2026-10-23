@@ -1,6 +1,7 @@
 import type { Fixture, Locale, MetricValue, Persona } from '@matchiq/contracts';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { RECAP_COPY, REPORT_RULE } from '@/constants/recap';
+import { STUDIO_COPY } from '@/constants/studio';
 import { statRows } from '@/features/studio/lib/stat-rows';
 import type { RecapDocument } from '@/lib/api/session-schemas';
 import { formatMetric, formatMinute } from '@/lib/format';
@@ -31,13 +32,17 @@ export const buildReport = ({
   const moments = orderedMoments(recap.keyMoments).map((m) => {
     const picked = pickNarrative(m.narratives, persona, locale);
     const text = picked
-      ? `${picked.narrative.headline}. ${picked.narrative.body}`
+      ? `${picked.narrative.headline}. ${picked.narrative.body} (${STUDIO_COPY.insights.source[picked.narrative.source]})`
       : INSIGHT_KIND_LABELS[m.kind];
     const notice = recapTranslationNotice(picked, locale);
     return `${formatMinute(m.period, m.matchClockMs)}  ${text}${notice ? ` ${notice}` : ''}`;
   });
   const stats = statRows(recap.finalSnapshot).map((r) =>
-    copy.statLine(r.label, statValue(r.home), statValue(r.away)),
+    copy.statLine(
+      r.label,
+      `${fixture.home.name} ${statValue(r.home)}`,
+      `${fixture.away.name} ${statValue(r.away)}`,
+    ),
   );
   return [
     copy.heading(recap.title),

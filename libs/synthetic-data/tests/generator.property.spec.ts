@@ -87,7 +87,14 @@ describe('generateMatch invariants (property-based)', () => {
       fc.property(seedArb, scenarioArb, (seed, scenario) => {
         const { events, score, fixture } = generateMatch({ seed, scenario });
         const byId = new Map(events.map((e) => [e.eventId, e]));
-        const goals = events.filter((e) => e.type === 'GOAL');
+        const voided = new Set(
+          events.flatMap((e) =>
+            e.type === 'CORRECTION' ? [e.correctedEventId] : [],
+          ),
+        );
+        const goals = events.flatMap((e) =>
+          e.type === 'GOAL' && !voided.has(e.eventId) ? [e] : [],
+        );
         for (const goal of goals) {
           const shot = byId.get(goal.shotEventId);
           expect(shot?.type).toBe('SHOT');

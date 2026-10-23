@@ -38,6 +38,7 @@ export const ROLE_PERMISSIONS: Readonly<
     'replay:control',
     'editorial:approve',
     'editorial:publish',
+    'policy:configure',
     'audit:read',
     'preferences:write',
   ],

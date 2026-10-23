@@ -83,6 +83,25 @@ const creditGoal = (
   ctx.goals.set(teamId, (ctx.goals.get(teamId) ?? 0) + 1);
 };
 
+/** A VOIDed goal no longer counts towards the score. */
+const checkCorrection = (
+  ctx: ValidationContext,
+  event: MatchEventOf<'CORRECTION'>,
+): void => {
+  const target = ctx.byId.get(event.correctedEventId);
+  if (target === undefined) {
+    ctx.report(
+      'DANGLING_REFERENCE',
+      event,
+      M.dangling('correctedEventId', event.correctedEventId),
+    );
+    return;
+  }
+  if (target.type !== 'GOAL') return;
+  const teamId = target.ownGoal ? ctx.otherTeam(target.teamId) : target.teamId;
+  ctx.goals.set(teamId, (ctx.goals.get(teamId) ?? 0) - 1);
+};
+
 const checkCardFoul = (
   ctx: ValidationContext,
   event: MatchEventOf<'CARD'>,
@@ -98,7 +117,7 @@ const checkCardFoul = (
   }
 };
 
-/** References must point at earlier events of the right type; scores move only on GOAL. */
+/** References must point at earlier events of the right type; scores move only on GOAL and its VOID. */
 export const checkReferences = (
   ctx: ValidationContext,
   event: MatchEvent,
@@ -119,13 +138,7 @@ export const checkReferences = (
       checkCardFoul(ctx, event);
       return;
     case 'CORRECTION':
-      if (!ctx.byId.has(event.correctedEventId)) {
-        ctx.report(
-          'DANGLING_REFERENCE',
-          event,
-          M.dangling('correctedEventId', event.correctedEventId),
-        );
-      }
+      checkCorrection(ctx, event);
       return;
     default:
       return;

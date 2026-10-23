@@ -1,4 +1,4 @@
-import type { Insight, Narrative } from '@matchiq/contracts';
+import type { Insight, InsightRetraction, Narrative } from '@matchiq/contracts';
 import { STORE_LIMITS } from '@/constants/api';
 import type { MatchData } from './types';
 
@@ -19,6 +19,19 @@ export const reduceInsight = (
   return { insights };
 };
 
+/** The moment stays listed, marked; its write-ups are withdrawn. */
+export const reduceInsightRetract = (
+  state: MatchData,
+  retraction: InsightRetraction,
+): Partial<MatchData> => {
+  const narratives = { ...state.narratives };
+  delete narratives[retraction.insightId];
+  return {
+    ruledOut: { ...state.ruledOut, [retraction.insightId]: retraction.reason },
+    narratives,
+  };
+};
+
 export const reduceNarrative = (
   state: MatchData,
   narrative: Narrative,
@@ -26,6 +39,7 @@ export const reduceNarrative = (
   const key = narrativeKey(narrative.persona, narrative.locale);
   const variants = state.narratives[narrative.insightId] ?? {};
   const existing = variants[key];
+  if (state.ruledOut[narrative.insightId] !== undefined) return {};
   if (existing && existing.createdAt > narrative.createdAt) return {};
   return {
     narratives: {

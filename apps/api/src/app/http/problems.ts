@@ -25,6 +25,10 @@ export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   insightNotFound: HttpStatus.NOT_FOUND,
   insightPublished: HttpStatus.CONFLICT,
   invalidCursor: HttpStatus.BAD_REQUEST,
+  overlayNotAwaiting: HttpStatus.CONFLICT,
+  approvalExpired: HttpStatus.CONFLICT,
+  reviewStale: HttpStatus.CONFLICT,
+  airPaused: HttpStatus.CONFLICT,
   demoFaultsDisabled: HttpStatus.FORBIDDEN,
   traceNotFound: HttpStatus.NOT_FOUND,
 };

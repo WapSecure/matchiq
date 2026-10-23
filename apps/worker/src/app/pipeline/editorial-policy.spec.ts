@@ -57,6 +57,7 @@ const end = (batch: PipelineBatch, c: OverlayCue, reason: string) => {
 
 const view = (partial: Partial<EditorialView> = {}): EditorialView => ({
   mode: 'AUTO',
+  publishPolicy: 'AUTO',
   overlays: new Map<string, OverlayEditorialState>(),
   aired: new Set<string>(),
   suppressedInsights: new Set<string>(),

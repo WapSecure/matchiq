@@ -5,7 +5,7 @@ import type {
   Narrative,
   OverlayCue,
 } from '@matchiq/contracts';
-import { and, asc, count, eq, inArray, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, isNull, type SQL } from 'drizzle-orm';
 import { PAGE_CURSOR } from '../constants.js';
 import type { Database, Transaction } from '../client.js';
 import type { InsightTrace, NarrativeFilter } from '../intelligence-types.js';
@@ -80,6 +80,7 @@ export class PostgresMatchPages {
   narratives(key: FixtureKey, filter: NarrativeFilter, query: CursorPageQuery) {
     const where = and(
       scoped(narratives, key),
+      isNull(narratives.retractedAt),
       filter.persona === undefined
         ? undefined
         : eq(narratives.persona, filter.persona),

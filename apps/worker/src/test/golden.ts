@@ -9,6 +9,7 @@ import { detectKeyMoments, project } from '@matchiq/football-engine';
 
 export const GOLDEN_SCENARIOS = [
   'comeback',
+  'disallowed-goal',
   'high-press',
   'low-event',
   'possession-dominance',
