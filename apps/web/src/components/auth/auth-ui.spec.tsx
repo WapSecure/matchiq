@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { AccessDenied } from '@/components/auth/access-denied';
 import { RequirePermission } from '@/components/auth/require-permission';
+import { SessionExpiredNotice } from '@/components/auth/session-expired-notice';
 import { UserMenu } from '@/components/auth/user-menu';
 import { permissionsOf, useSession } from '@/lib/auth/session-store';
 import type { SessionView } from '@/lib/auth/session-view';
@@ -17,6 +18,8 @@ const viewer: SessionView = {
   },
   permissions: ['fixtures:read', 'insights:read', 'overlays:read'],
 };
+
+vi.mock('next/navigation', () => ({ usePathname: () => '/studio/fx_1' }));
 
 const setView = (view: SessionView | null) => useSession.setState({ view });
 
@@ -74,5 +77,24 @@ describe('role-aware UI', () => {
     expect(
       screen.getByRole('button', { name: 'Account: Vic Viewer, Viewer' }),
     ).toBeTruthy();
+  });
+
+  it('turns a 401 from the BFF into a visible session-expired alert', () => {
+    setView(viewer);
+    render(<SessionExpiredNotice />);
+    expect(screen.queryByRole('alert')).toBeNull();
+    act(() => useSession.getState().markExpired());
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Your session expired',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
+    ).toBe('/sign-in?returnTo=%2Fstudio%2Ffx_1&error=expired');
+  });
+
+  it('does not mark a signed-out visitor as expired', () => {
+    setView({ status: 'anonymous', ssoEnabled: true });
+    useSession.getState().markExpired();
+    expect(useSession.getState().view?.status).toBe('anonymous');
   });
 });

@@ -27,12 +27,22 @@ export const AUTH_LIMITS = {
   transactionMaxAgeSeconds: 600,
   /** Refresh this long before the access token expires. */
   refreshLeewaySeconds: 30,
+  /** A rotated session is reused this long by requests still carrying the old refresh token. */
+  refreshGraceMs: 30_000,
+  refreshGraceEntriesMax: 1_000,
   /** Browsers cap a cookie near 4 KiB; sessions are split into chunks below it. */
   cookieChunkBytes: 3_800,
   cookieChunksMax: 4,
   apiNotifyTimeoutMs: 3_000,
   bffTimeoutMs: 15_000,
 } as const;
+
+/** Token-endpoint errors that end a session; anything else is treated as transient. */
+export const REFRESH_REJECTIONS: ReadonlySet<string> = new Set([
+  'invalid_grant',
+  'invalid_token',
+]);
+export const NO_REFRESH_TOKEN = 'no_refresh_token';
 
 export const AUTH_ERRORS = {
   callback: 'callback',
@@ -62,13 +72,21 @@ export const BFF_HEADERS = {
 } as const;
 
 export const BFF = {
-  status: { unauthorized: 401, forbidden: 403, notFound: 404, badGateway: 502 },
+  status: {
+    unauthorized: 401,
+    forbidden: 403,
+    notFound: 404,
+    badGateway: 502,
+    unavailable: 503,
+  },
   titles: {
     unconfigured: 'Sign-in is not configured',
     notFound: 'Not found',
     crossOrigin: 'Cross-origin request refused',
     signInAgain: 'Sign in again',
     unreachable: 'The MatchIQ API could not be reached',
+    idpUnreachable:
+      'The identity provider could not be reached. Your session is kept; try again shortly.',
   },
   dotSegments: ['.', '..'],
   problemType: (status: number) => `urn:matchiq:problem:bff-${status}`,
@@ -128,6 +146,7 @@ export const AUTH_COPY = {
     unavailable: 'The identity provider could not be reached.',
     expired: 'Your session expired. Sign in again to continue.',
   },
+  sessionExpiredAction: 'Sign in again',
   forbiddenTitle: 'You do not have access to this',
   forbiddenBody: (role: string) =>
     `Your role (${role}) does not include this permission. Ask a tenant owner if you need it.`,

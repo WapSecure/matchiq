@@ -2,6 +2,21 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-036: Signed-in users no longer drop out at token refresh
+
+Root cause (confirmed in the Keycloak log: `REFRESH_TOKEN_ERROR … error="invalid_token", reason="Maximum allowed refresh token reuse exceeded"` at 07:07:42): the realm rotates single-use refresh tokens, the studio polls several BFF routes in parallel, and every request near expiry refreshed with the same token. One won; the rest were treated as expired and cleared the session cookie.
+
+| Area                                                                                                                                                            | Status | Evidence                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------ |
+| Single-flight refresh keyed by a SHA-256 digest of the refresh token; 30 s grace store (bounded, TTL-evicted, pluggable) for requests with the old token        | Done   | `refresh-coordinator.spec.ts`              |
+| Only a definitive `invalid_grant`/`invalid_token` ends a session, and only once its access token has expired; an unreachable IdP gives 503 and keeps the cookie | Done   | `refresh-coordinator.spec.ts`              |
+| BFF persists a refreshed session on a 502 too (the old token is already spent)                                                                                  | Done   | `app/bff/[...path]/route.ts`               |
+| UI: a 401 from the BFF shows a "Your session expired" alert with a sign-in link and stops further BFF calls                                                     | Done   | `auth-ui.spec.tsx`                         |
+| Test issuer rotates single-use refresh tokens like the realm; e2e signs in with a 34 s token and polls in parallel past expiry                                  | Done   | `apps/web-e2e/src/session-refresh.spec.ts` |
+| Multi-instance web tier: shared grace store and lock in Redis                                                                                                   | Open   | ADR-0018 addendum                          |
+
+Refresh-token rotation stays on. Verification: CI (owner directive). Locally: format, lint and typecheck of `web` and `web-e2e`, and the three touched unit spec files.
+
 ## 2026-10-23 — MQ-035: Hackathon submission package and README
 
 | Area                                                                                                                                                                                          | Status | Evidence                                           |
