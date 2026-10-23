@@ -39,7 +39,7 @@ export function Drawer({
       onClick={(event) => {
         if (event.target === ref.current) onClose();
       }}
-      className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-dvh w-full max-w-lg border-l border-line-strong bg-surface p-0 text-ink shadow-2xl backdrop:bg-canvas/70 backdrop:backdrop-blur-[2px]"
+      className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-dvh w-full max-w-lg border-l border-line-strong bg-surface p-0 text-ink shadow-float backdrop:bg-canvas/70 backdrop:backdrop-blur-[2px] motion-safe:open:animate-[sheet-in_240ms_var(--ease-broadcast)]"
     >
       {open ? (
         <div className="flex h-full flex-col">

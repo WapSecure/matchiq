@@ -108,7 +108,7 @@ describe('commentary language boundaries', () => {
   it('gives language options their native tags without changing controls', async () => {
     const user = userEvent.setup();
     render(<AudienceBar />);
-    const group = screen.getByRole('group', { name: 'Language' });
+    const group = screen.getByRole('radiogroup', { name: 'Language' });
     const french = within(group).getByRole('radio', { name: /Français/ });
     expect(languageOf(french)).toBe('fr-FR');
     expect(
@@ -116,7 +116,9 @@ describe('commentary language boundaries', () => {
     ).toBe('pcm-NG');
     await user.click(french);
     expect(useStudioUi.getState().locale).toBe('fr-FR');
-    expect(screen.getByRole('group', { name: 'Audience' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radiogroup', { name: 'Audience' }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Language changes the commentary only/),
     ).toBeInTheDocument();

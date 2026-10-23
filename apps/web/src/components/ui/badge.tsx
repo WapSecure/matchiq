@@ -24,6 +24,20 @@ const DOT: Partial<Record<BadgeTone, string>> = {
   onair: 'bg-onair motion-safe:animate-[tally_1.6s_ease-in-out_infinite]',
 };
 
+export const badgeClassName = (tone: BadgeTone, className?: string): string =>
+  cn(
+    'eyebrow inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[5px] border px-1.5',
+    TONES[tone],
+    className,
+  );
+
+export const BadgeDot = ({ tone }: { tone: BadgeTone }) => (
+  <span
+    aria-hidden
+    className={cn('size-1.5 rounded-full', DOT[tone] ?? 'bg-current')}
+  />
+);
+
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
   tone?: BadgeTone;
   dot?: boolean;
@@ -38,20 +52,8 @@ export function Badge({
   ...rest
 }: BadgeProps) {
   return (
-    <span
-      className={cn(
-        'eyebrow inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[5px] border px-1.5',
-        TONES[tone],
-        className,
-      )}
-      {...rest}
-    >
-      {dot ? (
-        <span
-          aria-hidden
-          className={cn('size-1.5 rounded-full', DOT[tone] ?? 'bg-current')}
-        />
-      ) : null}
+    <span className={badgeClassName(tone, className)} {...rest}>
+      {dot ? <BadgeDot tone={tone} /> : null}
       {children}
     </span>
   );
