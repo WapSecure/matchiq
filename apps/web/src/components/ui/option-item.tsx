@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Header, ListBoxItem, ListBoxSection } from 'react-aria-components';
 import { CheckIcon, LockIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
-import { LIST_ITEM, SECTION_HEADER } from './control-styles';
+import { LIST_ITEM, SECTION_DIVIDER, SECTION_HEADER } from './control-styles';
 
 export type ChoiceOption<K extends string = string> = {
   id: K;
@@ -53,7 +53,13 @@ function OptionItem<K extends string>({
             </span>
           ) : null}
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className={cn('font-medium', isDisabled && 'text-ink-muted')}>
+            <span
+              className={cn(
+                'font-medium',
+                isSelected && 'font-semibold',
+                isDisabled && 'text-ink-muted',
+              )}
+            >
               {option.label}
             </span>
             {option.description ? (
@@ -96,7 +102,11 @@ export function ChoiceItems<K extends string>({
     ));
   }
   return source.sections.map((section) => (
-    <ListBoxSection key={section.title} id={section.title}>
+    <ListBoxSection
+      key={section.title}
+      id={section.title}
+      className={SECTION_DIVIDER}
+    >
       <Header className={SECTION_HEADER}>{section.title}</Header>
       {section.options.map((o) => (
         <OptionItem key={o.id} option={o} card={card} />

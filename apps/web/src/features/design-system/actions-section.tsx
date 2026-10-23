@@ -56,8 +56,20 @@ export function ActionsSection() {
           size="md"
         />
       </Specimen>
-      <Specimen state={C.states.default}>
-        <TextArea label={C.textareaLabel} value={reason} onChange={setReason} />
+      <Specimen state={`${C.states.empty} · ${C.states.described}`}>
+        <TextField
+          label={C.textLabel}
+          value=""
+          onChange={() => undefined}
+          placeholder={C.textPlaceholder}
+          description={C.textDescription}
+        />
+        <TextArea
+          label={C.textareaLabel}
+          value={reason}
+          onChange={setReason}
+          placeholder={C.textareaPlaceholder}
+        />
       </Specimen>
     </GallerySection>
   );

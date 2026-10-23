@@ -7,6 +7,7 @@ import {
 } from 'react-aria-components';
 import { cn } from '@/lib/cn';
 import {
+  CONTROL_FOCUSED,
   CONTROL_HEIGHT,
   CONTROL_INVALID,
   CONTROL_PADDING,
@@ -27,11 +28,15 @@ type TextFieldProps = FieldProps & {
   maxLength?: number;
 };
 
+/** Empty fields read as wells; once filled they lift to the surface colour. */
 const INPUT = cn(
-  'w-full min-w-0 bg-surface-sunken text-ink outline-none placeholder:text-ink-subtle',
+  'w-full min-w-0 text-ink outline-none placeholder:text-ink-subtle',
   CONTROL_SURFACE,
-  'data-hovered:border-control data-focused:border-accent data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent',
-  'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+  'placeholder-shown:bg-surface-raised placeholder-shown:shadow-none',
+  'data-hovered:border-control',
+  CONTROL_FOCUSED,
+  'data-focused:bg-surface',
+  'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised data-disabled:text-ink-subtle data-disabled:shadow-none',
   CONTROL_INVALID,
 );
 
@@ -63,7 +68,6 @@ export function TextField({
       isInvalid={Boolean(errorMessage)}
       maxLength={maxLength}
       autoComplete={autoComplete}
-      aria-label={hideLabel ? label : undefined}
       className={cn(FIELD_ROOT, className)}
     >
       <FieldFrame

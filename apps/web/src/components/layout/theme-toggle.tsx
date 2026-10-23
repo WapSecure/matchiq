@@ -1,6 +1,7 @@
 'use client';
 
-import { type ComponentType, useId } from 'react';
+import type { ComponentType } from 'react';
+import { ToggleButton, ToggleButtonGroup } from 'react-aria-components';
 import {
   type IconProps,
   MonitorIcon,
@@ -12,6 +13,7 @@ import {
   THEME_PREFERENCES,
   type ThemePreference,
 } from '@/constants/theme';
+import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/cn';
 import { setPreference, useThemePreference } from '@/lib/theme/theme-store';
 
@@ -26,41 +28,44 @@ const nextOf = (p: ThemePreference): ThemePreference =>
     (THEME_PREFERENCES.indexOf(p) + 1) % THEME_PREFERENCES.length
   ] ?? 'system';
 
-/** Three-way radio group: arrow keys and checked state are native. */
+/** Three-way choice; each icon names itself in a tooltip as well as to assistive tech. */
 function ThemeSegments({ value }: { value: ThemePreference }) {
-  const name = useId();
   return (
-    <fieldset className="flex rounded-md border border-line bg-surface-sunken p-0.5">
-      <legend className="sr-only">{THEME_COPY.legend}</legend>
+    <ToggleButtonGroup
+      aria-label={THEME_COPY.legend}
+      selectionMode="single"
+      disallowEmptySelection
+      selectedKeys={[value]}
+      onSelectionChange={(keys) => {
+        const next = THEME_PREFERENCES.find((p) => keys.has(p));
+        if (next) setPreference(next);
+      }}
+      className="flex rounded-md border border-line bg-surface-sunken p-0.5"
+    >
       {THEME_PREFERENCES.map((option) => {
         const Icon = ICONS[option];
-        const checked = option === value;
         return (
-          <label
+          <Tooltip
             key={option}
-            title={THEME_COPY.options[option]}
-            className={cn(
-              'press flex size-7 cursor-pointer items-center justify-center rounded-sm',
-              'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent',
-              checked
-                ? 'bg-selected text-ink shadow-panel ring-1 ring-line-strong'
-                : 'text-ink-subtle hover:text-ink',
-            )}
+            content={THEME_COPY.options[option]}
+            ariaChild
+            placement="bottom"
           >
-            <input
-              type="radio"
-              name={name}
-              value={option}
-              checked={checked}
-              onChange={() => setPreference(option)}
-              className="sr-only"
+            <ToggleButton
+              id={option}
               aria-label={THEME_COPY.options[option]}
-            />
-            <Icon size={15} />
-          </label>
+              className={cn(
+                'press flex size-7 cursor-pointer items-center justify-center rounded-sm text-ink-subtle outline-none',
+                'data-hovered:text-ink data-focus-visible:outline-2 data-focus-visible:outline-accent',
+                'data-selected:bg-selected data-selected:text-ink data-selected:shadow-panel data-selected:ring-1 data-selected:ring-line-strong',
+              )}
+            >
+              <Icon size={15} />
+            </ToggleButton>
+          </Tooltip>
         );
       })}
-    </fieldset>
+    </ToggleButtonGroup>
   );
 }
 

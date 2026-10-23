@@ -13,10 +13,10 @@ export function DropPrompt({
   const idle = multiple ? FILE_COPY.dropMany : FILE_COPY.drop;
   return (
     <>
-      <span className="flex size-10 items-center justify-center rounded-full border border-line bg-surface text-ink-muted shadow-panel group-data-drop-target:text-accent">
-        <UploadIcon size={18} />
+      <span className="flex size-11 items-center justify-center rounded-xl border border-line bg-surface text-accent shadow-panel transition-transform duration-200 ease-[var(--ease-broadcast)] group-data-hovered:-translate-y-0.5 group-data-drop-target:-translate-y-1 group-data-drop-target:scale-110 group-data-drop-target:border-accent/40 group-data-disabled:text-ink-subtle">
+        <UploadIcon size={19} />
       </span>
-      <p className="text-[13px] font-medium text-ink">
+      <p className="mt-1 text-sm font-semibold text-ink">
         {active ? FILE_COPY.dropActive : idle}
       </p>
       <p className="text-micro text-ink-subtle">{FILE_COPY.or}</p>

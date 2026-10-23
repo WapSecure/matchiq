@@ -6,7 +6,7 @@ import {
   OverlayCanvas,
   type Scorebug,
 } from '@/components/overlay/overlay-canvas';
-import { Badge, Panel, SegmentedControl } from '@/components/ui';
+import { Badge, InfoTip, Panel, SegmentedControl } from '@/components/ui';
 import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { MODE_VIEW } from '@/constants/editorial';
@@ -93,14 +93,14 @@ export function OverlayPanel({
         safeAreaLabel={copy.safeArea}
         frameLabel={copy.frameLabel(cues.length)}
       />
-      <p
-        className="mt-2 flex items-center gap-1.5 text-micro text-ink-subtle"
-        title={OVERLAY_COPY.programNoteHint}
-      >
-        <BroadcastIcon size={12} className="shrink-0" />
-        {OVERLAY_COPY.programNote}
-        <span className="sr-only">. {OVERLAY_COPY.programNoteHint}</span>
-      </p>
+      <div className="mt-2 flex items-center gap-1 text-micro text-ink-subtle">
+        <p className="flex items-center gap-1.5">
+          <BroadcastIcon size={12} className="shrink-0" />
+          {OVERLAY_COPY.programNote}
+          <span className="sr-only">. {OVERLAY_COPY.programNoteHint}</span>
+        </p>
+        <InfoTip content={OVERLAY_COPY.programNoteHint} />
+      </div>
       {footer}
       <CueLog />
     </Panel>

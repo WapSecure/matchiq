@@ -71,7 +71,10 @@ describe('lobby', () => {
     });
     renderLobby();
     const card = await screen.findByRole('article');
-    await user.selectOptions(within(card).getByLabelText(/Replay speed/), '30');
+    await user.click(
+      within(card).getByRole('button', { name: /Replay speed/ }),
+    );
+    await user.click(screen.getByRole('option', { name: /30×/ }));
     await user.click(
       within(card).getByRole('button', { name: /Start replay/ }),
     );

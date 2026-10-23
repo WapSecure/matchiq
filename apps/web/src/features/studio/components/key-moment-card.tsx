@@ -42,10 +42,7 @@ function AnalystFacts({ insight }: { insight: Insight }) {
     <dl className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-md border border-line bg-surface-sunken p-2 text-xs">
       {metrics.map(([ref, value]) => (
         <div key={ref} className="flex min-w-0 justify-between gap-2">
-          <dt
-            className="truncate text-ink-subtle"
-            title={describeMetric(ref).label}
-          >
+          <dt className="min-w-0 break-words text-ink-subtle">
             {describeMetric(ref).label}
           </dt>
           <dd className="tabular font-semibold text-ink">

@@ -3,7 +3,7 @@
 import type { Permission } from '@matchiq/access';
 import { useId } from 'react';
 import { LockIcon } from '@/components/icons';
-import { Button, type ButtonProps } from '@/components/ui';
+import { Button, type ButtonProps, Tooltip } from '@/components/ui';
 import { requiresRoleText } from '@/components/auth/require-permission';
 import { useCan } from '@/lib/auth/session-store';
 import { cn } from '@/lib/cn';
@@ -36,14 +36,15 @@ export function GatedButton({
   const reason = requiresRoleText(permission);
   return (
     <>
-      <Button
-        {...rest}
-        aria-disabled
-        aria-describedby={hintId}
-        title={reason}
-        className={cn('cursor-not-allowed opacity-60', className)}
-        leadingIcon={<LockIcon size={14} />}
-      />
+      <Tooltip content={reason}>
+        <Button
+          {...rest}
+          aria-disabled
+          aria-describedby={hintId}
+          className={cn('cursor-not-allowed opacity-60', className)}
+          leadingIcon={<LockIcon size={14} />}
+        />
+      </Tooltip>
       <span id={hintId} className="sr-only">
         {reason}
       </span>

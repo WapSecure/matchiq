@@ -99,11 +99,15 @@ describe('PitchMap', () => {
   const plotted = (container: HTMLElement) =>
     container.querySelectorAll('[data-mark]');
 
-  it('exposes a described image and a matching table alternative', () => {
+  it('exposes a described image and a matching table alternative', async () => {
+    const user = userEvent.setup();
     renderMap();
     expect(
       screen.getByRole('img', { name: /Pitch event map 4 events plotted/ }),
     ).toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: 'View as table' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(5);
     expect(rows[1]).toHaveTextContent('Goal');
@@ -121,6 +125,7 @@ describe('PitchMap', () => {
     ).toHaveLength(0);
     await user.click(screen.getByRole('checkbox', { name: /Recoveries/ }));
     expect(plotted(container)).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
     expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
       2,
     );
