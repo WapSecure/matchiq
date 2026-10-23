@@ -1074,3 +1074,19 @@ A moment found only by a re-scan (for example after a late event) is published, 
 - Studio: the broadcast panel has an approval queue with a live preview, a copy-fit indicator, time-on-screen and priority adjusters, and "Send to air" / "Don't air". The queue has loading, empty, error and permission states. The producer controls have an Auto/Manual switch with a reasoned confirmation. Roles without the permission see neither control.
 - Tests: an API integration spec (policy, review flow, idempotency, permission denial, tenant isolation), a worker unit spec for the MANUAL hold, approve, reject and expiry, a web component spec, and the access matrix.
 - Limits: an approval cannot extend a cue past its scheduled slot or reorder the scheduler queue. Priority applies to the aired cue only. Recorded in ADR-0023.
+
+## MQ-064: Per-agent handoff records and traces (23 October 2026)
+
+Branch `feat/MQ-064-agent-handoff-trace`. Spec §28, §29, §46; ADR-0011 addendum 4.
+
+| Item                                                                                                                                                         | Status | Evidence                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ---------------------------------------------------------------------- |
+| `AgentStep` / `AgentStepTrace` contracts; `PipelineResult.steps` (defaults to `[]`); codegen and sample updated                                              | Done   | `libs/contracts/tests/trace.spec.ts`, `tests/test_contract_samples.py` |
+| One step per roster stage with decision, reason code, SHA-256 input checksum, cited evidence, prompt version and hash, model, tokens, latency, cost, retries | Done   | `apps/agents/tests/test_agent_steps.py`                                |
+| Central per-run budget (`AGENT_BUDGET_MAX_HOPS`, `_MAX_TOKENS`, `_MAX_COST_USD`), clean fallback with `BUDGET_EXCEEDED`                                      | Done   | hop, token and cost budget tests in `test_agent_steps.py`              |
+| OTel span per step with GenAI attributes and the correlation id; no-op without an exporter                                                                   | Done   | `test_each_step_emits_a_genai_span`                                    |
+| `agent_steps` table (migration 0010) with RLS; worker persists steps with each publication                                                                   | Done   | `apps/worker/src/app/agents/agents.integration.spec.ts`                |
+| `GET /api/v1/agents/traces/{correlationId}`, `agents:traces:read`, tenant-scoped; OpenAPI and client regenerated                                             | Done   | `apps/api/src/app/intelligence/agent-traces.integration.spec.ts`       |
+| Fact-checks page: "How the agents worked on this" timeline; technical fields in Technical details                                                            | Done   | `apps/web/src/features/observatory/agent-step-timeline.spec.tsx`       |
+
+Not changed: the publish gate, prompts and roster files. Retention relies on the fixture foreign key cascade for `agent_steps`, as migration 0002 documents for new tables; the retention audit counts are unchanged. The Foundry path is not exercised here; step records from the mock and Ollama providers only.

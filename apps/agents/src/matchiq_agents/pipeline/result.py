@@ -5,6 +5,7 @@ from typing import Final
 
 from matchiq_agents.contracts.types import (
     AgentRun,
+    AgentStep,
     IssueCode,
     PipelineResult,
     PipelineStatus,
@@ -19,7 +20,9 @@ from matchiq_agents.pipeline.state import PipelineState
 SCHEMA_VERSION: Final = 1
 
 
-def build_result(view: FactView, state: PipelineState) -> PipelineResult:
+def build_result(
+    view: FactView, state: PipelineState, steps: Sequence[AgentStep] = ()
+) -> PipelineResult:
     narratives = [draft for draft in state.localised if draft.persona in view.personas]
     payload: dict[str, object] = {
         "schemaVersion": SCHEMA_VERSION,
@@ -31,6 +34,7 @@ def build_result(view: FactView, state: PipelineState) -> PipelineResult:
         "narratives": narratives if state.status is not PipelineStatus.REJECTED else [],
         "overlay": state.overlay if state.status is not PipelineStatus.REJECTED else None,
         "runs": list(state.runs),
+        "steps": list(steps),
     }
     reason = join_reasons(state.fallback_reasons)
     if reason is not None:

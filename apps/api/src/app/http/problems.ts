@@ -30,6 +30,7 @@ export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   reviewStale: HttpStatus.CONFLICT,
   airPaused: HttpStatus.CONFLICT,
   demoFaultsDisabled: HttpStatus.FORBIDDEN,
+  traceNotFound: HttpStatus.NOT_FOUND,
 };
 
 export const problem = (

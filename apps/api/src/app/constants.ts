@@ -19,6 +19,8 @@ export const ROUTES = {
   overlays: ':fixtureId/overlays',
   recap: ':fixtureId/recap',
   agentRuns: ':fixtureId/agent-runs',
+  agentTraces: 'agents/traces',
+  agentTrace: ':correlationId',
   fixtureTemplates: 'fixture-templates',
   replaySessions: 'replay-sessions',
   overlayResource: 'overlays',
@@ -45,6 +47,7 @@ export const ROUTE_PARAMS = {
   fixtureId: 'fixtureId',
   overlayId: 'overlayId',
   insightId: 'insightId',
+  correlationId: 'correlationId',
 } as const;
 
 export const HEADERS = {
@@ -217,6 +220,7 @@ export const PROBLEMS = {
     title: 'Demo fault scenarios are disabled here',
     slug: 'demo-faults-disabled',
   },
+  traceNotFound: { title: 'Agent trace not found', slug: 'trace-not-found' },
 } as const;
 
 /** Stream copy for `overlay.retract.reason`; the operator's own reason stays in the audit row. */

@@ -3,6 +3,7 @@ import type { AddressInfo } from 'node:net';
 import {
   PipelineRequest,
   type AgentRun,
+  type AgentStep,
   type PipelineResult,
 } from '@matchiq/contracts';
 import {
@@ -31,6 +32,26 @@ export const fakePipelineResult = (
     retries: 0,
     outcome: 'SUCCEEDED',
   };
+  const evidence = packet.insight.evidence;
+  const step = (stepIndex: number, role: AgentStep['role']): AgentStep => ({
+    stepIndex,
+    role,
+    runId: packet.runId,
+    correlationId: packet.correlationId,
+    agentVersion: { promptVersion: '1.0.0' },
+    provider: 'mock',
+    fromStatus: stepIndex === 0 ? 'DETECTED' : 'ANALYZED',
+    toStatus: stepIndex === 0 ? 'ANALYZED' : 'DRAFTED',
+    decision: 'PASS',
+    reasonCode: stepIndex === 0 ? 'GROUNDED' : 'DRAFTED',
+    reason: 'fake agents step',
+    inputChecksum: 'a'.repeat(64),
+    evidenceEventIds: evidence.eventIds.slice(0, 3),
+    metricRefs: Object.keys(evidence.computedMetrics).slice(0, 2),
+    startedAt: '2026-10-24T15:00:00.000Z',
+    latencyMs: 12,
+    retries: 0,
+  });
   const narratives = templateDrafts(packet.insight, fixture, {
     personas: request.personas,
     locales: request.locales,
@@ -50,6 +71,7 @@ export const fakePipelineResult = (
     narratives,
     overlay: { ...overlay, headline: `Agent: ${overlay.headline}` },
     runs: [run],
+    steps: [step(0, 'MATCH_ANALYST'), step(1, 'NARRATIVE_WRITER')],
   };
 };
 

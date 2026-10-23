@@ -5,17 +5,20 @@ from pydantic import Field, HttpUrl, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from matchiq_agents.constants import (
+    BUDGET_HOPS_MAX,
     DEFAULT_APP_VERSION,
     DEFAULT_CIRCUIT_FAILURE_THRESHOLD,
     DEFAULT_CIRCUIT_RESET_MS,
     DEFAULT_OLLAMA_ENDPOINT,
     DEFAULT_OLLAMA_MODEL,
     DEFAULT_PORT,
+    DEFAULT_RUN_BUDGET,
     LOCAL_CIRCUIT_TIMEOUT_THRESHOLD,
     SECRET_MIN_LENGTH,
 )
 from matchiq_agents.limits import MAX_AGENT_RETRIES
 from matchiq_agents.models.pricing import Price
+from matchiq_agents.pipeline.budget import BudgetLimits
 
 
 class ModelProvider(StrEnum):
@@ -58,8 +61,22 @@ class Settings(BaseSettings):
     # JSON: {"<deployment>": {"inputPerMTok": 0.15, "outputPerMTok": 0.6}} in USD. Local
     # inference costs 0; a cloud deployment missing here gets no estimate (docs/ai/EVALUATION.md).
     agent_price_table: dict[str, Price] = Field(default_factory=dict[str, Price])
+    # Central per-run budget (spec §46); exceeding it falls back with BUDGET_EXCEEDED.
+    agent_budget_max_hops: int = Field(
+        default=DEFAULT_RUN_BUDGET.max_hops, ge=1, le=BUDGET_HOPS_MAX
+    )
+    agent_budget_max_tokens: int = Field(default=DEFAULT_RUN_BUDGET.max_tokens, ge=1)
+    agent_budget_max_cost_usd: float = Field(default=DEFAULT_RUN_BUDGET.max_cost_usd, gt=0)
     # Honours `PipelineRequest.fault` (ADR-0020). Simulated failures only; refused in prod.
     demo_faults_enabled: bool = False
+
+    @property
+    def run_budget(self) -> BudgetLimits:
+        return BudgetLimits(
+            max_hops=self.agent_budget_max_hops,
+            max_tokens=self.agent_budget_max_tokens,
+            max_cost_usd=self.agent_budget_max_cost_usd,
+        )
 
     @property
     def is_local(self) -> bool:

@@ -1,6 +1,6 @@
 """Per-request dependencies shared by the agents in the roster."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Final
 
 from matchiq_agents.contracts.types import AgentName, AgentRun, Persona, RunOutcome, RunProvider
@@ -8,6 +8,7 @@ from matchiq_agents.domain.facts import FactView
 from matchiq_agents.guard.safety import ContentSafetyScreen
 from matchiq_agents.pipeline.recorder import RunRecord
 from matchiq_agents.pipeline.runner import ModelRunner
+from matchiq_agents.pipeline.steps import StepRecorder
 from matchiq_agents.templates.fallback import TEMPLATE_VERSION, TemplateFallback
 
 DETERMINISTIC_CHECKS_VERSION: Final = "1.0.0"
@@ -20,6 +21,7 @@ class AgentContext:
     fallback: TemplateFallback
     critique_enabled: bool
     safety: ContentSafetyScreen | None = None
+    recorder: StepRecorder = field(kw_only=True)
 
     @property
     def canonical_personas(self) -> tuple[Persona, ...]:

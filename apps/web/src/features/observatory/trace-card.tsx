@@ -7,6 +7,7 @@ import { OBSERVATORY_COPY } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { cn } from '@/lib/cn';
 import { formatClock, formatMinute } from '@/lib/format';
+import { AgentStepTimeline } from './agent-step-timeline';
 import { FaultChain } from './fault-chain';
 import { describeRejection, plainFallbackReasons } from './plain-trace';
 import { traceFacts, type Variants } from './trace-facts';
@@ -107,6 +108,7 @@ export function TraceCard({ trace, period, variants }: TraceCardProps) {
           label={copy.label(kind, minute)}
         />
         <FaultChain runs={trace.runs} publication={trace.publication} />
+        <AgentStepTimeline trace={trace} moment={`${kind} ${minute}`} />
         <Notes title={copy.why} items={why} />
         {caught.length > 0 ? (
           <section>
