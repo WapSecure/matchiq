@@ -21,6 +21,10 @@ export const GALLERY_COPY = {
     indeterminate: 'Indeterminate',
     card: 'Card',
     pending: 'Pending',
+    empty: 'Empty',
+    filled: 'Filled',
+    markers: 'Today, match days and unavailable days',
+    range: 'Range',
   },
   sections: {
     actions: 'Buttons and text fields',
@@ -95,6 +99,8 @@ export const GALLERY_COPY = {
   dateLabel: 'Kick-off date',
   dateTimeLabel: 'Kick-off time',
   rangeLabel: 'Audit window',
+  rangeFilledLabel: 'Second half',
+  unavailableReason: 'No replays run on Sundays in this sample.',
 } as const;
 
 export const GALLERY_OPTIONS = {

@@ -61,3 +61,5 @@ export { SearchIcon } from './search-icon';
 export { SpinnerIcon } from './spinner-icon';
 export { UploadIcon } from './upload-icon';
 export { OverlayArrowIcon } from './overlay-arrow-icon';
+export { MinusIcon } from './minus-icon';
+export { PlusIcon } from './plus-icon';

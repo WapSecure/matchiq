@@ -68,17 +68,22 @@ test.describe('component gallery (ADR-0021)', () => {
     await expect(listbox).toBeHidden();
   });
 
-  test('applies a relative date preset and echoes it in UTC', async ({
+  test('applies a relative date preset and names it in the field', async ({
     page,
   }) => {
     await page.goto(GALLERY);
     const light = page.getByRole('region', { name: 'Light theme' });
     await light
-      .getByRole('group', { name: /Audit window/ })
+      .getByRole('button', { name: /Audit window.*Any time/ })
       .first()
-      .getByRole('button', { name: /calendar/i })
       .click();
-    await page.getByRole('button', { name: 'Last 15 minutes' }).click();
-    await expect(light.getByText(/UTC$/).first()).toBeVisible();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('grid').first()).toBeVisible();
+    await expectNoBlockingA11yViolations(page);
+    await dialog.getByRole('button', { name: 'Last 15 minutes' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(
+      light.getByRole('button', { name: /Audit window.*Last 15 minutes/ }),
+    ).toBeVisible();
   });
 });
