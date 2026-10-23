@@ -2,6 +2,19 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-035: Hackathon submission package and README
+
+| Area                                                                                                                                                                                          | Status | Evidence                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------- |
+| README rewritten: value proposition, two quick-start paths checked against `package.json`, compose and `.env.example`, Mermaid architecture, provider honesty table, capabilities, disclosure | Done   | `README.md`                                        |
+| Write-up, judging map, demo script (under 2 minutes, per rules §4.4), pitch deck outline, checklist                                                                                           | Done   | `docs/submission/`                                 |
+| Judging criteria and submission rules taken from the official rules (`microsoft/insidethegamehackathon`, `OFFICIAL RULES.md`, commit `d7d8fc3`, fetched 2026-10-23)                           | Done   | `docs/submission/JUDGING_MAP.md`, `CHECKLIST.md`   |
+| `NOTICE` with the main third-party components; licences read from package metadata                                                                                                            | Done   | `NOTICE`                                           |
+| Live session figures read from the owner's running API (`fx_comeback_42_s7`: 222 of 228 narratives agent-written, 0 gate rejections, 117 of 171 non-English served in en-GB before PR #40)    | Done   | `docs/submission/SUBMISSION.md` § Measured results |
+| Video, hosted demo, branch for submission, category, team roster, deck format                                                                                                                 | Open   | Owner decisions, listed in `CHECKLIST.md`          |
+
+Docs only. Verification: Prettier on the changed files and a relative-link check; CI runs the rest (owner directive).
+
 ## 2026-10-23 — MQ-034: Localization covers every requested persona
 
 | Area                                                                                                                                                         | Status | Evidence                                               |
