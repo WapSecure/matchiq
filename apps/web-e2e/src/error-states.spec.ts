@@ -217,7 +217,7 @@ test.describe('friendly error states', () => {
       notice.getByRole('link', { name: 'Sign in again' }),
     ).toHaveAttribute(
       'href',
-      `/sign-in?returnTo=${encodeURIComponent(`${STUDIO}/audit`)}`,
+      `/sign-in?returnTo=${encodeURIComponent(`${STUDIO}/audit`)}&error=expired`,
     );
     await expectNoBlockingA11yViolations(page);
   });

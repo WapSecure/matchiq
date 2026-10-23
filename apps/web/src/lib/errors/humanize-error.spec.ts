@@ -9,7 +9,6 @@ import {
   ERROR_UI,
   FORBIDDEN_COPY_PATTERNS,
   PAGE_ERROR_COPY,
-  SESSION_EXPIRED_COPY,
 } from '@/constants/errors';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { PWA_COPY } from '@/constants/pwa';
@@ -154,9 +153,9 @@ describe('copy guard', () => {
       ui: ERROR_UI,
       boundary: BOUNDARY_COPY,
       page: PAGE_ERROR_COPY,
-      expired: SESSION_EXPIRED_COPY,
       connection: CONNECTION_COPY,
       auth: AUTH_COPY.errors,
+      authAction: AUTH_COPY.sessionExpiredAction,
       offline: PWA_COPY.offline,
       lobby: LOBBY_COPY,
       editorial: EDITORIAL_PROBLEMS,

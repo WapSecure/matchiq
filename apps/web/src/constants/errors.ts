@@ -128,13 +128,6 @@ export const PAGE_ERROR_COPY = {
   lobby: 'Go to matches',
 } as const;
 
-export const SESSION_EXPIRED_COPY = {
-  region: 'Signed out',
-  title: "You've been signed out for security",
-  message: 'Sign in again to pick up where you left off.',
-  action: 'Sign in again',
-} as const;
-
 /** Region names for error boundaries, as users know each part of the page. */
 export const REGION_NAMES = {
   scoreboard: 'The scoreboard',

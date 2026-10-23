@@ -115,6 +115,11 @@ export const PROBLEM_COPY: Record<string, ErrorCopy | ErrorKind> = {
     action: 'reload',
   },
   'bff-404': 'notFound',
+  'bff-503': {
+    title: 'Sign-in is briefly unavailable',
+    message: "You're still signed in. Try again in a moment.",
+    action: 'wait',
+  },
   'bff-502': 'network',
   network: 'network',
   timeout: 'timeout',

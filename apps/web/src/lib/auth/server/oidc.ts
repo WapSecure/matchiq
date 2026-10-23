@@ -1,7 +1,12 @@
 import { principalFromClaims } from '@matchiq/access';
 import * as client from 'openid-client';
-import { AUTH_ROUTES } from '@/constants/auth';
+import {
+  AUTH_ROUTES,
+  NO_REFRESH_TOKEN,
+  REFRESH_REJECTIONS,
+} from '@/constants/auth';
 import { callbackUrl, type OidcSettings } from './env';
+import { RefreshRejectedError } from './refresh-coordinator';
 import type { AuthTransaction, SessionUser, WebSession } from './session';
 
 let configuration: Promise<client.Configuration> | null = null;
@@ -113,15 +118,26 @@ export const completeSignIn = async (
   return user ? sessionFrom(tokens, user) : null;
 };
 
+const grantRefresh = async (env: OidcSettings, refreshToken: string) => {
+  try {
+    return await client.refreshTokenGrant(await config(env), refreshToken);
+  } catch (error) {
+    if (
+      error instanceof client.ResponseBodyError &&
+      REFRESH_REJECTIONS.has(error.error)
+    )
+      throw new RefreshRejectedError(error.error);
+    throw error;
+  }
+};
+
+/** Throws `RefreshRejectedError` only when the issuer refuses the token for good. */
 export const refreshSession = async (
   env: OidcSettings,
   session: WebSession,
-): Promise<WebSession | null> => {
-  if (!session.refreshToken) return null;
-  const tokens = await client.refreshTokenGrant(
-    await config(env),
-    session.refreshToken,
-  );
+): Promise<WebSession> => {
+  if (!session.refreshToken) throw new RefreshRejectedError(NO_REFRESH_TOKEN);
+  const tokens = await grantRefresh(env, session.refreshToken);
   const claims = tokens.claims();
   const user = (claims ? userOf(claims, env) : null) ?? session.user;
   return sessionFrom(tokens, user, session);

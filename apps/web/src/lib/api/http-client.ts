@@ -1,6 +1,12 @@
 import type { z } from 'zod';
-import { API_LIMITS, HTTP_HEADERS, MEDIA_TYPES } from '@/constants/api';
-import { whenSessionKnown } from '@/lib/auth/session-store';
+import {
+  API_LIMITS,
+  HTTP_HEADERS,
+  HTTP_STATUS,
+  MEDIA_TYPES,
+} from '@/constants/api';
+import { AUTH_ROUTES } from '@/constants/auth';
+import { useSession, whenSessionKnown } from '@/lib/auth/session-store';
 import { apiUrl } from '@/lib/env';
 import {
   httpError,
@@ -46,8 +52,10 @@ const send = async (path: string, options: RequestOptions) => {
     ? AbortSignal.any([options.signal, timeout])
     : timeout;
   const hasBody = options.body !== undefined;
+  const url = apiUrl(withQuery(path, options.query));
+  let response: Response;
   try {
-    return await fetch(apiUrl(withQuery(path, options.query)), {
+    response = await fetch(url, {
       method: options.method ?? 'GET',
       headers: {
         [HTTP_HEADERS.accept]: `${MEDIA_TYPES.json}, ${MEDIA_TYPES.problem}`,
@@ -61,6 +69,13 @@ const send = async (path: string, options: RequestOptions) => {
     if (timeout.aborted) throw timeoutError();
     throw networkError(error instanceof Error ? error.message : undefined);
   }
+  // A 401 from the BFF means the session is gone; the UI then says so once.
+  if (
+    response.status === HTTP_STATUS.unauthorized &&
+    url.startsWith(AUTH_ROUTES.bff)
+  )
+    useSession.getState().markExpired();
+  return response;
 };
 
 export const describeIssues = (error: z.ZodError): string =>

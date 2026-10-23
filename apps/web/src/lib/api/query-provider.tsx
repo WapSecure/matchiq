@@ -8,14 +8,13 @@ import {
 } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
 import { API_LIMITS } from '@/constants/api';
-import { isSignedIn } from '@/lib/auth/session-store';
+import { useSession } from '@/lib/auth/session-store';
 import { isSessionExpired } from '@/lib/errors/humanize-error';
-import { markSessionExpired } from '@/lib/errors/session-expiry';
 import { isApiError } from './api-error';
 
-/** A signed-in user refused with 401 has lost their session; say so once, calmly. */
+/** Any 401 ends a signed-in session (a no-op when signed out); the notice says so once. */
 const watchSession = (error: unknown): void => {
-  if (isSignedIn() && isSessionExpired(error)) markSessionExpired();
+  if (isSessionExpired(error)) useSession.getState().markExpired();
 };
 
 const shouldRetry = (failureCount: number, error: unknown): boolean =>

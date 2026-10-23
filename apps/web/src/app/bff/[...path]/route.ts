@@ -44,6 +44,8 @@ const forward = async (request: NextRequest, context: Context) => {
   if (request.method !== 'GET' && !isSameOrigin(request, env))
     return problem(STATUS.forbidden, TITLES.crossOrigin);
   const live = await liveSession(request, env);
+  if (live.kind === 'unavailable')
+    return problem(STATUS.unavailable, TITLES.idpUnreachable);
   if (live.kind !== 'active')
     return settle(problem(STATUS.unauthorized, TITLES.signInAgain), env, live);
   const headers = pick(request.headers, BFF_HEADERS.request);
@@ -61,7 +63,8 @@ const forward = async (request: NextRequest, context: Context) => {
       cache: 'no-store',
     });
   } catch {
-    return problem(STATUS.badGateway, TITLES.unreachable);
+    // Still persist a refreshed session: its old refresh token is now spent.
+    return settle(problem(STATUS.badGateway, TITLES.unreachable), env, live);
   }
   const response = new NextResponse(upstream.body, {
     status: upstream.status,

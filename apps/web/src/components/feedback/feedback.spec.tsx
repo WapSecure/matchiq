@@ -10,12 +10,13 @@ import {
 } from '@/lib/api/api-error';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { useSession } from '@/lib/auth/session-store';
-import { useSessionExpiry } from '@/lib/errors';
 import { ErrorState } from './error-state';
 import { InlineProblem } from './inline-problem';
 import { PageError } from './page-error';
 import { RegionBoundary } from './region-boundary';
-import { SessionExpiredNotice } from './session-expired-notice';
+import { SessionExpiredNotice } from '@/components/auth/session-expired-notice';
+
+vi.mock('next/navigation', () => ({ usePathname: () => '/studio/fx_1' }));
 
 const problem = (status: number, slug: string, retryAfter?: number) =>
   new ApiError(
@@ -39,7 +40,6 @@ const expectNoLeaks = (root: HTMLElement) => {
 
 afterEach(() => {
   vi.useRealTimers();
-  useSessionExpiry.setState({ expired: false });
   useSession.setState({ view: null });
 });
 
@@ -181,7 +181,7 @@ function Probe({ error }: { error: unknown }) {
 }
 
 describe('session expiry', () => {
-  it('asks a signed-in user to sign in again after a 401', async () => {
+  it('asks a signed-in user to sign in again after any 401 query', async () => {
     useSession.setState({
       view: {
         status: 'authenticated',
@@ -199,7 +199,7 @@ describe('session expiry', () => {
     render(
       <QueryClientProvider client={createQueryClient()}>
         <SessionExpiredNotice />
-        <Probe error={problem(401, 'bff-401')} />
+        <Probe error={problem(401, 'unauthorized')} />
       </QueryClientProvider>,
     );
     expect(

@@ -34,3 +34,11 @@ We rejected an environment-wide default: it could not be chosen per demo, and it
 - A plan is fixed at session creation. A new demo scenario means a new session, which matches ADR-0013.
 - Timeout latency is near zero, because the timeout is raised rather than waited for. The chain is legible, but latency figures for faulted runs are not representative.
 - Real-fault drills (killing Ollama, cutting the network) remain a separate operational exercise.
+
+## Addendum (2026-10-23): scenario isolation and accurate reasons (MQ-038)
+
+Live use showed `WRITER_REVISE` runs reporting "circuit breaker opened after simulated timeouts" and a refused Producer. Every faulted run had received the hair-trigger breaker, and on the local lane its threshold was one failure, so a real Localization timeout opened it. Each scenario now affects only what it claims to:
+
+- Only `MODEL_TIMEOUT` gets the per-run breaker that opens after one call's attempts. `WRITER_REVISE` and `GATE_REJECT` get a fresh per-run breaker with the shared breaker's thresholds, so a real failure during the demo behaves as in an ordinary run. No faulted run touches the shared breaker.
+- The breaker phrase is added to `fallbackReason` only when the scenario is `MODEL_TIMEOUT`, at least one simulated timeout was raised, and the per-run breaker is open.
+- A real failure inside a faulted run carries `faultInjected` (it belongs to a faulted trace) but no "simulated" note. A `MODEL_TIMEOUT` budget that ran out before any call reached the model is not labelled as a simulated timeout.

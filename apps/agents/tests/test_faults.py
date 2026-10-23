@@ -24,7 +24,7 @@ from matchiq_agents.settings import AppEnvironment, ModelProvider, Settings
 from matchiq_agents.wiring import build_service
 from tests.conftest import TOKEN
 from tests.support.builders import CaseSpec, build_payload, build_request
-from tests.support.models import FakeClock, ScriptedModel
+from tests.support.models import FakeClock, Override, ScriptedModel
 
 ENABLED = Settings(agents_service_token=SecretStr(TOKEN), demo_faults_enabled=True)
 DISABLED = Settings(agents_service_token=SecretStr(TOKEN))
@@ -164,3 +164,74 @@ def test_api_returns_labelled_runs_on_the_wire() -> None:
     runs = res.json()["runs"]
     assert {run["faultInjected"] for run in runs} == {"WRITER_REVISE"}
     assert any("faultNote" in run for run in runs)
+
+
+LOCAL = Settings(
+    agents_service_token=SecretStr(TOKEN),
+    model_provider=ModelProvider.OLLAMA,
+    demo_faults_enabled=True,
+)
+SETTINGS = [pytest.param(ENABLED, id="cloud"), pytest.param(LOCAL, id="local")]
+SIMULATED = "simulated"
+
+
+def _real_failure(answer: BaseModel, call: int) -> Exception:
+    return RuntimeError("connection reset")
+
+
+def _real_timeout(answer: BaseModel, call: int) -> Exception:
+    return TimeoutError()
+
+
+def _assert_no_simulated_text(result: PipelineResult) -> None:
+    assert SIMULATED not in (result.fallbackReason or "").lower()
+    for agent_run in result.runs:
+        if agent_run.agent is not AgentName.NARRATIVE_WRITER:
+            assert SIMULATED not in (agent_run.faultNote or "").lower()
+
+
+@pytest.mark.parametrize("settings", SETTINGS)
+@pytest.mark.parametrize(
+    ("agent", "failure"),
+    [
+        pytest.param(AgentName.MATCH_ANALYST, _real_failure, id="analyst-transport"),
+        pytest.param(AgentName.LOCALIZATION, _real_timeout, id="localization-timeout"),
+    ],
+)
+async def test_writer_revise_reports_real_failures_as_real_and_keeps_the_producer(
+    settings: Settings, agent: AgentName, failure: Override
+) -> None:
+    model = ScriptedModel({agent: failure})
+    result = await run(faulted(FaultScenario.WRITER_REVISE), model, settings)
+    assert REASON_BREAKER_OPEN not in (result.fallbackReason or "")
+    _assert_no_simulated_text(result)
+    producer = [r for r in result.runs if r.agent is AgentName.BROADCAST_PRODUCER]
+    assert [(r.provider, r.outcome) for r in producer] == [(model.provider, RunOutcome.SUCCEEDED)]
+    assert model.calls[AgentName.BROADCAST_PRODUCER] == 1
+    writers = [r for r in result.runs if r.agent is AgentName.NARRATIVE_WRITER]
+    assert writers[0].faultNote is not None
+    assert INJECTED_METRIC_REF in writers[0].faultNote
+
+
+async def test_local_model_timeout_still_opens_the_isolated_breaker() -> None:
+    model = ScriptedModel()
+    orchestrator = build_service(LOCAL, FakeClock(), model)
+    result = await orchestrator.run(faulted(FaultScenario.MODEL_TIMEOUT))
+    assert result.status is PipelineStatus.FALLBACK
+    assert result.fallbackReason is not None
+    assert REASON_BREAKER_OPEN in result.fallbackReason
+    assert model.calls == {}
+    clean = await orchestrator.run(build_request())
+    assert clean.status is PipelineStatus.VERIFIED
+
+
+@pytest.mark.parametrize("settings", SETTINGS)
+async def test_a_real_failure_in_an_ordinary_run_is_never_called_simulated(
+    settings: Settings,
+) -> None:
+    model = ScriptedModel({AgentName.MATCH_ANALYST: _real_failure})
+    result = await run(build_request(), model, settings)
+    assert result.fallbackReason is not None
+    assert REASON_BREAKER_OPEN not in result.fallbackReason
+    _assert_no_simulated_text(result)
+    assert all(r.faultInjected is None and r.faultNote is None for r in result.runs)
