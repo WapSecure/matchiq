@@ -6,6 +6,7 @@ condenses copy. Any overlay that fails the deterministic checks is replaced by t
 
 from matchiq_agents.contracts.types import AgentRun, NarrativeDraft, OverlayProposal
 from matchiq_agents.guard.checks import check_overlay
+from matchiq_agents.guard.editorial_repair import EditorialCopy, repair_editorial
 from matchiq_agents.guard.repair import Repair
 from matchiq_agents.limits import OVERLAY_LIMITS
 from matchiq_agents.pipeline import diagnostics, reasons
@@ -27,8 +28,12 @@ def _accept(
     values = list(cited.values())
     headline = repair_text(output.headline, ctx.view, values, "overlay headline", log)
     body = repair_text(output.body, ctx.view, values, "overlay body", log)
-    body = repair_body(body, None, "overlay body", log)
-    refs = overlay_refs(f"{headline}\n{body}", output.metric_refs, cited, log)
+    stated = {ref: ctx.view.metrics[ref] for ref in output.metric_refs if ref in ctx.view.metrics}
+    copy = repair_editorial(EditorialCopy(headline, body, stated), None, ctx.view, "overlay", log)
+    body = repair_body(copy.body, None, "overlay body", log)
+    headline = copy.headline
+    listed = [*output.metric_refs, *(ref for ref in copy.cited if ref not in stated)]
+    refs = overlay_refs(f"{headline}\n{body}", listed, cited, log)
     overlay = to_overlay(headline, body, refs, ctx.view)
     issues = check_overlay(overlay, ctx.view)
     if issues:

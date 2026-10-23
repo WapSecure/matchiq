@@ -4,13 +4,13 @@ Everything runs on one machine with no cloud account. All published ports are bo
 
 ## Profiles
 
-| Command                                             | Starts                                                                                         | Use                                    |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `pnpm infra:up` (`docker compose up -d --wait`)     | postgres (`:54320`), redis (`:63790`)                                                          | Day-to-day development with `pnpm dev` |
-| `docker compose --profile app up -d --build --wait` | the above, plus `migrate` (one-shot), api `:3000`, worker `:3001`, agents `:8000`, web `:4200` | Full demo from production images       |
-| `docker compose --profile ai up -d ollama`          | ollama `:11434` (CPU)                                                                          | Local model runtime on Linux hosts     |
+| Command                                                         | Starts                                                                                         | Use                                    |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `pnpm infra:up` (`docker compose --profile infra up -d --wait`) | postgres (`:54320`), redis (`:63790`), keycloak (`:8180`)                                      | Day-to-day development with `pnpm dev` |
+| `docker compose --profile app up -d --build --wait`             | the above, plus `migrate` (one-shot), api `:3000`, worker `:3001`, agents `:8000`, web `:4200` | Full demo from production images       |
+| `docker compose --profile ai up -d ollama`                      | ollama `:11434` (CPU)                                                                          | Local model runtime on Linux hosts     |
 
-Without a profile, compose still starts only Postgres and Redis. The app profile reuses those same containers and volumes.
+Without a profile, compose starts only Postgres and Redis. The `infra` profile adds Keycloak. The app profile reuses those same containers and volumes. The app profile was last run end to end during MQ-014 and MQ-022, before sign-in, RLS and Keycloak were added; it has not been re-run since.
 
 The app services are built from `apps/*/Dockerfile`. Each image is multi-stage, runs as a non-root user, has a pinned base image digest and includes a `HEALTHCHECK`.
 

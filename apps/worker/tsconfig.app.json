@@ -30,6 +30,9 @@
       "path": "../../libs/replay/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/narrative-guard/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/football-engine/tsconfig.lib.json"
     },
     {

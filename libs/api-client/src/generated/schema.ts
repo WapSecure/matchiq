@@ -1460,7 +1460,7 @@ export interface components {
                 persona?: "CASUAL" | "ANALYST" | "BROADCAST";
                 /** @enum {string} */
                 locale?: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
-                codes: ("UNSUPPORTED_NUMBER" | "UNKNOWN_ENTITY" | "UNCITED_EVIDENCE" | "FORBIDDEN_CLAIM" | "SCHEMA_VIOLATION" | "LENGTH_EXCEEDED" | "UNREQUESTED_VARIANT")[];
+                codes: ("UNSUPPORTED_NUMBER" | "UNKNOWN_ENTITY" | "UNCITED_EVIDENCE" | "FORBIDDEN_CLAIM" | "SCHEMA_VIOLATION" | "LENGTH_EXCEEDED" | "UNREQUESTED_VARIANT" | "INJECTION_ECHO" | "UNSUPPORTED_CAUSALITY" | "REPETITION" | "UNSAFE_TONE")[];
                 details: string[];
             }[];
         };

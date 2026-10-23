@@ -1,138 +1,116 @@
-"""Human labels for metric families (the first segment of a `metricRef`)."""
+"""Human labels for metric families (the first segment of a `metricRef`), singular and plural."""
 
 import re
 from typing import Final
 
-from matchiq_agents.contracts.types import InsightKind, Locale
+from matchiq_agents.contracts.types import Locale
+from matchiq_agents.domain.story import family_of
 
 _L = Locale
-METRIC_LABELS: Final[dict[str, dict[Locale, str]]] = {
+Forms = tuple[str, str]
+
+METRIC_LABELS: Final[dict[str, dict[Locale, Forms]]] = {
     "goals": {
-        _L.en_GB: "goals",
-        _L.fr_FR: "buts",
-        _L.es_ES: "goles",
-        _L.pcm_NG: "goals",
+        _L.en_GB: ("goal", "goals"),
+        _L.fr_FR: ("but", "buts"),
+        _L.es_ES: ("gol", "goles"),
+        _L.pcm_NG: ("goal", "goals"),
     },
     "shots": {
-        _L.en_GB: "shots",
-        _L.fr_FR: "tirs",
-        _L.es_ES: "tiros",
-        _L.pcm_NG: "shots",
+        _L.en_GB: ("shot", "shots"),
+        _L.fr_FR: ("tir", "tirs"),
+        _L.es_ES: ("tiro", "tiros"),
+        _L.pcm_NG: ("shot", "shots"),
     },
     "shotsOnTarget": {
-        _L.en_GB: "shots on target",
-        _L.fr_FR: "tirs cadrés",
-        _L.es_ES: "tiros a puerta",
-        _L.pcm_NG: "shots on target",
+        _L.en_GB: ("shot on target", "shots on target"),
+        _L.fr_FR: ("tir cadré", "tirs cadrés"),
+        _L.es_ES: ("tiro a puerta", "tiros a puerta"),
+        _L.pcm_NG: ("shot on target", "shots on target"),
     },
     "highRecoveries": {
-        _L.en_GB: "high recoveries",
-        _L.fr_FR: "récupérations hautes",
-        _L.es_ES: "recuperaciones altas",
-        _L.pcm_NG: "ball win for up",
+        _L.en_GB: ("high recovery", "high recoveries"),
+        _L.fr_FR: ("récupération haute", "récupérations hautes"),
+        _L.es_ES: ("recuperación alta", "recuperaciones altas"),
+        _L.pcm_NG: ("high recovery", "high recoveries"),
     },
     "recoveries": {
-        _L.en_GB: "recoveries",
-        _L.fr_FR: "récupérations",
-        _L.es_ES: "recuperaciones",
-        _L.pcm_NG: "ball recoveries",
+        _L.en_GB: ("recovery", "recoveries"),
+        _L.fr_FR: ("récupération", "récupérations"),
+        _L.es_ES: ("recuperación", "recuperaciones"),
+        _L.pcm_NG: ("ball recovery", "ball recoveries"),
     },
     "pressures": {
-        _L.en_GB: "pressures",
-        _L.fr_FR: "pressings",
-        _L.es_ES: "presiones",
-        _L.pcm_NG: "pressures",
+        _L.en_GB: ("pressure", "pressures"),
+        _L.fr_FR: ("pressing", "pressings"),
+        _L.es_ES: ("presión", "presiones"),
+        _L.pcm_NG: ("pressure", "pressures"),
+    },
+    "finalThirdEntries": {
+        _L.en_GB: ("final-third entry", "final-third entries"),
+        _L.fr_FR: ("entrée dans le dernier tiers", "entrées dans le dernier tiers"),
+        _L.es_ES: ("llegada al último tercio", "llegadas al último tercio"),
+        _L.pcm_NG: ("final-third entry", "final-third entries"),
     },
     "possession": {
-        _L.en_GB: "possession",
-        _L.fr_FR: "possession",
-        _L.es_ES: "posesión",
-        _L.pcm_NG: "possession",
+        _L.en_GB: ("possession", "possession"),
+        _L.fr_FR: ("de possession", "de possession"),
+        _L.es_ES: ("de posesión", "de posesión"),
+        _L.pcm_NG: ("possession", "possession"),
     },
     "passes": {
-        _L.en_GB: "passes",
-        _L.fr_FR: "passes",
-        _L.es_ES: "pases",
-        _L.pcm_NG: "passes",
+        _L.en_GB: ("pass", "passes"),
+        _L.fr_FR: ("passe", "passes"),
+        _L.es_ES: ("pase", "pases"),
+        _L.pcm_NG: ("pass", "passes"),
     },
     "xg": {
-        _L.en_GB: "expected goals",
-        _L.fr_FR: "buts attendus",
-        _L.es_ES: "goles esperados",
-        _L.pcm_NG: "expected goals",
-    },
-    "corners": {
-        _L.en_GB: "corners",
-        _L.fr_FR: "corners",
-        _L.es_ES: "córneres",
-        _L.pcm_NG: "corners",
+        _L.en_GB: ("expected goals", "expected goals"),
+        _L.fr_FR: ("but attendu", "buts attendus"),
+        _L.es_ES: ("gol esperado", "goles esperados"),
+        _L.pcm_NG: ("expected goals", "expected goals"),
     },
     "fouls": {
-        _L.en_GB: "fouls",
-        _L.fr_FR: "fautes",
-        _L.es_ES: "faltas",
-        _L.pcm_NG: "fouls",
+        _L.en_GB: ("foul", "fouls"),
+        _L.fr_FR: ("faute", "fautes"),
+        _L.es_ES: ("falta", "faltas"),
+        _L.pcm_NG: ("foul", "fouls"),
     },
     "redCards": {
-        _L.en_GB: "red cards",
-        _L.fr_FR: "cartons rouges",
-        _L.es_ES: "tarjetas rojas",
-        _L.pcm_NG: "red cards",
-    },
-    "yellowCards": {
-        _L.en_GB: "yellow cards",
-        _L.fr_FR: "cartons jaunes",
-        _L.es_ES: "tarjetas amarillas",
-        _L.pcm_NG: "yellow cards",
+        _L.en_GB: ("red card", "red cards"),
+        _L.fr_FR: ("carton rouge", "cartons rouges"),
+        _L.es_ES: ("tarjeta roja", "tarjetas rojas"),
+        _L.pcm_NG: ("red card", "red cards"),
     },
     "touches": {
-        _L.en_GB: "touches",
-        _L.fr_FR: "touches",
-        _L.es_ES: "toques",
-        _L.pcm_NG: "touches",
+        _L.en_GB: ("touch", "touches"),
+        _L.fr_FR: ("ballon touché", "ballons touchés"),
+        _L.es_ES: ("toque", "toques"),
+        _L.pcm_NG: ("touch", "touches"),
     },
     "momentum": {
-        _L.en_GB: "momentum index",
-        _L.fr_FR: "indice de dynamique",
-        _L.es_ES: "índice de impulso",
-        _L.pcm_NG: "momentum index",
+        _L.en_GB: ("momentum index", "momentum index"),
+        _L.fr_FR: ("indice de dynamique", "indice de dynamique"),
+        _L.es_ES: ("índice de impulso", "índice de impulso"),
+        _L.pcm_NG: ("momentum index", "momentum index"),
     },
 }
 
-PRIMARY_FAMILIES: Final[dict[InsightKind, tuple[str, ...]]] = {
-    InsightKind.GOAL: ("goals",),
-    InsightKind.RED_CARD: ("redCards",),
-    InsightKind.SHOT_BURST: ("shots", "shotsOnTarget", "xg"),
-    InsightKind.HIGH_REGAINS: ("highRecoveries", "recoveries"),
-    InsightKind.PRESSURE_SWING: ("pressures", "highRecoveries", "recoveries"),
-    InsightKind.MOMENTUM_SHIFT: ("momentum", "shots", "possession"),
-    InsightKind.PLAYER_MILESTONE: ("touches", "passes", "goals"),
-}
+# Families shown as a share: the value gets a percent sign ("58% possession").
+PERCENT_FAMILIES: Final = frozenset({"possession", "passCompletionPct", "possessionPct"})
+PERCENT: Final = "%"
 
 _CAMEL_BOUNDARY: Final = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
 
 
-def family_of(metric_ref: str) -> str:
-    return metric_ref.split(".", 1)[0]
-
-
-def side_of(metric_ref: str) -> str | None:
-    parts = metric_ref.split(".")
-    return next((part for part in parts[1:] if part in {"home", "away"}), None)
-
-
-def metric_label(metric_ref: str, locale: Locale) -> str:
+def metric_label(metric_ref: str, locale: Locale, value: float = 2) -> str:
     family = family_of(metric_ref)
     labels = METRIC_LABELS.get(family)
-    if labels is not None:
-        return labels[locale]
-    return _CAMEL_BOUNDARY.sub(" ", family).lower()
+    if labels is None:
+        return _CAMEL_BOUNDARY.sub(" ", family).lower()
+    singular, plural = labels[locale]
+    return singular if value == 1 else plural
 
 
-def primary_metric(kind: InsightKind, metric_refs: list[str]) -> str | None:
-    """The metric a one-line narrative should lead with, or None when nothing fits the kind."""
-    for family in PRIMARY_FAMILIES[kind]:
-        match = next((ref for ref in metric_refs if family_of(ref) == family), None)
-        if match is not None:
-            return match
-    return None
+def value_suffix(metric_ref: str) -> str:
+    return PERCENT if family_of(metric_ref) in PERCENT_FAMILIES else ""

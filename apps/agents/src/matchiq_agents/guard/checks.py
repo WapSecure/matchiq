@@ -13,8 +13,9 @@ from matchiq_agents.contracts.types import (
     NarrativeDraft,
     OverlayProposal,
 )
-from matchiq_agents.domain.facts import FactView
+from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
 from matchiq_agents.guard import messages
+from matchiq_agents.guard.editorial import editorial_issues
 from matchiq_agents.guard.safety import unsafe_categories
 from matchiq_agents.guard.text import (
     extract_numerals,
@@ -125,6 +126,9 @@ def check_draft(draft: NarrativeDraft, view: FactView, index: int | None = None)
     found = check_citations(draft.evidenceEventIds, draft.citedValues, view, index)
     found += check_text(f"{draft.headline}\n{draft.body}", supported, draft.locale, view, index)
     found += check_lengths(draft.headline, draft.body, PERSONA_LIMITS[draft.persona], index)
+    if draft.locale is CANONICAL_LOCALE:
+        cited = {value.metricRef: value.value for value in draft.citedValues}
+        found += editorial_issues(draft.headline, draft.body, cited, draft.persona, view, index)
     return found
 
 
@@ -145,4 +149,6 @@ def check_overlay(overlay: OverlayProposal, view: FactView) -> list[Issue]:
     supported = [view.metrics[ref] for ref in refs if ref in view.metrics]
     found += check_text(f"{overlay.headline}\n{overlay.body}", supported, Locale.en_GB, view, None)
     found += check_lengths(overlay.headline, overlay.body, OVERLAY_LIMITS, None)
+    cited = {ref: view.metrics[ref] for ref in refs if ref in view.metrics}
+    found += editorial_issues(overlay.headline, overlay.body, cited, None, view)
     return found

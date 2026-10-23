@@ -4,21 +4,22 @@ The source of truth for product behaviour is `docs/product/MatchIQ_Enterprise_Ma
 
 ## Projects
 
-| Project        | Path                  | Tags                              | Responsibility                                                                                            |
-| -------------- | --------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| web            | `apps/web`            | `scope:web` `type:app`            | Next.js UI. Talks only to the API (REST + SSE).                                                           |
-| api            | `apps/api`            | `scope:api` `type:app`            | Authoritative writes, ingest, replay control, SSE gateway. Never calls models.                            |
-| worker         | `apps/worker`         | `scope:worker` `type:app`         | Projection, moment detection, deterministic quality gate, overlay scheduling.                             |
-| agents         | `apps/agents`         | `scope:agents` `type:app`         | Stateless Python service: Agent Framework + Foundry. Returns proposals only.                              |
-| web-e2e        | `apps/web-e2e`        | —                                 | Playwright + axe.                                                                                         |
-| contracts      | `libs/contracts`      | `scope:shared` `type:contract`    | Zod schemas, the only hand-written contract source.                                                       |
-| canonical-json | `libs/canonical-json` | `scope:shared` `type:util`        | The only canonical JSON and SHA-256 implementation (ledger payload hashes, state hashes, fixture hashes). |
-| config         | `libs/config`         | `scope:shared` `type:util`        | Validated environment loading.                                                                            |
-| server-kit     | `libs/server-kit`     | `scope:server` `type:util`        | Nest HTTP baseline: health, problem details, request IDs, env module.                                     |
-| db             | `libs/db`             | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters.                      |
-| access         | `libs/access`         | `scope:shared` `type:domain`      | Roles, permissions, the role → permission matrix and claim mapping (ADR-0018). Framework-free.            |
-| auth           | `libs/auth`           | `scope:server` `type:data-access` | OIDC access-token verification (JWKS), stream tickets, Nest guards and `@RequirePermission`.              |
-| api-client     | `libs/api-client`     | `scope:shared` `type:util`        | Typed `openapi-fetch` client generated from `docs/api/openapi.json` (ADR-0017). Never hand-edited.        |
+| Project         | Path                   | Tags                              | Responsibility                                                                                                                           |
+| --------------- | ---------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| web             | `apps/web`             | `scope:web` `type:app`            | Next.js UI. Talks only to the API (REST + SSE).                                                                                          |
+| api             | `apps/api`             | `scope:api` `type:app`            | Authoritative writes, ingest, replay control, SSE gateway. Never calls models.                                                           |
+| worker          | `apps/worker`          | `scope:worker` `type:app`         | Projection, moment detection, deterministic quality gate, overlay scheduling.                                                            |
+| agents          | `apps/agents`          | `scope:agents` `type:app`         | Stateless Python service: Agent Framework + Foundry. Returns proposals only.                                                             |
+| web-e2e         | `apps/web-e2e`         | —                                 | Playwright + axe.                                                                                                                        |
+| contracts       | `libs/contracts`       | `scope:shared` `type:contract`    | Zod schemas, the only hand-written contract source.                                                                                      |
+| canonical-json  | `libs/canonical-json`  | `scope:shared` `type:util`        | The only canonical JSON and SHA-256 implementation (ledger payload hashes, state hashes, fixture hashes).                                |
+| config          | `libs/config`          | `scope:shared` `type:util`        | Validated environment loading.                                                                                                           |
+| server-kit      | `libs/server-kit`      | `scope:server` `type:util`        | Nest HTTP baseline: health, problem details, request IDs, env module.                                                                    |
+| db              | `libs/db`              | `scope:server` `type:data-access` | Drizzle schema and migrations, ledger and outbox ports, Postgres and Redis adapters.                                                     |
+| access          | `libs/access`          | `scope:shared` `type:domain`      | Roles, permissions, the role → permission matrix and claim mapping (ADR-0018). Framework-free.                                           |
+| narrative-guard | `libs/narrative-guard` | `scope:shared` `type:domain`      | Publish-gate text rules (claims, injection echoes, causality, repetition, tone) and the lexicon shared with the Python guard (ADR-0022). |
+| auth            | `libs/auth`            | `scope:server` `type:data-access` | OIDC access-token verification (JWKS), stream tickets, Nest guards and `@RequirePermission`.                                             |
+| api-client      | `libs/api-client`      | `scope:shared` `type:util`        | Typed `openapi-fetch` client generated from `docs/api/openapi.json` (ADR-0017). Never hand-edited.                                       |
 
 Planned for M1 (created by their owning stream with these tags):
 

@@ -62,7 +62,7 @@ describe('recap fallback provenance', () => {
     expect(
       screen.queryByText(RECAP_COPY.translationUnknown),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('Standard wording')).toBeInTheDocument();
+    expect(screen.queryByText('Standard wording')).not.toBeInTheDocument();
   });
 
   it('keeps a confirmed French translation tagged as French', () => {

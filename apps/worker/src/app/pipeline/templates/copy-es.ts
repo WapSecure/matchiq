@@ -52,8 +52,7 @@ export const COPY_ES: LocaleCopy = {
     HIGH_REGAINS: (f) => `${f.v['high']} recuperaciones altas recientes`,
     PRESSURE_SWING: (f) =>
       `${f.v['pressures']} presiones, frente a ${f.v['previous']} antes`,
-    MOMENTUM_SHIFT: (f) =>
-      `Índice de impulso ${f.v['momentum']} frente a ${f.v['oppMomentum']}`,
+    MOMENTUM_SHIFT: (f) => `${f.team} manda`,
     PLAYER_MILESTONE: () => 'Hito alcanzado',
   },
   generic: {

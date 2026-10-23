@@ -155,8 +155,8 @@ describe('agent observatory', () => {
     );
     expect(first).toHaveTextContent('Nothing rejected.');
     expect(facts(second)).toEqual([
-      'CommentaryAI-written',
-      'GraphicAI-written',
+      'CommentaryAuto-written',
+      'GraphicAuto-written',
       'Fact checkCaught 1 problem',
       expect.stringMatching(/^Ready in4 languages for 3 audiences: /),
     ]);

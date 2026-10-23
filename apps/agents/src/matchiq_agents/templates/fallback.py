@@ -20,10 +20,12 @@ from matchiq_agents.roster.schemas import (
     DraftOut,
     FactsPayload,
 )
+from matchiq_agents.templates.compose import analyst_sentences, render_text
+from matchiq_agents.templates.facts import story_facts
 from matchiq_agents.templates.phrases_en import EN_GB, INFERENCES
-from matchiq_agents.templates.render import RenderedText, metric_item, render_text
+from matchiq_agents.templates.render import RenderedText
 
-TEMPLATE_VERSION: Final = "1.0.0"
+TEMPLATE_VERSION: Final = "2.0.0"
 MAX_OBSERVATIONS: Final = 4
 
 
@@ -40,13 +42,18 @@ def rendered_to_draft(
 
 
 def analyst_output(facts: FactsPayload, variant: int = 0) -> AnalystOutput:
+    """The template analysis: the moment's story and its supporting facts, one claim each.
+
+    The Writer drafts from these claims when the Analyst model is skipped, so they are plain
+    sentences, never raw metric labels.
+    """
+    del variant
     events = facts.event_ids
-    casual = render_text(facts, Persona.CASUAL, Locale.en_GB, variant)
-    claims = [_observation(casual.body, casual.cited, events)]
-    for ref, value in list(facts.computed_metrics.items())[:MAX_OBSERVATIONS]:
-        if all(ref != cited for cited, _ in casual.cited):
-            item = metric_item(ref, value, Locale.en_GB)
-            claims.append(_observation(f"{item[:1].upper()}{item[1:]}.", ((ref, value),), events))
+    story = story_facts(facts)
+    sentences = analyst_sentences(facts, story, Locale.en_GB, MAX_OBSERVATIONS)
+    claims = [_observation(s.text, s.refs, facts, events) for s in sentences if s.refs]
+    if not claims:
+        claims = [_observation(sentences[0].text, (), facts, events)]
     claims.append(
         ClaimOut(
             claim_type="INFERENCE",
@@ -63,12 +70,16 @@ def analyst_output(facts: FactsPayload, variant: int = 0) -> AnalystOutput:
     )
 
 
-def _observation(text: str, cited: Sequence[tuple[str, float]], events: Sequence[str]) -> ClaimOut:
+def _observation(
+    text: str, refs: Sequence[str], facts: FactsPayload, events: Sequence[str]
+) -> ClaimOut:
     return ClaimOut(
         claim_type="OBSERVATION",
         text=text,
         evidence_event_ids=list(events),
-        cited_values=[CitedValueOut(metric_ref=ref, value=value) for ref, value in cited],
+        cited_values=[
+            CitedValueOut(metric_ref=ref, value=facts.computed_metrics[ref]) for ref in refs
+        ],
     )
 
 

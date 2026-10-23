@@ -14,14 +14,14 @@ export type FallbackGroup =
 
 export const FACT_CHECKS_COPY = {
   share: {
-    title: 'Written by AI',
+    title: 'Auto-written',
     of: (ai: number, total: number) =>
       `${ai} of ${plural(total, 'key moment')}`,
     percent: (pct: number) => `${pct}%`,
     barLabel: (ai: number, standard: number, pending: number) =>
-      `${ai} written by AI, ${standard} in standard wording, ${pending} still being written`,
+      `${ai} auto-written, ${standard} in standard wording, ${pending} still being written`,
     legend: {
-      AGENT: 'Written by AI',
+      AGENT: 'Auto-written',
       TEMPLATE: 'Standard wording',
       PENDING: 'Still being written',
     },
@@ -44,7 +44,7 @@ export const FACT_CHECKS_COPY = {
     option: (label: string, n: number) => `${label} (${n})`,
     labels: {
       ALL: 'All',
-      AGENT: 'Written by AI',
+      AGENT: 'Auto-written',
       TEMPLATE: 'Standard wording',
       SIMULATED: 'Simulated failures',
     } satisfies Record<MomentFilter, string>,
@@ -72,12 +72,12 @@ export const FACT_CHECKS_COPY = {
     check: 'Fact check',
     reach: 'Ready in',
     written: {
-      AGENT: 'AI-written',
+      AGENT: 'Auto-written',
       TEMPLATE: 'Standard wording',
       PENDING: 'Being written…',
     },
     graphicValue: {
-      aiWording: 'AI-written',
+      aiWording: 'Auto-written',
       standard: 'Standard wording',
       pending: 'Not made yet',
       RETRACTED: 'Taken off air by a producer',
@@ -96,7 +96,7 @@ export const FACT_CHECKS_COPY = {
       `${listOf(languages)}, for ${listOf(audiences)}.`,
     why: 'Why standard wording',
     badge: {
-      AGENT: 'Written by AI',
+      AGENT: 'Auto-written',
       TEMPLATE: 'Standard wording',
       PENDING: 'Being written',
     },
@@ -107,9 +107,9 @@ export const FACT_CHECKS_COPY = {
 } as const;
 
 export const FALLBACK_GROUP_BECAUSE: Record<FallbackGroup, string> = {
-  AI_TROUBLE: 'the AI was slow or unavailable',
+  AI_TROUBLE: 'the writing service was slow or unavailable',
   AI_OFF: 'AI writing is switched off here',
-  FACT_CHECK: 'the fact check rejected the AI wording',
+  FACT_CHECK: 'the fact check rejected the draft',
   HELD: 'they did not pass our checks',
   OTHER: 'it was the safer choice',
 };
