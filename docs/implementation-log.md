@@ -2,6 +2,21 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-054: Branded sign-in pages and back navigation
+
+| Area                                                                                                                                                                                                                                                                                            | Status | Evidence                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------ |
+| `matchiq` Keycloak login theme extending `keycloak.v2`: new page frame (`template.ftl`) plus `error`, `info`, `logout-confirm` and `login-page-expired` pages; the web app's tokens, Geist, logo mark and icons self-hosted (no PatternFly, no CDN); light and dark from `prefers-color-scheme` | Done   | Private Keycloak 26.7.5 on :8181 with the theme mounted; screenshots in the PR |
+| "Back to MatchIQ" on every Keycloak page (client `baseUrl`, falling back to `WEB_PUBLIC_URL`) and the "Simulated match data" note                                                                                                                                                               | Done   | Link followed from the hosted page back to `http://localhost:4200/`            |
+| Plain-language copy in `messages_en.properties`: sign-in title and lead, wrong password, locked account (same wording as a wrong password, so accounts can't be enumerated), disabled account, expired page and link, signed out                                                                | Done   | Screenshots; `keycloak-theme.spec.ts` checks every `mq*` key exists            |
+| Realm `loginTheme: matchiq`, `matchiq-web` `baseUrl`; compose mounts the theme read-only and passes `WEB_PUBLIC_URL`; `web:test` takes `infra/keycloak` and the compose file as inputs                                                                                                          | Done   | `keycloak-theme.spec.ts` (CI, no Keycloak needed)                              |
+| App `/sign-in`: `BackLink` returns to the previous page on this site, otherwise home. Other header-less screens (page error, access denied) already link to the matches; offline and not-found keep the site header                                                                             | Done   | `back-link.spec.tsx`, Playwright `auth.spec.ts`                                |
+| Entra company-branding steps and assets (`infra/entra-branding/`, within Entra's size limits)                                                                                                                                                                                                   | Done   | `docs/security/IDENTITY_AND_ACCESS.md`                                         |
+
+Verification: CI (owner directive). Locally: Prettier, `nx lint` and `nx typecheck` for `web` and `web-e2e`, the two new spec files, and axe (WCAG 2.2 AA) on the Keycloak login, wrong-password, error and logout pages and the app's `/sign-in`, in light and dark at 1440 and 390 px: no violations, no horizontal overflow.
+
+Limitations: the Entra branding is documented and the assets are shipped, but it has not been applied to a tenant (ADR-0003). Entra's own page has no back link.
+
 ## 2026-10-23 — MQ-052: Premium pass on AI fact-checks and recap
 
 - **AI fact-checks.** Each moment now shows four labelled facts instead of a run-on line: Commentary (AI-written or standard wording), Graphic (AI-written, standard wording or a producer action), Fact check (Passed ✓ or Caught N problems) and "Ready in 4 languages for 3 audiences". A tooltip on the last one lists the languages and audiences. The recap's write-ups are used when it exists; otherwise the full set is assumed only when the count matches it.
