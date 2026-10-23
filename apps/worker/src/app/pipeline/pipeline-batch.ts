@@ -2,6 +2,7 @@ import {
   SCHEMA_VERSION,
   type AgentRun,
   type Insight,
+  type InsightRetraction,
   type MatchEvent,
   type MatchSnapshot,
   type Narrative,
@@ -31,6 +32,8 @@ export interface PipelineBatch {
   readonly narratives: Narrative[];
   readonly overlays: OverlayRecord[];
   readonly overlayEnds: OverlayEnd[];
+  /** Insights a correction ruled out; written after the artifacts above. */
+  readonly retractions: InsightRetraction[];
   readonly completions: { insightId: string; completion: InsightCompletion }[];
   readonly agentRuns: { insightId: string; runs: AgentRun[] }[];
   /** Insights this batch publishes only if it moves them out of PENDING. */
@@ -49,6 +52,7 @@ export const emptyBatch = (): PipelineBatch => ({
   narratives: [],
   overlays: [],
   overlayEnds: [],
+  retractions: [],
   completions: [],
   agentRuns: [],
   claims: [],

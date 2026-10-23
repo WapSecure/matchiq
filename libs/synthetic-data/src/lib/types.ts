@@ -15,8 +15,14 @@ export interface TeamProfile {
 }
 
 /** `minute` is absolute match time: 0-45 first half, 45-90 second half. */
+/** `ruled-out-goal` scores, then a CORRECTION voids the goal after a review. */
 export type ScriptedBeat =
   | { readonly kind: 'goal'; readonly side: Side; readonly minute: number }
+  | {
+      readonly kind: 'ruled-out-goal';
+      readonly side: Side;
+      readonly minute: number;
+    }
   | { readonly kind: 'red-card'; readonly side: Side; readonly minute: number };
 
 export interface ScenarioPreset {

@@ -58,6 +58,8 @@ export const RecapMoment = z.strictObject({
   evidenceEventIds: z.array(z.string()),
   metricRefs: z.array(z.string()),
   narratives: z.array(RecapNarrative),
+  /** Set when a correction ruled the moment out; its narratives are withdrawn. */
+  retracted: z.strictObject({ reason: z.string().min(1) }).optional(),
 });
 
 /** Built once at full time from published outputs; numbers come from `finalSnapshot`. */
@@ -101,7 +103,8 @@ export const OverlayEditorialState = z.enum([
   'HELD',
   'SUPPRESSED',
 ]);
-export const InsightEditorialState = z.enum(['SUPPRESSED']);
+/** SUPPRESSED: a producer dropped it. RETRACTED: a correction ruled it out. */
+export const InsightEditorialState = z.enum(['SUPPRESSED', 'RETRACTED']);
 
 export const InsightEditorialTrace = z.strictObject({
   insight: InsightEditorialState.nullable(),
