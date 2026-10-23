@@ -1,6 +1,7 @@
 import type { Locale, Persona } from '@matchiq/contracts';
-import { TeamSwatch } from '@/components/match/team-swatch';
-import { Badge, TechnicalDetails } from '@/components/ui';
+import { SparkIcon } from '@/components/icons';
+import { SIDE_BG } from '@/components/match/team-swatch';
+import { Badge } from '@/components/ui';
 import {
   CONFIDENCE_LABELS,
   INSIGHT_KIND_LABELS,
@@ -8,12 +9,15 @@ import {
   PRIORITY_LABELS,
 } from '@/constants/match';
 import { RECAP_COPY } from '@/constants/recap';
-import { STUDIO_COPY } from '@/constants/studio';
 import { SITE } from '@/constants/site';
+import { STUDIO_COPY } from '@/constants/studio';
 import type { RosterTeam } from '@/features/studio/lib/roster';
 import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
+import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
+import { momentAnchor } from './recap-order';
+import { RecapMomentTechnical } from './recap-moment-technical';
 
 type RecapMomentProps = {
   moment: Moment;
@@ -21,6 +25,63 @@ type RecapMomentProps = {
   persona: Persona;
   locale: Locale;
 };
+
+function Rail({ team, major }: { team: RosterTeam | null; major: boolean }) {
+  return (
+    <span aria-hidden className="relative flex justify-center">
+      <span className="absolute inset-y-0 w-px bg-line group-first/moment:top-4 group-last/moment:bottom-[calc(100%-1rem)]" />
+      <span
+        className={cn(
+          'relative mt-1.5 rounded-full ring-4 ring-surface',
+          major ? 'size-3' : 'size-2.5',
+          team ? SIDE_BG[team.side] : 'bg-ink-subtle',
+        )}
+      />
+    </span>
+  );
+}
+
+type Picked = ReturnType<typeof pickNarrative>;
+
+/** Who wrote it, what backs it, and a note when the language fell back. */
+function Meta({
+  moment,
+  picked,
+  locale,
+}: {
+  moment: Moment;
+  picked: Picked;
+  locale: Locale;
+}) {
+  const ai = picked?.narrative.source === 'AGENT';
+  return (
+    <>
+      <p
+        lang={SITE.locale}
+        className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-micro text-ink-subtle"
+      >
+        {picked ? (
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 font-medium',
+              ai ? 'text-accent-strong' : 'text-ink-muted',
+            )}
+          >
+            {ai ? <SparkIcon size={11} /> : null}
+            {STUDIO_COPY.insights.source[picked.narrative.source]}
+          </span>
+        ) : null}
+        <span>{RECAP_COPY.evidence(moment.evidenceEventIds.length)}</span>
+        <span>{RECAP_COPY.metricRefs(moment.metricRefs.length)}</span>
+      </p>
+      {picked?.fallback ? (
+        <p lang={SITE.locale} className="mt-1 text-micro text-warning">
+          {RECAP_COPY.localeFallback(englishLanguageName(locale))}
+        </p>
+      ) : null}
+    </>
+  );
+}
 
 export function RecapMomentItem({
   moment,
@@ -30,23 +91,32 @@ export function RecapMomentItem({
 }: RecapMomentProps) {
   const picked = pickNarrative(moment.narratives, persona, locale);
   const kind = INSIGHT_KIND_LABELS[moment.kind];
+  const major = moment.priority === 'P0';
   return (
-    <li className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-0">
-      <span className="tabular pt-0.5 font-mono text-sm font-semibold text-ink">
+    <li
+      id={momentAnchor(moment.insightId)}
+      className="group/moment grid scroll-mt-24 grid-cols-[2.25rem_0.75rem_minmax(0,1fr)] gap-x-2 px-3 sm:grid-cols-[3rem_1rem_minmax(0,1fr)] sm:gap-x-3 sm:px-4"
+    >
+      <span
+        className={cn(
+          'tabular pt-3 text-right font-mono text-sm font-semibold',
+          major ? 'text-accent' : 'text-ink',
+        )}
+      >
         {formatMinute(moment.period, moment.matchClockMs)}
       </span>
+      <Rail team={team} major={major} />
       <article
         aria-label={picked?.narrative.headline ?? kind}
-        className="min-w-0"
+        className="min-w-0 border-b border-line py-3 group-last/moment:border-0"
       >
-        <header className="flex flex-wrap items-center gap-2">
-          <Badge tone={moment.priority === 'P0' ? 'accent' : 'neutral'}>
+        <header className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Badge tone={major ? 'accent' : 'neutral'}>
             {PRIORITY_LABELS[moment.priority]}
           </Badge>
           <span className="text-xs font-medium text-ink">{kind}</span>
           {team ? (
-            <span className="inline-flex items-center gap-1 text-micro font-semibold text-ink-muted">
-              <TeamSwatch side={team.side} className="size-2" />
+            <span className="text-micro font-semibold text-ink-muted">
               {team.shortName}
             </span>
           ) : null}
@@ -56,24 +126,11 @@ export function RecapMomentItem({
         </header>
         {picked ? (
           <div className="mt-1.5" lang={picked.narrative.locale}>
-            <p className="text-sm font-semibold text-ink">
+            <p className="text-[15px] font-semibold leading-snug text-ink">
               {picked.narrative.headline}
             </p>
-            <p className="text-[13px] leading-relaxed text-ink-muted">
+            <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
               {picked.narrative.body}
-            </p>
-            <p
-              lang={SITE.locale}
-              className="mt-1 flex flex-wrap gap-x-2 text-micro text-ink-subtle"
-            >
-              <span>
-                {STUDIO_COPY.insights.source[picked.narrative.source]}
-              </span>
-              {picked.fallback ? (
-                <span className="text-warning" lang={SITE.locale}>
-                  {RECAP_COPY.localeFallback(englishLanguageName(locale))}
-                </span>
-              ) : null}
             </p>
           </div>
         ) : (
@@ -81,21 +138,8 @@ export function RecapMomentItem({
             {RECAP_COPY.noNarrative}
           </p>
         )}
-        <p className="mt-2 text-micro text-ink-subtle">
-          {RECAP_COPY.evidence(moment.evidenceEventIds.length)} ·{' '}
-          {RECAP_COPY.metricRefs(moment.metricRefs.length)}
-        </p>
-        <TechnicalDetails className="mt-2">
-          <p className="break-all font-mono text-ink-muted">
-            {RECAP_COPY.technical.events}: {moment.evidenceEventIds.join(', ')}
-          </p>
-          <p className="break-all font-mono text-ink-muted">
-            {moment.metricRefs.join(', ')}
-          </p>
-          <p className="font-mono text-ink-muted">
-            {RECAP_COPY.technical.reason}: {moment.reasonCode}
-          </p>
-        </TechnicalDetails>
+        <Meta moment={moment} picked={picked} locale={locale} />
+        <RecapMomentTechnical moment={moment} />
       </article>
     </li>
   );

@@ -1,0 +1,87 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { buildReport } from '@/features/recap/recap-report';
+import { fixture } from '@/test/factories';
+import { recap, run, trace } from '@/test/session-factories';
+import { FallbackNote } from './fallback-note';
+import { MomentList } from './moment-list';
+import { TraceSummary } from './trace-summary';
+
+const traces = [
+  trace(),
+  trace({
+    insightId: 'in_ai',
+    publication: 'AGENT',
+    fallbackReason: null,
+    matchClockMs: 1_200_000,
+  }),
+  trace({
+    insightId: 'in_slow',
+    fallbackReason: 'agents service timed out after 4000 ms',
+    matchClockMs: 1_800_000,
+  }),
+  trace({
+    insightId: 'in_down',
+    fallbackReason: 'agents service unreachable',
+    matchClockMs: 2_400_000,
+    runs: [run({ faultInjected: 'MODEL_TIMEOUT', faultNote: 'x' })],
+  }),
+];
+
+describe('AI fact-checks overview', () => {
+  it('says a repeated reason once, with a count', () => {
+    render(<FallbackNote traces={traces} />);
+    const items = within(screen.getByTestId('fallback-note')).getAllByRole(
+      'listitem',
+    );
+    expect(items.map((li) => li.textContent)).toEqual([
+      '2 moments used standard wording because the AI was slow or unavailable.',
+      '1 moment used standard wording because AI writing is switched off here.',
+    ]);
+  });
+
+  it('shows the share written by AI as a number and a bar', () => {
+    render(<TraceSummary traces={traces} />);
+    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(screen.getByText('1 of 4 key moments')).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', {
+        name: '1 written by AI, 3 in standard wording, 0 still being written',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('filters moments and keeps a minute marker per shown moment', async () => {
+    const user = userEvent.setup();
+    render(<MomentList traces={traces} moments={new Map()} />);
+    const list = () =>
+      screen.getByRole('list', { name: 'Key moments and their checks' });
+    expect(within(list()).getAllByRole('article')).toHaveLength(4);
+    await user.click(screen.getByRole('radio', { name: 'Written by AI (1)' }));
+    expect(within(list()).getAllByRole('article')).toHaveLength(1);
+    const strip = screen.getByRole('list', { name: 'Key moments by minute' });
+    expect(within(strip).getAllByRole('link')).toHaveLength(1);
+    await user.click(
+      screen.getByRole('radio', { name: 'Simulated failures (1)' }),
+    );
+    expect(within(list()).getByRole('article')).toHaveAttribute(
+      'id',
+      'moment-in_down',
+    );
+  });
+});
+
+describe('match report', () => {
+  it('reads as plain text with the score, moments and stats', () => {
+    const text = buildReport({
+      recap: recap(),
+      fixture: fixture(),
+      persona: 'BROADCAST',
+      locale: 'en-GB',
+    });
+    expect(text).toContain('Final score: Home United 3–2 Away City');
+    expect(text).toContain("76'");
+    expect(text).toContain('Shots: ');
+    expect(text).not.toContain('{');
+  });
+});

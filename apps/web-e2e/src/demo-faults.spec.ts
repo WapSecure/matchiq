@@ -41,6 +41,10 @@ test.describe('demo failure scenarios in the AI fact-checks (ADR-0020)', () => {
     await expect(notes.nth(0)).toContainText('Fact Checker returned REVISE');
     await expect(notes.nth(1)).toContainText('Circuit breaker open');
 
+    await expect(page.getByTestId('fallback-note')).toContainText(
+      '1 moment used standard wording because the AI was slow or unavailable.',
+    );
+
     // Traces without a fault plan carry no badge.
     await expect(traces.getByRole('article').first()).not.toContainText(
       'Simulated failure',
