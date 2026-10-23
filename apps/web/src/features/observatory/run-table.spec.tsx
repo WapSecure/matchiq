@@ -33,7 +33,7 @@ describe('RunTable', () => {
       2,
     );
     expect(rows[1]).toHaveTextContent('Took too long');
-    expect(rows[2]).toHaveTextContent('Standard wording (no AI)');
+    expect(rows[2]).toHaveTextContent('Standard wording');
     const keyWarnings = errors.mock.calls.filter((args) =>
       args.some((a) => String(a).includes('same key')),
     );

@@ -30,7 +30,7 @@ export const PIPELINE = {
   eyebrow: 'How it works',
   title: 'Five steps from the pitch to the screen',
   description:
-    'Every fact is worked out once from the match data. AI explains the facts but never changes them, and a fact check confirms each number before it airs.',
+    'Every fact is worked out once from the match data. Nothing changes them afterwards, and a fact check confirms each number before it airs.',
   stages: [
     {
       key: 'ingest',
@@ -86,14 +86,14 @@ export const PRINCIPLES = {
       key: 'repeatable',
       title: 'Same match, same numbers',
       description:
-        'Stats come from fixed, tested rules, not AI. Replay a match and you get exactly the same figures every time.',
+        'Stats come from fixed, tested rules. Replay a match and you get exactly the same figures every time.',
       Icon: DeterministicIcon,
     },
     {
       key: 'resilience',
-      title: 'Keeps going if AI fails',
+      title: 'Keeps going if the writer fails',
       description:
-        'Scores and stats never depend on AI. If it is slow or wrong, standard wording goes on air, and a producer can pull any graphic at any time.',
+        'Scores and stats never depend on the writing. If it is slow or wrong, standard wording goes on air, and a producer can pull any graphic at any time.',
       Icon: ResilienceIcon,
     },
   ],

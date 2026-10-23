@@ -28,14 +28,14 @@ const traces = [
   }),
 ];
 
-describe('AI fact-checks overview', () => {
+describe('Fact-checks overview', () => {
   it('says a repeated reason once, with a count', () => {
     render(<FallbackNote traces={traces} />);
     const items = within(screen.getByTestId('fallback-note')).getAllByRole(
       'listitem',
     );
     expect(items.map((li) => li.textContent)).toEqual([
-      '2 moments used standard wording because the AI was slow or unavailable.',
+      '2 moments used standard wording because the writing service was slow or unavailable.',
       '1 moment used standard wording because AI writing is switched off here.',
     ]);
   });
@@ -45,16 +45,16 @@ describe('AI fact-checks overview', () => {
     const titles = screen.getAllByRole('term').map((t) => t.textContent ?? '');
     expect(titles).toHaveLength(4);
     for (const title of titles) expect(title).not.toBe(title.toUpperCase());
-    expect(titles).toContain('Written by AI');
+    expect(titles).toContain('Auto-written');
   });
 
-  it('shows the share written by AI as a number and a bar', () => {
+  it('shows the share auto-written as a number and a bar', () => {
     render(<TraceSummary traces={traces} />);
     expect(screen.getByText('25%')).toBeInTheDocument();
     expect(screen.getByText('1 of 4 key moments')).toBeInTheDocument();
     expect(
       screen.getByRole('img', {
-        name: '1 written by AI, 3 in standard wording, 0 still being written',
+        name: '1 auto-written, 3 in standard wording, 0 still being written',
       }),
     ).toBeInTheDocument();
   });
@@ -65,7 +65,7 @@ describe('AI fact-checks overview', () => {
     const list = () =>
       screen.getByRole('list', { name: 'Key moments and their checks' });
     expect(within(list()).getAllByRole('article')).toHaveLength(4);
-    await user.click(screen.getByRole('radio', { name: 'Written by AI (1)' }));
+    await user.click(screen.getByRole('radio', { name: 'Auto-written (1)' }));
     expect(within(list()).getAllByRole('article')).toHaveLength(1);
     const strip = screen.getByRole('list', { name: 'Key moments by minute' });
     expect(within(strip).getAllByRole('link')).toHaveLength(1);

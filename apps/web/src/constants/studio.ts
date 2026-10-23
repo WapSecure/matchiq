@@ -30,7 +30,7 @@ export const STUDIO_COPY = {
   insights: {
     moreLabel: 'More key moments',
     title: 'Key moments',
-    description: 'Spotted in the match data, written up by AI and fact-checked',
+    description: 'Spotted in the match data, written up and fact-checked',
     empty: 'No key moments yet. They appear here as the match unfolds.',
     evidence: 'Evidence',
     coverage: 'Data completeness',
@@ -39,19 +39,19 @@ export const STUDIO_COPY = {
     localeFallback: (language: string) =>
       `The ${language} version isn't ready yet, so you're seeing English.`,
     source: {
-      AGENT: 'Written by AI · fact-checked',
+      AGENT: 'Fact-checked',
       TEMPLATE: 'Standard wording',
     },
     sourceHint: {
       AGENT:
-        'AI wrote this from the match data, and the fact check confirmed every number and name in it.',
+        'Auto-written from the match data. Every number was checked before it went out.',
       TEMPLATE:
-        "Pre-written sentences filled in with match data. Used when the AI wording isn't ready or didn't pass the fact check.",
+        "Pre-written sentences filled in with match data. Used when the auto-written version isn't ready or didn't pass the fact check.",
     },
   },
   metrics: {
     title: 'Match stats',
-    description: 'Every number comes from the match data, never from AI',
+    description: 'Every number comes from the match data',
     possession: 'Possession',
     comparison: 'Team comparison',
     passCompletion: 'Pass completion',
