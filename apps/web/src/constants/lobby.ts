@@ -6,9 +6,7 @@ export const LOBBY_COPY = {
     'Explore fictional matches in the studio. Start a replay, inspect the evidence and share the session link with your team.',
   listLabel: 'Synthetic fixtures',
   scenario: 'Scenario',
-  seedLabel: 'Seed',
   events: 'Events',
-  hash: 'Events hash',
   start: 'Start replay',
   startLabel: (title: string) => `Start replay of ${title}`,
   starting: 'Starting…',
@@ -32,8 +30,7 @@ export const LOBBY_COPY = {
     error: "We couldn't load recent replays",
     loading: 'Loading recent sessions',
     open: 'Open',
-    openLabel: (title: string, n: number) => `Open session ${n} of ${title}`,
-    number: (n: number) => `Session ${n}`,
+    openLabel: (title: string, n: number) => `Open replay ${n} of ${title}`,
     notStarted: 'Not started',
   },
 } as const;
@@ -52,5 +49,3 @@ export const SCENARIO_WORD_SEPARATOR = /[-_]+/g;
 /** The judge quick-start (spec §19) begins with this scenario. */
 export const FEATURED_SCENARIO = 'comeback';
 export const FEATURED_LABEL = 'Recommended replay';
-
-export const HASH_PREVIEW_CHARS = 10;

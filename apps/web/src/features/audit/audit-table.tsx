@@ -3,10 +3,10 @@ import {
   ACTOR_TYPE_LABELS,
   AUDIT_ACTION_LABELS,
   AUDIT_COPY,
-  TARGET_TYPE_LABELS,
 } from '@/constants/audit';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
 import { AuditDiff } from './audit-diff';
+import { AuditTargetCell } from './audit-target-cell';
 
 type AuditTableProps = {
   events: readonly AuditEvent[];
@@ -55,12 +55,7 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
         <AuditActorCell event={event} />
       </td>
       <td className={CELL}>
-        <span className="block text-ink">
-          {TARGET_TYPE_LABELS[event.target.type]}
-        </span>
-        <span className="block break-all font-mono text-micro text-ink-subtle">
-          {event.target.id}
-        </span>
+        <AuditTargetCell target={event.target} />
       </td>
       <td className={`${CELL} max-w-[22rem] text-ink`}>
         {event.reason ?? (

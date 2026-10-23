@@ -12,17 +12,25 @@ import {
   Skeleton,
 } from '@/components/ui';
 import { LOBBY_COPY } from '@/constants/lobby';
+import { MATCH_CODE_COPY } from '@/constants/match-code';
 import { ROUTES } from '@/constants/navigation';
 import { REPLAY_COPY } from '@/constants/replay';
-import { useSessions } from '@/lib/api/hooks';
+import { useSessions, useTemplates } from '@/lib/api/hooks';
 import type { ReplaySessionView } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
+import { templateCode } from '@/lib/use-match-label';
 
 const copy = LOBBY_COPY.sessions;
 const NOT_STARTED = -1;
 
-function SessionRow({ session }: { session: ReplaySessionView }) {
+function SessionRow({
+  session,
+  code,
+}: {
+  session: ReplaySessionView;
+  code: string | undefined;
+}) {
   const { status } = session;
   const live = status.state === 'PLAYING';
   const minute =
@@ -34,7 +42,8 @@ function SessionRow({ session }: { session: ReplaySessionView }) {
       <div className="min-w-0 flex-1 basis-56">
         <p className="truncate text-sm font-medium text-ink">{session.title}</p>
         <p className="tabular font-mono text-micro text-ink-subtle">
-          {copy.number(session.sessionNumber)} · {session.sessionId}
+          {MATCH_CODE_COPY.replay(session.sessionNumber)}
+          {code ? ` · ${code}` : ''}
         </p>
       </div>
       <Badge tone={live ? 'accent' : 'neutral'} dot={live}>
@@ -57,6 +66,7 @@ function SessionRow({ session }: { session: ReplaySessionView }) {
 
 function SessionsBody() {
   const sessions = useSessions();
+  const templates = useTemplates();
   if (sessions.isPending) {
     return (
       <div role="status" aria-label={copy.loading} className="p-4">
@@ -74,13 +84,22 @@ function SessionsBody() {
       />
     );
   }
+  const found = new Map((templates.data ?? []).map((t) => [t.templateId, t]));
+  const codeFor = (id: string) => {
+    const template = found.get(id);
+    return template ? templateCode(template) : undefined;
+  };
   if (sessions.data.length === 0) {
     return <EmptyState compact Icon={TimelineIcon} title={copy.empty} />;
   }
   return (
     <ul aria-label={copy.listLabel} className="divide-y divide-line">
       {sessions.data.map((session) => (
-        <SessionRow key={session.sessionId} session={session} />
+        <SessionRow
+          key={session.sessionId}
+          session={session}
+          code={codeFor(session.templateId)}
+        />
       ))}
     </ul>
   );

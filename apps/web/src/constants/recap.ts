@@ -17,7 +17,7 @@ export const RECAP_COPY = {
   export: 'Export JSON',
   exportHint:
     'Download match statistics, key moments and source references as JSON',
-  exportFile: (fixtureId: string) => `matchiq-recap-${fixtureId}.json`,
+  exportFile: (name: string) => `matchiq-recap-${name}.json`,
   notReady: {
     title: 'Recap available at full time',
     description:

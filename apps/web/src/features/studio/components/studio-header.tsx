@@ -5,7 +5,9 @@ import type { ReactNode } from 'react';
 import { ChevronLeftIcon, LogoMark } from '@/components/icons';
 import { UserMenu } from '@/components/auth/user-menu';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { MatchCodeChip } from '@/components/match/match-code-chip';
 import { Badge } from '@/components/ui';
+import { MATCH_CODE_COPY } from '@/constants/match-code';
 import {
   ROUTES,
   STUDIO_TABS,
@@ -20,6 +22,8 @@ type StudioHeaderProps = {
   view: StudioView;
   title: string | null;
   competition: string | null;
+  matchCode?: string | null;
+  replay?: number | null;
   /** Live connection indicator; only the live view has a stream. */
   status?: ReactNode;
 };
@@ -64,6 +68,8 @@ export function StudioHeader({
   view,
   title,
   competition,
+  matchCode = null,
+  replay = null,
   status,
 }: StudioHeaderProps) {
   return (
@@ -92,9 +98,13 @@ export function StudioHeader({
           {competition ? (
             <p className="hidden truncate text-micro text-ink-subtle sm:block">
               {competition}
+              {replay ? ` · ${MATCH_CODE_COPY.replay(replay)}` : ''}
             </p>
           ) : null}
         </div>
+        {matchCode ? (
+          <MatchCodeChip code={matchCode} compact className="hidden lg:flex" />
+        ) : null}
         <Badge tone="synthetic" dot data-watermark="">
           {WATERMARK}
         </Badge>

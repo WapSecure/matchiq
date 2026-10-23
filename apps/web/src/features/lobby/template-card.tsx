@@ -1,14 +1,13 @@
 import { RequirePermission } from '@/components/auth/require-permission';
 import { TeamMonogram } from '@/components/match/team-monogram';
-import { Badge } from '@/components/ui';
-import {
-  FEATURED_LABEL,
-  HASH_PREVIEW_CHARS,
-  LOBBY_COPY,
-} from '@/constants/lobby';
+import { MatchCodeChip } from '@/components/match/match-code-chip';
+import { Badge, Disclosure } from '@/components/ui';
+import { FEATURED_LABEL, LOBBY_COPY } from '@/constants/lobby';
+import { MATCH_CODE_COPY } from '@/constants/match-code';
 import { SIDE_LABELS } from '@/constants/match';
 import { WATERMARK } from '@/constants/studio';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
+import { templateCode } from '@/lib/use-match-label';
 import { scenarioLabel } from './scenario';
 import { SessionStart } from './session-start';
 
@@ -27,22 +26,31 @@ function TeamLine({ team, side }: { team: Team; side: 'home' | 'away' }) {
 }
 
 function Facts({ template }: { template: FixtureTemplateSummary }) {
+  const technical = MATCH_CODE_COPY.technical;
   const rows: [string, string][] = [
-    [LOBBY_COPY.seedLabel, String(template.seed)],
-    [LOBBY_COPY.events, template.eventCount.toLocaleString('en-GB')],
-    [LOBBY_COPY.hash, `${template.eventsHash.slice(0, HASH_PREVIEW_CHARS)}…`],
+    [technical.seed, String(template.seed)],
+    [technical.hash, template.eventsHash],
   ];
   return (
-    <dl className="mt-1 grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-xs">
-      {rows.map(([label, value]) => (
-        <div key={label} className="min-w-0 bg-surface-raised px-2.5 py-2">
-          <dt className="text-micro text-ink-subtle">{label}</dt>
-          <dd className="tabular mt-0.5 truncate font-mono text-ink">
-            {value}
-          </dd>
-        </div>
-      ))}
-    </dl>
+    <div className="mt-1 flex flex-col gap-2">
+      <MatchCodeChip code={templateCode(template)} />
+      <p className="text-xs text-ink-muted">
+        {LOBBY_COPY.events}:{' '}
+        <span className="tabular text-ink">
+          {template.eventCount.toLocaleString('en-GB')}
+        </span>
+      </p>
+      <Disclosure title={technical.title}>
+        <dl className="grid gap-1 text-xs">
+          {rows.map(([label, value]) => (
+            <div key={label} className="min-w-0">
+              <dt className="text-micro text-ink-subtle">{label}</dt>
+              <dd className="tabular break-all font-mono text-ink">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Disclosure>
+    </div>
   );
 }
 
