@@ -11,7 +11,7 @@ import { envelope } from './support/mock-stream';
 
 /** The feed, not the throttled live-region echo of the same headline. */
 const insightFeed = (page: Page) =>
-  page.getByRole('group', { name: 'AI insight feed' });
+  page.getByRole('group', { name: 'Match insights' });
 
 const openStudio = async (page: Page) => {
   const api = await mockApi(page);
