@@ -1075,6 +1075,18 @@ A moment found only by a re-scan (for example after a late event) is published, 
 - Tests: an API integration spec (policy, review flow, idempotency, permission denial, tenant isolation), a worker unit spec for the MANUAL hold, approve, reject and expiry, a web component spec, and the access matrix.
 - Limits: an approval cannot extend a cue past its scheduled slot or reorder the scheduler queue. Priority applies to the aired cue only. Recorded in ADR-0023.
 
+## MQ-076: Accessible account popover (23 October 2026)
+
+Stream E, isolated branch `fix/MQ-076-account-popover` from origin/dev. Inspected open PRs #73 (agent handoff trace) and #74 (player preferences); avoided their owned files. Replaced the account panel's custom document listeners with the shared React Aria popover and action button. The panel now has an accessible dialog name, library-managed keyboard dismissal/focus restoration and viewport bounds. Account details wrap long names. Missing or blank organisation display names use plain language instead of an internal identifier. Sign-out remains a same-origin POST. No dependencies, contracts, authentication rules or code comments were added.
+
+Acceptance: keyboard opening, Escape focus return, outside dismissal, no raw organisation ID fallback and session-expiry removal. Added six focused regression cases covering these behaviours and the sign-out form. Local web lint, application/spec type checks, touched-file formatting and whitespace checks passed. Initial type checks used stale dependency declarations; regenerated declarations and corrected worktree-local dependency links, without changing tracked contracts or loosening types. Full tests, builds and browser/accessibility checks remain for CI.
+
+Known limits: narrow-screen wrapping is implemented but new long-name browser screenshots are not claimed. Production identity integration, interface localization and native-language editorial qualification remain separate gates. Next three tickets: independent interface locale catalogs; long-content browser qualification; production identity and pilot acceptance evidence.
+
+### MQ-076: Focus restoration regression timing
+
+The first CI run passed 455 frontend tests and failed the new Escape focus assertion because React Aria restores focus asynchronously after the panel unmounts. The regression now waits for the same focus-return assertion rather than checking synchronously. All six account cases passed in a diagnostic single-spec run. Its temporary untracked config pointed workspace package aliases to their source because this worktree has declaration-only dependency outputs; no runtime build, skipped assertion or altered production configuration was used. Removed the temporary config after diagnosis. Updated CI must pass before merge; the initial browser aggregate failed because verification prevented browser jobs from starting.
+
 ## MQ-064: Per-agent handoff records and traces (23 October 2026)
 
 Branch `feat/MQ-064-agent-handoff-trace`. Spec §28, §29, §46; ADR-0011 addendum 4.

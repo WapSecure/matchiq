@@ -139,6 +139,7 @@ export const AUTH_COPY = {
   userMenu: 'Account',
   signedInAs: 'Signed in as',
   organisation: 'Organisation',
+  organisationUnavailable: 'Organisation name unavailable',
   role: 'Role',
   publicDemo: 'Public demo',
   errors: {

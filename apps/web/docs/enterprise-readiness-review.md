@@ -64,8 +64,10 @@ Use concrete actions and short sentences. Distinguish live data, replay, static 
 ## Next three tickets
 
 1. MQ-049 (E, A): localize the operator interface with a preference independent of commentary, as selected by the product owner. Preserve correct server-rendered language and complete translated catalogs.
-2. MQ-050 (A, C, E): preserve translation fallback provenance in recap contracts and construction so English fallback is never mislabeled as translated commentary.
+2. Qualify long-content accessibility across supported screens, including account details, translated labels, keyboard focus and mobile layouts.
 3. MQ-051 (product, D): complete native editorial review of French, Spanish and Pidgin before claiming language quality. Licensed-data and operational pilot qualification remain P0/P1 gates in the backlog above.
+
+Recap fallback provenance shipped in PR #59; self-contained report labels and source disclosures shipped in PR #70. These close the earlier recap implementation gap, not translation editorial qualification.
 
 Details and acceptance evidence are in [language-readiness.md](language-readiness.md). MQ-044 mobile presentation and MQ-045 mobile regression coverage are merged locally. MQ-046 fixes commentary language boundaries and live announcement language/timing; it does not translate the interface.
 
