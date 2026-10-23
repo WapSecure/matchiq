@@ -16,8 +16,21 @@ import { OVERLAY_MOTION, OVERLAY_SURFACE } from './control-styles';
 
 const POPOVER_OFFSET = 6;
 
+const MAX_HEIGHT = {
+  list: 'max-h-[min(24rem,var(--visual-viewport-height))]',
+  panel: 'max-h-[calc(var(--visual-viewport-height)-1rem)]',
+} as const;
+
 /** Floating surface shared by Select, Combobox, Menu and date pickers. */
-export function Popover({ className, offset, ...props }: AriaPopoverProps) {
+export function Popover({
+  className,
+  offset,
+  fit = 'list',
+  ...props
+}: AriaPopoverProps & {
+  /** `panel` lets tall content such as a calendar use the whole viewport. */
+  fit?: keyof typeof MAX_HEIGHT;
+}) {
   return (
     <AriaPopover
       offset={offset ?? POPOVER_OFFSET}
@@ -26,7 +39,8 @@ export function Popover({ className, offset, ...props }: AriaPopoverProps) {
         cn(
           OVERLAY_SURFACE,
           OVERLAY_MOTION,
-          'max-h-[min(24rem,var(--visual-viewport-height))] overflow-auto',
+          MAX_HEIGHT[fit],
+          'overflow-auto',
           c,
         ),
       )}
