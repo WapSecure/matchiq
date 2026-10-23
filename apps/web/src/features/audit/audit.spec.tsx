@@ -139,7 +139,8 @@ describe('AuditView', () => {
     });
     renderView();
     await screen.findByRole('table', { name: /Activity/ });
-    await userEvent.selectOptions(screen.getByLabelText('Who'), 'SYSTEM');
+    await userEvent.click(screen.getByRole('button', { name: /Who$/ }));
+    await userEvent.click(screen.getByRole('option', { name: 'Automatic' }));
     await userEvent.click(
       screen.getByRole('button', { name: 'Apply filters' }),
     );
@@ -148,6 +149,31 @@ describe('AuditView', () => {
       expect(new URL(String(last)).searchParams.get('actorType')).toBe(
         'SYSTEM',
       );
+    });
+  });
+
+  it('sends a date preset as a UTC window', async () => {
+    const api = stubApi({
+      'GET /audit-events': { body: { items: [event(1)], nextCursor: null } },
+    });
+    renderView();
+    await screen.findByRole('table', { name: /Activity/ });
+    await userEvent.click(
+      screen.getByRole('button', { name: /When.*Any time/ }),
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Last 15 minutes' }),
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Apply filters' }),
+    );
+    await waitFor(() => {
+      const last = callsTo(api, '/audit-events').at(-1)?.[0];
+      const params = new URL(String(last)).searchParams;
+      const from = Date.parse(params.get('from') ?? '');
+      const to = Date.parse(params.get('to') ?? '');
+      expect(params.get('to')).toMatch(/Z$/);
+      expect(to - from).toBe(15 * 60 * 1000);
     });
   });
 });

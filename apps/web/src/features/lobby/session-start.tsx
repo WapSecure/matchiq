@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  REPLAY_SPEEDS,
-  ReplaySpeed,
-  type FaultScenario,
-} from '@matchiq/contracts';
+import type { FaultScenario, ReplaySpeed } from '@matchiq/contracts';
 import { useId, useState } from 'react';
 import { InlineProblem } from '@/components/feedback/inline-problem';
 import { PlayIcon } from '@/components/icons';
@@ -12,18 +8,17 @@ import { Button } from '@/components/ui';
 import { HTTP_STATUS } from '@/constants/api';
 import { demoFaultPlan } from '@/constants/demo-faults';
 import { LOBBY_COPY } from '@/constants/lobby';
-import { REPLAY_COPY } from '@/constants/replay';
 import { useStudioUi } from '@/features/studio/store';
 import { isApiError } from '@/lib/api/api-error';
 import { PUBLIC_ENV } from '@/lib/env';
 import { DemoScenarioSelect } from './demo-scenario-select';
+import { SpeedSelect } from './speed-select';
 import { useStartSession } from './use-start-session';
 
 type SessionStartProps = { templateId: string; title: string };
 
 /** Speed picker and Start: creates a session and opens its studio. */
 export function SessionStart({ templateId, title }: SessionStartProps) {
-  const speedId = useId();
   const errorId = useId();
   const [speed, setSpeed] = useState<ReplaySpeed>(
     () => useStudioUi.getState().speed,
@@ -32,24 +27,7 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
   const session = useStartSession();
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <label htmlFor={speedId} className="sr-only">
-        {LOBBY_COPY.speedFor(title)}
-      </label>
-      <select
-        id={speedId}
-        value={speed}
-        onChange={(e) => {
-          const parsed = ReplaySpeed.safeParse(Number(e.target.value));
-          if (parsed.success) setSpeed(parsed.data);
-        }}
-        className="tabular h-8 rounded-md border border-control bg-surface px-2 text-sm text-ink shadow-panel hover:border-ink-subtle"
-      >
-        {REPLAY_SPEEDS.map((s) => (
-          <option key={s} value={s}>
-            {REPLAY_COPY.speedOption(s)}
-          </option>
-        ))}
-      </select>
+      <SpeedSelect title={title} value={speed} onChange={setSpeed} />
       <Button
         variant="primary"
         onClick={() =>

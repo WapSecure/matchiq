@@ -87,11 +87,12 @@ export function FileUpload({
         getDropOperation={(types) => dropOperation(types, rules.accept)}
         onDrop={async (event) => take(await filesFrom(event.items))}
         className={cn(
-          'group flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-surface-sunken px-4 py-6 text-center outline-none transition-colors duration-150',
+          'group relative flex flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border-[1.5px] border-dashed bg-surface-raised px-4 py-7 text-center outline-none transition-[border-color,background-color,box-shadow] duration-200',
+          'bg-[radial-gradient(120%_80%_at_50%_0%,var(--mq-accent-soft),transparent_60%)]',
           invalid ? 'border-critical' : 'border-line-strong',
-          'data-hovered:border-control data-drop-target:border-solid data-drop-target:border-accent data-drop-target:bg-accent-soft',
+          'data-hovered:border-control data-drop-target:border-solid data-drop-target:border-accent data-drop-target:bg-accent-soft data-drop-target:ring-4 data-drop-target:ring-accent/12',
           'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent',
-          'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-surface-raised',
+          'data-disabled:cursor-not-allowed data-disabled:border-line data-disabled:bg-none',
         )}
       >
         {({ isDropTarget }) => (

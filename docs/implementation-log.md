@@ -13,6 +13,21 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 - Download is one "Download match report" menu with two choices: a readable match report (.txt) and a data file (.json). Both are named with the match code from MQ-051.
 - Evidence: `fact-checks.spec.tsx` (grouping, share, filters, report) and updated `recap-observatory.spec.tsx`. The e2e specs `judge-flow` (download menu) and `demo-faults` (grouped note) are updated, and the minute-strip markers are 24 px targets on wider screens and a picture only on phones (axe target-size). Screenshots before and after, in light and dark at 1440 and 390 px, are in `docs/screenshots/factchecks-recap/`.
 
+## 2026-10-23 — MQ-040 (2/2): Native controls replaced across the app
+
+| Area                                                                                                                                                                                                                                                                            | Status | Evidence                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------ |
+| Lobby replay speed and demo scenario: Select with descriptive option cards ("Highlights (30×): about 3 minutes…")                                                                                                                                                               | Done   | `lobby.spec.tsx`, `fault-chain.spec.tsx`, Playwright `lobby.spec.ts`           |
+| Audit filters: scope, actor and target Select; action Combobox grouped by editorial and platform; target id TextField; from/to replaced by a DateRangePicker with "Last 15 minutes", "Last hour", "Today" and "This match" (the session's lifetime), local zone shown, UTC sent | Done   | `audit.spec.tsx`, Playwright `editorial.spec.ts`                               |
+| Every `title=` tooltip replaced: gated buttons, restart, export recap, programme note (InfoTip), on-air source and hold, provisional, provider badges (HintBadge), audit actor id, theme toggle (ToggleButtonGroup with tooltips)                                               | Done   | `controls.spec.tsx`, `theme.spec.tsx`, `recap-observatory.spec.tsx`            |
+| Every `<details>` replaced by Disclosure: audit diff, recap evidence, pitch-map and momentum tables                                                                                                                                                                             | Done   | `pitch-map.spec.tsx`, `match-components.spec.tsx`, Playwright `studio.spec.ts` |
+| Seek bar keeps its native range semantics with a custom track and thumb (`range-input`), 44 px on touch                                                                                                                                                                         | Done   | Playwright `studio.spec.ts`                                                    |
+| `form-fields.tsx` (native select) removed                                                                                                                                                                                                                                       | Done   | `nx lint web`, `nx typecheck web`                                              |
+
+Verification: CI (owner directive). Locally: Prettier, `nx lint web web-e2e`, `nx typecheck web` and the touched spec files only.
+
+Limitations: the pitch-filter chips, the confirmation phrase input and the reason textarea were already custom-styled native inputs and are unchanged. `alert`, `confirm` and `prompt` were not used anywhere.
+
 ## 2026-10-23 — MQ-053 (1/2): Keyset pagination for the lobby and fixture lists
 
 | Area                                                                                                                                                                                                                                                                  | Status | Evidence                                            |
@@ -26,6 +41,16 @@ Newest entries first. Each entry records what was delivered, the evidence, and w
 No Python contracts changed (the lobby schemas are not exported to the agents service), so `agents:codegen` is not affected.
 
 Verification: CI (owner directive). Locally: format, lint and typecheck for `contracts`, `db`, `api`, `api-client` and `worker`, plus the touched API integration specs.
+
+## 2026-10-23 — MQ-050 (2/2): One visual system for the remaining controls
+
+- **Shared tokens (`control-styles.ts`, `button-styles.ts`, `global.css`):** one focus ring (2 px accent, 2 px offset), a typing halo (accent border plus soft ring), an invalid ring, a disabled look that dims colour instead of fading the whole control, and overlays that scale and fade from their trigger in 120 ms (`--trigger-anchor-point`), clamped by reduced motion.
+- **Select:** an icon well for the chosen option, its label, then its description in a quieter tone; an open state with the halo. **Combobox:** a search field with an icon that turns accent on focus, a styled empty state ("No matches") and a loading state. **Lists and menus:** hover and keyboard highlight are neutral, the keyboard adds an inset accent ring, and the selected row is tinted with a check mark. Groups have dividers. Menu shortcuts are key caps, and danger items are tinted.
+- **Text fields:** empty fields read as wells, and focused or filled fields lift to the surface colour. **Buttons:** an inner highlight on primary, pressed states, and 44 px targets on touch for `sm` and `md`. **Switch:** a larger track, a white thumb, and a squeeze on press. **Checkbox:** a hover halo and an animated check. **Radio cards:** a hover lift and a filled dot. **Segmented control:** an inset track, with a raised and bold selected segment.
+- **Toasts:** a tone rail and a tinted icon well, so the text stays ink. **File upload:** a premium drop zone (gradient wash, icon tile that lifts on hover and rises on drag-over, solid accent border and ring while a file is over it). Rows have status wells, a thicker progress bar and a check on completion.
+- Gallery: added empty and described text fields and a textarea placeholder. Screenshots, from one production build (`:4378`), are in `docs/screenshots/design-system/redesign/`.
+
+Verification: CI (owner directive). Locally: format, `nx lint web`, `nx typecheck web` and the `components/ui` specs.
 
 ## 2026-10-23 — MQ-050 (1/2): Date pickers and calendars redesigned
 

@@ -47,8 +47,11 @@ test.describe('live studio', () => {
   }) => {
     await openStudio(page);
     const metrics = page.getByRole('region', { name: 'Match stats' });
-    await metrics.getByText('View as table').click();
-    const firstRow = metrics.locator('details table tbody tr').first();
+    await metrics.getByRole('button', { name: 'View as table' }).click();
+    const firstRow = metrics
+      .getByRole('group', { name: 'View as table' })
+      .locator('tbody tr')
+      .first();
     await expect(firstRow).toContainText('Not available');
   });
 

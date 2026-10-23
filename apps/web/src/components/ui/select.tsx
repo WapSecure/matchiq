@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import {
   Select as AriaSelect,
   Button,
@@ -20,13 +19,9 @@ import {
   FOCUS_RING,
 } from './control-styles';
 import { FIELD_ROOT, FieldFrame, type FieldProps } from './field';
-import {
-  ChoiceItems,
-  type ChoiceOption,
-  type ChoiceSource,
-  flattenChoices,
-} from './option-item';
+import { ChoiceItems, type ChoiceSource, flattenChoices } from './option-item';
 import { Popover } from './popover';
+import { SelectedValue } from './select-value';
 
 export type SelectProps<K extends string> = FieldProps &
   ChoiceSource<K> & {
@@ -36,26 +31,7 @@ export type SelectProps<K extends string> = FieldProps &
     isLoading?: boolean;
     /** Wider popover for descriptive option cards. */
     popoverWidth?: 'trigger' | 'wide';
-    'aria-label'?: string;
   };
-
-function SelectedValue<K extends string>({
-  option,
-  placeholder,
-}: {
-  option: ChoiceOption<K> | undefined;
-  placeholder: string;
-}): ReactNode {
-  if (!option) return <span className="text-ink-subtle">{placeholder}</span>;
-  return (
-    <span className="flex min-w-0 items-center gap-2">
-      {option.icon ? (
-        <span className="flex shrink-0 text-ink-muted">{option.icon}</span>
-      ) : null}
-      <span className="truncate">{option.label}</span>
-    </span>
-  );
-}
 
 /** Single choice from a list; options can carry descriptions, icons and disabled reasons. */
 export function Select<K extends string>(props: SelectProps<K>) {
@@ -87,7 +63,6 @@ export function Select<K extends string>(props: SelectProps<K>) {
       }}
       isDisabled={isDisabled || isLoading}
       isInvalid={Boolean(errorMessage)}
-      aria-label={hideLabel ? label : props['aria-label']}
       aria-busy={isLoading || undefined}
       placeholder={placeholder}
       className={cn(FIELD_ROOT, className)}
@@ -107,7 +82,7 @@ export function Select<K extends string>(props: SelectProps<K>) {
             CONTROL_INTERACTIVE,
             CONTROL_INVALID,
             FOCUS_RING,
-            'data-pressed:border-accent group-data-open:border-accent',
+            'group-data-open:border-accent group-data-open:ring-3 group-data-open:ring-accent/15',
           )}
         >
           <SelectValue className="flex min-w-0 flex-1">
@@ -127,7 +102,7 @@ export function Select<K extends string>(props: SelectProps<K>) {
       </FieldFrame>
       <Popover
         className={cn(
-          'min-w-(--trigger-width) p-1',
+          'min-w-(--trigger-width) p-1.5',
           popoverWidth === 'wide' && 'w-[min(26rem,calc(100vw-2rem))]',
         )}
       >

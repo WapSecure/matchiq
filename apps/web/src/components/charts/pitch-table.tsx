@@ -1,3 +1,4 @@
+import { Disclosure } from '@/components/ui/disclosure';
 import { PITCH_COPY } from '@/constants/pitch';
 import { EVENT_DETAIL } from '@/constants/events';
 import type { PitchMark } from './pitch-events';
@@ -13,11 +14,8 @@ const eventLabel = (m: PitchMark): string =>
 /** Text alternative for the pitch map (WCAG 1.1.1), filtered like the plot. */
 export function PitchTable({ marks }: { marks: readonly PitchMark[] }) {
   return (
-    <details className="group text-xs">
-      <summary className="w-fit cursor-pointer select-none rounded-sm text-ink-muted hover:text-ink">
-        {PITCH_COPY.tableToggle}
-      </summary>
-      <div className="mt-2 max-h-56 overflow-auto rounded-md border border-line">
+    <Disclosure title={PITCH_COPY.tableToggle} panelClassName="pt-2 text-xs">
+      <div className="max-h-56 overflow-auto rounded-md border border-line">
         <table className="w-full text-left">
           <caption className="sr-only">{PITCH_COPY.title}</caption>
           <thead className="sticky top-0 bg-surface-raised text-ink-muted">
@@ -47,6 +45,6 @@ export function PitchTable({ marks }: { marks: readonly PitchMark[] }) {
       <p className="mt-1.5 text-micro text-ink-subtle">
         {PITCH_COPY.positionNote}
       </p>
-    </details>
+    </Disclosure>
   );
 }

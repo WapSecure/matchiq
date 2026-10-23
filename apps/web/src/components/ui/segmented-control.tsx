@@ -57,7 +57,7 @@ export function SegmentedControl<T extends string | number>({
       <Label className={cn('eyebrow mb-1.5 block', hideLegend && 'sr-only')}>
         {legend}
       </Label>
-      <div className="inline-flex max-w-full rounded-md border border-line bg-surface-sunken p-0.5 group-data-disabled:opacity-50">
+      <div className="inline-flex max-w-full gap-0.5 rounded-lg border border-line bg-surface-raised p-0.5 shadow-[inset_0_1px_2px_0_var(--mq-shade)] group-data-disabled:opacity-50">
         {options.map((option) => (
           <Radio
             key={String(option.value)}
@@ -68,11 +68,11 @@ export function SegmentedControl<T extends string | number>({
               option.short ? `${option.label} (${option.short})` : undefined
             }
             className={cn(
-              'press relative flex cursor-pointer items-center gap-1.5 rounded-sm font-medium outline-none pointer-coarse:min-h-11',
+              'press relative flex cursor-pointer items-center gap-1.5 rounded-md font-medium outline-none transition-[background-color,color,box-shadow] duration-150 pointer-coarse:min-h-11',
               SEGMENT_SIZE[size],
-              'text-ink-muted data-hovered:text-ink',
-              'data-selected:bg-selected data-selected:text-ink data-selected:shadow-panel data-selected:ring-1 data-selected:ring-line-strong',
-              'data-focus-visible:outline-2 data-focus-visible:outline-offset-1 data-focus-visible:outline-accent',
+              'text-ink-muted data-hovered:bg-ink/5 data-hovered:text-ink',
+              'data-selected:bg-selected data-selected:font-semibold data-selected:text-ink data-selected:shadow-[0_1px_2px_0_var(--mq-shade),0_0_0_1px_var(--mq-line-strong)] data-selected:data-hovered:bg-selected',
+              'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent',
               'data-disabled:cursor-not-allowed data-disabled:opacity-50',
             )}
           >

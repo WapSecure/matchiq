@@ -130,6 +130,37 @@ test.describe('editorial controls', () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test('filters the audit trail with custom pickers', async ({ page }) => {
+    await mockApi(page);
+    await signIn(page, 'harbour.producer', `${STUDIO}/audit`);
+    await expect(page.getByRole('table', { name: /Activity/ })).toBeVisible();
+    const filters = page.getByRole('form', { name: 'Filter the activity log' });
+    await filters.getByRole('button', { name: /Who$/ }).click();
+    await page.getByRole('option', { name: 'Automatic' }).click();
+    const action = filters.getByRole('combobox', { name: 'Action' });
+    await action.fill('emergency');
+    const option = page.getByRole('option', { name: 'Emergency stop on' });
+    await expect(option).toBeVisible();
+    // A virtual press, as assistive tech sends: phones keep re-laying out the list.
+    await option.dispatchEvent('click');
+    await expect(action).toHaveValue('Emergency stop on');
+    await filters.getByRole('button', { name: /When/ }).click();
+    await page.getByRole('button', { name: 'Last hour' }).click();
+    await expect(
+      filters.getByRole('button', { name: /When.*Last hour/ }),
+    ).toBeVisible();
+    const request = page.waitForRequest(
+      (r) =>
+        r.url().includes('/audit-events') &&
+        r.url().includes('actorType=SYSTEM'),
+    );
+    await filters.getByRole('button', { name: 'Apply filters' }).click();
+    const url = new URL((await request).url());
+    expect(url.searchParams.get('action')).toBe('kill-switch.activated');
+    expect(url.searchParams.get('from')).toMatch(/Z$/);
+    await expectNoBlockingA11yViolations(page);
+  });
+
   test('explains locked controls on the signed-out public demo', async ({
     page,
   }) => {
