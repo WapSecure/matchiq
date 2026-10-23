@@ -44,11 +44,42 @@ const matchWindow = (timeZone: string): InstantRange => {
   };
 };
 
+function RangeSpecimens() {
+  const timeZone = useTimeZone();
+  const [range, setRange] = useState<InstantRange | null>(null);
+  return (
+    <>
+      <Specimen state={`${C.states.empty} · ${C.states.filled}`} wide>
+        <DateRangePicker
+          label={C.rangeLabel}
+          value={range}
+          onChange={setRange}
+          presets={['last15m', 'lastHour', 'today', 'last7d', 'thisMatch']}
+          matchWindow={matchWindow(timeZone)}
+          markedDates={MATCH_DAYS}
+        />
+        <DateRangePicker
+          label={C.rangeFilledLabel}
+          value={SAMPLE_RANGE}
+          onChange={() => undefined}
+          presets={['lastHour', 'today']}
+        />
+      </Specimen>
+      <Specimen state={C.states.range}>
+        <RangeCalendar
+          aria-label={C.rangeLabel}
+          defaultValue={{ start: RANGE_START, end: RANGE_END }}
+          markedDates={MATCH_DAYS}
+        />
+      </Specimen>
+    </>
+  );
+}
+
 export function DatesSection() {
   const timeZone = useTimeZone();
   const [date, setDate] = useState<DateValue | null>(parseDate(SAMPLE_DATE));
   const [time, setTime] = useState<DateValue | null>(null);
-  const [range, setRange] = useState<InstantRange | null>(null);
   const kickOff = time ?? toZoned(parseDateTime(SAMPLE_KICK_OFF), timeZone);
   return (
     <GallerySection title={C.sections.dates}>
@@ -95,29 +126,7 @@ export function DatesSection() {
           unavailableReason={C.unavailableReason}
         />
       </Specimen>
-      <Specimen state={`${C.states.empty} · ${C.states.filled}`} wide>
-        <DateRangePicker
-          label={C.rangeLabel}
-          value={range}
-          onChange={setRange}
-          presets={['last15m', 'lastHour', 'today', 'last7d', 'thisMatch']}
-          matchWindow={matchWindow(timeZone)}
-          markedDates={MATCH_DAYS}
-        />
-        <DateRangePicker
-          label={C.rangeFilledLabel}
-          value={SAMPLE_RANGE}
-          onChange={() => undefined}
-          presets={['lastHour', 'today']}
-        />
-      </Specimen>
-      <Specimen state={C.states.range}>
-        <RangeCalendar
-          aria-label={C.rangeLabel}
-          defaultValue={{ start: RANGE_START, end: RANGE_END }}
-          markedDates={MATCH_DAYS}
-        />
-      </Specimen>
+      <RangeSpecimens />
       <Specimen state={C.states.default}>
         {LOCALES.map((locale) => (
           <DatePicker
