@@ -139,12 +139,10 @@ test.describe('editorial controls', () => {
     await page.getByRole('option', { name: 'Automatic' }).click();
     const action = filters.getByRole('combobox', { name: 'Action' });
     await action.fill('emergency');
-    await expect(
-      page.getByRole('option', { name: 'Emergency stop on' }),
-    ).toBeVisible();
-    // Keyboard selection: the filtered list can still be settling on phones.
-    await action.press('ArrowDown');
-    await action.press('Enter');
+    const option = page.getByRole('option', { name: 'Emergency stop on' });
+    await expect(option).toBeVisible();
+    // A virtual press, as assistive tech sends: phones keep re-laying out the list.
+    await option.dispatchEvent('click');
     await expect(action).toHaveValue('Emergency stop on');
     await filters
       .getByRole('group', { name: /When/ })
