@@ -3,16 +3,18 @@ import {
   ReplaySpeed,
   ReplayState,
   SCHEMA_VERSION,
+  type CursorPage,
+  type CursorPageQuery,
   type ReplayStatus,
 } from '@matchiq/contracts';
 import type { ActiveSessionQuery } from '../operations-types.js';
-import { and, desc, eq, max } from 'drizzle-orm';
+import { and, count, desc, eq, max, sql } from 'drizzle-orm';
 import type { Database, Transaction } from '../client.js';
 import {
   AUDIT_ACTIONS,
   AUDIT_ACTORS,
   AUDIT_TARGET_TYPES,
-  DB_LIMITS,
+  PAGE_CURSOR,
   SESSION_ID_SEPARATOR,
 } from '../constants.js';
 import { sha256Hex } from '../hash.js';
@@ -34,6 +36,7 @@ import {
   listSessionsInState,
   reserveSlot,
 } from './session-activity.js';
+import { cursorAfter, decodeCursor } from './keyset-cursor.js';
 import { enterTenant, withTenant } from './tenant-scope.js';
 
 const s = replaySessions;
@@ -162,14 +165,37 @@ export class PostgresSessionStore implements SessionStore {
     return listSessionsInState(this.db, { state, limit });
   }
 
-  async list(orgId: string, limit: number): Promise<ReplaySessionView[]> {
-    const rows = await withTenant(this.db, orgId, (tx) =>
-      sessionSelect(tx)
-        .where(eq(s.orgId, orgId))
+  /** Newest first; the `(created_at, fixture_id)` keyset keeps pages stable under inserts. */
+  async page(
+    orgId: string,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<ReplaySessionView>> {
+    const kind = PAGE_CURSOR.kinds.sessions;
+    const after =
+      query.cursor === undefined
+        ? undefined
+        : decodeCursor(query.cursor, kind, ['timestamp', 'fixtureId']);
+    const { rows, total } = await withTenant(this.db, orgId, async (tx) => ({
+      rows: await sessionSelect(tx)
+        .where(
+          and(
+            eq(s.orgId, orgId),
+            after === undefined
+              ? undefined
+              : sql`(${s.createdAt}, ${s.fixtureId}) < (${new Date(after[0] ?? '')}, ${after[1]})`,
+          ),
+        )
         .orderBy(desc(s.createdAt), desc(s.fixtureId))
-        .limit(Math.min(limit, DB_LIMITS.sessionListMax)),
+        .limit(query.limit + 1),
+      total: await tx.select({ n: count() }).from(s).where(eq(s.orgId, orgId)),
+    }));
+    const { page, nextCursor } = cursorAfter(
+      rows,
+      query.limit,
+      (row) => [row.createdAt.toISOString(), row.fixtureId],
+      kind,
     );
-    return rows.map(toView);
+    return { items: page.map(toView), nextCursor, total: total[0]?.n ?? 0 };
   }
 
   private async insertRows(

@@ -2,7 +2,11 @@ import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import type { Principal } from '@matchiq/access';
 import { CurrentPrincipal, RequirePermission } from '@matchiq/auth';
-import { ReplayCommand, type ReplayStatus } from '@matchiq/contracts';
+import {
+  type CursorPage,
+  ReplayCommand,
+  type ReplayStatus,
+} from '@matchiq/contracts';
 import type {
   CreatedSession,
   FixtureTemplateSummary,
@@ -20,8 +24,12 @@ import { Caller, type CallerContext } from '../http/caller-context';
 import { respond } from '../http/respond';
 import { FixtureIdParam } from '../fixtures/fixtures.schemas';
 import { ReplayThrottled } from './replay-throttle';
-import { CreateSessionBody, SessionListQuery } from './replay.schemas';
-import { type ItemList, ReplayService } from './replay.service';
+import {
+  CreateSessionBody,
+  SessionListQuery,
+  TemplateListQuery,
+} from './replay.schemas';
+import { ReplayService } from './replay.service';
 
 const fixtureIdPipe = new ZodValidationPipe(FixtureIdParam);
 
@@ -97,9 +105,10 @@ export class LobbyController {
   @Get(ROUTES.fixtureTemplates)
   @RequirePermission('fixtures:read')
   templates(
+    @Query(new ZodValidationPipe(TemplateListQuery)) query: TemplateListQuery,
     @CurrentPrincipal() principal: Principal,
-  ): Promise<ItemList<FixtureTemplateSummary>> {
-    return this.replay.listTemplates(principal.orgId);
+  ): Promise<CursorPage<FixtureTemplateSummary>> {
+    return this.replay.listTemplates(principal.orgId, query);
   }
 
   @Get(ROUTES.replaySessions)
@@ -107,7 +116,7 @@ export class LobbyController {
   sessions(
     @Query(new ZodValidationPipe(SessionListQuery)) query: SessionListQuery,
     @CurrentPrincipal() principal: Principal,
-  ): Promise<ItemList<ReplaySessionView>> {
-    return this.replay.listSessions(principal.orgId, query.limit);
+  ): Promise<CursorPage<ReplaySessionView>> {
+    return this.replay.listSessions(principal.orgId, query);
   }
 }

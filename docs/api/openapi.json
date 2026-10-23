@@ -357,8 +357,8 @@
       },
       "get": {
         "operationId": "listFixtures",
-        "summary": "List fixtures, newest first (bounded by `limit`, no cursor)",
-        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "summary": "List fixtures in kickoff order",
+        "description": "Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Fixtures"
         ],
@@ -375,6 +375,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 50,
@@ -389,7 +398,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Fixtures",
+            "description": "One page of fixtures",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -399,6 +408,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FixtureList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -2653,7 +2690,7 @@
       "get": {
         "operationId": "listFixtureTemplates",
         "summary": "List replayable fixture templates (the lobby)",
-        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "By template id. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Replay"
         ],
@@ -2669,12 +2706,31 @@
         "x-matchiq-permission": "fixtures:read",
         "parameters": [
           {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
             "$ref": "#/components/parameters/RequestId"
           }
         ],
         "responses": {
           "200": {
-            "description": "Templates",
+            "description": "One page of templates, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -2684,6 +2740,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FixtureTemplateList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -2738,6 +2822,34 @@
                       "type": "urn:matchiq:problem:forbidden",
                       "title": "You do not have permission for this action",
                       "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
                     }
                   }
                 }
@@ -2849,7 +2961,7 @@
       "get": {
         "operationId": "listReplaySessions",
         "summary": "List recent replay sessions to join",
-        "description": "Access: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "Newest first. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`.\n\nAccess: requires the `fixtures:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Replay"
         ],
@@ -2866,6 +2978,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 20,
@@ -2880,7 +3001,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sessions, most recent first",
+            "description": "One page of sessions, newest first, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -2890,6 +3011,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReplaySessionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -12808,10 +12957,28 @@
             "items": {
               "$ref": "#/components/schemas/Fixture"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -12888,10 +13055,28 @@
             "items": {
               "$ref": "#/components/schemas/FixtureTemplateSummary"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -12903,10 +13088,28 @@
             "items": {
               "$ref": "#/components/schemas/ReplaySessionView"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },

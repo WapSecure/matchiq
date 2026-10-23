@@ -1,12 +1,14 @@
 import {
   FixtureStatus,
+  type CursorPage,
+  type CursorPageQuery,
   type Fixture,
   type MatchEvent,
   type StreamMessage,
 } from '@matchiq/contracts';
-import { and, asc, eq, gt, lte } from 'drizzle-orm';
+import { and, asc, eq, gt, lte, sql } from 'drizzle-orm';
 import type { Database } from '../client.js';
-import { DB_LIMITS } from '../constants.js';
+import { DB_LIMITS, PAGE_CURSOR } from '../constants.js';
 import type {
   EventReader,
   FixtureKey,
@@ -17,6 +19,7 @@ import type {
 import { withTenant } from './tenant-scope.js';
 import { fixtures, matchEvents, streamMessages } from '../schema/tables.js';
 import { fixtureMatch } from './ledger-transaction.js';
+import { cursorAfter, decodeCursor } from './keyset-cursor.js';
 
 /** The status column is authoritative; the stored payload keeps the original. */
 const withStatus = (row: { payload: Fixture; status: string }): Fixture => ({
@@ -47,6 +50,45 @@ export class PostgresFixtureReader implements FixtureReader {
         .limit(limit),
     );
     return rows.map(withStatus);
+  }
+
+  /** Kickoff order with a `(kickoff_utc, fixture_id)` keyset; no total, since sessions add fixtures. */
+  async page(
+    orgId: string,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<Fixture>> {
+    const kind = PAGE_CURSOR.kinds.fixtures;
+    const after =
+      query.cursor === undefined
+        ? undefined
+        : decodeCursor(query.cursor, kind, ['timestamp', 'fixtureId']);
+    const rows = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select({
+          payload: fixtures.payload,
+          status: fixtures.status,
+          kickoffUtc: fixtures.kickoffUtc,
+          fixtureId: fixtures.fixtureId,
+        })
+        .from(fixtures)
+        .where(
+          and(
+            eq(fixtures.orgId, orgId),
+            after === undefined
+              ? undefined
+              : sql`(${fixtures.kickoffUtc}, ${fixtures.fixtureId}) > (${new Date(after[0] ?? '')}, ${after[1]})`,
+          ),
+        )
+        .orderBy(asc(fixtures.kickoffUtc), asc(fixtures.fixtureId))
+        .limit(query.limit + 1),
+    );
+    const { page, nextCursor } = cursorAfter(
+      rows,
+      query.limit,
+      (row) => [row.kickoffUtc.toISOString(), row.fixtureId],
+      kind,
+    );
+    return { items: page.map(withStatus), nextCursor };
   }
 }
 

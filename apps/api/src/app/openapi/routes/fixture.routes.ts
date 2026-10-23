@@ -12,7 +12,7 @@ import {
   FixtureListQuery,
   StreamQuery,
 } from '../../fixtures/fixtures.schemas';
-import { STREAM_TEXT, TAGS } from '../openapi.constants';
+import { KEYSET_TEXT, STREAM_TEXT, TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
 
 export const FixturePath = z.strictObject({ fixtureId: FixtureId });
@@ -41,11 +41,16 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     method: 'get',
     path: '/fixtures',
     tag: TAGS.fixtures,
-    summary: 'List fixtures, newest first (bounded by `limit`, no cursor)',
+    summary: 'List fixtures in kickoff order',
+    description: KEYSET_TEXT,
     auth: 'fixtures:read',
     query: FixtureListQuery,
-    success: { status: 200, description: 'Fixtures', body: json(FixtureList) },
-    problems: ['validation'],
+    success: {
+      status: 200,
+      description: 'One page of fixtures',
+      body: json(FixtureList),
+    },
+    problems: ['validation', 'invalidCursor'],
   },
   {
     operationId: 'getFixture',

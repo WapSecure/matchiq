@@ -2,6 +2,8 @@ import type {
   AgentRun,
   AuditActorType,
   CreatedSession,
+  CursorPage,
+  CursorPageQuery,
   FaultPlan,
   Fixture,
   FixtureTemplateSummary,
@@ -158,6 +160,10 @@ export interface TemplateStore {
   upsert(orgId: string, input: TemplateInput): Promise<TemplateUpsertOutcome>;
   get(orgId: string, templateId: string): Promise<FixtureTemplate | null>;
   list(orgId: string): Promise<FixtureTemplateSummary[]>;
+  page(
+    orgId: string,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<FixtureTemplateSummary>>;
 }
 
 export interface CreateSessionCommand {
@@ -180,7 +186,10 @@ export interface SessionStore extends SessionActivity {
   /** Null when the template does not exist. */
   create(command: CreateSessionCommand): Promise<CreatedSession | null>;
   get(key: FixtureKey): Promise<ReplaySessionView | null>;
-  list(orgId: string, limit: number): Promise<ReplaySessionView[]>;
+  page(
+    orgId: string,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<ReplaySessionView>>;
 }
 
 export interface IntelligenceReader {

@@ -41,8 +41,18 @@ CI fails if a Nest route is missing from the registry or a registry entry has no
 ## Pagination
 
 - **Keyset by sequence.** `GET /fixtures/{id}/events?afterSequence=&limit=` returns `{ items, nextAfterSequence }`. Pass `nextAfterSequence` back until it is `null`. `limit` is 1–500 (default 100).
-- **Opaque cursor.** `GET /audit-events?cursor=&limit=` returns `{ items, nextCursor }`, newest first. Treat the cursor as opaque. A tampered one is `400 invalid-cursor`.
-- **Bounded lists.** `GET /fixtures` (`limit` up to 100), `/replay-sessions` (up to 100), `/fixture-templates` and the per-fixture reads return `{ items }` without a cursor.
+- **Opaque cursor.** Every growing list takes `?cursor=&limit=` and returns the shared `CursorPage` envelope `{ items, nextCursor, total? }`. Pass `nextCursor` back as `cursor` until it is `null`. Treat the cursor as opaque: it is a base64url keyset position tagged with its list, so a tampered cursor, or one taken from another list, is `400 invalid-cursor`. Every read is scoped to the caller's organisation, so a cursor never reaches another tenant's rows.
+
+  | Operation                | Order                              | `limit` default / max | `total` |
+  | ------------------------ | ---------------------------------- | --------------------- | ------- |
+  | `GET /audit-events`      | newest first, `(at, id)`           | 50 / 200              | no      |
+  | `GET /replay-sessions`   | newest first, `(createdAt, id)`    | 20 / 100              | yes     |
+  | `GET /fixture-templates` | `templateId`                       | 100 / 100             | yes     |
+  | `GET /fixtures`          | kickoff, `(kickoffUtc, fixtureId)` | 50 / 100              | no      |
+
+  There is no `prevCursor`. To go back, a client keeps the cursors it followed (the web's `CursorPagination` does). `total` appears only where counting is cheap; session fixtures grow without bound, so `/fixtures` and `/audit-events` omit it.
+
+- **Bounded lists.** The per-fixture reads (`/insights`, `/narratives`, `/overlays`, `/agent-runs`) return `{ items }` without a cursor.
 
 ## Idempotency
 
