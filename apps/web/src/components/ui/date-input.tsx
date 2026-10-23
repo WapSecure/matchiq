@@ -15,7 +15,7 @@ export function DateInput({
   return (
     <AriaDateInput
       {...props}
-      className={cn('flex min-w-0 items-center tabular', className)}
+      className={cn('flex items-center tabular', className)}
     >
       {(segment) => (
         <DateSegment

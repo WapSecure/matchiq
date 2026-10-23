@@ -59,7 +59,8 @@ export function DateRangePicker({
         onChange={(r) => onChange(r ? zonedToRange(r) : null)}
         placeholderValue={midnight(timeZone)}
         granularity={granularity}
-        hideTimeZone={false}
+        // The zone is stated in the help text, which keeps the field narrow on phones.
+        hideTimeZone
         isOpen={open}
         onOpenChange={setOpen}
         isDisabled={isDisabled}
