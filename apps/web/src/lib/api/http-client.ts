@@ -91,7 +91,7 @@ export const requestJson = async <S extends z.ZodType>(
 ): Promise<z.infer<S>> => {
   const response = await send(path, options);
   const body = await readBody(response);
-  if (!response.ok) throw httpError(response.status, body);
+  if (!response.ok) throw httpError(response.status, body, response.headers);
   const parsed = schema.safeParse(body);
   if (!parsed.success) throw invalidResponseError(describeIssues(parsed.error));
   return parsed.data;

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { RegionBoundary } from '@/components/feedback';
 import { SiteFooter, SiteHeader, SyntheticNotice } from '@/components/layout';
+import { REGION_NAMES } from '@/constants/errors';
 import { Container } from '@/components/ui';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { MAIN_CONTENT_ID } from '@/constants/site';
@@ -25,10 +27,14 @@ export default function FixturesPage() {
             </p>
           </header>
           <div className="mt-8">
-            <TemplateLobby />
+            <RegionBoundary region={REGION_NAMES.matches}>
+              <TemplateLobby />
+            </RegionBoundary>
           </div>
           <div className="mt-10">
-            <RecentSessions />
+            <RegionBoundary region={REGION_NAMES.replays}>
+              <RecentSessions />
+            </RegionBoundary>
           </div>
         </Container>
       </main>

@@ -120,8 +120,12 @@ describe('editorial controls', () => {
     await user.type(screen.getByLabelText('Reason'), 'Wrong scorer');
     await user.click(screen.getByRole('button', { name: 'Freeze' }));
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent(/Sign in as a producer/);
-    expect(alert).toHaveTextContent('Reference req_9');
+    expect(alert).toHaveTextContent(/Sign in again as a producer/);
+    expect(alert).toHaveTextContent(/Nothing was changed/);
+    expect(alert).not.toHaveTextContent('req_9');
+    expect(
+      screen.getByRole('link', { name: 'Sign in again' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 

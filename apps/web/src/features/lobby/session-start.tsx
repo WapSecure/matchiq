@@ -6,6 +6,7 @@ import {
   type FaultScenario,
 } from '@matchiq/contracts';
 import { useId, useState } from 'react';
+import { InlineProblem } from '@/components/feedback/inline-problem';
 import { PlayIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
 import { HTTP_STATUS } from '@/constants/api';
@@ -17,13 +18,6 @@ import { isApiError } from '@/lib/api/api-error';
 import { PUBLIC_ENV } from '@/lib/env';
 import { DemoScenarioSelect } from './demo-scenario-select';
 import { useStartSession } from './use-start-session';
-
-const failureText = (error: unknown): string => {
-  if (isApiError(error) && error.status === HTTP_STATUS.tooManyRequests)
-    return LOBBY_COPY.rateLimited;
-  const detail = error instanceof Error ? error.message : '';
-  return `${LOBBY_COPY.startFailed}${detail ? `: ${detail}` : ''}`;
-};
 
 type SessionStartProps = { templateId: string; title: string };
 
@@ -77,9 +71,18 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
         <DemoScenarioSelect title={title} value={fault} onChange={setFault} />
       ) : null}
       {session.error ? (
-        <p id={errorId} role="alert" className="w-full text-xs text-critical">
-          {failureText(session.error)}
-        </p>
+        <div id={errorId} className="w-full">
+          <InlineProblem
+            error={session.error}
+            lead={LOBBY_COPY.startFailed}
+            message={
+              isApiError(session.error) &&
+              session.error.status === HTTP_STATUS.tooManyRequests
+                ? LOBBY_COPY.rateLimited
+                : undefined
+            }
+          />
+        </div>
       ) : null}
     </div>
   );
