@@ -8,7 +8,7 @@ import type { PitchKind } from '@/constants/pitch';
  */
 export const DEMO = {
   chrome: 'Live studio',
-  live: 'Live',
+  live: 'Sample preview',
   title: 'Penbrook Town v Marshstead Albion',
   home: { name: 'Penbrook Town', shortName: 'PEN' },
   away: { name: 'Marshstead Albion', shortName: 'MAR' },
@@ -19,7 +19,7 @@ export const DEMO = {
   insight: {
     kind: 'Momentum shift',
     priority: 'High',
-    headline: 'Penbrook turn the screw',
+    headline: 'Penbrook increase pressure',
     body: 'Six regains in the final third in eight minutes, three shots and the equaliser.',
     evidence: '7 events · 3 metrics · high confidence',
   },

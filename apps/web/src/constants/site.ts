@@ -1,8 +1,8 @@
 export const SITE = {
   name: 'MatchIQ',
-  title: 'MatchIQ — Football intelligence for live broadcast',
+  title: 'MatchIQ | Football intelligence for live broadcast',
   description:
-    'Event-driven football intelligence: deterministic match analytics, evidence-grounded AI narratives and timed broadcast overlays.',
+    'Match analytics, traceable commentary and editorial controls for football broadcast workflows.',
   repositoryUrl: 'https://github.com/WapSecure/matchiq',
   locale: 'en-GB',
 } as const;

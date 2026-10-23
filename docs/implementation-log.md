@@ -633,3 +633,14 @@ Wire the engine into the worker projection and the deterministic publish gate, a
 ### Next
 
 M1: MQ-003 seeded generator, MQ-004 ledger and idempotent ingest, MQ-005 deterministic metrics, MQ-006 SSE and snapshot reconciliation.
+
+## MQ-040: Enterprise review and frontend copy polish (23 October 2026)
+
+Stream E, branch `fix/MQ-040-enterprise-polish`, isolated worktree cut from `dev`.
+
+- Reviewed the enterprise product addendum, ADRs and frontend source. The prioritized review, acceptance evidence and next three tickets are in `apps/web/docs/enterprise-readiness-review.md`.
+- Reworked landing, lobby, studio and diagnostic copy around producer tasks; removed unsupported speed claims, judge-facing labels, prose dashes and unnecessary final third hyphens. Kept synthetic, template and real-provider disclosures.
+- Simplified the landing hero and labeled its static sample explicitly. Updated frontend assertions and added sample-label coverage.
+- Prepared `apps/web/docs/qa-label-migration.patch` for stream F because three existing Playwright selectors reference changed labels. `git apply --check` passes; the patch has not been applied to QA-owned files.
+- Frontend lint, typecheck, source formatting and diff whitespace checks passed under Node 22.22.3. Shell default Node 18 cannot start this Vitest version. Two concurrent suite runs encountered different 5-second test timeouts; the observatory test passed independently without changing its timeout. Final serial run: all 197 tests in 30 files passed. Existing auth tests emit React act warnings.
+- Standard Turbopack build could not resolve Next.js outside the isolated worktree through reused dependency symlinks. Webpack production compilation, type checking and page generation passed with standalone tracing warnings. Landing Playwright: 20 passed across four viewport/theme projects, including axe. Screenshot inspection found mobile clipping; explicit mobile grid sizing and a shrinkable preview address it, with a proposed QA regression test. Deployment packaging and the full browser suite remain unqualified. No enterprise deployment, licensed feed or external graphics integration was claimed.

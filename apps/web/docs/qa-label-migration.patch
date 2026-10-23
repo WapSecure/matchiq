@@ -1,0 +1,58 @@
+diff --git a/apps/web-e2e/src/lobby.spec.ts b/apps/web-e2e/src/lobby.spec.ts
+--- a/apps/web-e2e/src/lobby.spec.ts
++++ b/apps/web-e2e/src/lobby.spec.ts
+@@ -19,7 +19,7 @@
+       .getByRole('article');
+     await expect(cards).toHaveCount(2);
+     await expect(cards.first()).toContainText('Late comeback');
+-    await expect(cards.first()).toContainText('Judge quick-start');
++    await expect(cards.first()).toContainText('Recommended replay');
+     await expect(cards.first()).toContainText('Northbridge Athletic');
+     await expect(cards.first()).toContainText('Synthetic match demo');
+     await expect(cards.first()).toContainText('4207');
+diff --git a/apps/web-e2e/src/judge-flow.spec.ts b/apps/web-e2e/src/judge-flow.spec.ts
+--- a/apps/web-e2e/src/judge-flow.spec.ts
++++ b/apps/web-e2e/src/judge-flow.spec.ts
+@@ -46,7 +46,7 @@
+     await expect(trigger).toBeFocused();
+ 
+     const metrics = page.getByRole('region', { name: 'Live metrics' });
+-    const feed = page.getByRole('group', { name: 'AI insight feed' });
++    const feed = page.getByRole('group', { name: 'Match insights' });
+     const before = (await metrics.textContent()) ?? '';
+     await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
+     await expect(feed.getByText('Northbridge are on top now')).toBeVisible();
+diff --git a/apps/web-e2e/src/studio.spec.ts b/apps/web-e2e/src/studio.spec.ts
+--- a/apps/web-e2e/src/studio.spec.ts
++++ b/apps/web-e2e/src/studio.spec.ts
+@@ -11,7 +11,7 @@
+ 
+ /** The feed, not the throttled live-region echo of the same headline. */
+ const insightFeed = (page: Page) =>
+-  page.getByRole('group', { name: 'AI insight feed' });
++  page.getByRole('group', { name: 'Match insights' });
+ 
+ const openStudio = async (page: Page) => {
+   const api = await mockApi(page);
+diff --git a/apps/web-e2e/src/landing.spec.ts b/apps/web-e2e/src/landing.spec.ts
+--- a/apps/web-e2e/src/landing.spec.ts
++++ b/apps/web-e2e/src/landing.spec.ts
+@@ -43,6 +43,18 @@
+     expect(blocking.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+   });
+ 
++  test('keeps the product preview inside the viewport', async ({ page }) => {
++    const preview = page.getByRole('img', { name: /Product preview/ });
++    const box = await preview.boundingBox();
++    expect(box).not.toBeNull();
++    if (box) {
++      expect(box.x).toBeGreaterThanOrEqual(0);
++      expect(box.x + box.width).toBeLessThanOrEqual(
++        await page.evaluate(() => window.innerWidth),
++      );
++    }
++  });
++
+   test('does not scroll horizontally', async ({ page }) => {
+     const overflow = await page.evaluate(
+       () => document.documentElement.scrollWidth - window.innerWidth,

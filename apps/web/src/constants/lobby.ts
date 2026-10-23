@@ -3,7 +3,7 @@ export const LOBBY_COPY = {
   eyebrow: 'Fixture lobby',
   title: 'Choose a synthetic fixture',
   description:
-    'Each fixture is generated from a fixed seed, so every replay reproduces the same events, match state and overlay decisions. Starting a replay creates a new session that every viewer of its link sees identically.',
+    'Explore fictional matches in the studio. Start a replay, inspect the evidence and share the session link with your team.',
   listLabel: 'Synthetic fixtures',
   scenario: 'Scenario',
   seedLabel: 'Seed',
@@ -20,7 +20,7 @@ export const LOBBY_COPY = {
   empty: {
     title: 'No fixtures available',
     description:
-      'The API returned no fixture templates. Run `pnpm seed:fixtures`, then refresh.',
+      'No demo fixtures are available right now. Try again later or contact your workspace administrator.',
   },
   error: { title: 'Fixtures could not be loaded' },
   loading: 'Loading fixtures',
@@ -42,15 +42,15 @@ export const LOBBY_COPY = {
 export const SCENARIO_LABELS: Record<string, string> = {
   comeback: 'Late comeback',
   'high-press': 'High press',
-  'low-event': 'Low-event grind',
+  'low-event': 'Quiet match',
   'possession-dominance': 'Possession dominance',
-  'red-card-swing': 'Red-card swing',
+  'red-card-swing': 'Red card turning point',
 };
 
 export const SCENARIO_WORD_SEPARATOR = /[-_]+/g;
 
 /** The judge quick-start (spec §19) begins with this scenario. */
 export const FEATURED_SCENARIO = 'comeback';
-export const FEATURED_LABEL = 'Judge quick-start';
+export const FEATURED_LABEL = 'Recommended replay';
 
 export const HASH_PREVIEW_CHARS = 10;

@@ -21,7 +21,7 @@ export const EVENT_LABELS: Record<MatchEventType, string> = {
   PASS_COMPLETED: 'Pass completed',
   PASS_INTERCEPTED: 'Pass intercepted',
   CARRY: 'Carry',
-  FINAL_THIRD_ENTRY: 'Final-third entry',
+  FINAL_THIRD_ENTRY: 'Final third entry',
   TACKLE: 'Tackle',
   PRESSURE_APPLIED: 'Pressure',
   RECOVERY: 'Ball recovery',
