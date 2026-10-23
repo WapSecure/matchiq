@@ -77,9 +77,8 @@ def event_line(view: FactView, limit: int = OVERLAY_LIMITS.headline_max) -> str 
 
 def scoreline_in(text: str, found: Score) -> bool:
     pairs = {(found.subject, found.other), (found.home, found.away)}
-    return any(
-        re.search(rf"(?<![\w.,]){a}{SCORE_DASH}{b}(?!\w|[.,]\d)", text) is not None for a, b in pairs
-    )
+    patterns = [rf"(?<![\w.,]){a}{SCORE_DASH}{b}(?!\w|[.,]\d)" for a, b in pairs]
+    return any(re.search(pattern, text) is not None for pattern in patterns)
 
 
 def subjects(view: FactView) -> tuple[str, ...]:

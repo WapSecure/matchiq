@@ -1,7 +1,7 @@
 """Prompt builders: every few-shot example passes the deterministic checks of its golden case."""
 
 from dataclasses import replace
-from typing import get_args
+from typing import cast, get_args
 
 import pytest
 
@@ -106,14 +106,13 @@ def test_writer_prompt_states_each_persona_limit() -> None:
 def test_moment_examples_meet_the_editorial_rules(
     example: dict[str, object], persona: Persona
 ) -> None:
-    metrics = example["computedMetrics"]
-    assert isinstance(metrics, dict)
+    metrics = cast("dict[str, float]", example["computedMetrics"])
     spec = replace(
         CASE.spec, kind=str(example["insightKind"]), metrics=metrics, team_name=EXAMPLE_TEAM,
         player_name=EXAMPLE_PLAYER, player_id="pl_harbour_9",
     )  # fmt: skip
     view = build_fact_view(build_request(spec))
     headline, body = str(example["headline"]), str(example["body"])
-    cited = {str(ref): float(value) for ref, value in metrics.items()}
+    cited = dict(metrics)
     assert editorial_issues(headline, body, cited, persona, view) == []
     assert example.get("eventLine") == event_line(view)
