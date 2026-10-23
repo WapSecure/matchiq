@@ -798,6 +798,46 @@ export interface components {
             /** @enum {string} */
             reason: "ZERO_DENOMINATOR" | "NO_TRACKING_DATA" | "NOT_GENERATED" | "INSUFFICIENT_SAMPLE";
         };
+        MomentContext: {
+            methodVersion: string;
+            /** @enum {string} */
+            side: "home" | "away";
+            /** @enum {string} */
+            scoreState: "LEADING" | "LEVEL" | "TRAILING";
+            /** @enum {string} */
+            phase: "EARLY" | "FIRST_HALF" | "BEFORE_HALF_TIME" | "SECOND_HALF" | "FINAL_15";
+            comparison: {
+                /** @enum {string} */
+                metric: "shots" | "shotsOnTarget" | "pressures" | "recoveries" | "highRecoveries" | "finalThirdEntries";
+            } | null;
+            trend: {
+                /** @enum {string} */
+                metric: "shots" | "shotsOnTarget" | "pressures" | "recoveries" | "highRecoveries" | "finalThirdEntries";
+                /** @enum {string} */
+                direction: "RISING" | "FALLING" | "STEADY" | "MIXED";
+            } | null;
+            linked: {
+                regainEventId?: string;
+                previousInsightId?: string;
+            };
+            eventIds: string[];
+            metrics: {
+                [key: string]: number;
+            };
+        };
+        AnalystBreakdown: {
+            whatHappened: components["schemas"]["BreakdownPart"];
+            whyItMatters: components["schemas"]["BreakdownPart"];
+            whatToWatch: components["schemas"]["BreakdownPart"];
+        };
+        BreakdownPart: {
+            text: string;
+            citedValues: {
+                metricRef: string;
+                value: number;
+            }[];
+            evidenceEventIds: string[];
+        };
         Fixture: {
             /** @constant */
             schemaVersion: 1;
@@ -1237,6 +1277,7 @@ export interface components {
             };
             /** @enum {string} */
             status: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";
+            context?: components["schemas"]["MomentContext"];
             /** @constant */
             synthetic: true;
         };
@@ -1256,6 +1297,7 @@ export interface components {
             /** @enum {string} */
             source: "AGENT" | "TEMPLATE";
             localeFallback: boolean;
+            breakdown?: components["schemas"]["AnalystBreakdown"];
             /** Format: date-time */
             createdAt: string;
         };
@@ -1415,6 +1457,7 @@ export interface components {
                 source: "AGENT" | "TEMPLATE";
                 localeFallback?: boolean;
                 citations: string[];
+                breakdown?: components["schemas"]["AnalystBreakdown"];
             }[];
         };
         GateReport: {
@@ -1551,6 +1594,24 @@ export interface components {
             title: string;
             finalSnapshot: components["schemas"]["MatchSnapshot"];
             keyMoments: components["schemas"]["RecapMoment"][];
+            story?: {
+                /** @enum {string} */
+                persona: "CASUAL" | "ANALYST" | "BROADCAST";
+                /** @enum {string} */
+                locale: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+                paragraphs: {
+                    /** @enum {string} */
+                    kind: "FIRST_HALF" | "SECOND_HALF" | "TURNING_POINTS" | "FULL_TIME";
+                    text: string;
+                    citedValues: {
+                        metricRef: string;
+                        value: number;
+                        insightId?: string;
+                    }[];
+                    eventIds: string[];
+                    insightIds: string[];
+                }[];
+            }[];
             /** @constant */
             synthetic: true;
         };
