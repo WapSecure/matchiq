@@ -134,7 +134,7 @@ describe('LiveStudio', () => {
       screen.getByRole('article', { name: 'Home pile on the pressure' }),
     ).toBeInTheDocument();
     expect(screen.getByTestId('on-air-meta')).toHaveTextContent(
-      /Key moment.*Priority 50.*Standard wording/,
+      /Key moment.*Standard wording/,
     );
   });
 

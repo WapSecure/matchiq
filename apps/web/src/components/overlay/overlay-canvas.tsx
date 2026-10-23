@@ -6,7 +6,7 @@ import { PitchBackdrop } from '@/components/charts/pitch-backdrop';
 import { cn } from '@/lib/cn';
 import { OverlayCue } from './overlay-cue';
 import { type Scorebug, OverlayScorebug } from './overlay-scorebug';
-import { OverlayStandby } from './overlay-standby';
+import { OverlayStandby, type StandbyHold } from './overlay-standby';
 
 export type { Scorebug } from './overlay-scorebug';
 
@@ -16,6 +16,9 @@ type OverlayCanvasProps = {
   watermark: string;
   standbyLabel: string;
   standbyHeld?: boolean;
+  /** Which editorial hold; tints the frame edge so the state reads at a glance. */
+  standbyHold?: StandbyHold | null;
+  standbyNote?: string | null;
   /** Headline of the most recent cue that left air, shown while standing by. */
   lastAired?: string | null;
   safeAreaLabel: string;
@@ -29,6 +32,11 @@ export const DEFAULT_SAFE_AREA: SafeArea = {
   rightPct: 5,
   bottomPct: 5,
   leftPct: 5,
+};
+
+const HOLD_FRAME: Record<StandbyHold, string> = {
+  paused: 'ring-2 ring-warning/45',
+  stopped: 'ring-2 ring-critical/55',
 };
 
 const insetStyle = (area: SafeArea) => ({
@@ -48,6 +56,8 @@ export function OverlayCanvas({
   watermark,
   standbyLabel,
   standbyHeld = false,
+  standbyHold = null,
+  standbyNote = null,
   lastAired = null,
   safeAreaLabel,
   frameLabel,
@@ -59,7 +69,12 @@ export function OverlayCanvas({
       <div
         role="group"
         aria-label={frameLabel}
-        className="relative aspect-video w-full overflow-hidden rounded-md bg-canvas ring-1 ring-black/40"
+        className={cn(
+          'relative aspect-video w-full overflow-hidden rounded-md bg-canvas',
+          cues.length === 0 && standbyHold
+            ? HOLD_FRAME[standbyHold]
+            : 'ring-1 ring-black/40',
+        )}
       >
         <PitchBackdrop />
         <div data-safe-area="" className="absolute" style={insetStyle(area)}>
@@ -84,6 +99,8 @@ export function OverlayCanvas({
               <OverlayStandby
                 label={standbyLabel}
                 held={standbyHeld}
+                hold={standbyHold}
+                note={standbyNote}
                 lastAired={lastAired}
               />
             ) : (

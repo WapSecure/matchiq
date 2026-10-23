@@ -119,8 +119,6 @@ describe('commentary language boundaries', () => {
     expect(
       screen.getByRole('radiogroup', { name: 'Audience' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Language changes the commentary only/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/The numbers never change/)).toBeInTheDocument();
   });
 });

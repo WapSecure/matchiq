@@ -6,10 +6,10 @@ import {
   OverlayCanvas,
   type Scorebug,
 } from '@/components/overlay/overlay-canvas';
+import type { StandbyHold } from '@/components/overlay/overlay-standby';
 import { Badge, InfoTip, Panel, SegmentedControl } from '@/components/ui';
 import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
-import { MODE_VIEW } from '@/constants/editorial';
 import { formatClock } from '@/lib/format';
 import { useEditorialMode } from '../editorial/editorial-status';
 import { RetractCueButton } from '../editorial/retract-cue-button';
@@ -24,6 +24,11 @@ type OverlayPanelProps = {
   className?: string;
   footer?: ReactNode;
 };
+
+const HOLD_OF = {
+  FROZEN: 'paused',
+  KILLED: 'stopped',
+} as const satisfies Record<'FROZEN' | 'KILLED', StandbyHold>;
 
 function useScorebug(home: string, away: string): Scorebug | null {
   const score = useMatchStore((s) => s.snapshot?.score ?? null);
@@ -43,6 +48,37 @@ function Tally({ onAir }: { onAir: boolean }) {
   );
 }
 
+function HoldControl() {
+  const cueHold = useStudioUi((s) => s.cueHold);
+  const setCueHold = useStudioUi((s) => s.setCueHold);
+  return (
+    <div className="flex items-center gap-2">
+      <span aria-hidden className="text-micro text-ink-subtle">
+        {OVERLAY_COPY.holdShort}
+      </span>
+      <SegmentedControl
+        legend={OVERLAY_COPY.holdLegend}
+        hideLegend
+        options={OVERLAY_COPY.holdOptions}
+        value={cueHold}
+        onChange={setCueHold}
+      />
+    </div>
+  );
+}
+
+function ProgramNote() {
+  return (
+    <p className="flex items-center gap-1 text-micro text-ink-subtle">
+      <BroadcastIcon size={12} className="shrink-0" />
+      {OVERLAY_COPY.programNote}
+      <span className="sr-only">. {OVERLAY_COPY.programNoteHint}</span>
+      <InfoTip content={OVERLAY_COPY.programNoteHint} />
+    </p>
+  );
+}
+
+/** Program preview with its tally, cue details, hold setting and transport. */
 export function OverlayPanel({
   homeShort,
   awayShort,
@@ -51,13 +87,12 @@ export function OverlayPanel({
 }: OverlayPanelProps) {
   const persona = useStudioUi((s) => s.persona);
   const locale = useStudioUi((s) => s.locale);
-  const cueHold = useStudioUi((s) => s.cueHold);
-  const setCueHold = useStudioUi((s) => s.setCueHold);
   const lastHeadline = useMatchStore((s) => s.retractions[0]?.headline ?? null);
   const onAir = useOnAirCue(persona, locale);
   const cues = onAir.cue ? [onAir.cue] : [];
   const scorebug = useScorebug(homeShort, awayShort);
-  const heldBy = MODE_VIEW[useEditorialMode()].standby;
+  const mode = useEditorialMode();
+  const held = mode === 'AUTO' ? null : OVERLAY_COPY.hold[mode];
   const copy = STUDIO_COPY.overlay;
   return (
     <Panel
@@ -73,33 +108,30 @@ export function OverlayPanel({
         </>
       }
     >
-      <div className="mb-3 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
-        <OnAirMeta onAir={onAir} locale={locale} />
-        <SegmentedControl
-          className="ml-auto"
-          legend={OVERLAY_COPY.holdLegend}
-          options={OVERLAY_COPY.holdOptions}
-          value={cueHold}
-          onChange={setCueHold}
-        />
+      <div className="mb-2.5 flex min-h-6 flex-wrap items-center gap-1.5">
+        {onAir.cue ? (
+          <OnAirMeta onAir={onAir} locale={locale} />
+        ) : (
+          <span className="text-micro text-ink-subtle">
+            {OVERLAY_COPY.nothingOnAir}
+          </span>
+        )}
       </div>
       <OverlayCanvas
         cues={cues}
         scorebug={scorebug}
         watermark={WATERMARK}
-        standbyLabel={heldBy ?? OVERLAY_COPY.standby}
-        standbyHeld={heldBy !== null}
+        standbyLabel={held?.label ?? OVERLAY_COPY.standby}
+        standbyHeld={held !== null}
+        standbyHold={mode === 'AUTO' ? null : HOLD_OF[mode]}
+        standbyNote={held?.note ?? null}
         lastAired={lastHeadline ? OVERLAY_COPY.lastAired(lastHeadline) : null}
         safeAreaLabel={copy.safeArea}
         frameLabel={copy.frameLabel(cues.length)}
       />
-      <div className="mt-2 flex items-center gap-1 text-micro text-ink-subtle">
-        <p className="flex items-center gap-1.5">
-          <BroadcastIcon size={12} className="shrink-0" />
-          {OVERLAY_COPY.programNote}
-          <span className="sr-only">. {OVERLAY_COPY.programNoteHint}</span>
-        </p>
-        <InfoTip content={OVERLAY_COPY.programNoteHint} />
+      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <ProgramNote />
+        <HoldControl />
       </div>
       {footer}
       <CueLog />
