@@ -48,7 +48,7 @@ export function ActionButton({
           BUTTON_BASE,
           BUTTON_VARIANTS[variant],
           BUTTON_SIZES[size],
-          'outline-none pointer-coarse:min-h-11 data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent data-disabled:cursor-not-allowed data-disabled:opacity-50 data-pending:cursor-progress',
+          'outline-none pointer-coarse:min-h-11 data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-accent data-disabled:cursor-not-allowed data-disabled:opacity-45 data-pending:cursor-progress',
           iconOnly && 'aspect-square px-0 pointer-coarse:min-w-11',
           c,
         ),
