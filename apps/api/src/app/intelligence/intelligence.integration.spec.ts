@@ -71,7 +71,11 @@ describe('Intelligence read API (integration)', () => {
     expect((await jsonOf(await get('recap'))).type).toBe(
       'urn:matchiq:problem:recap-not-ready',
     );
-    expect(await jsonOf(await get('insights'))).toEqual({ items: [] });
+    expect(await jsonOf(await get('insights'))).toEqual({
+      items: [],
+      nextCursor: null,
+      total: 0,
+    });
     const unknown = await fetch(`${t.baseUrl}/fixtures/fx_unknown/insights`);
     expect(unknown.status).toBe(404);
     expect((await jsonOf(unknown)).type).toBe(
@@ -145,7 +149,11 @@ describe('Intelligence read API (integration)', () => {
     );
     expect(casualFr.items).toHaveLength(1);
     expect((await get('narratives?persona=FAN')).status).toBe(422);
-    expect(await jsonOf(await get('overlays'))).toEqual({ items: [] });
+    expect(await jsonOf(await get('overlays'))).toEqual({
+      items: [],
+      nextCursor: null,
+      total: 0,
+    });
     const runs = await jsonOf<{ items: unknown[] }>(await get('agent-runs'));
     expect(runs.items).toEqual([
       expect.objectContaining({

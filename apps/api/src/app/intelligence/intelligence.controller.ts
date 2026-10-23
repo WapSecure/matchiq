@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { RequirePermission } from '@matchiq/auth';
 import type {
+  CursorPage,
   Insight,
   MatchSnapshot,
   Narrative,
@@ -10,8 +11,7 @@ import type { FixtureKey, InsightTrace, RecapDocument } from '@matchiq/db';
 import { ZodValidationPipe } from '@matchiq/server-kit';
 import { ROUTES } from '../constants';
 import { FixtureScope } from '../http/fixture-scope';
-import type { ItemList } from '../replay/replay.service';
-import { NarrativeQuery } from './intelligence.schemas';
+import { MatchListQuery, NarrativeQuery } from './intelligence.schemas';
 import { IntelligenceService } from './intelligence.service';
 
 @Controller(ROUTES.fixtures)
@@ -26,8 +26,11 @@ export class IntelligenceController {
 
   @Get(ROUTES.insights)
   @RequirePermission('insights:read')
-  insights(@FixtureScope() key: FixtureKey): Promise<ItemList<Insight>> {
-    return this.intelligence.insights(key);
+  insights(
+    @FixtureScope() key: FixtureKey,
+    @Query(new ZodValidationPipe(MatchListQuery)) query: MatchListQuery,
+  ): Promise<CursorPage<Insight>> {
+    return this.intelligence.insights(key, query);
   }
 
   /** Narratives are stored only once the gate publishes them. */
@@ -36,14 +39,17 @@ export class IntelligenceController {
   narratives(
     @FixtureScope() key: FixtureKey,
     @Query(new ZodValidationPipe(NarrativeQuery)) query: NarrativeQuery,
-  ): Promise<ItemList<Narrative>> {
+  ): Promise<CursorPage<Narrative>> {
     return this.intelligence.narratives(key, query);
   }
 
   @Get(ROUTES.overlays)
   @RequirePermission('overlays:read')
-  overlays(@FixtureScope() key: FixtureKey): Promise<ItemList<OverlayCue>> {
-    return this.intelligence.overlays(key);
+  overlays(
+    @FixtureScope() key: FixtureKey,
+    @Query(new ZodValidationPipe(MatchListQuery)) query: MatchListQuery,
+  ): Promise<CursorPage<OverlayCue>> {
+    return this.intelligence.overlays(key, query);
   }
 
   @Get(ROUTES.recap)
@@ -54,7 +60,10 @@ export class IntelligenceController {
 
   @Get(ROUTES.agentRuns)
   @RequirePermission('agents:traces:read')
-  agentRuns(@FixtureScope() key: FixtureKey): Promise<ItemList<InsightTrace>> {
-    return this.intelligence.traces(key);
+  agentRuns(
+    @FixtureScope() key: FixtureKey,
+    @Query(new ZodValidationPipe(MatchListQuery)) query: MatchListQuery,
+  ): Promise<CursorPage<InsightTrace>> {
+    return this.intelligence.traces(key, query);
   }
 }

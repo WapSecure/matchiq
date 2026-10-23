@@ -82,6 +82,9 @@ export const API_LIMITS = {
   /** The catalogue is small; the default still returns all of it for `{ items }` clients. */
   templateListDefault: 100,
   templateListMax: 100,
+  /** Per-match lists: the default equals the max so `{ items }` clients still get a whole match. */
+  matchListDefault: 500,
+  matchListMax: 500,
   /** Seconds a client should wait after a replay-capacity 503. */
   replayCapacityRetryAfterS: 30,
 } as const;

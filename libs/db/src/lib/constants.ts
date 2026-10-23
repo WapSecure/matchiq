@@ -54,10 +54,20 @@ export const AUDIT_CURSOR = {
   idPattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
 } as const;
 
-/** Keyset cursors for `GET /fixtures`, `/fixture-templates` and `/replay-sessions`. */
+/** Keyset cursors for the lobby lists and the per-match insight, narrative, overlay and trace lists. */
 export const PAGE_CURSOR = {
   encoding: 'base64url',
-  kinds: { fixtures: 'f', templates: 't', sessions: 's' },
+  kinds: {
+    fixtures: 'f',
+    templates: 't',
+    sessions: 's',
+    insights: 'i',
+    narratives: 'n',
+    overlays: 'o',
+    traces: 'r',
+  },
+  integerPattern: /^(0|[1-9]\d{0,9})$/,
+  textMax: 200,
   timestampPattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
 } as const;
 

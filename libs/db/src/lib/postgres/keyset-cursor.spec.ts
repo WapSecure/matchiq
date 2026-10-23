@@ -18,6 +18,24 @@ describe('keyset cursor', () => {
     ]);
   });
 
+  it('round-trips integer and text parts of a per-match key', () => {
+    const raw = encodeCursor('n', ['fx_a_s1', '70', 'CASUAL', 'nr_1']);
+    expect(
+      decodeCursor(raw, 'n', ['fixtureId', 'integer', 'text', 'text']),
+    ).toEqual(['fx_a_s1', '70', 'CASUAL', 'nr_1']);
+  });
+
+  it.each([
+    ['negative integer', encodeCursor('i', ['fx_a', '-1', 'in_a'])],
+    ['fractional integer', encodeCursor('i', ['fx_a', '1.5', 'in_a'])],
+    ['empty text', encodeCursor('i', ['fx_a', '1', ''])],
+    ['overlong text', encodeCursor('i', ['fx_a', '1', 'x'.repeat(201)])],
+  ])('rejects a %s part', (_name, raw) => {
+    expect(() =>
+      decodeCursor(raw, 'i', ['fixtureId', 'integer', 'text']),
+    ).toThrow(InvalidCursorError);
+  });
+
   it.each([
     ['garbage', 'not base64 json'],
     ['other kind', encodeCursor('t', ['fx_comeback_42'])],

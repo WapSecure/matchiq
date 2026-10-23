@@ -1,14 +1,11 @@
-import {
-  OverlayStatus,
-  PipelineStatus,
-  type AgentRun,
-  type Insight,
-  type MatchSnapshot,
-  type Narrative,
-  type OverlayCue,
+import type {
+  CursorPageQuery,
+  Insight,
+  MatchSnapshot,
+  Narrative,
+  OverlayCue,
 } from '@matchiq/contracts';
-import { and, asc, eq, isNull, notInArray, or, type SQL } from 'drizzle-orm';
-import type { PgColumn } from 'drizzle-orm/pg-core';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { Database } from '../client.js';
 import type {
   InsightTrace,
@@ -17,8 +14,20 @@ import type {
   NarrativeFilter,
   RecapDocument,
 } from '../intelligence-types.js';
-import type { OverlayEditorialState } from '../editorial-types.js';
 import type { FixtureKey } from '../ports.js';
+import {
+  groupRuns,
+  insightColumns,
+  onAir,
+  overlayColumns,
+  overlayOf,
+  scoped,
+  toOverlay,
+  toTrace,
+  traceColumns,
+  withInsightStatus,
+} from './intelligence-rows.js';
+import { PostgresMatchPages } from './match-pages.js';
 import { withTenant } from './tenant-scope.js';
 import {
   agentRuns,
@@ -29,46 +38,32 @@ import {
   overlayCues,
 } from '../schema/intelligence-tables.js';
 
-const scoped = (
-  table: { orgId: PgColumn; fixtureId: PgColumn },
-  key: FixtureKey,
-): SQL | undefined =>
-  and(eq(table.orgId, key.orgId), eq(table.fixtureId, key.fixtureId));
-
-const insightColumns = {
-  payload: insights.payload,
-  status: insights.status,
-  period: insights.period,
-};
-
-/**
- * Status and period columns are authoritative; payloads keep the values first
- * published, and those stored before MQ-024 have no `period`.
- */
-const withInsightStatus = (row: {
-  payload: Insight;
-  status: string;
-  period: number;
-}): Insight => ({
-  ...row.payload,
-  period: row.period,
-  status: PipelineStatus.parse(row.status),
-});
-
-const NEVER_AIRED: OverlayEditorialState[] = ['HELD', 'SUPPRESSED'];
-
-const groupRuns = (rows: { insightId: string; payload: AgentRun }[]) => {
-  const byInsight = new Map<string, AgentRun[]>();
-  for (const row of rows) {
-    const list = byInsight.get(row.insightId) ?? [];
-    list.push(row.payload);
-    byInsight.set(row.insightId, list);
-  }
-  return byInsight;
-};
-
 export class PostgresIntelligenceReader implements IntelligenceReader {
-  constructor(private readonly db: Database) {}
+  private readonly pages: PostgresMatchPages;
+
+  constructor(private readonly db: Database) {
+    this.pages = new PostgresMatchPages(db);
+  }
+
+  insightPage(key: FixtureKey, query: CursorPageQuery) {
+    return this.pages.insights(key, query);
+  }
+
+  narrativePage(
+    key: FixtureKey,
+    filter: NarrativeFilter,
+    query: CursorPageQuery,
+  ) {
+    return this.pages.narratives(key, filter, query);
+  }
+
+  overlayPage(key: FixtureKey, query: CursorPageQuery) {
+    return this.pages.overlays(key, query);
+  }
+
+  tracePage(key: FixtureKey, query: CursorPageQuery) {
+    return this.pages.traces(key, query);
+  }
 
   async latestSnapshot(key: FixtureKey): Promise<MatchSnapshot | null> {
     const [row] = await withTenant(this.db, key.orgId, (tx) =>
@@ -164,27 +159,15 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
   async overlays(key: FixtureKey): Promise<OverlayCue[]> {
     const rows = await withTenant(this.db, key.orgId, (tx) =>
       tx
-        .select({ payload: overlayCues.payload, status: overlayCues.status })
+        .select(overlayColumns)
         .from(overlayCues)
-        .where(
-          and(
-            scoped(overlayCues, key),
-            // Held and suppressed cues never aired; viewers see only what went on air.
-            or(
-              isNull(overlayCues.editorialState),
-              notInArray(overlayCues.editorialState, NEVER_AIRED),
-            ),
-          ),
-        )
+        .where(and(scoped(overlayCues, key), onAir()))
         .orderBy(
           asc(overlayCues.publishedSequence),
           asc(overlayCues.overlayId),
         ),
     );
-    return rows.map((r) => ({
-      ...r.payload,
-      status: OverlayStatus.parse(r.status),
-    }));
+    return rows.map(toOverlay);
   }
 
   async recap(key: FixtureKey): Promise<RecapDocument | null> {
@@ -200,28 +183,9 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
   async traces(key: FixtureKey): Promise<InsightTrace[]> {
     const insightRows = await withTenant(this.db, key.orgId, (tx) =>
       tx
-        .select({
-          insightId: insights.insightId,
-          matchClockMs: insights.matchClockMs,
-          status: insights.status,
-          publication: insights.publication,
-          fallbackReason: insights.fallbackReason,
-          gate: insights.gateReport,
-          payload: insights.payload,
-          insightState: insights.editorialState,
-          insightReason: insights.editorialReason,
-          overlayState: overlayCues.editorialState,
-          overlayReason: overlayCues.editorialReason,
-        })
+        .select(traceColumns)
         .from(insights)
-        .leftJoin(
-          overlayCues,
-          and(
-            eq(overlayCues.orgId, insights.orgId),
-            eq(overlayCues.fixtureId, insights.fixtureId),
-            eq(overlayCues.insightId, insights.insightId),
-          ),
-        )
+        .leftJoin(overlayCues, overlayOf())
         .where(scoped(insights, key))
         .orderBy(asc(insights.detectedSequence)),
     );
@@ -233,21 +197,6 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
         .orderBy(asc(agentRuns.createdAt)),
     );
     const runs = groupRuns(runRows);
-    return insightRows.map((row) => ({
-      insightId: row.insightId,
-      kind: row.payload.kind,
-      matchClockMs: row.matchClockMs,
-      status: PipelineStatus.parse(row.status),
-      publication: row.publication,
-      fallbackReason: row.fallbackReason,
-      gate: row.gate,
-      runs: runs.get(row.insightId) ?? [],
-      editorial: {
-        insight: row.insightState,
-        insightReason: row.insightReason,
-        overlay: row.overlayState,
-        overlayReason: row.overlayReason,
-      },
-    }));
+    return insightRows.map((row) => toTrace(row, runs));
   }
 }

@@ -43,16 +43,20 @@ CI fails if a Nest route is missing from the registry or a registry entry has no
 - **Keyset by sequence.** `GET /fixtures/{id}/events?afterSequence=&limit=` returns `{ items, nextAfterSequence }`. Pass `nextAfterSequence` back until it is `null`. `limit` is 1–500 (default 100).
 - **Opaque cursor.** Every growing list takes `?cursor=&limit=` and returns the shared `CursorPage` envelope `{ items, nextCursor, total? }`. Pass `nextCursor` back as `cursor` until it is `null`. Treat the cursor as opaque: it is a base64url keyset position tagged with its list, so a tampered cursor, or one taken from another list, is `400 invalid-cursor`. Every read is scoped to the caller's organisation, so a cursor never reaches another tenant's rows.
 
-  | Operation                | Order                              | `limit` default / max | `total` |
-  | ------------------------ | ---------------------------------- | --------------------- | ------- |
-  | `GET /audit-events`      | newest first, `(at, id)`           | 50 / 200              | no      |
-  | `GET /replay-sessions`   | newest first, `(createdAt, id)`    | 20 / 100              | yes     |
-  | `GET /fixture-templates` | `templateId`                       | 100 / 100             | yes     |
-  | `GET /fixtures`          | kickoff, `(kickoffUtc, fixtureId)` | 50 / 100              | no      |
+  | Operation                       | Order                                          | `limit` default / max | `total`                                       |
+  | ------------------------------- | ---------------------------------------------- | --------------------- | --------------------------------------------- |
+  | `GET /audit-events`             | newest first, `(at, id)`                       | 50 / 200              | no                                            |
+  | `GET /replay-sessions`          | newest first, `(createdAt, id)`                | 20 / 100              | yes                                           |
+  | `GET /fixture-templates`        | `templateId`                                   | 100 / 100             | yes                                           |
+  | `GET /fixtures`                 | kickoff, `(kickoffUtc, fixtureId)`             | 50 / 100              | no                                            |
+  | `GET /fixtures/{id}/insights`   | detection, `(detectedSequence, insightId)`     | 500 / 500             | yes                                           |
+  | `GET /fixtures/{id}/narratives` | insight, then `(persona, locale, narrativeId)` | 500 / 500             | yes, after the `persona` and `locale` filters |
+  | `GET /fixtures/{id}/overlays`   | on-air cues, `(publishedSequence, overlayId)`  | 500 / 500             | yes                                           |
+  | `GET /fixtures/{id}/agent-runs` | one trace per insight, detection order         | 500 / 500             | yes                                           |
 
   There is no `prevCursor`. To go back, a client keeps the cursors it followed (the web's `CursorPagination` does). `total` appears only where counting is cheap; session fixtures grow without bound, so `/fixtures` and `/audit-events` omit it.
 
-- **Bounded lists.** The per-fixture reads (`/insights`, `/narratives`, `/overlays`, `/agent-runs`) return `{ items }` without a cursor.
+- **Per-match lists.** The default `limit` equals the maximum (500), so a call without a cursor returns the same whole list as before, now inside the shared envelope. A longer match follows `nextCursor`. These cursors also carry the fixture id: a cursor from another match is `400 invalid-cursor`. `narratives` keeps its `persona` and `locale` filters; pass them on every page. `agent-runs` pages the per-insight traces, and each page loads only its own insights' runs.
 
 ## Idempotency
 
