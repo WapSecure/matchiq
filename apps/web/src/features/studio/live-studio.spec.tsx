@@ -315,4 +315,51 @@ describe('LiveStudio', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Goal disallowed')).toBeInTheDocument();
   });
+
+  it('shows headline events first and every play on request', async () => {
+    const user = userEvent.setup();
+    const {
+      outcome: _o,
+      bodyPart: _b,
+      ...base
+    } = shot(3) as Extract<ReturnType<typeof shot>, { type: 'SHOT' }>;
+    const tackle = {
+      ...base,
+      type: 'TACKLE',
+      opponentPlayerId: 'pl_aw01',
+      won: true,
+    } as ReturnType<typeof shot>;
+    await renderStudio(
+      baseRoutes({
+        'GET /events': {
+          body: { items: [shot(1), shot(2), tackle], nextAfterSequence: null },
+        },
+        'GET /replay': { body: status({ appliedSequence: 3 }) },
+      }),
+    );
+    const timeline = await screen.findByRole('list', { name: 'Match events' });
+    await waitFor(() =>
+      expect(within(timeline).getAllByText('Shot')).toHaveLength(2),
+    );
+    expect(within(timeline).queryByText('Tackle')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('switch', { name: 'Show all events' }));
+    expect(
+      within(screen.getByRole('list', { name: 'Match events' })).getByText(
+        'Tackle',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'More match events' }),
+    ).toHaveTextContent('Showing 3 events');
+  });
+
+  it('offers the recap at full time', async () => {
+    const { push } = await renderStudio();
+    expect(screen.queryByRole('link', { name: /See the recap/ })).toBeNull();
+    await push(message('replay.status', status({ state: 'COMPLETED' }), 1));
+    expect(screen.getByRole('link', { name: /See the recap/ })).toHaveAttribute(
+      'href',
+      `/studio/${FX}/recap`,
+    );
+  });
 });

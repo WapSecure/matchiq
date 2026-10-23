@@ -26,11 +26,25 @@ export function Legend({
 }) {
   return (
     <li className="flex items-center gap-1.5 text-xs text-ink-muted">
-      <TeamSwatch side={side} />
+      <svg
+        aria-hidden
+        viewBox="0 0 16 4"
+        className="h-1 w-4 shrink-0 overflow-visible"
+      >
+        <line
+          x1={0}
+          x2={16}
+          y1={2}
+          y2={2}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeDasharray={side === 'away' ? '4 3' : undefined}
+          className={side === 'home' ? 'stroke-home' : 'stroke-away'}
+        />
+      </svg>
+      <TeamSwatch side={side} className="size-2" />
       <span>{name}</span>
-      <span className="text-micro text-ink-subtle">
-        {STUDIO_COPY.metrics.lineStyle[side]}
-      </span>
+      <span className="sr-only">{STUDIO_COPY.metrics.lineStyle[side]}</span>
       {value ? (
         <span className="tabular font-semibold text-ink">{value}</span>
       ) : null}

@@ -13,8 +13,16 @@ export const STUDIO_COPY = {
     'Catching up after a short gap. Figures will settle in a moment.',
   timeline: {
     title: 'Match events',
-    description: 'Key events as they happen',
+    description: 'Goals, cards, shots and changes',
+    descriptionAll: 'Every play as it happens',
+    showAll: 'Show all events',
+    moreLabel: 'More match events',
+    noun: { one: 'event', other: 'events' },
+    pageSize: 25,
+    loadFailed: "We couldn't load earlier events.",
     empty: 'No events yet. Start the replay to begin.',
+    emptyKey:
+      'No goals, cards or shots yet. Switch on "Show all events" to see every play.',
     count: (n: number) => `${n} events`,
     voided: 'Corrected',
     period: (n: number) => `Period ${n}`,
@@ -34,9 +42,16 @@ export const STUDIO_COPY = {
       AGENT: 'Written by AI · fact-checked',
       TEMPLATE: 'Standard wording',
     },
+    sourceHint: {
+      AGENT:
+        'AI wrote this from the match data, and the fact check confirmed every number and name in it.',
+      TEMPLATE:
+        "Pre-written sentences filled in with match data. Used when the AI wording isn't ready or didn't pass the fact check.",
+    },
   },
   metrics: {
     title: 'Match stats',
+    description: 'Every number comes from the match data, never from AI',
     possession: 'Possession',
     comparison: 'Team comparison',
     passCompletion: 'Pass completion',
@@ -46,7 +61,11 @@ export const STUDIO_COPY = {
     awaiting: 'Stats appear once play begins.',
     momentumEmpty: 'Momentum appears a few minutes into the match.',
     tableToggle: 'View as table',
-    lineStyle: { home: 'solid', away: 'dashed' },
+    lineStyle: { home: 'solid line', away: 'dashed line' },
+    momentumLead: (team: string) => `${team} on top`,
+    momentumLevel: 'Evenly balanced',
+    /** Index points between the sides that still read as level. */
+    momentumLevelMargin: 5,
     clock: 'Match time',
   },
   overlay: {
@@ -63,6 +82,11 @@ export const STUDIO_COPY = {
     locale: 'Language',
     invariant:
       'Changes the wording of key moments and graphics. The numbers never change.',
+  },
+  fullTime: {
+    title: 'Full time',
+    body: 'The recap is ready: the result, the key moments and a match report to download.',
+    action: 'See the recap',
   },
   connectionPrefix: 'Connection: ',
   notFound: "We couldn't find this match",

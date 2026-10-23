@@ -51,6 +51,7 @@ export const PITCH_COPY = {
   teamLegend: 'Team',
   allTeams: 'Both',
   kindLegend: 'Event types',
+  teamKey: 'Team colours',
   kinds: {
     GOAL: 'Goals',
     SHOT: 'Shots',
