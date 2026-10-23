@@ -17,6 +17,13 @@ Verification: CI (owner directive). Locally: Prettier, `nx lint web web-e2e`, `n
 
 Limitations: the pitch-filter chips, the confirmation phrase input and the reason textarea were already custom-styled native inputs and are unchanged. `alert`, `confirm` and `prompt` were not used anywhere.
 
+## 2026-10-23 — MQ-051: A readable match code instead of the events hash
+
+- Added `lib/match-code.ts`: the two team codes plus four Crockford base32 characters from the first 20 bits of the events hash (`PEN-MAR · N7R5`). The same hash always gives the same code; the five seeded fixtures are pinned in a unit test.
+- Lobby cards show one "Match code" chip with a copy button and tooltip. Seed and full hash moved into a "Technical details" disclosure.
+- The studio header, recap scoreline, recap export file name, "Recent sessions" ("Replay 5 · PEN-MAR · N7R5") and the audit target column for fixtures now use the code. Raw ids remain only in technical details and non-fixture audit targets.
+- Session screens resolve the code through the cached fixture list (`useMatchLabel`); until it loads they show no code rather than a raw id.
+
 ## 2026-10-23 — MQ-039 (part 2): Plain-language copy and a Technical details layer
 
 | Area                                                                                                                                                                                                                                                                                                                                     | Status | Evidence                                                              |

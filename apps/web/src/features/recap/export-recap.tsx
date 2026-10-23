@@ -4,15 +4,17 @@ import { DownloadIcon } from '@/components/icons';
 import { Button, Tooltip } from '@/components/ui';
 import { JSON_INDENT, JSON_MEDIA_TYPE, RECAP_COPY } from '@/constants/recap';
 import type { RecapDocument } from '@/lib/api/session-schemas';
+import { matchCodeSlug } from '@/lib/match-code';
+import { useMatchLabel } from '@/lib/use-match-label';
 
-const download = (recap: RecapDocument): void => {
+const download = (recap: RecapDocument, name: string): void => {
   const blob = new Blob([JSON.stringify(recap, null, JSON_INDENT)], {
     type: JSON_MEDIA_TYPE,
   });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = RECAP_COPY.exportFile(recap.fixtureId);
+  anchor.download = RECAP_COPY.exportFile(name);
   anchor.click();
   URL.revokeObjectURL(url);
 };
@@ -24,11 +26,13 @@ export function ExportRecap({
   recap: RecapDocument;
   className?: string;
 }) {
+  const { code } = useMatchLabel(recap.fixtureId);
+  const name = code ? matchCodeSlug(code) : recap.fixtureId;
   return (
     <Tooltip content={RECAP_COPY.exportHint}>
       <Button
         size="sm"
-        onClick={() => download(recap)}
+        onClick={() => download(recap, name)}
         leadingIcon={<DownloadIcon size={14} />}
         className={className}
       >

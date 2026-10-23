@@ -7,8 +7,6 @@ export const LOBBY_COPY = {
   listLabel: 'Matches',
   scenario: 'Storyline',
   events: 'Match events',
-  seedLabel: 'Seed',
-  hash: 'Events hash',
   start: 'Start replay',
   startLabel: (title: string) => `Start replay of ${title}`,
   starting: 'Starting…',
@@ -33,7 +31,6 @@ export const LOBBY_COPY = {
     loading: 'Loading recent replays',
     open: 'Open',
     openLabel: (title: string, n: number) => `Open replay ${n} of ${title}`,
-    number: (n: number) => `Replay ${n}`,
     notStarted: 'Not started',
   },
 } as const;
@@ -52,5 +49,3 @@ export const SCENARIO_WORD_SEPARATOR = /[-_]+/g;
 /** The judge quick-start (spec §19) begins with this scenario. */
 export const FEATURED_SCENARIO = 'comeback';
 export const FEATURED_LABEL = 'Recommended replay';
-
-export const HASH_PREVIEW_CHARS = 10;

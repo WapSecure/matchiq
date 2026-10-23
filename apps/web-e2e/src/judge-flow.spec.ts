@@ -100,7 +100,7 @@ test.describe('judge quick-start', () => {
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download recap (JSON)' }).click();
     expect((await download).suggestedFilename()).toBe(
-      `matchiq-recap-${FIXTURE_ID}.json`,
+      'matchiq-recap-NBA-HSR-NANA.json',
     );
   });
 });
