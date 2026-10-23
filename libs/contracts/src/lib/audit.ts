@@ -19,6 +19,11 @@ export const AUDIT_ACTIONS = {
   editorialResumed: 'editorial.resumed',
   killSwitchActivated: 'kill-switch.activated',
   killSwitchReleased: 'kill-switch.released',
+  publishPolicyChanged: 'editorial.publish-policy.changed',
+  overlayAwaitingApproval: 'overlay.awaiting-approval',
+  overlayApproved: 'overlay.approved',
+  overlayRejected: 'overlay.rejected',
+  overlayApprovalExpired: 'overlay.approval-expired',
 } as const;
 
 /** Dotted lower-case verb phrase; open so new actions never invalidate stored rows. */

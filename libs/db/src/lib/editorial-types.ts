@@ -7,10 +7,12 @@ import type {
   InsightPublication,
   OverlayEditorialState,
   OverlayStatus,
+  PublishPolicy,
 } from '@matchiq/contracts';
-import type { FixtureKey, LedgerTransaction } from './ports.js';
+import type { FixtureKey } from './ports.js';
+import type { ReviewReader, ReviewTransaction } from './review-types.js';
 
-export type EditorialScope = 'ORG' | 'FIXTURE';
+export type EditorialScope = 'ORG' | 'FIXTURE' | 'APPROVAL';
 
 export type {
   InsightEditorialState,
@@ -36,6 +38,8 @@ export interface EditorialControlWrite {
 export interface EditorialControls {
   readonly freeze: EditorialControlRow | null;
   readonly killSwitch: EditorialControlRow | null;
+  /** Active means the session publishes in MANUAL (ADR-0023). */
+  readonly approval: EditorialControlRow | null;
 }
 
 export interface OverlayRow {
@@ -56,12 +60,12 @@ export interface InsightRow {
 export interface OverlayEditorialWrite {
   readonly status: OverlayStatus;
   readonly state: OverlayEditorialState;
-  readonly reason: string;
+  readonly reason: string | null;
   readonly endReason?: string;
 }
 
 /** Operator commands; every method runs inside the caller's transaction. */
-export interface EditorialTransaction extends LedgerTransaction {
+export interface EditorialTransaction extends ReviewTransaction {
   /** Unlocked lookup of the fixture an id belongs to. */
   fixtureOfOverlay(orgId: string, overlayId: string): Promise<string | null>;
   fixtureOfInsight(orgId: string, insightId: string): Promise<string | null>;
@@ -106,7 +110,8 @@ export interface EditorialUnitOfWork {
 /** What the worker's publish path needs to apply editorial policy to one batch. */
 export interface EditorialView {
   readonly mode: EditorialMode;
-  /** Cues already off air for editorial reasons, by overlay id. */
+  readonly publishPolicy: PublishPolicy;
+  /** Cues with an editorial state: off air, held or under review for editorial reasons, by overlay id. */
   readonly overlays: ReadonlyMap<string, OverlayEditorialState>;
   /** Cues with a stored row and no editorial state: on air now or aired before. */
   readonly aired: ReadonlySet<string>;
@@ -119,7 +124,7 @@ export interface AuditReader {
   list(orgId: string, query: AuditEventQuery): Promise<AuditPage>;
 }
 
-export interface EditorialReader {
+export interface EditorialReader extends ReviewReader {
   /** Null when the fixture does not exist. */
   status(key: FixtureKey): Promise<EditorialStatus | null>;
   killSwitch(orgId: string): Promise<EditorialControlRow | null>;
@@ -129,6 +134,9 @@ export const editorialModeOf = (controls: EditorialControls): EditorialMode => {
   if (controls.killSwitch?.active) return 'KILLED';
   return controls.freeze?.active ? 'FROZEN' : 'AUTO';
 };
+
+export const publishPolicyOf = (controls: EditorialControls): PublishPolicy =>
+  controls.approval?.active ? 'MANUAL' : 'AUTO';
 
 const controlView = (row: EditorialControlRow | null) => ({
   active: row?.active ?? false,
@@ -143,4 +151,8 @@ export const toEditorialStatus = (
   mode: editorialModeOf(controls),
   freeze: controlView(controls.freeze),
   killSwitch: controlView(controls.killSwitch),
+  publishPolicy: {
+    policy: publishPolicyOf(controls),
+    changedAt: controls.approval?.changedAt.toISOString() ?? null,
+  },
 });

@@ -2,6 +2,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Executor } from '../client.js';
 import {
   editorialModeOf,
+  publishPolicyOf,
   type EditorialControlRow,
   type EditorialControls,
   type EditorialScope,
@@ -36,7 +37,7 @@ export const readControls = async (
     .select({ scopeType: c.scopeType, ...controlColumns })
     .from(c)
     .where(
-      sql`${c.orgId} = ${key.orgId} and ((${c.scopeType} = 'FIXTURE' and ${c.scopeId} = ${key.fixtureId}) or (${c.scopeType} = 'ORG' and ${c.scopeId} = ${key.orgId}))`,
+      sql`${c.orgId} = ${key.orgId} and ((${c.scopeType} in ('FIXTURE', 'APPROVAL') and ${c.scopeId} = ${key.fixtureId}) or (${c.scopeType} = 'ORG' and ${c.scopeId} = ${key.orgId}))`,
     );
   const pick = (scope: EditorialScope): EditorialControlRow | null => {
     const row = rows.find((r) => r.scopeType === scope);
@@ -49,7 +50,11 @@ export const readControls = async (
         }
       : null;
   };
-  return { freeze: pick('FIXTURE'), killSwitch: pick('ORG') };
+  return {
+    freeze: pick('FIXTURE'),
+    killSwitch: pick('ORG'),
+    approval: pick('APPROVAL'),
+  };
 };
 
 export const readControl = async (
@@ -126,6 +131,7 @@ export const readEditorialView = async (
   const overlays = await overlayStates(db, key, ids.overlayIds);
   return {
     mode: editorialModeOf(controls),
+    publishPolicy: publishPolicyOf(controls),
     overlays: overlays.blocked,
     aired: overlays.aired,
     suppressedInsights: await suppressedInsights(db, key, ids.insightIds),

@@ -26,6 +26,7 @@ export const initialMatchData = (fixtureId: string): MatchData => ({
   retractions: [],
   ruledOut: {},
   suppressed: {},
+  reviewVersion: 0,
   momentum: [],
   connection: INITIAL_CONNECTION,
   hydrationToken: 0,
@@ -86,6 +87,8 @@ export const reduceMessage = (
       return reduceReplay(state, message.payload);
     case 'editorial.status':
       return reduceEditorial(state, message.payload);
+    case 'overlay.review':
+      return { reviewVersion: state.reviewVersion + 1 };
     case 'heartbeat':
       return {};
   }

@@ -40,13 +40,17 @@ export class EditorialEffects {
   }
 }
 
-/** Everything an operator command carries besides its target. */
-export interface CommandContext {
+/** The admitted actor and the request, correlation and idempotency headers. */
+export interface RequestContext {
   readonly actor: Actor;
-  readonly reason: string;
   readonly requestId?: string;
   readonly correlationId?: string;
   readonly idempotencyKey?: string;
+}
+
+/** Everything an operator command carries besides its target. */
+export interface CommandContext extends RequestContext {
+  readonly reason: string;
 }
 
 type EditorialCause = Exclude<
@@ -55,7 +59,7 @@ type EditorialCause = Exclude<
 >;
 
 export const auditOf = (
-  ctx: CommandContext,
+  ctx: RequestContext & { readonly reason?: string },
   entry: Omit<
     AuditEntry,
     | 'orgId'
@@ -71,7 +75,7 @@ export const auditOf = (
   actor: ctx.actor.id,
   actorType: ctx.actor.type,
   ...auditNameOf(ctx.actor),
-  reason: ctx.reason,
+  ...(ctx.reason === undefined ? {} : { reason: ctx.reason }),
   ...(ctx.requestId === undefined ? {} : { requestId: ctx.requestId }),
   ...(ctx.correlationId === undefined
     ? {}
@@ -79,7 +83,7 @@ export const auditOf = (
   ...entry,
 });
 
-const draft = (
+export const draft = (
   fixtureId: string,
   emittedAt: string,
   body: Pick<StreamMessageDraft, 'type' | 'payload'>,

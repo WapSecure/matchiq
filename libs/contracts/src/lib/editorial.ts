@@ -55,12 +55,30 @@ export const EditorialControl = z.strictObject({
   changedAt: UtcTimestamp.nullable(),
 });
 
+/**
+ * Per-session publish policy (ADR-0023): `AUTO` airs every gated cue,
+ * `MANUAL` holds each one as `AWAITING_APPROVAL` until a producer reviews it.
+ */
+export const PublishPolicy = z.enum(['AUTO', 'MANUAL']);
+
+export const PublishPolicyControl = z.strictObject({
+  policy: PublishPolicy,
+  changedAt: UtcTimestamp.nullable(),
+});
+
+export const AUTO_PUBLISH_POLICY = {
+  policy: 'AUTO',
+  changedAt: null,
+} as const satisfies z.infer<typeof PublishPolicyControl>;
+
 /** Public view: carries no actor or reason, which stay in the audit trail. */
 export const EditorialStatus = z.strictObject({
   fixtureId: FixtureId,
   mode: EditorialMode,
   freeze: EditorialControl,
   killSwitch: EditorialControl,
+  /** Always set by the API; absent on frames stored before ADR-0023, which means AUTO. */
+  publishPolicy: PublishPolicyControl.optional(),
 });
 
 export const EditorialStatusResult = z.strictObject({
@@ -110,6 +128,8 @@ export type InsightRetractCause = z.infer<typeof InsightRetractCause>;
 export type InsightRetraction = z.infer<typeof InsightRetraction>;
 export type EditorialMode = z.infer<typeof EditorialMode>;
 export type EditorialControl = z.infer<typeof EditorialControl>;
+export type PublishPolicy = z.infer<typeof PublishPolicy>;
+export type PublishPolicyControl = z.infer<typeof PublishPolicyControl>;
 export type EditorialStatus = z.infer<typeof EditorialStatus>;
 export type EditorialStatusResult = z.infer<typeof EditorialStatusResult>;
 export type KillSwitchStatus = z.infer<typeof KillSwitchStatus>;

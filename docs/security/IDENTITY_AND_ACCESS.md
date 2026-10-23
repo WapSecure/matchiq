@@ -28,12 +28,12 @@ Roles are the spec §40 names. A route needs exactly one permission. `anonymous`
 | audit:read                      |                   |      ✓       |    ✓     |         |           |        |           |
 | preferences:write               |                   |      ✓       |    ✓     |    ✓    |           |   ✓    |           |
 | members:manage (reserved)       |                   |      ✓       |          |         |           |        |           |
-| policy:configure (reserved)     |                   |      ✓       |          |         |           |        |           |
+| policy:configure                |                   |      ✓       |    ✓     |         |           |        |           |
 | billing:read (reserved)         |                   |      ✓       |          |         |           |        |           |
 | platform:diagnostics (reserved) |         ✓         |              |          |         |           |        |           |
 | platform:config (reserved)      |         ✓         |              |          |         |           |        |           |
 
-**Reserved, no route yet.** `billing:read`, `members:manage`, `policy:configure`, `platform:diagnostics`, `platform:config` and `insights:write` are in the matrix but guard no API route today. They exist so roles are defined before the features arrive (ADR-0030, ADR-0032, ADR-0035). `preferences:write` is also unguarded until the player-focus work lands (MQ-066).
+**Reserved, no route yet.** `billing:read`, `members:manage`, `platform:diagnostics`, `platform:config` and `insights:write` are in the matrix but guard no API route today. They exist so roles are defined before the features arrive (ADR-0030, ADR-0032, ADR-0035). `policy:configure` guards the per-match publish policy (ADR-0023). `preferences:write` is also unguarded until the player-focus work lands (MQ-066).
 
 The source of truth is `libs/access/src/lib/matrix.ts`; `libs/access/tests/matrix.spec.ts` pins the spec rules (only producers publish, a producer cannot read billing, the platform operator sees no tenant data, the anonymous demo is read-only apart from replay controls).
 

@@ -27,6 +27,7 @@ import {
   EditorialEffects,
   retractInTx,
 } from './editorial-writes';
+import { isOnAir } from './review-writes';
 
 type Reply<T> = StoredResponse & { body: T };
 
@@ -219,7 +220,7 @@ export class EditorialControlsService {
       const key = { orgId: ctx.actor.orgId, fixtureId };
       if (!(await tx.lockFixture(key))) continue;
       const live = input.active ? await tx.liveOverlays(key) : [];
-      for (const overlay of live.filter((o) => o.editorialState === null)) {
+      for (const overlay of live.filter(isOnAir)) {
         await retractInTx(tx, { key, overlay, cause: 'KILL_SWITCH', now }, ctx);
         retracted.push(overlay.overlayId);
       }

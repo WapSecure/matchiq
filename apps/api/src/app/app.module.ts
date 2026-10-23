@@ -24,6 +24,9 @@ import {
 } from './editorial/editorial.controller';
 import { EditorialEffects } from './editorial/editorial-writes';
 import { EditorialService } from './editorial/editorial.service';
+import { PublishPolicyService } from './editorial/publish-policy.service';
+import { ReviewController } from './editorial/review.controller';
+import { ReviewService } from './editorial/review.service';
 import { IdempotencyService } from './http/idempotency.service';
 import { API_LIMITS, SERVICE_NAME, THROTTLERS } from './constants';
 import { FixturesController } from './fixtures/fixtures.controller';
@@ -55,6 +58,7 @@ export const API_CONTROLLERS = [
   IntelligenceController,
   EditorialController,
   EditorialControlsController,
+  ReviewController,
   AuditController,
   MeController,
 ];
@@ -99,6 +103,8 @@ export class AppModule {
         EditorialEffects,
         EditorialService,
         EditorialControlsService,
+        ReviewService,
+        PublishPolicyService,
         IdempotencyService,
         FixturesService,
         IngestService,

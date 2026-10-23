@@ -25,6 +25,11 @@ export const API_PATHS = {
     `/overlays/${encodeURIComponent(overlayId)}/retract`,
   suppress: (insightId: string) =>
     `/insights/${encodeURIComponent(insightId)}/suppress`,
+  review: (insightId: string) =>
+    `/insights/${encodeURIComponent(insightId)}/review`,
+  overlayReviews: (fixtureId: string) => `${fx(fixtureId)}/overlay-reviews`,
+  publishPolicy: (fixtureId: string) =>
+    `${fx(fixtureId)}/editorial/publish-policy`,
   killSwitch: '/editorial/kill-switch',
   killSwitchActivate: '/editorial/kill-switch/activate',
   killSwitchRelease: '/editorial/kill-switch/release',

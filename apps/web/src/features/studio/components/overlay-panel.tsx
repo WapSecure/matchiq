@@ -11,6 +11,7 @@ import { Badge, InfoTip, Panel, SegmentedControl } from '@/components/ui';
 import { OVERLAY_COPY } from '@/constants/overlay';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
 import { formatClock } from '@/lib/format';
+import { ApprovalQueue } from '../approval/approval-queue';
 import { useEditorialMode } from '../editorial/editorial-status';
 import { RetractCueButton } from '../editorial/retract-cue-button';
 import { useOnAirCue } from '../hooks/use-on-air-cue';
@@ -134,6 +135,7 @@ export function OverlayPanel({
         <HoldControl />
       </div>
       {footer}
+      <ApprovalQueue />
       <CueLog />
     </Panel>
   );

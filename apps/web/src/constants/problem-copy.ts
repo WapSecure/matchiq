@@ -88,6 +88,27 @@ export const PROBLEM_COPY: Record<string, ErrorCopy | ErrorKind> = {
     message: "There's nothing to take off air.",
     action: 'none',
   },
+  'overlay-approval-expired': {
+    title: 'That graphic missed its moment',
+    message: 'Its moment has passed, so it can no longer go on air.',
+    action: 'none',
+  },
+  'overlay-not-awaiting-approval': {
+    title: 'That graphic was already decided',
+    message: 'Someone already sent it to air or dropped it. Nothing changed.',
+    action: 'none',
+  },
+  'overlay-revision-stale': {
+    title: 'The wording just changed',
+    message: 'Check the new version, then decide again.',
+    action: 'none',
+  },
+  'editorial-air-paused': {
+    title: 'Graphics are on hold',
+    message:
+      'Graphics are paused or the emergency stop is on, so nothing can go on air.',
+    action: 'none',
+  },
   'insight-not-found': {
     title: 'That key moment no longer exists',
     message: 'It may have been removed with its replay.',

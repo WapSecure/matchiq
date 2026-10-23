@@ -1,0 +1,2 @@
+ALTER TABLE "editorial_controls" DROP CONSTRAINT "editorial_controls_scope_valid";--> statement-breakpoint
+ALTER TABLE "editorial_controls" ADD CONSTRAINT "editorial_controls_scope_valid" CHECK ("editorial_controls"."scope_type" in ('ORG', 'FIXTURE', 'APPROVAL'));

@@ -208,4 +208,7 @@ export const EDITORIAL_REASONS = {
   KILLED: 'KILL_SWITCH',
   suppressed: 'INSIGHT_SUPPRESSED',
   offAir: 'CUE_OFF_AIR',
+  awaitingApproval: 'AWAITING_APPROVAL',
+  approved: 'APPROVED_COPY_LOCKED',
+  manualRevision: 'MANUAL_REVISION_WITHHELD',
 } as const;

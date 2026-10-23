@@ -58,6 +58,7 @@ export const LIMITS = {
   auditIdentifierMax: 128,
   faultEveryNthMax: 50,
   faultNoteMax: 300,
+  reviewQueueMax: 20,
 } as const;
 
 export const MESSAGES = {
@@ -75,4 +76,5 @@ export const MESSAGES = {
   overlayTooLong: 'display window exceeds maxDisplayMs',
   auditRange: 'from must not be after to',
   auditTarget: 'targetId requires targetType',
+  reviewOverrides: 'duration and priority apply to an approval only',
 } as const;
