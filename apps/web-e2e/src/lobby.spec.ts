@@ -25,7 +25,7 @@ test.describe('fixture lobby', () => {
     await expect(cards.first()).toContainText('4207');
     await expect(cards.nth(1)).toContainText('High press');
     const sessions = page.getByRole('list', { name: 'Recent replay sessions' });
-    await expect(sessions).toContainText('Session 1');
+    await expect(sessions).toContainText('Replay 1 · NBA-HSR · NANA');
     await expect(sessions).toContainText('Playing');
   });
 
@@ -90,7 +90,7 @@ test.describe('fixture lobby', () => {
     await mockApi(page);
     await page.goto('/fixtures');
     await expect(page.getByRole('article').first()).toBeVisible();
-    await expect(page.getByText('Session 1')).toBeVisible();
+    await expect(page.getByText('Replay 1 · NBA-HSR · NANA')).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });
 
