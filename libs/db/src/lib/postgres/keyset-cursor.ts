@@ -6,13 +6,15 @@ export class InvalidCursorError extends Error {}
 export type CursorKind =
   (typeof PAGE_CURSOR.kinds)[keyof typeof PAGE_CURSOR.kinds];
 
-export type CursorPart = 'timestamp' | 'fixtureId';
+export type CursorPart = 'timestamp' | 'fixtureId' | 'integer' | 'text';
 
 const valid: Record<CursorPart, (value: string) => boolean> = {
   timestamp: (value) =>
     PAGE_CURSOR.timestampPattern.test(value) &&
     !Number.isNaN(Date.parse(value)),
   fixtureId: (value) => FixtureId.safeParse(value).success,
+  integer: (value) => PAGE_CURSOR.integerPattern.test(value),
+  text: (value) => value.length > 0 && value.length <= PAGE_CURSOR.textMax,
 };
 
 /**

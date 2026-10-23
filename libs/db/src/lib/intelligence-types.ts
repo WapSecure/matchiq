@@ -202,4 +202,25 @@ export interface IntelligenceReader {
   overlays(key: FixtureKey): Promise<OverlayCue[]>;
   recap(key: FixtureKey): Promise<RecapDocument | null>;
   traces(key: FixtureKey): Promise<InsightTrace[]>;
+  /** Detection order, `(detectedSequence, insightId)`. */
+  insightPage(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<Insight>>;
+  /** Insight order, then `(persona, locale, narrativeId)`. */
+  narrativePage(
+    key: FixtureKey,
+    filter: NarrativeFilter,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<Narrative>>;
+  /** On-air cues in publication order, `(publishedSequence, overlayId)`. */
+  overlayPage(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<OverlayCue>>;
+  /** One trace per insight, in detection order. */
+  tracePage(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<InsightTrace>>;
 }

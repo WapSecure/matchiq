@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type {
+  CursorPage,
+  CursorPageQuery,
   Insight,
   MatchSnapshot,
   Narrative,
@@ -10,12 +12,12 @@ import type {
   FixtureReader,
   InsightTrace,
   IntelligenceReader,
-  NarrativeFilter,
   RecapDocument,
 } from '@matchiq/db';
+import { readPage } from '../http/cursor-page';
 import { problem } from '../http/problems';
 import { FIXTURE_READER, INTELLIGENCE_READER } from '../infrastructure/tokens';
-import type { ItemList } from '../replay/replay.service';
+import type { NarrativeQuery } from './intelligence.schemas';
 
 /** Read models the worker's pipeline maintains, scoped to the caller's organisation (ADR-0018). */
 @Injectable()
@@ -32,21 +34,30 @@ export class IntelligenceService {
     return snapshot;
   }
 
-  async insights(key: FixtureKey): Promise<ItemList<Insight>> {
-    return { items: await this.reader.insights(await this.known(key)) };
+  async insights(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<Insight>> {
+    const known = await this.known(key);
+    return readPage(() => this.reader.insightPage(known, query));
   }
 
   async narratives(
     key: FixtureKey,
-    filter: NarrativeFilter,
-  ): Promise<ItemList<Narrative>> {
-    return {
-      items: await this.reader.narratives(await this.known(key), filter),
-    };
+    { persona, locale, ...query }: NarrativeQuery,
+  ): Promise<CursorPage<Narrative>> {
+    const known = await this.known(key);
+    return readPage(() =>
+      this.reader.narrativePage(known, { persona, locale }, query),
+    );
   }
 
-  async overlays(key: FixtureKey): Promise<ItemList<OverlayCue>> {
-    return { items: await this.reader.overlays(await this.known(key)) };
+  async overlays(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<OverlayCue>> {
+    const known = await this.known(key);
+    return readPage(() => this.reader.overlayPage(known, query));
   }
 
   async recap(key: FixtureKey): Promise<RecapDocument> {
@@ -57,8 +68,12 @@ export class IntelligenceService {
   }
 
   /** Agent Observatory: per-insight runs and gate decisions; holds no prompts or secrets. */
-  async traces(key: FixtureKey): Promise<ItemList<InsightTrace>> {
-    return { items: await this.reader.traces(await this.known(key)) };
+  async traces(
+    key: FixtureKey,
+    query: CursorPageQuery,
+  ): Promise<CursorPage<InsightTrace>> {
+    const known = await this.known(key);
+    return readPage(() => this.reader.tracePage(known, query));
   }
 
   /** Another organisation's fixture answers the same 404 as a missing one. */

@@ -323,7 +323,9 @@ export interface paths {
         };
         /**
          * Detected insights with their evidence
-         * @description Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * @description Detection order, `(detectedSequence, insightId)`. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.
+         *
+         *     Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listInsights"];
         put?: never;
@@ -343,7 +345,9 @@ export interface paths {
         };
         /**
          * Published narratives, optionally for one persona and locale
-         * @description Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * @description Insight order, then persona, locale and id. `total` counts the narratives the filters match. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.
+         *
+         *     Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listNarratives"];
         put?: never;
@@ -363,7 +367,9 @@ export interface paths {
         };
         /**
          * Overlay cues published for the fixture
-         * @description Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         * @description Cues that went on air, in publication order, `(publishedSequence, overlayId)`. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.
+         *
+         *     Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["listOverlays"];
         put?: never;
@@ -405,7 +411,7 @@ export interface paths {
         };
         /**
          * Agent runs, gate verdicts and editorial decisions per insight
-         * @description The Agent Observatory. Holds no prompts or secrets.
+         * @description The Agent Observatory. Holds no prompts or secrets. One trace per insight, in detection order. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.
          *
          *     Access: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
@@ -1549,15 +1555,23 @@ export interface components {
         };
         InsightTraceList: {
             items: components["schemas"]["InsightTrace"][];
+            nextCursor: string | null;
+            total?: number;
         };
         InsightList: {
             items: components["schemas"]["Insight"][];
+            nextCursor: string | null;
+            total?: number;
         };
         NarrativeList: {
             items: components["schemas"]["Narrative"][];
+            nextCursor: string | null;
+            total?: number;
         };
         OverlayList: {
             items: components["schemas"]["OverlayCue"][];
+            nextCursor: string | null;
+            total?: number;
         };
         EditorialStatusResult: {
             status: components["schemas"]["EditorialStatus"];
@@ -3367,7 +3381,10 @@ export interface operations {
     };
     listInsights: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
@@ -3379,7 +3396,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Insights */
+            /** @description One page of insights, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3387,6 +3404,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InsightList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
@@ -3466,6 +3493,8 @@ export interface operations {
     listNarratives: {
         parameters: {
             query?: {
+                cursor?: string;
+                limit?: number;
                 persona?: "CASUAL" | "ANALYST" | "BROADCAST";
                 locale?: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
             };
@@ -3480,7 +3509,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Narratives */
+            /** @description One page of narratives, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3488,6 +3517,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NarrativeList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
@@ -3566,7 +3605,10 @@ export interface operations {
     };
     listOverlays: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
@@ -3578,7 +3620,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Overlay cues */
+            /** @description One page of overlay cues, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3586,6 +3628,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OverlayList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */
@@ -3762,7 +3814,10 @@ export interface operations {
     };
     listAgentRuns: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
@@ -3774,7 +3829,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Insight traces */
+            /** @description One page of insight traces, with the total */
             200: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3782,6 +3837,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InsightTraceList"];
+                };
+            };
+            /** @description `invalid-cursor`: Invalid pagination cursor */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description `unauthorized`: Authentication required */

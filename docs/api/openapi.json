@@ -4509,7 +4509,7 @@
       "get": {
         "operationId": "listInsights",
         "summary": "Detected insights with their evidence",
-        "description": "Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "Detection order, `(detectedSequence, insightId)`. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
@@ -4534,12 +4534,31 @@
             "required": true
           },
           {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 500,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
             "$ref": "#/components/parameters/RequestId"
           }
         ],
         "responses": {
           "200": {
-            "description": "Insights",
+            "description": "One page of insights, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -4549,6 +4568,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InsightList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -4770,7 +4817,7 @@
       "get": {
         "operationId": "listNarratives",
         "summary": "Published narratives, optionally for one persona and locale",
-        "description": "Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "Insight order, then persona, locale and id. `total` counts the narratives the filters match. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
@@ -4793,6 +4840,25 @@
               "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
             },
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 500,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
           },
           {
             "in": "query",
@@ -4825,7 +4891,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Narratives",
+            "description": "One page of narratives, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -4835,6 +4901,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NarrativeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -5056,7 +5150,7 @@
       "get": {
         "operationId": "listOverlays",
         "summary": "Overlay cues published for the fixture",
-        "description": "Access: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "Cues that went on air, in publication order, `(publishedSequence, overlayId)`. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.\n\nAccess: requires the `overlays:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
@@ -5081,12 +5175,31 @@
             "required": true
           },
           {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 500,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
             "$ref": "#/components/parameters/RequestId"
           }
         ],
         "responses": {
           "200": {
-            "description": "Overlay cues",
+            "description": "One page of overlay cues, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -5096,6 +5209,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OverlayList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -5587,7 +5728,7 @@
       "get": {
         "operationId": "listAgentRuns",
         "summary": "Agent runs, gate verdicts and editorial decisions per insight",
-        "description": "The Agent Observatory. Holds no prompts or secrets.\n\nAccess: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "The Agent Observatory. Holds no prompts or secrets. One trace per insight, in detection order. Keyset pagination: pass `nextCursor` back as `cursor` until it is null. A tampered cursor, or one from another list, is `400 invalid-cursor`. A cursor is bound to its match. `limit` defaults to and is capped at 500, so a call without a cursor returns the whole list for matches up to that size.\n\nAccess: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
@@ -5612,12 +5753,31 @@
             "required": true
           },
           {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 500,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
             "$ref": "#/components/parameters/RequestId"
           }
         ],
         "responses": {
           "200": {
-            "description": "Insight traces",
+            "description": "One page of insight traces, with the total",
             "headers": {
               "X-Request-ID": {
                 "$ref": "#/components/headers/RequestId"
@@ -5627,6 +5787,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InsightTraceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid-cursor`: Invalid pagination cursor",
+            "x-problem-types": [
+              "urn:matchiq:problem:invalid-cursor"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalid-cursor": {
+                    "summary": "Invalid pagination cursor",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-cursor",
+                      "title": "Invalid pagination cursor",
+                      "status": 400
+                    }
+                  }
                 }
               }
             }
@@ -13176,10 +13364,28 @@
             "items": {
               "$ref": "#/components/schemas/InsightTrace"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -13191,10 +13397,28 @@
             "items": {
               "$ref": "#/components/schemas/Insight"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -13206,10 +13430,28 @@
             "items": {
               "$ref": "#/components/schemas/Narrative"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -13221,10 +13463,28 @@
             "items": {
               "$ref": "#/components/schemas/OverlayCue"
             }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "items"
+          "items",
+          "nextCursor"
         ],
         "additionalProperties": false
       },

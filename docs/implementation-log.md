@@ -2,6 +2,21 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## 2026-10-23 — MQ-058: Cursor pagination for the per-match lists
+
+| Area                                                                                                                                                                                                                                                                                                                                                                             | Status | Evidence                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
+| `GET /fixtures/{id}/insights`, `/narratives`, `/overlays`, `/agent-runs` take `cursor` + `limit` and return the shared `CursorPage` envelope `{ items, nextCursor, total }`. `limit` defaults to and is capped at 500, so a call without a cursor returns the same whole list as before                                                                                          | Done   | `match-paging.integration.spec.ts` |
+| Orders keep what each consumer already reads: insights `(detectedSequence, insightId)`, narratives insight order then `(persona, locale, narrativeId)`, overlays on-air cues by `(publishedSequence, overlayId)`, agent-runs one trace per insight in detection order. `createdAt` is not a usable key: a worker batch shares one `now()`, so it does not follow detection order | Done   | same spec                          |
+| Cursors reuse the list-tagged codec, with `integer` and `text` parts added, and carry the fixture id, so a cursor from another match or list is `400 invalid-cursor`. Reads stay under `withTenant` RLS plus the `org_id` predicate                                                                                                                                              | Done   | codec spec, same spec              |
+| `total` is a count with the same filters (narratives count after `persona` and `locale`; overlays exclude cues that never aired)                                                                                                                                                                                                                                                 | Done   | same spec                          |
+| Agent-runs pages load only the runs of their own insights, and keep one row per insight when an insight has several cues                                                                                                                                                                                                                                                         | Done   | same spec                          |
+| OpenAPI registry, `docs/api/openapi.json`, `libs/api-client` and the README pagination table regenerated. No Python contracts changed. Web parses these with non-strict `{ items }` schemas, so no web change                                                                                                                                                                    | Done   | `api-client:codegen`               |
+
+Caveat: web clients read the first page only. A match with more than 500 narratives for one `persona` and `locale` would need them to follow `nextCursor`.
+
+Verification: CI (owner directive). Locally: format, lint and typecheck for the touched projects, plus the touched spec files.
+
 ## 2026-10-23 — MQ-053 (2/2): One pagination family across every list
 
 | Area                                                                                                                                                                                                                                                                                                                                      | Status   | Evidence                                     |

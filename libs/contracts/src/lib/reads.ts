@@ -7,9 +7,9 @@ import {
   InsightPriority,
   PipelineStatus,
 } from './insight.js';
-import { ItemList } from './lobby.js';
 import { Narrative, NarrativeSource } from './narrative.js';
 import { OverlayCue } from './overlay.js';
+import { CursorPage } from './paging.js';
 import {
   ConfidenceLabel,
   FixtureId,
@@ -30,9 +30,10 @@ export const EventPage = z.strictObject({
   nextAfterSequence: z.int().min(-1).nullable(),
 });
 
-export const InsightList = ItemList(Insight);
-export const NarrativeList = ItemList(Narrative);
-export const OverlayList = ItemList(OverlayCue);
+/** The per-match lists are keyset-paged; `total` counts every row the filters match. */
+export const InsightList = CursorPage(Insight);
+export const NarrativeList = CursorPage(Narrative);
+export const OverlayList = CursorPage(OverlayCue);
 
 export const RecapNarrative = z.strictObject({
   persona: Persona,
@@ -121,7 +122,7 @@ export const InsightTrace = z.strictObject({
   editorial: InsightEditorialTrace,
 });
 
-export const InsightTraceList = ItemList(InsightTrace);
+export const InsightTraceList = CursorPage(InsightTrace);
 
 export type EventPage = z.infer<typeof EventPage>;
 export type InsightList = z.infer<typeof InsightList>;
