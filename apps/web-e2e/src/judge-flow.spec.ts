@@ -64,7 +64,7 @@ test.describe('judge quick-start', () => {
       'Northbridge prend le contrôle',
     );
     await expect(
-      page.getByRole('button', { name: 'Download recap (JSON)' }),
+      page.getByRole('button', { name: 'Download match report' }),
     ).toBeVisible();
     await checkScreen(page);
 
@@ -94,13 +94,21 @@ test.describe('judge quick-start', () => {
     await checkScreen(page);
   });
 
-  test('recap exports the structured document', async ({ page }) => {
+  test('recap downloads a match report or the data file', async ({ page }) => {
     await mockApi(page);
     await page.goto(`/studio/${FIXTURE_ID}/recap`);
-    const download = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Download recap (JSON)' }).click();
-    expect((await download).suggestedFilename()).toBe(
+    const menu = page.getByRole('button', { name: 'Download match report' });
+    const data = page.waitForEvent('download');
+    await menu.click();
+    await page.getByRole('menuitem', { name: /Data file/ }).click();
+    expect((await data).suggestedFilename()).toBe(
       'matchiq-recap-NBA-HSR-NANA.json',
+    );
+    const report = page.waitForEvent('download');
+    await menu.click();
+    await page.getByRole('menuitem', { name: /Match report/ }).click();
+    expect((await report).suggestedFilename()).toBe(
+      'matchiq-report-NBA-HSR-NANA.txt',
     );
   });
 });

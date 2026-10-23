@@ -3,9 +3,7 @@ import type {
   AgentRunOutcome,
   ModelProvider,
 } from '@matchiq/contracts';
-
-const plural = (n: number, one: string, many = `${one}s`) =>
-  `${n} ${n === 1 ? one : many}`;
+import type { FallbackGroup } from './fact-checks';
 
 export const OBSERVATORY_COPY = {
   metaTitle: 'AI fact-checks',
@@ -28,32 +26,13 @@ export const OBSERVATORY_COPY = {
   secretsNote:
     'Prompts, keys and passwords are never shown here; only what happened.',
   story: {
-    region: (kind: string, minute: string) => `${kind} at ${minute}`,
-    spotted: (minute: string) => `Spotted at ${minute}`,
-    written: {
-      AGENT: 'Written by AI',
-      TEMPLATE: 'Standard wording',
-      PENDING: 'Being written…',
-    },
-    checkPending: 'Fact check pending',
-    checked: 'Fact-checked ✓',
-    caught: (n: number) => `Fact check caught ${plural(n, 'problem')}`,
-    graphic: {
-      aiWording: 'Graphic updated with AI wording',
-      standard: 'Graphic kept standard wording',
-      RETRACTED: 'Taken off air by a producer',
-      HELD: 'Graphic held by a producer',
-      SUPPRESSED: 'Dropped by a producer',
-    },
-    versions: (n: number) => plural(n, 'version'),
-    why: 'Why standard wording?',
     caughtTitle: 'What the fact check caught',
   },
   technical: {
-    status: 'Pipeline status',
-    fallback: 'Fallback reason (raw)',
-    insightId: 'Insight id',
-    gate: 'Publish gate',
+    status: 'Status',
+    fallback: 'Raw fallback reason',
+    insightId: 'Moment ID',
+    gate: 'Fact check (publish gate)',
     gatePending: 'Gate has not run yet.',
     published: (n: number) => `${n} published`,
     templates: (n: number) => `${n} from templates`,
@@ -61,16 +40,16 @@ export const OBSERVATORY_COPY = {
       r === null ? 'Overlay copy unchanged' : `Overlay revision ${r}`,
     rejected: 'Rejected items',
     noRejections: 'Nothing rejected.',
-    runs: 'Agent runs',
+    runs: 'Run steps',
     noRuns: 'No agent runs recorded.',
     columns: {
-      agent: 'Agent',
-      provider: 'Provider',
-      model: 'Model deployment',
+      agent: 'Step',
+      provider: 'Written by',
+      model: 'Model',
       prompt: 'Prompt',
-      latency: 'Latency',
+      latency: 'Time taken',
       retries: 'Retries',
-      outcome: 'Outcome',
+      outcome: 'Result',
     },
     latency: (ms: number) => `${ms.toLocaleString('en-GB')} ms`,
     faultNotes: 'Demo failure notes',
@@ -130,40 +109,50 @@ export const OUTCOME_LABELS: Record<AgentRunOutcome, string> = {
 export const FALLBACK_REASON_COPY: readonly {
   pattern: RegExp;
   text: string;
+  group: FallbackGroup;
 }[] = [
   {
     pattern: /AI_ENABLED=false/i,
-    text: 'AI writing is switched off here, so standard wording was used.',
+    text: 'AI writing is switched off here.',
+    group: 'AI_OFF',
   },
   {
     pattern: /circuit breaker/i,
-    text: 'AI writing paused briefly to recover from delays, so standard wording was used.',
+    text: 'AI writing paused briefly to recover.',
+    group: 'AI_TROUBLE',
   },
   {
     pattern: /time(d)? ?out/i,
-    text: 'The AI took too long, so standard wording went out on time.',
+    text: 'The AI took too long.',
+    group: 'AI_TROUBLE',
   },
   {
     pattern:
       /unreachable|HTTP \d+|invalid PipelineResult|orchestration|enqueue|unavailable/i,
-    text: 'The AI service had a problem, so standard wording was used.',
+    text: 'The AI service was unavailable.',
+    group: 'AI_TROUBLE',
   },
   {
     pattern: /suppressed/i,
-    text: 'This moment was held back because it did not pass our checks.',
+    text: 'Held back because it did not pass our checks.',
+    group: 'HELD',
   },
   {
     pattern: /publish gate|fact checker|failed checks/i,
-    text: 'The fact check found a problem with the AI wording, so standard wording was used.',
+    text: 'The fact check rejected the AI wording.',
+    group: 'FACT_CHECK',
   },
   {
     pattern: /skipped/i,
     text: 'Part of the AI analysis was skipped to stay on time.',
+    group: 'AI_TROUBLE',
   },
 ];
 
-export const FALLBACK_REASON_DEFAULT =
-  'Standard wording was used for this moment.';
+export const FALLBACK_REASON_DEFAULT = {
+  text: 'Standard wording was the safer choice here.',
+  group: 'OTHER',
+} as const;
 export const FALLBACK_REASON_SEPARATOR = '; ';
 
 /** Fact-check issue codes (`GateIssueCode`) in plain words. */

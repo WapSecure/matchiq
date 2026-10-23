@@ -17,6 +17,7 @@ import {
 } from './mock-session';
 import { mockFaultTraces } from './mock-faults';
 import { pagedLobby } from './mock-paging';
+import { mockLoadTraces } from './mock-load';
 
 /** The public API and the signed-in BFF share one mock. */
 const API_PREFIX = /^\/(api\/v1|bff)/;
@@ -64,6 +65,8 @@ export type MockApiOptions = {
   faults?: boolean;
   /** Serve eight matches and eleven replays in keyset pages. */
   paging?: boolean;
+  /** Add moments that fell back to standard wording under heavy load. */
+  load?: boolean;
 };
 
 export type Recorder = {
@@ -96,7 +99,11 @@ const READS: Reads = {
   '/narratives': (url, o) => ({ items: o.hydrate ? narrativesFor(url) : [] }),
   '/overlays': (_, o) => ({ items: o.hydrate ? [mockCue()] : [] }),
   '/agent-runs': (_, o) => ({
-    items: o.faults ? [...mockTraces(), ...mockFaultTraces()] : mockTraces(),
+    items: [
+      ...mockTraces(),
+      ...(o.faults ? mockFaultTraces() : []),
+      ...(o.load ? mockLoadTraces() : []),
+    ],
   }),
 };
 

@@ -9,22 +9,25 @@ import { withUniqueKeys } from '@/lib/unique-keys';
 import { ProviderBadge } from './provider-badge';
 
 const copy = OBSERVATORY_COPY.technical;
+
 const COLUMNS = [
-  copy.columns.agent,
-  copy.columns.provider,
-  copy.columns.model,
-  copy.columns.prompt,
-  copy.columns.latency,
-  copy.columns.retries,
-  copy.columns.outcome,
+  { label: copy.columns.agent, numeric: false },
+  { label: copy.columns.provider, numeric: false },
+  { label: copy.columns.model, numeric: false },
+  { label: copy.columns.prompt, numeric: false },
+  { label: copy.columns.latency, numeric: true },
+  { label: copy.columns.retries, numeric: true },
+  { label: copy.columns.outcome, numeric: false },
 ];
 
 const OUTCOME_TONE: Record<AgentRun['outcome'], string> = {
-  SUCCEEDED: 'text-positive',
-  FAILED: 'text-critical',
-  TIMED_OUT: 'text-warning',
-  FALLBACK: 'text-ink-muted',
+  SUCCEEDED: 'bg-positive',
+  FAILED: 'bg-critical',
+  TIMED_OUT: 'bg-warning',
+  FALLBACK: 'bg-ink-subtle',
 };
+
+const CELL = 'px-3 py-2 align-middle';
 
 // runId is shared by every agent step of one insight's pipeline run.
 const runKey = (r: AgentRun) =>
@@ -46,45 +49,58 @@ export function RunTable({
   );
   return (
     <div
-      className="overflow-x-auto"
+      className="overflow-x-auto rounded-md border border-line"
       tabIndex={0}
       role="group"
       aria-label={caption}
     >
-      <table className="w-full min-w-[36rem] text-left text-xs">
+      <table className="w-full min-w-[38rem] border-collapse text-left text-xs">
         <caption className="sr-only">{caption}</caption>
-        <thead className="text-ink-subtle">
+        <thead className="bg-surface-sunken text-ink-muted">
           <tr>
             {COLUMNS.map((c) => (
-              <th key={c} scope="col" className="pb-1 pr-3 font-normal">
-                {c}
+              <th
+                key={c.label}
+                scope="col"
+                className={cn(CELL, 'font-medium', c.numeric && 'text-right')}
+              >
+                {c.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-surface">
           {ordered.map(({ item: run, key }) => (
-            <tr key={key} className="border-t border-line/60">
-              <th scope="row" className="py-1.5 pr-3 font-medium text-ink">
+            <tr key={key} className="border-t border-line">
+              <th scope="row" className={cn(CELL, 'font-medium text-ink')}>
                 {AGENT_LABELS[run.agent]}
               </th>
-              <td className="py-1.5 pr-3">
-                <ProviderBadge provider={run.provider} />
+              <td className={CELL}>
+                <ProviderBadge provider={run.provider} inline />
               </td>
-              <td className="py-1.5 pr-3 font-mono text-ink-muted">
+              <td className={cn(CELL, 'font-mono text-ink-muted')}>
                 {run.modelDeployment ?? OBSERVATORY_COPY.notApplicable}
               </td>
-              <td className="py-1.5 pr-3 font-mono text-ink-muted">
+              <td className={cn(CELL, 'font-mono text-ink-muted')}>
                 v{run.promptVersion}
               </td>
-              <td className="tabular py-1.5 pr-3 text-ink">
+              <td className={cn(CELL, 'tabular text-right font-mono text-ink')}>
                 {copy.latency(run.latencyMs)}
               </td>
-              <td className="tabular py-1.5 pr-3 text-ink">{run.retries}</td>
-              <td
-                className={cn('py-1.5 font-medium', OUTCOME_TONE[run.outcome])}
-              >
-                {OUTCOME_LABELS[run.outcome]}
+              <td className={cn(CELL, 'tabular text-right font-mono text-ink')}>
+                {run.retries}
+              </td>
+              <td className={cn(CELL, 'whitespace-nowrap text-ink')}>
+                <span className="inline-flex items-center gap-1.5">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'size-1.5 rounded-full',
+                      OUTCOME_TONE[run.outcome],
+                    )}
+                  />
+                  {OUTCOME_LABELS[run.outcome]}
+                </span>
               </td>
             </tr>
           ))}

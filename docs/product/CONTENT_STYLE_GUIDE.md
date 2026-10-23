@@ -119,29 +119,30 @@ Use the right-hand column on screen. The left-hand column stays in code, contrac
 
 ### 3.3 The plain-language story for a key moment
 
-The AI fact-checks page leads with a one-line story per key moment, built from data rather than from raw text:
+The AI fact-checks page shows each key moment's minute and type, then four labelled facts built from data rather than from raw text. Commentary and the on-screen graphic are always separate facts, because one can be AI-written while the other uses standard wording.
 
-> Spotted at 18' · Written by AI · Fact-checked ✓ · On air · 12 versions
+> 18' Goal · Commentary: AI-written · Graphic: Standard wording · Fact check: Passed ✓ · Ready in: 4 languages for 3 audiences
 
-| Step | Source | Wording |
+| Fact | Source | Wording |
 | --- | --- | --- |
-| Spotted | moment clock | "Spotted at 18'" |
-| Writing | publication | "Written by AI" / "Standard wording" / "Being written…" |
-| Fact check | gate report | "Fact-checked ✓" / "Fact check caught 1 problem" / "Fact check pending" |
-| Graphic | overlay revision and editorial state | "On air" / "Graphic kept standard wording" / "Taken off air by a producer" / "Held" / "Dropped by a producer" |
-| Versions | published narratives | "12 versions" (audiences × languages) |
+| Commentary | publication | "AI-written" / "Standard wording" / "Being written…" |
+| Graphic | overlay revision and editorial state | "AI-written" / "Standard wording" / "Not made yet" / "Taken off air by a producer" / "Held by a producer" / "Dropped by a producer" |
+| Fact check | gate report | "Passed ✓" / "Caught 1 problem" / "Pending" |
+| Ready in | published narratives | "4 languages for 3 audiences"; the tooltip lists them. Never "12 versions". |
+
+When several moments fall back for the same reason, the page says it once with a count ("9 moments used standard wording because the AI was slow or unavailable"). Each moment keeps only a short reason.
 
 ### 3.4 Translating machine text
 
-Strings produced by the agents and the worker (fallback reasons, fact-check notes, demo-failure notes) are **never shown raw** on the default view. The web maps them by pattern or code to sentences in `apps/web/src/constants/observatory.ts`. The original text stays available under Technical details for engineers. If a new reason appears that doesn't match a pattern, the default is "Standard wording was used for this moment."
+Strings produced by the agents and the worker (fallback reasons, fact-check notes, demo-failure notes) are **never shown raw** on the default view. The web maps them by pattern or code to sentences in `apps/web/src/constants/observatory.ts`. The original text stays available under Technical details for engineers. If a new reason appears that doesn't match a pattern, the default is "Standard wording was the safer choice here." These sentences follow a "Why standard wording:" label, so they do not repeat it.
 
 | Machine text (examples) | Plain sentence |
 | --- | --- |
-| `AI_ENABLED=false: deterministic templates only` | AI writing is switched off here, so standard wording was used. |
-| `agents service timed out`, `simulated model timeout` | The AI took too long, so standard wording went out on time. |
-| `circuit breaker open…` | AI writing paused briefly to recover, so standard wording was used. |
-| `agents service unreachable`, `HTTP 5xx`, `orchestration error` | The AI service had a problem, so standard wording was used. |
-| `every agent draft failed the publish gate`, `fact checker rejected drafts (…)` | The fact check found a problem with the AI wording, so standard wording was used. |
+| `AI_ENABLED=false: deterministic templates only` | AI writing is switched off here. |
+| `agents service timed out`, `simulated model timeout` | The AI took too long. |
+| `circuit breaker open…` | AI writing paused briefly to recover. |
+| `agents service unreachable`, `HTTP 5xx`, `orchestration error` | The AI service was unavailable. |
+| `every agent draft failed the publish gate`, `fact checker rejected drafts (…)` | The fact check rejected the AI wording. |
 | issue code `UNSUPPORTED_NUMBER` | A number that doesn't match the match data |
 | issue code `UNKNOWN_ENTITY` | A player or team that isn't in this match |
 | issue code `UNCITED_EVIDENCE` | A claim with no plays to back it up |

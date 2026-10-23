@@ -39,7 +39,10 @@ export function FaultChain({ runs, publication }: FaultChainProps) {
       className="rounded-md border border-warning/35 bg-warning/5 px-3 py-2"
     >
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
-        <Badge tone="warning">
+        <Badge
+          tone="warning"
+          className="h-auto min-h-5 max-w-full whitespace-normal py-0.5"
+        >
           {DEMO_FAULT_COPY.badge}: {FAULT_SCENARIO_SHORT[scenario]}
         </Badge>
         <h4 className="eyebrow">{DEMO_FAULT_COPY.chainTitle}</h4>
