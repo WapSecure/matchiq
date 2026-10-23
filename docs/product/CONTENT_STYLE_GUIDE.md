@@ -227,7 +227,7 @@ The disclosure must stay **visible on every page**, in plain words:
 - **UI chrome is en-GB.** Narratives and graphics are localized by the agents and by standard wording in `fr-FR`, `es-ES` and `pcm-NG`.
 - **Numbers never change between languages.** Only the words change. Format with the locale (`54,5 %` in French, `54,5 %` in Spanish).
 - **Language names in their own language:** Français, Español, Naijá (Pidgin).
-- **Fallback is said plainly:** "Not yet available in Français, so this is in English." Mark the fallback text with `lang="en-GB"`.
+- **Fallback is said plainly, with the language's English name:** "The French version isn't ready yet, so you're seeing English." Mark the fallback text with `lang="en-GB"`.
 - **Nigerian Pidgin (pcm):** write how people speak it in football commentary ("Dem don score!"). Keep it respectful and don't caricature it. Have every pcm string reviewed by a fluent speaker before release.
 - **French and Spanish:** use the football register of broadcast commentary (fr: « temps fort », « le score » ; es: « jugada clave », « marcador »). Use formal *vous* or *usted* in the UI and the natural commentary voice in narratives.
 - Keep strings whole. Don't concatenate translated fragments. Use functions with parameters (`(team) => …`) so word order can change.

@@ -16,16 +16,12 @@ function Provenance() {
       </span>
     );
   }
+  if (!snapshot.provisional) return null;
   return (
     <span className="flex flex-wrap items-center justify-center gap-2 text-micro text-ink-subtle">
-      <span className="font-mono">
-        {STUDIO_COPY.algorithm(snapshot.algorithmVersion)}
-      </span>
-      {snapshot.provisional ? (
-        <HintBadge tone="warning" hint={STUDIO_COPY.provisionalHint}>
-          {STUDIO_COPY.provisional}
-        </HintBadge>
-      ) : null}
+      <HintBadge tone="warning" hint={STUDIO_COPY.provisionalHint}>
+        {STUDIO_COPY.provisional}
+      </HintBadge>
     </span>
   );
 }

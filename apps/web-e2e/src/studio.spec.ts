@@ -11,7 +11,7 @@ import { envelope } from './support/mock-stream';
 
 /** The feed, not the throttled live-region echo of the same headline. */
 const insightFeed = (page: Page) =>
-  page.getByRole('group', { name: 'Match insights' });
+  page.getByRole('group', { name: 'Key moments' });
 
 const openStudio = async (page: Page) => {
   const api = await mockApi(page);
@@ -21,7 +21,7 @@ const openStudio = async (page: Page) => {
 };
 
 test.describe('live studio', () => {
-  test('shows score, clock, live status, insight and on-air cue', async ({
+  test('shows score, clock, live status, key moment and on-air graphic', async ({
     page,
   }) => {
     await openStudio(page);
@@ -35,10 +35,10 @@ test.describe('live studio', () => {
       page.getByRole('article', { name: 'Northbridge seize control' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('group', { name: /1 cue on air/ }),
+      page.getByRole('group', { name: /1 graphic on air/ }),
     ).toBeVisible();
     await expect(page.locator('[data-watermark]')).toHaveText(
-      /synthetic match demo/i,
+      /simulated match/i,
     );
   });
 
@@ -46,7 +46,7 @@ test.describe('live studio', () => {
     page,
   }) => {
     await openStudio(page);
-    const metrics = page.getByRole('region', { name: 'Live metrics' });
+    const metrics = page.getByRole('region', { name: 'Match stats' });
     await metrics.getByRole('button', { name: 'View as table' }).click();
     const firstRow = metrics
       .getByRole('group', { name: 'View as table' })
@@ -60,7 +60,7 @@ test.describe('live studio', () => {
   }) => {
     await openStudio(page);
     const trigger = page.getByRole('button', {
-      name: /open evidence for northbridge seize control/i,
+      name: /see the evidence for northbridge seize control/i,
     });
     await trigger.focus();
     await page.keyboard.press('Enter');
@@ -71,9 +71,12 @@ test.describe('live studio', () => {
     await expect(
       dialog.getByRole('button', { name: 'Close evidence' }),
     ).toBeFocused();
-    await expect(dialog).toContainText('Triggering events');
+    await expect(dialog).toContainText('The plays behind it');
     await expect(dialog).toContainText('Ball recovery');
-    await expect(dialog).toContainText('recoveries.home.rolling6m');
+    await expect(dialog).toContainText('Recoveries (home)');
+    await expect(dialog.getByTestId('technical-details').last()).toContainText(
+      'recoveries.home.rolling6m',
+    );
     await expect(dialog).toContainText('Away side retained 46% possession');
     await page.keyboard.press('Tab');
     await expect(dialog.locator(':focus')).toHaveCount(1);
@@ -86,7 +89,7 @@ test.describe('live studio', () => {
     page,
   }) => {
     await openStudio(page);
-    const metrics = page.getByRole('region', { name: 'Live metrics' });
+    const metrics = page.getByRole('region', { name: 'Match stats' });
     const scoreboard = page.getByRole('region', { name: 'Scoreboard' });
     const before = [await metrics.innerText(), await scoreboard.innerText()];
     await page.getByRole('radio', { name: /Français/ }).check({ force: true });
@@ -98,7 +101,7 @@ test.describe('live studio', () => {
     await expect(
       insightFeed(page).getByText('High regains drive home momentum swing'),
     ).toBeVisible();
-    await page.getByRole('radio', { name: 'Casual' }).check({ force: true });
+    await page.getByRole('radio', { name: 'Fan' }).check({ force: true });
     await expect(
       insightFeed(page).getByText('Northbridge are on top now'),
     ).toBeVisible();
@@ -107,7 +110,7 @@ test.describe('live studio', () => {
     );
   });
 
-  test('retracts an on-air cue immediately', async ({ page }) => {
+  test('takes an on-air graphic off air immediately', async ({ page }) => {
     const api = await openStudio(page);
     await api.push(
       envelope('overlay.retract', {
@@ -125,12 +128,16 @@ test.describe('live studio', () => {
     await expect(page.getByText('Superseded by goal review')).toBeVisible();
   });
 
-  test('replay transport waits for the worker to confirm', async ({ page }) => {
+  test('replay controls wait for the replay to confirm', async ({ page }) => {
     const api = await openStudio(page);
-    await page.getByRole('button', { name: 'Pause' }).click();
-    await expect(page.getByText(/Waiting for the replay worker/)).toBeVisible();
+    await page.getByRole('button', { name: 'Pause', exact: true }).click();
+    await expect(
+      page.getByText(/Waiting for the replay to respond/),
+    ).toBeVisible();
     await api.push(envelope('replay.status', mockStatus({ state: 'PAUSED' })));
-    await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Resume', exact: true }),
+    ).toBeVisible();
     // Controlled by server status: the radio only moves once the 202 lands.
     await page.getByRole('radio', { name: '5×' }).click({ force: true });
     await expect
@@ -143,12 +150,18 @@ test.describe('live studio', () => {
     page,
   }) => {
     const api = await openStudio(page);
-    const seek = page.getByRole('slider', { name: 'Skip ahead to event' });
+    const seek = page.getByRole('slider', { name: 'Jump ahead' });
     await expect(seek).toHaveAttribute('max', '1469');
-    await expect(seek).toHaveAttribute('aria-valuetext', 'Event 641 of 1470');
+    await expect(seek).toHaveAttribute(
+      'aria-valuetext',
+      '44% through the replay',
+    );
     await seek.focus();
     await page.keyboard.press('ArrowLeft');
-    await expect(seek).toHaveAttribute('aria-valuetext', 'Event 641 of 1470');
+    await expect(seek).toHaveAttribute(
+      'aria-valuetext',
+      '44% through the replay',
+    );
     await page.keyboard.press('ArrowRight');
     await expect
       .poll(() => api.replayCommands)
@@ -200,7 +213,7 @@ test.describe('live studio', () => {
     page,
   }) => {
     await openStudio(page);
-    await page.getByRole('button', { name: /open evidence/i }).click();
+    await page.getByRole('button', { name: /see the evidence/i }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expectNoBlockingA11yViolations(page);
   });

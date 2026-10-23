@@ -47,7 +47,7 @@ export const PITCH_COPY = {
       : `${count} event${count === 1 ? '' : 's'} plotted${window ? `, ${window}` : ''}. Each team attacks the goal its arrow points to.`,
   window: (from: string, to: string) => `${from} to ${to}`,
   windowNote: (from: string, to: string) =>
-    `Live window ${from}–${to}. Totals come from the engine metrics.`,
+    `Showing ${from}–${to}. Totals come from the match stats.`,
   teamLegend: 'Team',
   allTeams: 'Both',
   kindLegend: 'Event types',
@@ -77,5 +77,5 @@ export const PITCH_COPY = {
   },
   position: (x: number, y: number) => `${Math.round(x)}, ${Math.round(y)}`,
   positionNote:
-    'Position is normalised 0–100: x toward the goal the team attacks, y from its right touchline.',
+    'Position is on a 0–100 scale: x runs towards the goal the team attacks, y from its right touchline.',
 } as const;

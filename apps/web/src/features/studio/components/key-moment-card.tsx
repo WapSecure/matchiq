@@ -10,6 +10,7 @@ import {
 } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
+import { describeMetric } from '@/lib/metric-definition';
 import { formatFraction, formatMinute } from '@/lib/format';
 import type { InsightMark } from '../editorial/insight-marks';
 import { SuppressInsightButton } from '../editorial/suppress-insight-button';
@@ -41,7 +42,9 @@ function AnalystFacts({ insight }: { insight: Insight }) {
     <dl className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-md border border-line bg-surface-sunken p-2 text-xs">
       {metrics.map(([ref, value]) => (
         <div key={ref} className="flex min-w-0 justify-between gap-2">
-          <dt className="truncate font-mono text-ink-subtle">{ref}</dt>
+          <dt className="min-w-0 break-words text-ink-subtle">
+            {describeMetric(ref).label}
+          </dt>
           <dd className="tabular font-semibold text-ink">
             {Number.isInteger(value) ? value : value.toFixed(METRIC_DECIMALS)}
           </dd>

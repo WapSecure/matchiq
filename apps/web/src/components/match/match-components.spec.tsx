@@ -12,7 +12,7 @@ describe('unavailable metrics', () => {
   it('renders the reason instead of zero', () => {
     const { container } = render(<MetricValueText metric={unavailable} />);
     expect(screen.getByText('Not available')).toBeInTheDocument();
-    expect(screen.getByText('No tracking data')).toBeInTheDocument();
+    expect(screen.getByText('Not tracked in this match')).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/\b0\b/);
   });
 
@@ -29,7 +29,7 @@ describe('unavailable metrics', () => {
     );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('Not available')).toBeInTheDocument();
-    expect(screen.getByText('Event-share proxy')).toBeInTheDocument();
+    expect(screen.getByText('Estimated from events')).toBeInTheDocument();
   });
 
   it('renders an accessible possession split when both sides are known', () => {

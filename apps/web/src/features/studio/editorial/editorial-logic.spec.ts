@@ -58,8 +58,8 @@ describe('editorial store mapping', () => {
 
   it('maps each mode to its chip and standby copy', () => {
     expect(MODE_VIEW.AUTO.standby).toBeNull();
-    expect(MODE_VIEW.FROZEN.standby).toBe('Held by editorial freeze');
-    expect(MODE_VIEW.KILLED.standby).toBe('Kill switch active');
+    expect(MODE_VIEW.FROZEN.standby).toBe('Held: graphics paused');
+    expect(MODE_VIEW.KILLED.standby).toBe('Held: emergency stop');
   });
 
   it('keeps the retraction cause for the cue log', () => {
@@ -95,13 +95,13 @@ describe('insight marks', () => {
       { in_local: true },
     );
     expect(markOf('in_held')).toEqual({
-      labels: ['Cue held: freeze'],
+      labels: ['Held: graphics paused'],
       suppressed: false,
       published: false,
     });
     expect(markOf('in_pub').published).toBe(true);
     expect(markOf('in_local')).toMatchObject({
-      labels: ['Suppressed'],
+      labels: ['Dropped'],
       suppressed: true,
     });
     expect(markOf('in_unknown')).toEqual({

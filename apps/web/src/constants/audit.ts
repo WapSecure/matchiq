@@ -7,37 +7,37 @@ import {
 export const ANY = '';
 
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
-  [AUDIT_ACTIONS.overlayRetracted]: 'Cue retracted',
-  [AUDIT_ACTIONS.overlayHeld]: 'Cue held',
-  [AUDIT_ACTIONS.overlayBlocked]: 'Revision blocked',
-  [AUDIT_ACTIONS.insightSuppressed]: 'Insight suppressed',
-  [AUDIT_ACTIONS.publicationGated]: 'Publication gated',
-  [AUDIT_ACTIONS.editorialFrozen]: 'Auto-publish frozen',
-  [AUDIT_ACTIONS.editorialResumed]: 'Auto-publish resumed',
-  [AUDIT_ACTIONS.killSwitchActivated]: 'Kill switch activated',
-  [AUDIT_ACTIONS.killSwitchReleased]: 'Kill switch released',
-  [AUDIT_ACTIONS.sessionCreated]: 'Session created',
-  [AUDIT_ACTIONS.commandRejected]: 'Replay command rejected',
-  [AUDIT_ACTIONS.fixtureCreated]: 'Fixture created',
-  [AUDIT_ACTIONS.eventsIngested]: 'Events ingested',
-  [AUDIT_ACTIONS.sessionsPurged]: 'Sessions purged',
-  [AUDIT_ACTIONS.retentionRun]: 'Retention run',
+  [AUDIT_ACTIONS.overlayRetracted]: 'Graphic taken off air',
+  [AUDIT_ACTIONS.overlayHeld]: 'Graphic held',
+  [AUDIT_ACTIONS.overlayBlocked]: 'Graphic update blocked',
+  [AUDIT_ACTIONS.insightSuppressed]: 'Key moment dropped',
+  [AUDIT_ACTIONS.publicationGated]: 'Fact check blocked wording',
+  [AUDIT_ACTIONS.editorialFrozen]: 'Graphics paused',
+  [AUDIT_ACTIONS.editorialResumed]: 'Graphics resumed',
+  [AUDIT_ACTIONS.killSwitchActivated]: 'Emergency stop on',
+  [AUDIT_ACTIONS.killSwitchReleased]: 'Emergency stop released',
+  [AUDIT_ACTIONS.sessionCreated]: 'Replay started',
+  [AUDIT_ACTIONS.commandRejected]: 'Replay action refused',
+  [AUDIT_ACTIONS.fixtureCreated]: 'Match added',
+  [AUDIT_ACTIONS.eventsIngested]: 'Match data loaded',
+  [AUDIT_ACTIONS.sessionsPurged]: 'Old replays removed',
+  [AUDIT_ACTIONS.retentionRun]: 'Scheduled clean-up',
 };
 
 export const ACTOR_TYPE_LABELS: Record<AuditActorType, string> = {
-  USER: 'User',
-  SERVICE: 'Service',
-  OPERATOR: 'Operator',
-  SYSTEM: 'System',
-  ANONYMOUS: 'Anonymous',
+  USER: 'Person',
+  SERVICE: 'MatchIQ service',
+  OPERATOR: 'Platform operator',
+  SYSTEM: 'Automatic',
+  ANONYMOUS: 'Signed-out visitor',
 };
 
 export const TARGET_TYPE_LABELS: Record<AuditTargetType, string> = {
-  fixture: 'Fixture',
-  overlay: 'Cue',
-  insight: 'Insight',
+  fixture: 'Match',
+  overlay: 'Graphic',
+  insight: 'Key moment',
   organization: 'Organisation',
-  retention: 'Retention',
+  retention: 'Data clean-up',
 };
 
 const option = <T extends string>(
@@ -53,50 +53,50 @@ const option = <T extends string>(
 
 export const AUDIT_FILTER_OPTIONS = {
   action: option(AUDIT_ACTION_LABELS, 'Any action'),
-  actorType: option(ACTOR_TYPE_LABELS, 'Any actor'),
-  targetType: option(TARGET_TYPE_LABELS, 'Any target'),
+  actorType: option(ACTOR_TYPE_LABELS, 'Anyone'),
+  targetType: option(TARGET_TYPE_LABELS, 'Any item'),
   scope: [
-    { value: 'fixture', label: 'This session' },
+    { value: 'fixture', label: 'This match' },
     { value: 'org', label: 'Whole organisation' },
   ],
 } as const;
 
-const ACTOR_ID_SHORT = 8;
-
 export const AUDIT_COPY = {
-  metaTitle: 'Audit trail',
-  eyebrow: 'Editorial governance',
-  title: 'Audit trail',
+  metaTitle: 'Activity log',
+  eyebrow: 'Who did what',
+  title: 'Activity log',
   description:
-    'Append-only record of producer actions and automated editorial decisions, newest first.',
-  filtersLabel: 'Filter the audit trail',
+    'Every producer action and automatic on-air decision, newest first. Entries can never be edited or removed.',
+  filtersLabel: 'Filter the activity log',
   fields: {
     action: 'Action',
-    actorType: 'Actor',
-    targetType: 'Target type',
-    targetId: 'Target id',
-    scope: 'Scope',
+    actorType: 'Who',
+    targetType: 'Item type',
+    targetId: 'Item ID',
+    scope: 'Show',
     from: 'From',
     to: 'To',
   },
-  targetIdHint: 'Requires a target type.',
+  targetIdHint: 'Choose an item type first.',
   apply: 'Apply filters',
   reset: 'Reset',
   tableCaption: (n: number, more: boolean) =>
-    `Audit events: ${n} shown${more ? ', more available' : ''}`,
+    `Activity: ${n} shown${more ? ', more available' : ''}`,
   columns: {
-    time: 'Time',
-    action: 'Action',
-    actor: 'Actor',
-    target: 'Target',
+    time: 'When',
+    action: 'What happened',
+    actor: 'Who',
+    target: 'Item',
     reason: 'Reason',
     changes: 'Changes',
   },
-  /** Under a named actor: the type and a short id; the full id is the hover title. */
-  actorDetail: (type: string, id: string) =>
-    `${type} · ${id.length > ACTOR_ID_SHORT + 4 ? `${id.slice(0, ACTOR_ID_SHORT)}…` : id}`,
-  noReason: 'None recorded',
-  noChanges: 'No state change',
+  technical: {
+    action: 'Action key',
+    actor: 'Actor id',
+    target: 'Item id',
+  },
+  noReason: 'None given',
+  noChanges: 'Nothing changed',
   viewChanges: (n: number) => `${n} field${n === 1 ? '' : 's'} changed`,
   diffBefore: 'Before',
   diffAfter: 'After',
@@ -104,9 +104,9 @@ export const AUDIT_COPY = {
   diffEmpty: '—',
   loadMore: 'Load more',
   loadingMore: 'Loading…',
-  end: 'End of the audit trail.',
-  loading: 'Loading the audit trail',
+  end: 'End of the activity log.',
+  loading: 'Loading the activity log',
   error: "We couldn't load the activity log",
-  empty: 'No audit events match these filters.',
-  scrollRegion: 'Audit events table, scrolls horizontally',
+  empty: 'Nothing matches these filters.',
+  scrollRegion: 'Activity table, scrolls sideways',
 } as const;

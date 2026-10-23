@@ -31,9 +31,6 @@ export function EvidenceSummary({ insight }: { insight: Insight }) {
     ],
     [EVIDENCE_COPY.fields.confidence, CONFIDENCE_LABELS[e.confidenceLabel]],
     [EVIDENCE_COPY.fields.coverage, formatFraction(e.dataCoverage)],
-    [EVIDENCE_COPY.fields.method, e.methodVersion],
-    [EVIDENCE_COPY.fields.reason, insight.reasonCode],
-    [EVIDENCE_COPY.fields.status, insight.status],
   ];
   return (
     <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -78,9 +75,11 @@ export function EvidenceEvents({
                     ? EVIDENCE_COPY.resolving
                     : EVIDENCE_COPY.eventOutsideWindow)}
               </p>
-              <p className="truncate font-mono text-micro text-ink-subtle">
-                {[described?.detail, id].filter(Boolean).join(' · ')}
-              </p>
+              {described?.detail ? (
+                <p className="truncate text-micro text-ink-subtle">
+                  {described.detail}
+                </p>
+              ) : null}
             </div>
           </li>
         );
@@ -106,11 +105,6 @@ export function CounterEvidenceList({
             className="rounded-md border border-line bg-surface-sunken p-2"
           >
             <p className="text-ink">{item.description}</p>
-            {item.eventIds.length > 0 ? (
-              <p className="mt-0.5 font-mono text-micro text-ink-subtle">
-                {item.eventIds.join(', ')}
-              </p>
-            ) : null}
           </li>
         ),
       )}
@@ -119,3 +113,4 @@ export function CounterEvidenceList({
 }
 
 export { EvidenceMetrics } from './evidence-metrics';
+export { EvidenceTechnical } from './evidence-technical';

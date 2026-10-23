@@ -57,7 +57,7 @@ describe('role-aware UI', () => {
     setView(viewer);
     render(<AccessDenied />);
     const region = screen.getByRole('region', {
-      name: 'You do not have access to this',
+      name: "You don't have access to this",
     });
     expect(region.textContent).toContain('Viewer');
   });
