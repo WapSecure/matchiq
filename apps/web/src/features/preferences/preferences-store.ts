@@ -48,7 +48,7 @@ export const usePreferences = create<PreferencesState>()((set) => ({
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
 }));
 
-/** Persona and language live in the studio UI store; the rest here. */
+/** Persona and commentary language live in the studio UI store; the rest here. */
 export const currentPreferences = (): ViewerPreferences => {
   const { persona, locale } = useStudioUi.getState();
   const { favouriteTeamId, followedPlayerIds, reducedMotion } =

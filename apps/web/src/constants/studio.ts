@@ -79,9 +79,9 @@ export const STUDIO_COPY = {
   },
   controls: {
     persona: 'Audience',
-    locale: 'Language',
+    locale: 'Commentary language',
     invariant:
-      'Changes the wording of key moments and graphics. The numbers never change.',
+      'Changes commentary and graphic wording only. Interface labels, facts and figures stay the same.',
   },
   fullTime: {
     title: 'Full time',

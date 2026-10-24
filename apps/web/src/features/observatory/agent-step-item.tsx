@@ -37,7 +37,7 @@ function Evidence({ step }: { step: AgentStep }) {
   );
 }
 
-/** One hand-off in plain words; ids, versions and tokens live in Technical details. */
+/** One handoff in plain words; ids, versions and tokens live in Technical details. */
 export function AgentStepItem({ step }: { step: AgentStep }) {
   return (
     <li className="relative flex flex-col gap-0.5 pb-3 pl-5 last:pb-0">

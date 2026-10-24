@@ -59,7 +59,7 @@ function Row({ step }: { step: AgentStep }) {
   );
 }
 
-/** Raw hand-off fields for engineers and judges, inside Technical details. */
+/** Raw handoff fields for engineers and judges, inside Technical details. */
 export function AgentStepTable({
   trace,
   caption,

@@ -193,7 +193,9 @@ describe('LiveStudio', () => {
           ),
       }),
     );
-    const languages = screen.getByRole('radiogroup', { name: 'Language' });
+    const languages = screen.getByRole('radiogroup', {
+      name: 'Commentary language',
+    });
     expect(within(languages).getAllByRole('radio')).toHaveLength(4);
     await user.click(
       within(languages).getByRole('radio', { name: 'Naijá (Pidgin) (PCM)' }),

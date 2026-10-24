@@ -35,7 +35,7 @@ export function LocaleSwitcher() {
   );
 }
 
-/** Persona and language for narratives; facts and figures stay identical. */
+/** Persona and commentary language; interface labels and facts stay unchanged. */
 export function AudienceBar({
   variant = 'card',
   className,

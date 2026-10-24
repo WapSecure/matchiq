@@ -10,7 +10,7 @@ import { ApiError } from '@/lib/api/api-error';
 import { requestJson } from '@/lib/api/http-client';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 
-/** Null when the run stored no hand-offs, e.g. templates published without the agents. */
+/** Null when the run stored no handoffs, e.g. templates published without the agents. */
 const fetchAgentSteps = async (
   correlationId: string,
   signal?: AbortSignal,

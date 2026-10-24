@@ -74,13 +74,13 @@ const renderWith = (ui: React.ReactNode) =>
 describe('AgentStepTimeline', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('walks every hand-off in plain words, with time taken and evidence', async () => {
+  it('walks every handoff in plain words, with time taken and evidence', async () => {
     const steps = ROSTER.map((o, i) => step({ ...o, stepIndex: i }));
     stubApi({ [`GET ${PATH}`]: { body: body(steps) } });
     renderWith(<AgentStepTimeline trace={published} moment="Shot burst 10'" />);
 
     const list = await screen.findByRole('list', {
-      name: "Agent hand-offs for Shot burst 10'",
+      name: "Agent handoffs for Shot burst 10'",
     });
     const items = within(list).getAllByRole('listitem');
     expect(items).toHaveLength(5);
@@ -93,22 +93,22 @@ describe('AgentStepTimeline', () => {
     expect(list).not.toHaveTextContent('aaaaaaaaaaaa');
   });
 
-  it('pages a long run of hand-offs', async () => {
+  it('pages a long run of handoffs', async () => {
     const steps = Array.from({ length: 9 }, (_, i) => step({ stepIndex: i }));
     stubApi({ [`GET ${PATH}`]: { body: body(steps) } });
     renderWith(<AgentStepTimeline trace={published} moment="m" />);
 
-    const list = await screen.findByRole('list', { name: /hand-offs for m/ });
+    const list = await screen.findByRole('list', { name: /handoffs for m/ });
     expect(within(list).getAllByRole('listitem')).toHaveLength(6);
     await userEvent.click(screen.getByRole('button', { name: 'Show more' }));
     expect(within(list).getAllByRole('listitem')).toHaveLength(9);
   });
 
-  it('shows an empty state when the run stored no hand-offs', async () => {
+  it('shows an empty state when the run stored no handoffs', async () => {
     stubApi({});
     renderWith(<AgentStepTimeline trace={published} moment="m" />);
     expect(
-      await screen.findByText('No hand-offs were recorded for this moment.'),
+      await screen.findByText('No handoffs were recorded for this moment.'),
     ).toBeInTheDocument();
   });
 

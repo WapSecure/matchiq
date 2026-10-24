@@ -76,7 +76,7 @@ function Body({ trace, label }: { trace: InsightTrace; label: string }) {
   return <StepList steps={steps} label={label} />;
 }
 
-/** Per-moment hand-off timeline: analyst → writer → fact checker → translator → graphics. */
+/** Per-moment handoff timeline: analyst → writer → fact checker → translator → graphics. */
 export function AgentStepTimeline({
   trace,
   moment,

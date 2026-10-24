@@ -7,7 +7,7 @@ export const AGENT_TRACE_PATH = (correlationId: string) =>
 
 export const AGENT_STEPS_QUERY_KEY = 'agent-traces';
 export const AGENT_STEPS_PAGE_SIZE = 6;
-/** Hand-off records never change once stored. */
+/** Handoff records never change once stored. */
 export const AGENT_STEPS_STALE_MS = 5 * 60_000;
 export const HASH_PREVIEW_LENGTH = 12;
 export const NOT_FOUND_STATUS = 404;
@@ -15,23 +15,23 @@ export const NOT_FOUND_STATUS = 404;
 export const AGENT_STEP_COPY = {
   title: 'How the agents worked on this',
   description:
-    'Each hand-off between the agents, in order: what it decided, why, and the evidence it used.',
-  listLabel: (moment: string) => `Agent hand-offs for ${moment}`,
+    'Each handoff between the agents, in order: what it decided, why, and the evidence it used.',
+  listLabel: (moment: string) => `Agent handoffs for ${moment}`,
   loading: 'Loading how the agents worked on this',
   pending: 'The agents are still working on this moment.',
-  empty: 'No hand-offs were recorded for this moment.',
+  empty: 'No handoffs were recorded for this moment.',
   error: "We couldn't load how the agents worked on this",
   took: (seconds: string) => `Took ${seconds}`,
   evidence: (events: number, stats: number) =>
     `Used ${events} match ${events === 1 ? 'event' : 'events'} and ${stats} ${stats === 1 ? 'statistic' : 'statistics'}`,
   noEvidence: 'Used no match evidence',
-  moreLabel: 'More agent hand-offs',
-  noun: { one: 'hand-off', other: 'hand-offs' },
+  moreLabel: 'More agent handoffs',
+  noun: { one: 'handoff', other: 'handoffs' },
   technical: {
-    title: 'Agent hand-offs',
-    hint: 'One row per hand-off; checksums are SHA-256 of what the agent received',
-    caption: (moment: string) => `Agent hand-off records for ${moment}`,
-    none: 'No hand-off records stored.',
+    title: 'Agent handoffs',
+    hint: 'One row per handoff; checksums are SHA-256 of what the agent received',
+    caption: (moment: string) => `Agent handoff records for ${moment}`,
+    none: 'No handoff records stored.',
     columns: {
       step: 'Step',
       agent: 'Agent',
@@ -89,7 +89,7 @@ export const STEP_REASONS: Record<string, string> = {
   OVERLAY_READY: 'Wrote the on-screen graphic and it passed the checks.',
   OVERLAY_FALLBACK: 'The graphic failed the checks, so the prepared one aired.',
   ORCHESTRATION_ERROR:
-    'Something went wrong part-way, so prepared wording was used.',
+    'Something went wrong partway, so prepared wording was used.',
   BUDGET_EXCEEDED:
     'Reached the spending limit for this moment, so prepared wording was used.',
 };

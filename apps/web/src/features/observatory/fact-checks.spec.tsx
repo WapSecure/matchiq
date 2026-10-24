@@ -31,7 +31,7 @@ const traces = [
   }),
 ];
 
-// Trace cards load their agent hand-offs; unknown routes answer 404, an empty timeline.
+// Trace cards load their agent handoffs; unknown routes answer 404, an empty timeline.
 const renderList = (ui: React.ReactNode) => {
   stubApi({});
   return render(
