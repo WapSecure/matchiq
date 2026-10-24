@@ -67,7 +67,7 @@ export interface InsightRecord {
 export interface OverlayEndWrite {
   readonly status: OverlayCue['status'];
   readonly reason: string;
-  /** Set when a cue that never aired closes under review (ADR-0023). */
+  /** Set when a cue that never aired closes under review (ADR-0024). */
   readonly editorial?: OverlayRecord['editorial'];
 }
 

@@ -137,7 +137,7 @@ class PolicyRun {
     });
   }
 
-  /** MANUAL: stored with its copy and slot, announced without copy (ADR-0023). */
+  /** MANUAL: stored with its copy and slot, announced without copy (ADR-0024). */
   private await(draft: StreamMessageDraft, cue: Publish): Drafts {
     this.states.set(cue.overlayId, 'AWAITING_APPROVAL');
     const reason = EDITORIAL_REASONS.awaitingApproval;

@@ -27,7 +27,7 @@ const policyOf = (active: boolean | undefined): PublishPolicy =>
   active ? 'MANUAL' : 'AUTO';
 
 /**
- * Per-session publish policy (ADR-0023), stored as the session's `APPROVAL`
+ * Per-session publish policy (ADR-0024), stored as the session's `APPROVAL`
  * control row. Switching never releases or drops a cue already waiting: it
  * keeps waiting until a producer reviews it or its slot closes.
  */

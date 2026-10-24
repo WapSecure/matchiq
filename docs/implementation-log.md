@@ -1086,11 +1086,11 @@ A moment found only by a re-scan (for example after a late event) is published, 
 ## MQ-062: Producer approve-before-air (23 October 2026)
 
 - Added a per-session publish policy, `AUTO` (the default) or `MANUAL`. It is stored as an `APPROVAL` row in `editorial_controls`, which keeps row-level security (migration `0009`). Producers and tenant owners set it with `POST /fixtures/{id}/editorial/publish-policy` (`policy:configure`, idempotent, audited with before and after). `editorial.status` now carries `publishPolicy`.
-- In MANUAL, a cue that passes the gate waits as `AWAITING_APPROVAL` in the slot the scheduler gave it, and the stream announces it with `overlay.review`. The frame has no copy, because the stream is public. A waiting cue whose slot ends is marked `APPROVAL_EXPIRED` and never airs late. The scheduler itself is unchanged, and AUTO streams are byte-identical to before (ADR-0023).
+- In MANUAL, a cue that passes the gate waits as `AWAITING_APPROVAL` in the slot the scheduler gave it, and the stream announces it with `overlay.review`. The frame has no copy, because the stream is public. A waiting cue whose slot ends is marked `APPROVAL_EXPIRED` and never airs late. The scheduler itself is unchanged, and AUTO streams are byte-identical to before (ADR-0024).
 - Added `POST /insights/{id}/review` (`editorial:approve`) to approve or reject. Approve takes optional duration and priority overrides within the contract bounds, and `409`s when the slot has closed, when the reviewed revision is stale, or when graphics are paused. Reject takes an optional reason. Both use `Idempotency-Key`, RFC 9457 problems and before/after audit rows. Added `GET /fixtures/{id}/overlay-reviews` for the queue. Retract, suppress and the kill switch treat approved cues as on air.
 - Studio: the broadcast panel has an approval queue with a live preview, a copy-fit indicator, time-on-screen and priority adjusters, and "Send to air" / "Don't air". The queue has loading, empty, error and permission states. The producer controls have an Auto/Manual switch with a reasoned confirmation. Roles without the permission see neither control.
 - Tests: an API integration spec (policy, review flow, idempotency, permission denial, tenant isolation), a worker unit spec for the MANUAL hold, approve, reject and expiry, a web component spec, and the access matrix.
-- Limits: an approval cannot extend a cue past its scheduled slot or reorder the scheduler queue. Priority applies to the aired cue only. Recorded in ADR-0023.
+- Limits: an approval cannot extend a cue past its scheduled slot or reorder the scheduler queue. Priority applies to the aired cue only. Recorded in ADR-0024.
 
 ## MQ-076: Accessible account popover (23 October 2026)
 
@@ -1159,3 +1159,12 @@ Each key moment was one short sentence, and the recap had no story. The owner wa
 - **Web**: Analyst breakdown with three subheadings, collapsed to the first part with "Show full breakdown", in the key-moment card, the evidence drawer and the recap; a match story panel above the key moments; the downloaded report includes both.
 
 Tests: engine context spec (20), worker breakdown and story specs (16), pytest `test_breakdown.py` plus the full agents suite (509), web specs for the breakdown, the story and the report. Deferred: model polish of the story (no recap pipeline yet), a native review of the Pidgin, French and Spanish wording.
+
+## MQ-082: Enterprise audit, ADRs and documentation fixes (24 October 2026)
+
+A full audit of the repository against the v3 specification is committed under [`docs/audits/`](audits/MATCHIQ_ENTERPRISE_IMPLEMENTATION_AUDIT.md), with a [traceability matrix](audits/MATCHIQ_REQUIREMENTS_TRACEABILITY_MATRIX.md) ([CSV](audits/MATCHIQ_REQUIREMENTS_TRACEABILITY_MATRIX.csv)). The owner approved the findings. This ticket changes documents only.
+
+- **ADRs**: 0025 local development credentials (proposed), 0026 no hosted demo before the verdict, 0027 six scenarios, 0028 agent roster and states follow spec section 28, 0029 descoped metrics and personalisation (proposed), 0037 naming deviations. The producer approve-before-air ADR was numbered 0023 like the player-focus ADR, so it is now ADR-0024 and every reference was updated.
+- **Corrections**: ARCHITECTURE_RULES (built libraries), IDENTITY_AND_ACCESS (`preferences:write` is guarded), THREAT_MODEL T3 and I4 test references, the API idempotency text (key optional; no `Retry-After-replay` header exists), ADR-0033 (a gap does mark state provisional; correction note added), TESTING_STRATEGY (golden replay), OBSERVABILITY (alerts use the 4 s target), the traceability CSV statuses, and the enterprise readiness review.
+- **Submission documents**: stale CI references now point to run 40105654686 on `ed46466`; the README gains a CI badge, Limitations and Team sections.
+- **Open for the owner**: ADR-0025 and ADR-0029 are proposed. The landing hero description still says "in seconds" (`apps/web/src/constants/landing.ts`).

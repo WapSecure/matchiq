@@ -17,6 +17,8 @@ A provider adapter framework, licence and rights records, the full provenance ch
 - Late or out-of-order events are handled by sequence and idempotency in the ledger, not by a bounded-watermark buffer, and a gap does not mark state provisional (I7 is partial).
 - The clock-drift target of 250 ms is a spec objective, not a measurement.
 
+> **Correction (MQ-082, 2026-10-24).** The statement above that a gap does not mark state provisional is wrong for the current code. `libs/football-engine/src/lib/projection/snapshot.ts` sets `provisional: hasSequenceGap(state) || hasPendingCorrection(state)`, with tests in the worker's `corrections.spec.ts` and `projection.spec.ts`, and the web scoreboard strip shows a badge. What is still missing is the bounded-watermark buffer, the stale indicator and the resync notice, so I7 remains partial.
+
 ## What it would take
 
 - A `ProviderAdapter` port with capabilities `{events, tracking, video, ballSpeed, playerIdentity, corrections}` and a first adapter behind it.

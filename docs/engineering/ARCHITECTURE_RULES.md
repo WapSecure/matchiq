@@ -21,14 +21,13 @@ The source of truth for product behaviour is `docs/product/MatchIQ_Enterprise_Ma
 | auth            | `libs/auth`            | `scope:server` `type:data-access` | OIDC access-token verification (JWKS), stream tickets, Nest guards and `@RequirePermission`.                                             |
 | api-client      | `libs/api-client`      | `scope:shared` `type:util`        | Typed `openapi-fetch` client generated from `docs/api/openapi.json` (ADR-0017). Never hand-edited.                                       |
 
-Planned for M1 (created by their owning stream with these tags):
+Built after M1, with these tags:
 
-| Project                | Tags                              |
-| ---------------------- | --------------------------------- |
-| `libs/football-engine` | `scope:shared` `type:domain`      |
-| `libs/synthetic-data`  | `scope:shared` `type:domain`      |
-| `libs/replay`          | `scope:shared` `type:domain`      |
-| `libs/db`              | `scope:server` `type:data-access` |
+| Project                | Tags                         |
+| ---------------------- | ---------------------------- |
+| `libs/football-engine` | `scope:shared` `type:domain` |
+| `libs/synthetic-data`  | `scope:shared` `type:domain` |
+| `libs/replay`          | `scope:shared` `type:domain` |
 
 ## Dependency rules (enforced by `@nx/enforce-module-boundaries`)
 

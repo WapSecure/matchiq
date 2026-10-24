@@ -31,7 +31,7 @@ jest.setTimeout(30_000);
 const ORG_B = 'org_northbank';
 const PROBLEM = 'urn:matchiq:problem:';
 
-describe('Producer approve-before-air (integration, ADR-0023)', () => {
+describe('Producer approve-before-air (integration, ADR-0024)', () => {
   let t: TestApp;
   let fixtureId: string;
 

@@ -56,7 +56,7 @@ export const EditorialControl = z.strictObject({
 });
 
 /**
- * Per-session publish policy (ADR-0023): `AUTO` airs every gated cue,
+ * Per-session publish policy (ADR-0024): `AUTO` airs every gated cue,
  * `MANUAL` holds each one as `AWAITING_APPROVAL` until a producer reviews it.
  */
 export const PublishPolicy = z.enum(['AUTO', 'MANUAL']);
@@ -77,7 +77,7 @@ export const EditorialStatus = z.strictObject({
   mode: EditorialMode,
   freeze: EditorialControl,
   killSwitch: EditorialControl,
-  /** Always set by the API; absent on frames stored before ADR-0023, which means AUTO. */
+  /** Always set by the API; absent on frames stored before ADR-0024, which means AUTO. */
   publishPolicy: PublishPolicyControl.optional(),
 });
 
