@@ -272,6 +272,36 @@ jobs:
           trivy image --quiet --scanners vuln --severity HIGH,CRITICAL
           --ignore-unfixed --ignorefile .trivyignore.yaml --exit-code 1 "$IMAGE"
 
+  compose-smoke:
+    name: Compose stack and replay smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    env:
+      APP_VERSION: ${{ github.sha }}
+      COMPOSE_PROJECT_NAME: matchiq-ci-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate Compose configuration
+        run: docker compose --profile app config --quiet
+      - name: Start fresh application stack
+        run: docker compose --profile app up -d --build --wait --wait-timeout 360
+      - name: Verify services, seed and replay
+        run: bash scripts/compose-smoke.sh
+      - name: Sanitized diagnostics
+        if: failure()
+        run: |
+          docker compose --profile app ps --all
+          docker compose --profile app logs --no-color --tail 200 2>&1 \
+            | sed -E \
+                -e 's/(Bearer )[A-Za-z0-9._~+\/-]+/\1[REDACTED]/gI' \
+                -e 's/((password|secret|token)[=: ]+)[^ ,;}]*/\1[REDACTED]/gI' \
+                -e 's#postgresql://[^@[:space:]]+@#postgresql://[REDACTED]@#g'
+      - name: Stop application stack
+        if: always()
+        run: docker compose --profile app down -v --remove-orphans
+
   iac:
     name: IaC and filesystem scan
     runs-on: ubuntu-latest

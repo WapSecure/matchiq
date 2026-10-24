@@ -33,7 +33,13 @@ docker compose --profile app up -d --build --wait
 
 This starts Postgres, Redis, a one-shot `migrate` job that also seeds the six golden fixtures, then the api (`:3000`), worker (`:3001`), agents (`:8000`) and web (`:4200`). Open <http://localhost:4200>, choose **Fixtures**, then **Start** on _Late comeback_.
 
-In this profile the agents container runs `MODEL_PROVIDER=mock` and `AI_ENABLED` defaults to `false`, so the narratives on screen are deterministic templates, labelled as such. Sign-in is not available in the web container ([why](docs/security/IDENTITY_AND_ACCESS.md#web-sign-in)). Details: [`docs/deployment/LOCAL_STACK.md`](docs/deployment/LOCAL_STACK.md). The container path was last exercised end to end during MQ-014 and MQ-022 ([implementation log](docs/implementation-log.md)); it was not re-run for this document.
+Verify the running stack, seeded fixture and replay path with:
+
+```bash
+bash scripts/compose-smoke.sh
+```
+
+In this profile the agents container runs `MODEL_PROVIDER=mock` and `AI_ENABLED` defaults to `false`, so the narratives on screen are deterministic templates, labelled as such. Sign-in is not available in the web container ([why](docs/security/IDENTITY_AND_ACCESS.md#web-sign-in)). Details: [`docs/deployment/LOCAL_STACK.md`](docs/deployment/LOCAL_STACK.md). CI starts the same profile from an empty runner and runs the smoke check on every pull request and protected-branch push.
 
 ### Option B: native services (sign-in, real local AI)
 

@@ -398,12 +398,18 @@ importers:
       '@nestjs/platform-express':
         specifier: 11.2.7
         version: 11.2.7(@nestjs/common@11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)
+      '@opentelemetry/api':
+        specifier: 1.9.1
+        version: 1.9.1
       bullmq:
         specifier: 5.81.5
         version: 5.81.5
       ioredis:
         specifier: 5.11.1
         version: 5.11.1
+      pg:
+        specifier: 8.23.1
+        version: 8.23.1
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -423,9 +429,6 @@ importers:
       '@nestjs/testing':
         specifier: 11.2.7
         version: 11.2.7(@nestjs/common@11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)(@nestjs/platform-express@11.2.7)
-      '@opentelemetry/api':
-        specifier: 1.9.1
-        version: 1.9.1
       '@opentelemetry/sdk-trace-base':
         specifier: 2.12.0
         version: 2.12.0(@opentelemetry/api@1.9.1)
@@ -438,9 +441,6 @@ importers:
       '@types/supertest':
         specifier: 7.2.1
         version: 7.2.1
-      pg:
-        specifier: 8.23.1
-        version: 8.23.1
       supertest:
         specifier: 7.3.1
         version: 7.3.1
