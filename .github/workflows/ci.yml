@@ -292,7 +292,7 @@ jobs:
       - name: Sanitized diagnostics
         if: failure()
         run: |
-          docker compose --profile app ps
+          docker compose --profile app ps --all
           docker compose --profile app logs --no-color --tail 200 2>&1 \
             | sed -E \
                 -e 's/(Bearer )[A-Za-z0-9._~+\/-]+/\1[REDACTED]/gI' \

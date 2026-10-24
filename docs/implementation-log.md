@@ -1189,3 +1189,5 @@ A full audit of the repository against the v3 specification is committed under [
 The app profile now orders the worker after the one-shot migration and six-fixture seed. A Docker-only smoke command checks API, worker, agents and web readiness, confirms the seeded late-comeback fixture, creates a replay session and observes both advancing replay state and persisted events. CI runs that check from fresh volumes, prints bounded sanitized diagnostics on failure and always removes containers and volumes.
 
 Local validation covers script syntax, formatting and rendered Compose configuration. The end-to-end claim requires the pull request's clean GitHub runner and will be recorded after it passes.
+
+The first fresh-runner attempt exposed that the worker package classified its runtime `@opentelemetry/api` import as a development dependency, so the production image built but exited at startup. The pinned package is now a worker runtime dependency, and failure diagnostics include exited containers.
