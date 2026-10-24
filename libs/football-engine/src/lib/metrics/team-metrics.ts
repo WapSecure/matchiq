@@ -84,6 +84,13 @@ const momentumNow = (derived: DerivedState, side: Side): MetricValue =>
         ),
       ).value;
 
+/** Goals from the team's own shots (own goals credited to it are excluded) over its shots. */
+const shotConversion = (tally: TeamTally): MetricValue =>
+  percentOf(tally.goals - tally.ownGoalsFor, tally.shots);
+
+const passQuality = (tally: TeamTally): MetricValue =>
+  percentOf(tally.progressivePasses, tally.passesCompleted);
+
 const countsOf = (tally: TeamTally) => ({
   goals: tally.goals,
   shots: tally.shots,
@@ -110,6 +117,8 @@ export const teamMetrics = (
         tally.passesCompleted,
         tally.passesAttempted,
       ),
+      shotConversionPct: shotConversion(tally),
+      passQualityPct: passQuality(tally),
       possessionPct: possession.value[side],
       possessionBasis: possession.basis,
       momentum: momentumNow(derived, side),

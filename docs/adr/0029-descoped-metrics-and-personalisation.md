@@ -1,6 +1,6 @@
 # ADR-0029: Metrics and personalisation that are descoped or not yet built
 
-- Status: Proposed, owner to confirm (2026-10-24). Spec §9, §27, §32, §43, §47. Recorded by MQ-082 (audit REM-09).
+- Status: Proposed, owner to confirm (2026-10-24). Shot conversion %, a defined pass quality and `PLAYER_MILESTONE` rules were later built; see ADR-0038. Spec §9, §27, §32, §43, §47. Recorded by MQ-082 (audit REM-09).
 
 ## Context
 

@@ -1,4 +1,5 @@
 import type { MatchEvent } from '@matchiq/contracts';
+import { playerCountKey, type PlayerCountKind } from '../constants.js';
 import type {
   DerivedState,
   FixtureContext,
@@ -23,6 +24,17 @@ export const bump = (
   const tally = { ...derived.tallies[side] };
   for (const key of keys) tally[key] += 1;
   return { ...derived, tallies: { ...derived.tallies, [side]: tally } };
+};
+
+export const bumpPlayer = (
+  derived: DerivedState,
+  kind: PlayerCountKind,
+  playerId: string,
+): DerivedState => {
+  const key = playerCountKey(kind, playerId);
+  const playerCounts = new Map(derived.playerCounts);
+  playerCounts.set(key, (playerCounts.get(key) ?? 0) + 1);
+  return { ...derived, playerCounts };
 };
 
 export const track = (
