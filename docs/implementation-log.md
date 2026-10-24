@@ -1201,3 +1201,11 @@ The engine gains two snapshot metrics, `shotConversionPct` and `passQualityPct`,
 ## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
 
 The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
+
+## MQ-085: API alignment and ingest validation (24 October 2026)
+
+- **Evidence endpoint**: `GET /insights/{insightId}/evidence` returns the stored evidence envelope (metrics, event ids, method version, coverage, counter-evidence). Permission `insights:read`; another organisation's insight is the same 404 as a missing one.
+- **Recap**: `GET /fixtures/{id}/recap` takes optional `persona` and `lang`, filtering key-moment narratives and the story. Without them the stored recap is returned unchanged (`recap-filter.spec.ts`).
+- **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
+- **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
+- Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.

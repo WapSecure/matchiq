@@ -1171,7 +1171,7 @@
       "post": {
         "operationId": "ingestEvents",
         "summary": "Append a batch of events to the ledger",
-        "description": "Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.\n\nAccess: requires the `events:ingest` permission.",
+        "description": "Duplicates (same eventId and body) are counted and ignored; a changed body is a 409. A clock that runs backwards within a period, or an impossible period change, is a 422 listing the offending event ids. Sequence gaps are accepted and reported in `warnings`; the snapshot stays provisional until they fill.\n\nAccess: requires the `events:ingest` permission.",
         "tags": [
           "Fixtures"
         ],
@@ -1380,10 +1380,11 @@
             }
           },
           "422": {
-            "description": "`validation-failed`: Request validation failed; `fixture-mismatch`: Events must belong to the fixture in the path; `idempotency-key-reused`: Idempotency-Key was reused with a different request",
+            "description": "`validation-failed`: Request validation failed; `fixture-mismatch`: Events must belong to the fixture in the path; `event-order`: Events are out of order; `idempotency-key-reused`: Idempotency-Key was reused with a different request",
             "x-problem-types": [
               "urn:matchiq:problem:validation-failed",
               "urn:matchiq:problem:fixture-mismatch",
+              "urn:matchiq:problem:event-order",
               "urn:matchiq:problem:idempotency-key-reused"
             ],
             "headers": {
@@ -1410,6 +1411,14 @@
                     "value": {
                       "type": "urn:matchiq:problem:fixture-mismatch",
                       "title": "Events must belong to the fixture in the path",
+                      "status": 422
+                    }
+                  },
+                  "event-order": {
+                    "summary": "Events are out of order",
+                    "value": {
+                      "type": "urn:matchiq:problem:event-order",
+                      "title": "Events are out of order",
                       "status": 422
                     }
                   },
@@ -5912,7 +5921,7 @@
       "get": {
         "operationId": "getRecap",
         "summary": "Full-time recap document",
-        "description": "`404 recap-not-ready` until the match has ended; poll or wait for full time.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "description": "`404 recap-not-ready` until the match has ended; poll or wait for full time. `persona` and `lang` are optional; each keeps only the matching narratives and stories, and without them the whole recap is returned.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
         "tags": [
           "Intelligence"
         ],
@@ -5935,6 +5944,31 @@
               "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
             },
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "persona",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CASUAL",
+                "ANALYST",
+                "BROADCAST"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en-GB",
+                "fr-FR",
+                "es-ES",
+                "pcm-NG"
+              ]
+            }
           },
           {
             "$ref": "#/components/parameters/RequestId"
@@ -6042,6 +6076,389 @@
                     "value": {
                       "type": "urn:matchiq:problem:recap-not-ready",
                       "title": "The recap is available once the match has ended",
+                      "status": 404
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/insights/{insightId}/evidence": {
+      "get": {
+        "operationId": "getInsightEvidence",
+        "summary": "The evidence behind one insight",
+        "description": "Computed metrics, the evidence event ids, method version, data coverage and any counter-evidence, as stored when the insight was detected. An insight of another organisation answers 404.\n\nAccess: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "tags": [
+          "Intelligence"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "insights:read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "insightId",
+            "schema": {
+              "type": "string",
+              "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The evidence envelope",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "insightId": {
+                      "type": "string",
+                      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "fixtureId": {
+                      "type": "string",
+                      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "windowStartMs": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "windowEndMs": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "eventIds": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                      }
+                    },
+                    "computedMetrics": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "methodVersion": {
+                      "type": "string",
+                      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+                    },
+                    "dataCoverage": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "confidenceLabel": {
+                      "type": "string",
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ]
+                    },
+                    "rationale": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 400
+                    },
+                    "counterEvidence": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "description": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "eventIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                            }
+                          }
+                        },
+                        "required": [
+                          "description",
+                          "eventIds"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "sampleSize": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "limitations": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "confidenceType": {
+                      "type": "string",
+                      "enum": [
+                        "measured",
+                        "heuristic"
+                      ]
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "insightId",
+                    "fixtureId",
+                    "windowStartMs",
+                    "windowEndMs",
+                    "eventIds",
+                    "computedMetrics",
+                    "methodVersion",
+                    "dataCoverage",
+                    "confidenceLabel",
+                    "rationale",
+                    "counterEvidence",
+                    "generatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`insight-not-found`: Insight not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:insight-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "insight-not-found": {
+                    "summary": "Insight not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:insight-not-found",
+                      "title": "Insight not found",
                       "status": 404
                     }
                   }
@@ -15646,6 +16063,12 @@
             "type": "integer",
             "minimum": -1,
             "maximum": 9007199254740991
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -17111,11 +17534,11 @@
         "in": "header",
         "name": "Idempotency-Key",
         "schema": {
-          "description": "Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.",
+          "description": "Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.",
           "type": "string",
           "pattern": "^[\\x21-\\x7e]{1,255}$"
         },
-        "description": "Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422."
+        "description": "Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422."
       },
       "LastEventId": {
         "in": "header",

@@ -23,3 +23,7 @@ Three deviations are accepted for now and deferred until after the hackathon: (1
 - A `match_snapshots` history keyed by `(org_id, fixture_id, through_sequence, algorithm_version)` with a retention rule (ADR-0015).
 - Paired down migrations and a rollback rehearsal on a synthetic snapshot in CI.
 - Foreign keys that keep tenant consistency across the new tables.
+
+## Amendment (MQ-085)
+
+The spec's `insight_evidence` table is still not created. Evidence stays inside `insights.payload` and is served on its own by `GET /insights/{insightId}/evidence`, so the deviation no longer hides the evidence from clients.

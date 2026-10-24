@@ -71,7 +71,7 @@ export const DOCUMENT_TEXT = {
 
 export const HEADER_TEXT = {
   idempotencyKey:
-    'Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.',
+    'Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.',
   idempotentReplayed:
     'Present and `true` when the response is a stored replay.',
   retryAfter: 'Seconds to wait before retrying.',

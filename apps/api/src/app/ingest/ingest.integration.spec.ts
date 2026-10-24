@@ -145,6 +145,24 @@ describe('Event ingest (integration)', () => {
     expect(first.accepted).toBe(2);
   });
 
+  it('answers 422 event-order naming the event when a clock runs backwards', async () => {
+    const res = await ingest(
+      batchOf(FX, [buildTestEvent(FX, 12, { matchClockMs: 1_000 })]),
+    );
+    expect(res.status).toBe(422);
+    const problem = await jsonOf(res);
+    expect(problem.type).toBe('urn:matchiq:problem:event-order');
+    expect(JSON.stringify(problem.errors)).toContain('ev_00012');
+  });
+
+  it('accepts a sequence gap and reports it as a warning', async () => {
+    const res = await ingest(batchOf(FX, events(20, 20)));
+    expect(res.status).toBe(202);
+    const body = (await res.json()) as IngestBatchResponse;
+    expect(body.accepted).toBe(1);
+    expect(body.warnings?.[0]).toContain('ev_00020');
+  });
+
   it('pages events by sequence with a bounded limit', async () => {
     const page1 = await jsonOf<EventPage>(
       await fetch(`${t.baseUrl}/fixtures/${FX}/events?limit=3`),
@@ -156,7 +174,7 @@ describe('Event ingest (integration)', () => {
         `${t.baseUrl}/fixtures/${FX}/events?afterSequence=2&limit=500`,
       ),
     );
-    expect(page2.items.map((e) => e.sequence)).toEqual([3, 4, 10, 11]);
+    expect(page2.items.map((e) => e.sequence)).toEqual([3, 4, 10, 11, 20]);
     expect(page2.nextAfterSequence).toBeNull();
     expect(
       (await fetch(`${t.baseUrl}/fixtures/${FX}/events?limit=501`)).status,

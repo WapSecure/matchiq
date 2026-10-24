@@ -1,5 +1,5 @@
 import { StreamMessage, type Fixture } from '@matchiq/contracts';
-import { and, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import type { Database, Transaction } from '../client.js';
 import type {
   AuditEntry,
@@ -9,6 +9,7 @@ import type {
   IdempotencyRequest,
   LedgerTransaction,
   StoredEventRef,
+  StoredEventTail,
   StoredResponse,
   StreamMessageDraft,
   UnitOfWork,
@@ -116,6 +117,22 @@ export class PostgresLedgerTransaction implements LedgerTransaction {
           ),
         ),
       );
+  }
+
+  async findEventTail(key: FixtureKey): Promise<StoredEventTail | null> {
+    await this.pin.to(key.orgId);
+    const [row] = await this.tx
+      .select({
+        sequence: matchEvents.sequence,
+        type: matchEvents.type,
+        period: matchEvents.period,
+        matchClockMs: matchEvents.matchClockMs,
+      })
+      .from(matchEvents)
+      .where(eventsOf(key))
+      .orderBy(desc(matchEvents.sequence))
+      .limit(1);
+    return row ? { ...row, type: row.type as StoredEventTail['type'] } : null;
   }
 
   async insertEvents(

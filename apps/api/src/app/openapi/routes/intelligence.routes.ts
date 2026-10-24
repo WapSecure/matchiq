@@ -7,12 +7,15 @@ import {
   NarrativeList,
   OverlayList,
   RecapDocument,
+  EvidenceEnvelope,
+  InsightId,
 } from '@matchiq/contracts';
 import { z } from 'zod';
 import { API_LIMITS } from '../../constants';
 import {
   MatchListQuery,
   NarrativeQuery,
+  RecapQuery,
 } from '../../intelligence/intelligence.schemas';
 import { KEYSET_TEXT, TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
@@ -98,15 +101,33 @@ export const INTELLIGENCE_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.intelligence,
     summary: 'Full-time recap document',
     description:
-      '`404 recap-not-ready` until the match has ended; poll or wait for full time.',
+      '`404 recap-not-ready` until the match has ended; poll or wait for full time. `persona` and `lang` are optional; each keeps only the matching narratives and stories, and without them the whole recap is returned.',
     auth: 'insights:read',
     params: FixturePath,
+    query: RecapQuery,
     success: {
       status: 200,
       description: 'Recap',
       body: json(RecapDocument),
     },
     problems: ['validation', 'fixtureNotFound', 'recapNotReady'],
+  },
+  {
+    operationId: 'getInsightEvidence',
+    method: 'get',
+    path: '/insights/{insightId}/evidence',
+    tag: TAGS.intelligence,
+    summary: 'The evidence behind one insight',
+    description:
+      'Computed metrics, the evidence event ids, method version, data coverage and any counter-evidence, as stored when the insight was detected. An insight of another organisation answers 404.',
+    auth: 'insights:read',
+    params: z.strictObject({ insightId: InsightId }),
+    success: {
+      status: 200,
+      description: 'The evidence envelope',
+      body: json(EvidenceEnvelope),
+    },
+    problems: ['validation', 'insightNotFound'],
   },
   {
     operationId: 'listAgentRuns',

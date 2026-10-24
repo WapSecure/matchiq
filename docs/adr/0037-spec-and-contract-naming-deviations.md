@@ -22,6 +22,11 @@ The product keeps these names. A client or reviewer should read the contracts an
 | Event fields      | `eventTime`, `evidenceIds` (§44)                                                                       | `wallClockUtc`, `evidenceEventIds`                                                                       |
 | `Idempotency-Key` | Required on replay (§29), on writes (§45)                                                              | Optional on every route that supports it; not read by `PUT /me/preferences`                              |
 
+## Amendment (MQ-085)
+
+- `Idempotency-Key` stays optional; ADR-0039 lists the 12 routes that read it.
+- The evidence endpoint exists as `GET /insights/{insightId}/evidence` (the spec's `/matches/...` form is the ADR-0005 rename). The recap filter parameter is `lang`; the narratives list keeps `locale`.
+
 ## Consequences
 
 - External integrators get a typed client generated from the OpenAPI document (ADR-0017), so the names are discoverable.

@@ -222,6 +222,9 @@ importers:
       '@matchiq/server-kit':
         specifier: workspace:*
         version: link:../../libs/server-kit
+      '@matchiq/synthetic-data':
+        specifier: workspace:*
+        version: link:../../libs/synthetic-data
       '@nestjs/common':
         specifier: 11.2.7
         version: 11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2)

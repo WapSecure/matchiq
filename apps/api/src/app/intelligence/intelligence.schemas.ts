@@ -14,3 +14,10 @@ export const NarrativeQuery = MatchListQuery.extend({
 
 export type MatchListQuery = z.infer<typeof MatchListQuery>;
 export type NarrativeQuery = z.infer<typeof NarrativeQuery>;
+
+export const RecapQuery = z.strictObject({
+  persona: Persona.optional(),
+  lang: Locale.optional(),
+});
+
+export type RecapQuery = z.infer<typeof RecapQuery>;
