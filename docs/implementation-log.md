@@ -1191,3 +1191,7 @@ The app profile now orders the worker after the one-shot migration and six-fixtu
 Local validation covers script syntax, formatting and rendered Compose configuration. Fresh-stack verification passed in [CI run 40127584909](https://github.com/WapSecure/matchiq/actions/runs/40127584909) for commit `8ede2a1`: every service became ready, all six fixtures seeded, a replay advanced, persisted events were observed, and cleanup completed.
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
+
+## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
+
+The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
