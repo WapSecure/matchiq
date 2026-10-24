@@ -4,6 +4,8 @@ import {
   type AuditTargetType,
 } from '@matchiq/contracts';
 
+import { REASON_COPY } from './audit-reasons';
+
 export const ANY = '';
 
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
@@ -11,6 +13,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   [AUDIT_ACTIONS.overlayHeld]: 'Graphic held',
   [AUDIT_ACTIONS.overlayBlocked]: 'Graphic update blocked',
   [AUDIT_ACTIONS.insightSuppressed]: 'Key moment dropped',
+  [AUDIT_ACTIONS.insightRetracted]: 'Key moment ruled out',
   [AUDIT_ACTIONS.publicationGated]: 'Fact check blocked wording',
   [AUDIT_ACTIONS.editorialFrozen]: 'Graphics paused',
   [AUDIT_ACTIONS.editorialResumed]: 'Graphics resumed',
@@ -97,12 +100,13 @@ export const AUDIT_COPY = {
   },
   technical: {
     action: 'Action key',
+    reason: 'Reason as recorded',
     actor: 'Actor id',
     target: 'Item id',
     entry: 'Entry id',
     request: 'Request id',
   },
-  noReason: 'None given',
+  noReason: REASON_COPY.none,
   noChanges: 'Nothing changed',
   viewChanges: (n: number) => `${n} field${n === 1 ? '' : 's'} changed`,
   diffBefore: 'Before',
