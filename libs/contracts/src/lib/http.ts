@@ -28,6 +28,8 @@ export const IngestBatchResponse = z.strictObject({
   rejected: z.int().nonnegative(),
   ingestionId: z.string().min(1),
   lastAcceptedSequence: z.int().min(-1),
+  /** Plain-language notes such as sequence gaps, which leave the snapshot provisional. */
+  warnings: z.array(z.string()).optional(),
 });
 
 export const HealthStatus = z.strictObject({

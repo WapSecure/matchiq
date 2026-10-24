@@ -44,6 +44,7 @@ import { PreferencesController } from './me/preferences.controller';
 import { PreferencesService } from './me/preferences.service';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
 import { AgentTracesController } from './intelligence/agent-traces.controller';
+import { InsightEvidenceController } from './intelligence/insight-evidence.controller';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
 import { LobbyController, ReplayController } from './replay/replay.controller';
@@ -60,6 +61,7 @@ export const API_CONTROLLERS = [
   LobbyController,
   IntelligenceController,
   AgentTracesController,
+  InsightEvidenceController,
   EditorialController,
   EditorialControlsController,
   ReviewController,

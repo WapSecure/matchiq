@@ -83,7 +83,7 @@ export interface paths {
         put?: never;
         /**
          * Append a batch of events to the ledger
-         * @description Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.
+         * @description Duplicates (same eventId and body) are counted and ignored; a changed body is a 409. A clock that runs backwards within a period, or an impossible period change, is a 422 listing the offending event ids. Sequence gaps are accepted and reported in `warnings`; the snapshot stays provisional until they fill.
          *
          *     Access: requires the `events:ingest` permission.
          */
@@ -417,11 +417,33 @@ export interface paths {
         };
         /**
          * Full-time recap document
-         * @description `404 recap-not-ready` until the match has ended; poll or wait for full time.
+         * @description `404 recap-not-ready` until the match has ended; poll or wait for full time. `persona` and `lang` are optional; each keeps only the matching narratives and stories, and without them the whole recap is returned.
          *
          *     Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
          */
         get: operations["getRecap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/insights/{insightId}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The evidence behind one insight
+         * @description Computed metrics, the evidence event ids, method version, data coverage and any counter-evidence, as stored when the insight was detected. An insight of another organisation answers 404.
+         *
+         *     Access: requires the `insights:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         */
+        get: operations["getInsightEvidence"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1738,6 +1760,7 @@ export interface components {
             rejected: number;
             ingestionId: string;
             lastAcceptedSequence: number;
+            warnings?: string[];
         };
         AgentStepTrace: {
             /** Format: uuid */
@@ -2035,7 +2058,7 @@ export interface components {
     parameters: {
         /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
         RequestId: string;
-        /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+        /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
         IdempotencyKey: string;
         /** @description Resume after this `streamSequence`. Wins over `?lastEventId=` (for clients that cannot set headers). */
         LastEventId: string;
@@ -2156,7 +2179,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -2468,7 +2491,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -2543,7 +2566,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `validation-failed`: Request validation failed; `fixture-mismatch`: Events must belong to the fixture in the path; `idempotency-key-reused`: Idempotency-Key was reused with a different request */
+            /** @description `validation-failed`: Request validation failed; `fixture-mismatch`: Events must belong to the fixture in the path; `event-order`: Events are out of order; `idempotency-key-reused`: Idempotency-Key was reused with a different request */
             422: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -3402,7 +3425,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -3618,7 +3641,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4172,7 +4195,10 @@ export interface operations {
     };
     getRecap: {
         parameters: {
-            query?: never;
+            query?: {
+                persona?: "CASUAL" | "ANALYST" | "BROADCAST";
+                lang?: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+            };
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
@@ -4215,6 +4241,124 @@ export interface operations {
                 };
             };
             /** @description `fixture-not-found`: Fixture not found; `recap-not-ready`: The recap is available once the match has ended */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getInsightEvidence: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path: {
+                insightId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The evidence envelope */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        insightId: string;
+                        fixtureId: string;
+                        windowStartMs: number;
+                        windowEndMs: number;
+                        eventIds: string[];
+                        computedMetrics: {
+                            [key: string]: number;
+                        };
+                        methodVersion: string;
+                        dataCoverage: number;
+                        /** @enum {string} */
+                        confidenceLabel: "low" | "medium" | "high";
+                        rationale: string;
+                        counterEvidence: {
+                            description: string;
+                            eventIds: string[];
+                        }[];
+                        /** Format: date-time */
+                        generatedAt: string;
+                    };
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `insight-not-found`: Insight not found */
             404: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
@@ -4483,7 +4627,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4608,7 +4752,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4831,7 +4975,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4946,7 +5090,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -5137,7 +5281,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -5240,7 +5384,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -5564,7 +5708,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -5706,7 +5850,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {

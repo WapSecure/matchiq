@@ -4,6 +4,7 @@ import type {
   HashedEvent,
   LedgerTransaction,
   StoredEventRef,
+  StoredEventTail,
   StreamMessageDraft,
   UnitOfWork,
 } from '@matchiq/db';
@@ -25,6 +26,8 @@ class FakeLedger implements Partial<LedgerTransaction> {
 
   lockFixture = async () => this.fixtureExists;
   findEventRefs = async () => this.stored;
+  tail: StoredEventTail | null = null;
+  findEventTail = async () => this.tail;
   insertEvents = async (
     _k: unknown,
     _id: string,
@@ -135,5 +138,53 @@ describe('IngestService', () => {
     ).toBe(409);
     expect(ledger.inserted).toEqual([]);
     expect(notify).not.toHaveBeenCalled();
+  });
+
+  it('answers 422 listing the offending event ids on a clock regression', async () => {
+    const { ledger, notify, service } = setup();
+    ledger.tail = {
+      sequence: 4,
+      type: 'SHOT',
+      period: 1,
+      matchClockMs: 90_000,
+    };
+    const late = {
+      ...batch([5]),
+      events: [buildTestEvent(FX, 5, { matchClockMs: 10_000 })],
+    };
+    const failure = await service
+      .ingest({ key, principal, batch: late })
+      .catch((e: unknown) => e);
+    expect(failure).toBeInstanceOf(ProblemException);
+    expect((failure as ProblemException).getStatus()).toBe(422);
+    expect(
+      JSON.stringify((failure as ProblemException).problem.errors),
+    ).toContain('ev_00005');
+    expect(ledger.inserted).toEqual([]);
+    expect(notify).not.toHaveBeenCalled();
+  });
+
+  it('accepts a sequence gap and reports it in warnings', async () => {
+    const { ledger, service } = setup();
+    ledger.tail = {
+      sequence: 4,
+      type: 'SHOT',
+      period: 1,
+      matchClockMs: 64_000,
+    };
+    const result = await service.ingest({ key, principal, batch: batch([7]) });
+    expect(result.status).toBe(202);
+    expect(result.body.accepted).toBe(1);
+    expect(result.body.warnings?.[0]).toContain('ev_00007');
+  });
+
+  it('omits warnings for a contiguous batch', async () => {
+    const { service } = setup();
+    const result = await service.ingest({
+      key,
+      principal,
+      batch: batch([0, 1]),
+    });
+    expect(result.body.warnings).toBeUndefined();
   });
 });

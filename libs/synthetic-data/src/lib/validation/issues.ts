@@ -48,6 +48,10 @@ export const ISSUE_MESSAGES = {
   clock: (actual: number, previous: number) =>
     `matchClockMs ${actual} precedes ${previous} in the same period`,
   wallClock: 'wallClockUtc moves backwards',
+  periodRegress: (actual: number, previous: number) =>
+    `period ${actual} follows period ${previous}`,
+  periodSkip: (actual: number, previous: number) =>
+    `period ${actual} cannot follow period ${previous} without PERIOD_STARTED`,
   matchStartFirst: 'the first event must be MATCH_STARTED',
   matchStartOnce: 'MATCH_STARTED may only appear once, first',
   periodOrder: (actual: number, expected: number) =>

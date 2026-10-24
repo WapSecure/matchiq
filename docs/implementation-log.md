@@ -1191,3 +1191,11 @@ The app profile now orders the worker after the one-shot migration and six-fixtu
 Local validation covers script syntax, formatting and rendered Compose configuration. Fresh-stack verification passed in [CI run 40127584909](https://github.com/WapSecure/matchiq/actions/runs/40127584909) for commit `8ede2a1`: every service became ready, all six fixtures seeded, a replay advanced, persisted events were observed, and cleanup completed.
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
+
+## MQ-085: API alignment and ingest validation (24 October 2026)
+
+- **Evidence endpoint**: `GET /insights/{insightId}/evidence` returns the stored evidence envelope (metrics, event ids, method version, coverage, counter-evidence). Permission `insights:read`; another organisation's insight is the same 404 as a missing one.
+- **Recap**: `GET /fixtures/{id}/recap` takes optional `persona` and `lang`, filtering key-moment narratives and the story. Without them the stored recap is returned unchanged (`recap-filter.spec.ts`).
+- **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
+- **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0038; ADR-0034 and ADR-0037 amended).
+- Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.

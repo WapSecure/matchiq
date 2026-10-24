@@ -60,7 +60,7 @@ CI fails if a Nest route is missing from the registry or a registry entry has no
 
 ## Idempotency
 
-- `Idempotency-Key` (1–255 visible ASCII) is optional on every route that supports it: replay session create and control, event ingest and the editorial commands. `PUT /me/preferences` does not read it, because it replaces the whole document and is naturally repeatable. No route requires the key (ADR-0037). A retry with the same key and body returns the stored response with `Idempotent-Replayed: true`. The same key with a different body is `422 idempotency-key-reused`.
+- `Idempotency-Key` (1–255 visible ASCII) is optional. No route requires it (ADR-0037, ADR-0038). Exactly these routes read it: `POST /fixtures`, `POST /fixtures/{id}/events:batch`, `POST /fixtures/{id}/sessions`, `POST /fixtures/{id}/replay`, `POST /overlays/{id}/retract`, `POST /insights/{id}/suppress`, `POST /insights/{id}/review`, `POST /fixtures/{id}/editorial/freeze`, `…/editorial/resume`, `…/editorial/publish-policy`, `POST /editorial/kill-switch/activate` and `…/release`. `PUT /me/preferences` does not read it, because it replaces the whole document and is naturally repeatable. A retry with the same key and body returns the stored response with `Idempotent-Replayed: true`. The same key with a different body is `422 idempotency-key-reused`.
 - Only successful responses are stored, so a failed request can be retried with the same key. Keys are pruned after `IDEMPOTENCY_RETENTION_HOURS`.
 - Editorial commands are also no-ops when repeated: the response says `changed: false` and writes no audit row.
 
@@ -75,7 +75,7 @@ Errors are RFC 9457 `application/problem+json` with `type = urn:matchiq:problem:
 | 403    | `forbidden` (valid caller without the permission)                                                                                                             |
 | 404    | `fixture-not-found`, `fixture-template-not-found`, `replay-session-not-found`, `state-not-found`, `recap-not-ready`, `overlay-not-found`, `insight-not-found` |
 | 409    | `fixture-exists`, `event-conflict`, `replay-state-conflict`, `overlay-not-on-air`, `insight-already-published`                                                |
-| 422    | `validation-failed`, `fixture-mismatch`, `idempotency-key-reused`                                                                                             |
+| 422    | `validation-failed`, `fixture-mismatch`, `event-order`, `idempotency-key-reused`                                                                              |
 | 429    | `rate-limited`. Honour `Retry-After`                                                                                                                          |
 | 503    | `replay-capacity` (with `Retry-After`), `replay-unavailable`, `stream-unavailable`, `auth-unavailable`                                                        |
 

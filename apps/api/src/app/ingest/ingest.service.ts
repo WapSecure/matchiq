@@ -33,6 +33,7 @@ import {
 } from '../infrastructure/tokens';
 import { actorTypeOf, auditNameOf } from '../auth/actor';
 import { actorDetails } from '../auth/audit-trail.service';
+import { assessBatchOrder } from './batch-order';
 import { classifyBatch } from './classify-batch';
 
 export interface IngestCommand {
@@ -113,6 +114,14 @@ export class IngestService {
     if (conflicts.length > 0)
       throw problem('eventConflict', { errors: conflicts });
 
+    const order = assessBatchOrder(
+      fresh.map((h) => h.event),
+      await tx.findEventTail(key),
+    );
+    if (order.violations.length > 0) {
+      throw problem('eventOrder', { errors: order.violations });
+    }
+
     const ingestionId = `${ID_PREFIXES.ingestion}${randomUUID()}`;
     await tx.insertEvents(key, ingestionId, fresh);
     await tx.appendStreamMessages(
@@ -125,6 +134,7 @@ export class IngestService {
       rejected: 0,
       ingestionId,
       lastAcceptedSequence: fresh.at(-1)?.event.sequence ?? NO_SEQUENCE,
+      ...(order.warnings.length > 0 ? { warnings: order.warnings } : {}),
     };
     await tx.appendAudit({
       orgId: key.orgId,

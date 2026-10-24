@@ -24,6 +24,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/synthetic-data/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/server-kit/tsconfig.lib.json"
     },
     {

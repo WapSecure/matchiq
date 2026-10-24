@@ -27,6 +27,7 @@ export const ROUTES = {
   overlayResource: 'overlays',
   overlayRetract: ':overlayId/retract',
   insightResource: 'insights',
+  insightEvidence: ':insightId/evidence',
   insightSuppress: ':insightId/suppress',
   insightReview: ':insightId/review',
   overlayReviews: ':fixtureId/overlay-reviews',
@@ -146,6 +147,7 @@ export const PROBLEMS = {
     title: 'Events conflict with the stored ledger',
     slug: 'event-conflict',
   },
+  eventOrder: { title: 'Events are out of order', slug: 'event-order' },
   idempotencyMismatch: {
     title: 'Idempotency-Key was reused with a different request',
     slug: 'idempotency-key-reused',
