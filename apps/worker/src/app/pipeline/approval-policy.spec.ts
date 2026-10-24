@@ -83,7 +83,11 @@ describe('applyEditorialPolicy in MANUAL (ADR-0023)', () => {
       expect.objectContaining({
         status: 'VERIFIED',
         cue: expect.objectContaining({ status: 'VERIFIED', clockEndMs: 8_000 }),
-        editorial: { state: 'AWAITING_APPROVAL', reason: 'AWAITING_APPROVAL' },
+        editorial: {
+          state: 'AWAITING_APPROVAL',
+          reason: 'AWAITING_APPROVAL',
+          approvalDeadline: expect.any(Date),
+        },
       }),
     ]);
     expect(out.audits.map((a) => a.action)).toEqual([
