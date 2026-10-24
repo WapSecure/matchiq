@@ -66,7 +66,7 @@ export const readReviews = async (
   }));
 };
 
-/** Review commands; each runs inside the caller's transaction (ADR-0023). */
+/** Review commands; each runs inside the caller's transaction (ADR-0024). */
 export class PostgresReviewTransaction
   extends PostgresLedgerTransaction
   implements ReviewTransaction

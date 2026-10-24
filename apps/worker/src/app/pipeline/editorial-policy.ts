@@ -163,7 +163,7 @@ class PolicyRun {
     });
   }
 
-  /** MANUAL: stored with its copy and wall-clock window, announced without copy (ADR-0023). */
+  /** MANUAL: stored with its copy and wall-clock window, announced without copy (ADR-0024). */
   private await(
     draft: StreamMessageDraft,
     cue: Publish,

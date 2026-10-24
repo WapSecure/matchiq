@@ -63,7 +63,7 @@ export const ReplayCapacityEnv = z.object({
   ),
 });
 
-/** Wall-clock time a producer has to approve a waiting graphic (ADR-0023). */
+/** Wall-clock time a producer has to approve a waiting graphic (ADR-0024). */
 export const ApprovalWindowEnv = z.object({
   APPROVAL_WINDOW_SECONDS: bounded(
     OPERATIONS_LIMITS.approvalWindowMinSeconds,

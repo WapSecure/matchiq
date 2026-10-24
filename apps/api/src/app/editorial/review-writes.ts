@@ -69,7 +69,7 @@ export const approvedCue = (
   };
 };
 
-/** False once the cue's wall-clock approval window has passed (ADR-0023). */
+/** False once the cue's wall-clock approval window has passed (ADR-0024). */
 export const windowOpen = (
   row: ReviewCueRow,
   clock: SessionClock | null,

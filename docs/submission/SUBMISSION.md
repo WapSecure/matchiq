@@ -1,6 +1,6 @@
 # MatchIQ: submission write-up
 
-Microsoft × Premier League: Inside the Game developer hackathon. Prepared 2026-10-23 against `dev` at `728c1ce`.
+Microsoft × Premier League: Inside the Game developer hackathon. Prepared 2026-10-23 against `dev`; CI last verified green at `ed46466`.
 
 Claims in this document carry the evidence labels from spec §58:
 
@@ -66,7 +66,7 @@ Around the pipeline: a match recap at full time, an Agent Observatory that shows
 | **Azure (Bicep)**             | Container Apps (4 apps and a migrate job), Container Registry, PostgreSQL 17 Flexible Server, Azure Managed Redis, Key Vault, Log Analytics, Application Insights, user-assigned identity with least-privilege roles, Foundry, a budget. An OIDC GitHub Actions deploy workflow with what-if and approval. | **[DESIGN] Linted, never deployed.** `az bicep build` and `lint` pass in CI. `what-if` and deployment have never run ([`infra/azure/README.md`](../../infra/azure/README.md)). |
 | **Azure Monitor**             | An OpenTelemetry collector variant with the `azuremonitor` exporter.                                                                                                                                                                                                                                       | **[DESIGN] Seam only, not exercised.**                                                                                                                                         |
 | **Azure AI Content Safety**   | A `ContentSafetyScreen` port that fails closed when configured. A deterministic blocklist runs today.                                                                                                                                                                                                      | **[DESIGN] Port only, not wired.**                                                                                                                                             |
-| **GitHub**                    | Public repository, GitHub Actions CI with CodeQL, dependency review and the promotion path.                                                                                                                                                                                                                | **[VALIDATED]** CI green on `dev` ([run 39886416370](https://github.com/WapSecure/matchiq/actions/runs/39886416370)).                                                          |
+| **GitHub**                    | Public repository, GitHub Actions CI with CodeQL, dependency review and the promotion path.                                                                                                                                                                                                                | **[VALIDATED]** CI green on `dev` ([run 40105654686](https://github.com/WapSecure/matchiq/actions/runs/40105654686)).                                                          |
 
 We do not claim Azure MCP, Fabric, GitHub Copilot SDK integration or any hosted Azure service.
 

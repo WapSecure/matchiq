@@ -1,4 +1,4 @@
-# ADR-0023: Producer approve-before-air with a per-match publish policy
+# ADR-0024: Producer approve-before-air with a per-match publish policy
 
 - Status: Accepted (2026-10-23). Implements MQ-062. Refines spec §29 (human in the loop), §31.4 (producer console: approval queue, copy fit, priority and duration editing) and §45 (`POST /insights/{id}/review`). Extends ADR-0016, whose editorial stage it reuses, and ADR-0018 (permissions, row-level security).
 

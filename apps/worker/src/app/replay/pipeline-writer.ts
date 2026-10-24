@@ -87,7 +87,7 @@ const writeArtifacts = async (
   }
 };
 
-/** Wall clock and approval window for MANUAL cues (ADR-0023). */
+/** Wall clock and approval window for MANUAL cues (ADR-0024). */
 interface ApprovalClock {
   readonly now: () => number;
   readonly windowMs: number;

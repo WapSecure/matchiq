@@ -100,6 +100,8 @@ Counters from the pipeline are recorded only after the transaction commits. A re
 
 These are the spec's proposed targets (§14, §44, §50), to validate under the documented load (20 events/s across 10 fixtures). The alerts below are not evidence that the targets are met.
 
+The spec gives two insight-to-overlay targets: p95 under 3 s with AI in §14, and at most 4 s in §44 and §50. The alert `MatchiqAgentLatencyHigh` uses 4 s. §44 and §50 come after §23 and so override §14, and the 4 s figure leaves room for the gate and the scheduler on top of a local model call. If the owner prefers 3 s, change the threshold in `infra/observability/alerts.yml` and this table together.
+
 | SLO                                                  | SLI (query basis)                                                                                                          | Alert                                                     |
 | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | API availability 99.9% monthly                       | non-5xx ratio of `matchiq_http_requests_total{service="matchiq-api"}`                                                      | `MatchiqApiErrorBudgetFastBurn` (14.4× burn, 5 m and 1 h) |

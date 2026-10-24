@@ -11,7 +11,7 @@ import { TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
 import { FixturePath } from './fixture.routes';
 
-/** Approve-before-air (spec §29, §31.4, §45; ADR-0023). */
+/** Approve-before-air (spec §29, §31.4, §45; ADR-0024). */
 export const REVIEW_ROUTES: readonly ApiRoute[] = [
   {
     operationId: 'listOverlayReviews',

@@ -17,7 +17,7 @@ export interface SweepOutcome {
 }
 
 /**
- * Closes what the clocks have run out (ADR-0023). A waiting cue whose
+ * Closes what the clocks have run out (ADR-0024). A waiting cue whose
  * wall-clock window has passed lapses and never airs; an approved cue leaves
  * the screen once the match clock passes its own slot.
  */

@@ -11,7 +11,7 @@ import {
 } from './primitives.js';
 import { OverlayEditorialState } from './reads.js';
 
-/** Approve-before-air (spec §29, §31.4, §45; ADR-0023). */
+/** Approve-before-air (spec §29, §31.4, §45; ADR-0024). */
 export const ReviewDecision = z.enum(['APPROVE', 'REJECT']);
 
 export const OverlayReviewState = OverlayEditorialState.extract([

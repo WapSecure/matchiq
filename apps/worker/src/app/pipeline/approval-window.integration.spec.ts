@@ -18,7 +18,7 @@ jest.setTimeout(120_000);
 const WINDOW_MS = 45_000;
 const START_MS = Date.parse('2026-10-24T12:00:00.000Z');
 
-describe('manual approval window on the wall clock (integration, ADR-0023)', () => {
+describe('manual approval window on the wall clock (integration, ADR-0024)', () => {
   let t: TestWorker;
   let key: FixtureKey;
   let wall = START_MS;

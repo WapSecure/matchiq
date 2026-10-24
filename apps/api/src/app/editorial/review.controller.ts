@@ -30,7 +30,7 @@ import { ReviewService } from './review.service';
 
 const fixtureIdPipe = new ZodValidationPipe(FixtureIdParam);
 
-/** Approve-before-air: the producer's queue, reviews and the session policy (ADR-0023). */
+/** Approve-before-air: the producer's queue, reviews and the session policy (ADR-0024). */
 @Controller()
 export class ReviewController {
   constructor(

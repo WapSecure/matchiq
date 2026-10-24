@@ -107,7 +107,7 @@ export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 
 /**
  * RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its
- * insight was suppressed. The rest are the MANUAL review states (ADR-0023);
+ * insight was suppressed. The rest are the MANUAL review states (ADR-0024);
  * only APPROVED and RETRACTED cues ever aired.
  */
 export const OverlayEditorialState = z.enum([
