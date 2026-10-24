@@ -24,7 +24,7 @@ Mock and template output are never counted as agent output. A narrative served i
 - **Adversarial inputs** (8 cases): prompt injection in player and team names, rationale and counter-evidence (English and Pidgin), a forged data delimiter and a digit in a name.
 - **Compromised-model attacks** (`tests/eval/attacks.py`, 13 scripted outputs): what a model that ignores its instructions would return. They run in CI against the real checks.
 
-A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 50) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds the 10 cases of the MQ-060 run (implementation log). A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
+A live run uses `--cases 12` (an evenly spaced, deterministic sample of the 50) plus `--case real_packet_shape`, or the full set. That is 13 cases. The committed baseline (`ollama-qwen2.5-7b-instruct.json`) holds the 12 cases of the MQ-068 run (implementation log). A new baseline recorded with the command below will have its own case count; the CI check reads the baseline file, not this document.
 
 The "28% to 87% fully localised" figure compares the run before and after commit `4d977d6` (PR #40). Only the after run is committed as a baseline; the before figure is historical, recorded in the implementation log, and has no artifact in the repository.
 
@@ -68,6 +68,17 @@ The worker gate re-checks every agent draft and overlay on its own (spec ยง10, ย
 - **Reject, not repair.** A causal clause is never cut out: removing it can change what the sentence claims, and the template for that variant is always available. Templates are exempt only from the recent-narrative check, because their deterministic wording repeats by design.
 - **False-positive guards.** Table-driven tests cover all four locales, including causal sentences that cite a metric or name an event, ordinary pressing and possession prose, Pidgin reduplication ("well well") and Pidgin "pass" meaning "more than". Every golden template variant and overlay must still pass the gate.
 
+## Analyst breakdown (MQ-068)
+
+An ANALYST narrative may carry `breakdown`: what happened, why it matters, what to watch. The deterministic templates write it in every locale, so the live model does not affect it. Checks:
+
+- Each part is held to the body's rules: cited values equal the evidence metrics or the insight's `context.metrics`, every numeral is a cited value, evidence ids come from the envelope or `context.eventIds`, names are allowlisted, and the forbidden-claim, safety, betting and prediction rules pass. Spelled-out numbers are flagged in every locale.
+- Editorial rules for the parts (`guard/editorial_breakdown.py`): an internal index is shown only with its label, each metric is cited in one part only, "what to watch" has no number and is never a prediction, and a rising moment is never described as falling.
+- The independent oracle (`tests/eval/harness.py`) accepts context metrics as support and checks the parts again without importing the guard.
+- Tests: `tests/test_breakdown.py` covers every moment type and locale (three parts present, 360 characters at most, every numeral cited, no number words), packets without context, and the editorial rules. The worker has the same coverage for its TypeScript templates.
+
+The model writes no breakdown part. The Analyst (2.2.0) may state one context value in a claim and the Writer (3.1.0) may carry it into the Analyst body, so the prompts changed and the baseline was re-recorded (below).
+
 ## Running an evaluation
 
 From `apps/agents`:
@@ -91,6 +102,8 @@ uv run python scripts/run_eval.py --provider ollama --deadline-ms 120000 \
   1. a prompt's (version, hash) is not in the registry (text changed without a version bump, or the bump was not recorded); or
   2. the checked-in live baseline (`tests/eval/baselines/ollama-qwen2.5-7b-instruct.json`) was recorded against different prompts, or shows any violation.
 - So a prompt change ships only with a fresh offline Ollama evaluation, recorded with `--baseline` and reviewed in the PR. The mock evaluation (`tests/eval/test_golden.py`) still runs every case in CI.
+
+**Baseline re-recorded for MQ-068 (2026-10-23).** The prompt registry gate requires a baseline recorded against the current prompts, and Analyst 2.1.0 to 2.2.0 and Writer 3.0.0 to 3.1.0 changed them. Live run on `ollama/qwen2.5:7b-instruct` at a 120 s deadline: 12 cases, 0 violations, 73% agent share (84 of 115 narratives), 40 successful and 2 timed-out model calls, with a load average of 6 to 13. The earlier baseline had 3% agent share under a load of 26 to 35, so the two shares are not a like-for-like comparison.
 
 ## Repairs, retries and what may never change
 

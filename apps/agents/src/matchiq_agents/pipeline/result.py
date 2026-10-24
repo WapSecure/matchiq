@@ -5,8 +5,8 @@ from typing import Final
 
 from matchiq_agents.contracts.types import (
     AgentRun,
-    AnalystBreakdown,
     AgentStep,
+    AnalystBreakdown,
     IssueCode,
     Locale,
     NarrativeDraft,

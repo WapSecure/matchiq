@@ -1147,3 +1147,15 @@ Stream A, isolated branch `fix/MQ-079-parser-security` from origin/dev. PR #78 e
 ### MQ-078: Trace-confirmed responsive visibility correction
 
 The next CI browser run still measured the same 24px overflow. Downloaded and inspected its actual retry trace and screenshot: the repository link retained both shared `inline-flex` styling and the attempted `hidden` class, and remained visible at 320px. Replaced that conflicting display utility on the link with the responsive wrapper pattern already used for other navigation items (`hidden sm:contents`). This hides the whole optional shortcut at narrow widths while preserving the shared button's display contract. Browser assertions and timeouts remain unchanged; rerun required before completion.
+
+## MQ-068: Richer analyst breakdowns and a match story (24 October 2026)
+
+Each key moment was one short sentence, and the recap had no story. The owner wanted more narrative without waiting on a slow local model, so the richness is deterministic and cited, and the model only polishes (ADR-0011 addendum 5).
+
+- **Engine** (`libs/football-engine/src/lib/context`): pure functions for the score state and margin, the scoreboard minute and phase, the last 10 minutes against the match average for both sides, the trend over the last three 5-minute spells, the regain before a goal and the previous moment of the same kind. `derivedAt` gives the state at a moment's clock, so a moment found by a re-scan gets the same context as a live one. The worker's `MomentTracker` attaches `Insight.context` (`MomentContext`, fixed `context.*` metricRefs) when it admits a moment.
+- **Contracts**: `MomentContext`, `AnalystBreakdown`, `MatchStory`; `breakdown` on `NarrativeDraft`, `Narrative` and `RecapNarrative`; `story` on `RecapDocument`. Codegen, OpenAPI and the API client are regenerated.
+- **Agents**: context metrics are citable by the Fact Checker; deterministic breakdown templates in four locales with the editorial rules in `guard/editorial_breakdown.py`; `build_result` attaches a checked breakdown to each Analyst draft. Analyst 2.2.0 and Writer 3.1.0; registry and Ollama baseline re-recorded (docs/ai/EVALUATION.md).
+- **Worker**: TypeScript breakdown templates for AI-disabled and failed runs; the publish gate checks each part and drops a failing breakdown without losing the narrative; the recap builder writes the match story for each audience and language and drops any paragraph whose numbers do not match the snapshot or the moment.
+- **Web**: Analyst breakdown with three subheadings, collapsed to the first part with "Show full breakdown", in the key-moment card, the evidence drawer and the recap; a match story panel above the key moments; the downloaded report includes both.
+
+Tests: engine context spec (20), worker breakdown and story specs (16), pytest `test_breakdown.py` plus the full agents suite (509), web specs for the breakdown, the story and the report. Deferred: model polish of the story (no recap pipeline yet), a native review of the Pidgin, French and Spanish wording.
