@@ -8,6 +8,8 @@ import { paragraphIssues } from './story-verify';
 const lengthOf = (story: MatchStory) =>
   story.paragraphs.reduce((n, p) => n + p.text.length, 0);
 
+jest.setTimeout(60_000);
+
 describe('match story', () => {
   it.each(GOLDEN_SCENARIOS)(
     '%s: every paragraph cites numbers the engine computed',

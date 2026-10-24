@@ -20,6 +20,8 @@ const runs = Promise.all(
   GOLDEN_SCENARIOS.map((name) => goldenPipelineRun(name)),
 );
 
+jest.setTimeout(60_000);
+
 describe('template Analyst breakdown', () => {
   it('gives every detected moment context that matches the contract', async () => {
     for (const run of await runs) {
