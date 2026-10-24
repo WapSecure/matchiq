@@ -21,10 +21,11 @@ export function describeReason(raw: string | null | undefined): string {
   if (!text) return REASON_COPY.none;
   const known = AUDIT_REASON_LABELS[text];
   if (known) return known;
-  return sentenceCase(
-    text.replace(REASON_CODE_PATTERN, (code) =>
-      (AUDIT_REASON_LABELS[code] ?? humaniseCode(code)).toLowerCase(),
-    ),
+  if (!text.includes(' ') && text.toUpperCase() === text) {
+    return humaniseCode(text);
+  }
+  return text.replace(REASON_CODE_PATTERN, (code) =>
+    (AUDIT_REASON_LABELS[code] ?? humaniseCode(code)).toLowerCase(),
   );
 }
 
