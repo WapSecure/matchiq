@@ -55,6 +55,9 @@ export const TeamMatchMetrics = z
     passesAttempted: z.int().nonnegative(),
     passesCompleted: z.int().nonnegative(),
     passCompletionPct: MetricValue,
+    /** Optional so snapshots stored before algorithm 1.1.0 still parse. */
+    shotConversionPct: MetricValue.optional(),
+    passQualityPct: MetricValue.optional(),
     possessionPct: MetricValue,
     possessionBasis: PossessionBasis,
     pressures: z.int().nonnegative(),

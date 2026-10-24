@@ -94,6 +94,7 @@ export const toInsight = (
         description: c.description,
         eventIds: [...c.eventIds],
       })),
+      ...(candidate.envelope === undefined ? {} : candidate.envelope),
       generatedAt: event.wallClockUtc,
     },
     status: 'DETECTED',

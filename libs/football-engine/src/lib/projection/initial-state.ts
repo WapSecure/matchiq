@@ -21,6 +21,8 @@ export const EMPTY_TALLY: TeamTally = {
   fouls: 0,
   yellowCards: 0,
   redCards: 0,
+  ownGoalsFor: 0,
+  progressivePasses: 0,
 };
 
 export const EMPTY_TIMELINE: TeamTimeline = {
@@ -47,6 +49,8 @@ export const INITIAL_DERIVED: DerivedState = {
   },
   passAttempts: new Map(),
   completedAttempts: new Set(),
+  progressiveAttempts: new Set(),
+  playerCounts: new Map(),
 };
 
 export const toFixtureContext = (fixture: Fixture): FixtureContext => ({

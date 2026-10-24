@@ -80,6 +80,8 @@ class TeamMatchMetrics(BaseModel):
     passesAttempted: Annotated[int, Field(ge=0, le=9007199254740991)]
     passesCompleted: Annotated[int, Field(ge=0, le=9007199254740991)]
     passCompletionPct: MetricValue
+    shotConversionPct: MetricValue | None = None
+    passQualityPct: MetricValue | None = None
     possessionPct: MetricValue
     possessionBasis: PossessionBasis
     pressures: Annotated[int, Field(ge=0, le=9007199254740991)]

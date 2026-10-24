@@ -1,4 +1,5 @@
 import type {
+  ConfidenceType,
   CounterEvidence,
   InsightKind,
   InsightPriority,
@@ -44,6 +45,12 @@ export interface Candidate {
   readonly sampleSize: number;
   readonly rationale: string;
   readonly counterEvidence: readonly CounterEvidence[];
+  /** Optional spec §43 evidence fields copied onto the envelope. */
+  readonly envelope?: {
+    readonly sampleSize: number;
+    readonly limitations: string;
+    readonly confidenceType: ConfidenceType;
+  };
   /** Rules that describe a sustained pattern are debounced per kind and side. */
   readonly debounced: boolean;
 }
