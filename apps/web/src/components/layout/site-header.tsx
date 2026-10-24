@@ -42,6 +42,7 @@ export function SiteHeader() {
               size="sm"
               external
               aria-label={HEADER_LABELS.repository}
+              className="hidden sm:inline-flex"
               leadingIcon={<GithubIcon size={16} />}
             >
               <span className="hidden lg:inline">GitHub</span>
