@@ -1190,4 +1190,4 @@ The app profile now orders the worker after the one-shot migration and six-fixtu
 
 Local validation covers script syntax, formatting and rendered Compose configuration. The end-to-end claim requires the pull request's clean GitHub runner and will be recorded after it passes.
 
-The first fresh-runner attempt exposed that the worker package classified its runtime `@opentelemetry/api` import as a development dependency, so the production image built but exited at startup. The pinned package is now a worker runtime dependency, and failure diagnostics include exited containers.
+The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
