@@ -14,6 +14,7 @@ import type { FixtureContext, ProjectionState } from '../types.js';
 import { goalRule, redCardRule } from './event-rules.js';
 import { toInsight } from './insight-builder.js';
 import { momentumShiftRule, pressureSwingRule } from './swing-rules.js';
+import { milestoneRules } from './milestone-rules.js';
 import { highRegainsRule, shotBurstRule } from './threshold-rules.js';
 import type {
   Candidate,
@@ -31,6 +32,7 @@ const RULES: readonly Rule[] = [
   highRegainsRule,
   pressureSwingRule,
   momentumShiftRule,
+  ...milestoneRules,
 ];
 
 export const createMomentCursor = (): MomentCursor => ({

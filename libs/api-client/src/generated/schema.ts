@@ -879,6 +879,8 @@ export interface components {
             passesAttempted: number;
             passesCompleted: number;
             passCompletionPct: components["schemas"]["MetricValue"];
+            shotConversionPct?: components["schemas"]["MetricValue"];
+            passQualityPct?: components["schemas"]["MetricValue"];
             possessionPct: components["schemas"]["MetricValue"];
             /** @enum {string} */
             possessionBasis: "TIME_WEIGHTED" | "EVENT_SHARE_PROXY";
@@ -1390,6 +1392,10 @@ export interface components {
                     description: string;
                     eventIds: string[];
                 }[];
+                sampleSize?: number;
+                limitations?: string;
+                /** @enum {string} */
+                confidenceType?: "measured" | "heuristic";
                 /** Format: date-time */
                 generatedAt: string;
             };

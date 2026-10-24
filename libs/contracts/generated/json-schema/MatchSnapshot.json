@@ -127,6 +127,12 @@
         "passCompletionPct": {
           "$ref": "#/$defs/MetricValue"
         },
+        "shotConversionPct": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "passQualityPct": {
+          "$ref": "#/$defs/MetricValue"
+        },
         "possessionPct": {
           "$ref": "#/$defs/MetricValue"
         },

@@ -39,6 +39,17 @@ export const METRIC_BASES: Record<
     plain: 'Share of passes that reached a teammate',
     formula: 'passesCompleted / passesAttempted × 100',
   },
+  shotConversionPct: {
+    label: 'Shot conversion',
+    plain: 'Share of the team’s shots that became goals',
+    formula: '(goals − own goals credited) / shots × 100',
+  },
+  passQualityPct: {
+    label: 'Pass quality',
+    plain: 'Share of completed passes that moved the ball well forward',
+    formula:
+      'completed passes gaining ≥ 10 pitch units / passesCompleted × 100',
+  },
   possessionPct: {
     label: 'Possession',
     plain: 'Share of the time the team had the ball',
