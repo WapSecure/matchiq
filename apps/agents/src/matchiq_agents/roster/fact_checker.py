@@ -148,7 +148,9 @@ async def _critique(
 ) -> tuple[list[Issue], AgentRun]:
     call = ModelCall(
         prompt=FACT_CHECKER,
-        payload=CritiqueInput(facts=facts_payload(ctx.view), drafts=text_pairs(drafts)),
+        payload=CritiqueInput(
+            facts=facts_payload(ctx.view, context=True), drafts=text_pairs(drafts)
+        ),
         response_model=CritiqueOutput,
         convert=lambda output: output,
     )

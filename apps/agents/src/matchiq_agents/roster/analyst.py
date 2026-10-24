@@ -23,7 +23,8 @@ def analyst_payload(ctx: AgentContext, issues: Sequence[Issue] = ()) -> AnalystI
     view = ctx.view
     refs = set(ranked_refs(view.metrics, view.kind, view.subject_side))
     return AnalystInput(
-        facts=facts_payload(view, metric_refs=refs), revision_notes=revision_notes(issues)
+        facts=facts_payload(view, metric_refs=refs, context=True),
+        revision_notes=revision_notes(issues),
     )
 
 

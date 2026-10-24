@@ -4,6 +4,7 @@ from pydantic import BaseModel, SecretStr
 
 from matchiq_agents.clock import Deadline
 from matchiq_agents.contracts.types import AgentName, InsightKind, PipelineStatus
+from matchiq_agents.domain.context import is_context_ref
 from matchiq_agents.domain.facts import build_fact_view
 from matchiq_agents.domain.relevance import ANALYST_METRIC_LIMIT, ranked_refs
 from matchiq_agents.models.port import ModelUsage
@@ -71,13 +72,15 @@ async def test_analyst_payload_is_trimmed_but_any_evidence_metric_may_be_cited()
             deadline: Deadline,
         ) -> tuple[T, ModelUsage]:
             if isinstance(payload, AnalystInput):
-                seen.append(len(payload.facts.computed_metrics))
+                metrics = payload.facts.computed_metrics
+                seen.append(len([ref for ref in metrics if not is_context_ref(ref)]))
             return await super().generate(
                 agent_name, instructions, payload, response_model, deadline
             )
 
     model = Recording({AgentName.MATCH_ANALYST: cite_outside})
     result = await build_orchestrator(SETTINGS, FakeClock(), model).run(build_request(REAL))
+    # The evidence is trimmed; the engine's moment context is shown in full (MQ-068).
     assert seen == [ANALYST_METRIC_LIMIT]
     assert result.analysis is not None
     assert result.analysis.claims[0].citedValues[0].metricRef == outside

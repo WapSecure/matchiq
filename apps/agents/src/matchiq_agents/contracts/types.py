@@ -5,14 +5,19 @@ distinct classes in several modules. Inputs come from `PipelineRequest`, outputs
 `PipelineResult`; never mix the two families inside one model.
 """
 
+from matchiq_agents.contracts.generated.PipelineRequest import Direction as TrendDirection
 from matchiq_agents.contracts.generated.PipelineRequest import (
     Entities,
     Evidence,
     Insight,
+    MomentContext,
     Packet,
     PipelineRequest,
+    ScoreState,
 )
 from matchiq_agents.contracts.generated.PipelineRequest import Kind as InsightKind
+from matchiq_agents.contracts.generated.PipelineRequest import Metric as ContextMetric
+from matchiq_agents.contracts.generated.PipelineRequest import Phase as MinutePhase
 from matchiq_agents.contracts.generated.PipelineRequest import Priority as InsightPriority
 from matchiq_agents.contracts.generated.PipelineResult import (
     Agent as AgentName,
@@ -21,6 +26,8 @@ from matchiq_agents.contracts.generated.PipelineResult import (
     Analysis as AgentResult,
 )
 from matchiq_agents.contracts.generated.PipelineResult import (
+    AnalystBreakdown,
+    BreakdownPart,
     CitedValue,
     Claim,
     ClaimType,
@@ -50,10 +57,13 @@ __all__ = [
     "AgentName",
     "AgentResult",
     "AgentRun",
+    "AnalystBreakdown",
+    "BreakdownPart",
     "CitedValue",
     "Claim",
     "ClaimType",
     "ConfidenceLabel",
+    "ContextMetric",
     "Entities",
     "Evidence",
     "EvidenceEventId",
@@ -64,6 +74,8 @@ __all__ = [
     "IssueCode",
     "Locale",
     "MetricRef",
+    "MinutePhase",
+    "MomentContext",
     "NarrativeDraft",
     "NarrativeSource",
     "OverlayKind",
@@ -75,6 +87,8 @@ __all__ = [
     "PipelineStatus",
     "RunOutcome",
     "RunProvider",
+    "ScoreState",
+    "TrendDirection",
     "Verdict",
     "VerificationResult",
 ]

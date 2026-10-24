@@ -5,6 +5,7 @@ from collections.abc import Iterable, Sequence
 
 from matchiq_agents.contracts.types import (
     AgentResult,
+    AnalystBreakdown,
     CitedValue,
     EvidenceEventId,
     Issue,
@@ -16,6 +17,7 @@ from matchiq_agents.contracts.types import (
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
 from matchiq_agents.guard import messages
 from matchiq_agents.guard.editorial import editorial_issues
+from matchiq_agents.guard.editorial_breakdown import breakdown_editorial_issues, breakdown_parts
 from matchiq_agents.guard.safety import unsafe_categories
 from matchiq_agents.guard.text import (
     extract_numerals,
@@ -23,7 +25,12 @@ from matchiq_agents.guard.text import (
     suspect_counts,
     unknown_capitalised,
 )
-from matchiq_agents.limits import OVERLAY_LIMITS, PERSONA_LIMITS, TextLimits
+from matchiq_agents.limits import (
+    BREAKDOWN_PART_MAX,
+    OVERLAY_LIMITS,
+    PERSONA_LIMITS,
+    TextLimits,
+)
 
 _SENTENCE_END = re.compile(r"(?<=[.!?…])\s+")
 
@@ -46,12 +53,14 @@ def check_citations(
     found: list[Issue] = []
     if not event_ids:
         found.append(issue(IssueCode.UNCITED_EVIDENCE, messages.UNCITED, index))
+    citable_events = view.citable_event_ids
+    citable = view.citable_metrics
     for event in event_ids:
-        if event.root not in view.event_ids:
+        if event.root not in citable_events:
             detail = messages.UNKNOWN_EVENT.format(event_id=event.root)
             found.append(issue(IssueCode.UNCITED_EVIDENCE, detail, index))
     for value in cited:
-        actual = view.metrics.get(value.metricRef)
+        actual = citable.get(value.metricRef)
         if actual is None:
             detail = messages.UNKNOWN_METRIC.format(metric_ref=value.metricRef)
             found.append(issue(IssueCode.UNSUPPORTED_NUMBER, detail, index))
@@ -129,7 +138,28 @@ def check_draft(draft: NarrativeDraft, view: FactView, index: int | None = None)
     if draft.locale is CANONICAL_LOCALE:
         cited = {value.metricRef: value.value for value in draft.citedValues}
         found += editorial_issues(draft.headline, draft.body, cited, draft.persona, view, index)
+    if draft.breakdown is not None:
+        locale = CANONICAL_LOCALE if draft.localeFallback else draft.locale
+        found += check_breakdown(draft.breakdown, locale, view, index)
     return found
+
+
+def check_breakdown(
+    breakdown: AnalystBreakdown, locale: Locale, view: FactView, index: int | None = None
+) -> list[Issue]:
+    """Every grounding check per part, then the breakdown's editorial rules."""
+    parts = breakdown_parts(breakdown)
+    found: list[Issue] = []
+    for name, part in parts:
+        found += check_citations(part.evidenceEventIds, part.citedValues, view, index)
+        supported = [value.value for value in part.citedValues]
+        found += check_text(part.text, supported, locale, view, index)
+        if len(part.text) > BREAKDOWN_PART_MAX:
+            detail = messages.TOO_LONG.format(
+                field=name, length=len(part.text), limit=BREAKDOWN_PART_MAX
+            )
+            found.append(issue(IssueCode.LENGTH_EXCEEDED, detail, index))
+    return found + breakdown_editorial_issues(parts, locale, view, index)
 
 
 def check_drafts(drafts: Sequence[NarrativeDraft], view: FactView) -> list[Issue]:

@@ -32,6 +32,7 @@ from matchiq_agents.roster.schemas import (
     CitedValueOut,
     DraftOut,
     FactsPayload,
+    MomentLabels,
     TextPair,
 )
 
@@ -50,8 +51,26 @@ OVERLAY_KINDS: Final[dict[InsightKind, OverlayKind]] = {
 }
 
 
+def moment_labels(view: FactView) -> MomentLabels | None:
+    context = view.context
+    if context is None:
+        return None
+    return MomentLabels(
+        side=context.side.value,
+        score_state=context.scoreState.value,
+        phase=context.phase.value,
+        compare_metric=context.comparison.metric.value if context.comparison else None,
+        trend_metric=context.trend.metric.value if context.trend else None,
+        trend_direction=context.trend.direction.value if context.trend else None,
+    )
+
+
 def facts_payload(
-    view: FactView, *, free_text: bool = True, metric_refs: Collection[str] | None = None
+    view: FactView,
+    *,
+    free_text: bool = True,
+    metric_refs: Collection[str] | None = None,
+    context: bool = False,
 ) -> FactsPayload:
     """The data block for one agent, trimmed to what that agent needs (ADR-0011 addendum).
 
@@ -59,10 +78,16 @@ def facts_payload(
     (and the critique) reason over it, and small models otherwise copy its wording and numbers
     into drafts. `metric_refs` keeps only the metrics already cited upstream (a real packet has
     about 28), plus the metrics the moment's headline must state (the score after a goal).
-    Output is checked against the full evidence either way.
+    Output is checked against the full evidence either way. `context=True` (the Analyst) adds
+    every `context.*` value and what they describe; other agents see only the ones cited upstream.
     """
     keep = None if metric_refs is None else {*metric_refs, *key_refs(view)}
     metrics = {ref: value for ref, value in view.metrics.items() if keep is None or ref in keep}
+    metrics |= {
+        ref: value
+        for ref, value in view.context_metrics.items()
+        if context or (keep is not None and ref in keep)
+    }
     return FactsPayload(
         insight_kind=view.kind,
         subject_team=view.team_name,
@@ -77,6 +102,7 @@ def facts_payload(
         rationale=view.rationale if free_text else "",
         counter_evidence=list(view.counter_evidence) if free_text else [],
         entities=view.prompt_entities,
+        moment_context=moment_labels(view) if context else None,
     )
 
 

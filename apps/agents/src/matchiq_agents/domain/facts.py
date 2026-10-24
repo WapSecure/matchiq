@@ -10,6 +10,7 @@ from matchiq_agents.contracts.types import (
     InsightKind,
     InsightPriority,
     Locale,
+    MomentContext,
     Persona,
     PipelineRequest,
 )
@@ -31,6 +32,7 @@ class FactView:
     player_name: str | None
     # "home" or "away" for the subject team, as metric refs name it; None without a team.
     subject_side: str | None
+    # Evidence `computedMetrics` only; the story and editorial rules read these.
     metrics: MappingProxyType[str, float]
     event_ids: tuple[str, ...]
     confidence: ConfidenceLabel
@@ -43,6 +45,19 @@ class FactView:
     personas: tuple[Persona, ...]
     locales: tuple[Locale, ...]
     deadline_ms: int
+    # Deterministic moment context (MQ-068); None for packets that predate it.
+    context: MomentContext | None = None
+    context_metrics: MappingProxyType[str, float] = MappingProxyType({})
+    context_event_ids: tuple[str, ...] = ()
+
+    @property
+    def citable_metrics(self) -> MappingProxyType[str, float]:
+        """Every value a claim may cite: the evidence metrics plus the `context.*` values."""
+        return MappingProxyType({**self.metrics, **self.context_metrics})
+
+    @property
+    def citable_event_ids(self) -> tuple[str, ...]:
+        return _ordered_unique([*self.event_ids, *self.context_event_ids])
 
     @property
     def allowed_name_tokens(self) -> frozenset[str]:
@@ -86,6 +101,7 @@ def build_fact_view(request: PipelineRequest) -> FactView:
     index = team_ids.index(insight.teamId) if insight.teamId in team_ids else None
     side = TEAM_SIDES[index] if index is not None and index < len(TEAM_SIDES) else None
     player_name = players.get(insight.playerId) if insight.playerId else None
+    context = insight.context
     return FactView(
         run_id=packet.runId,
         correlation_id=packet.correlationId,
@@ -107,6 +123,9 @@ def build_fact_view(request: PipelineRequest) -> FactView:
         personas=_ordered_unique([Persona(p.value) for p in request.personas]),
         locales=_ordered_unique([Locale(loc.value) for loc in request.locales]),
         deadline_ms=packet.deadlineMs,
+        context=context,
+        context_metrics=MappingProxyType(dict(sorted(context.metrics.items())) if context else {}),
+        context_event_ids=_ordered_unique([e.root for e in context.eventIds] if context else []),
     )
 
 

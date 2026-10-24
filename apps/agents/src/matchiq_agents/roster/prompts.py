@@ -78,13 +78,29 @@ _MOMENTS: Final = (
     "it as 'a momentum index of 0.62'. Correct example per moment type: "
     f"{compact(MOMENT_EXAMPLES)}"
 )
+# Moment context (v2.2 Analyst, v3.1 Writer, MQ-068): engine values about the score, the
+# minute, the last 10 minutes against the match average and the spell-by-spell trend.
+_CONTEXT: Final = (
+    "`computedMetrics` may also hold `context.*` values the engine computed for the moment; "
+    "`momentContext` says what they describe. `context.score.home` and `context.score.away` "
+    "are the score and `context.score.margin` the gap (`scoreState` is the subject's position); "
+    "`context.minute` is the match minute; `context.compare.recent.home` and "
+    "`context.compare.recent.away` count `compareMetric` in the last "
+    "`context.compare.windowMinutes` minutes, and `context.compare.average.home` and "
+    "`context.compare.average.away` are the match average for a spell that long; "
+    "`context.trend.spell1` to `context.trend.spell3` count `trendMetric` in the last spells, "
+    "oldest first. You may add at most 1 more OBSERVATION from these values, stating up to "
+    "three of them in digits and citing each metricRef, e.g. 'In the last 10 minutes Kestrel "
+    "Vale have 5 shots, against a match average of 1.8.' A minute or window length is allowed "
+    "only as such a cited value."
+)
 _REVISION: Final = (
     "If `revisionNotes` is not empty, your previous answer broke the rules: fix every note."
 )
 
 MATCH_ANALYST: Final = Prompt(
     agent=AgentName.MATCH_ANALYST,
-    version="2.1.0",
+    version="2.2.0",
     instructions=(
         f"{_GROUNDING} You are the Match Analyst. Return JSON with `claims`: 1 to 3 OBSERVATION "
         "claims about the metrics that matter most for `insightKind` and the subject, each one "
@@ -95,13 +111,13 @@ MATCH_ANALYST: Final = Prompt(
         "and gives the score from `goals.home` and `goals.away`, citing both. "
         "`limitations`: 1 or 2 short notes without numbers, such as 'Synthetic match "
         "feed.' or 'Partial data coverage.'. `confidenceLabel`: copy it from the data. "
-        f"{_REVISION} {_EXAMPLE_INTRO}{compact(ANALYST_EXAMPLE)}"
+        f"{_CONTEXT} {_REVISION} {_EXAMPLE_INTRO}{compact(ANALYST_EXAMPLE)}"
     ),
 )
 
 NARRATIVE_WRITER: Final = Prompt(
     agent=AgentName.NARRATIVE_WRITER,
-    version="3.0.0",
+    version="3.1.0",
     instructions=(
         f"{_GROUNDING} You are the Narrative Writer. Using only the analyst's `claims`, "
         "`limitations` and `computedMetrics`, write one en-GB draft per persona in `personas`. "
@@ -113,7 +129,10 @@ NARRATIVE_WRITER: Final = Prompt(
         "2 to 4 sentences (at most 500 characters) giving each cited value, the confidence in "
         "words ('Confidence is medium.') and one limitation. BROADCAST: headline of at most 6 "
         "words; body exactly ONE sentence of at most 15 words, for an on-screen caption. "
-        f"{_MOMENTS} {_REVISION} Rewrite only the personas the notes name. "
+        "A claim may cite a `context.*` value (the score, the minute, or the last 10 minutes "
+        "against the match average): an ANALYST body may state one such value, cited with its "
+        "metricRef; CASUAL and BROADCAST never state a `context.*` value and stay one short "
+        f"sentence. {_MOMENTS} {_REVISION} Rewrite only the personas the notes name. "
         f"{_EXAMPLE_INTRO}{compact(WRITER_EXAMPLE)}"
     ),
 )

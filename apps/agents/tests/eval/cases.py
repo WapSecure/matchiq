@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, replace
 
-from tests.support.builders import AWAY, STAR, CaseSpec
+from tests.support.builders import AWAY, STAR, CaseSpec, moment_context
 
 
 @dataclass(frozen=True)
@@ -47,7 +47,9 @@ GOLDEN: tuple[EvalCase, ...] = (
     _case("goal_sparse", "sparse", kind="GOAL", priority="P0", metrics={}),
     _case("red_card_away", kind="RED_CARD", priority="P0", team_id=AWAY,
           metrics={"redCards.away.match": 1, "fouls.away.match": 11}),
-    _case("red_card_sparse", "sparse", kind="RED_CARD", priority="P0", metrics={}),
+    _case("red_card_sparse", "sparse", "context", kind="RED_CARD", priority="P0", metrics={},
+          context=moment_context(score=(0, 1), minute=41, phase="BEFORE_HALF_TIME",
+                                 metric="pressures", direction="FALLING")),
     _case("shot_burst_rich", "rich", kind="SHOT_BURST", metrics=RICH),
     _case("shot_burst_casual_en", kind="SHOT_BURST", personas=("CASUAL",), locales=("en-GB",),
           metrics={"shots.home.rolling5m": 4}),
@@ -57,11 +59,14 @@ GOLDEN: tuple[EvalCase, ...] = (
     _case("goal_rich_pcm", "locale", "pcm", kind="GOAL", priority="P0",
           locales=("en-GB", "pcm-NG"),
           metrics={"goals.home.match": 3, "goals.away.match": 2, "shots.home.match": 9}),
-    _case("pressure_swing_pcm", "locale", "pcm", kind="PRESSURE_SWING",
+    _case("pressure_swing_pcm", "locale", "pcm", "context", kind="PRESSURE_SWING",
           locales=("en-GB", "pcm-NG"),
-          metrics={"pressures.home.rolling10m": 14, "pressures.home.previous10m": 6}),
-    _case("xg_decimals_pcm", "locale", "pcm", kind="SHOT_BURST", locales=("en-GB", "pcm-NG"),
-          metrics={"xg.home.rolling10m": 1.37, "shots.home.rolling10m": 7}),
+          metrics={"pressures.home.rolling10m": 14, "pressures.home.previous10m": 6},
+          context=moment_context(score=(0, 0), minute=12, phase="EARLY", metric="pressures")),
+    _case("xg_decimals_pcm", "locale", "pcm", "context", kind="SHOT_BURST",
+          locales=("en-GB", "pcm-NG"),
+          metrics={"xg.home.rolling10m": 1.37, "shots.home.rolling10m": 7},
+          context=moment_context(score=(0, 0), minute=23, phase="FIRST_HALF")),
     _case("pressure_swing_away", kind="PRESSURE_SWING", team_id=AWAY,
           metrics={"pressures.away.rolling10m": 14, "highRecoveries.away.rolling10m": 4}),
     _case("pressure_swing_low_confidence", "sparse", kind="PRESSURE_SWING", confidence="low",
@@ -102,15 +107,24 @@ GOLDEN: tuple[EvalCase, ...] = (
     # the player named, and a momentum shift between two negative indices.
     _case("goal_real_shape", "editorial", kind="GOAL", priority="P0", player_id=STAR,
           confidence="high", metrics={**REAL_WINDOWS, **REAL_MOMENTUM, "goals.home": 3,
-                                      "goals.away": 2}),
+                                      "goals.away": 2},
+          context=moment_context(score=(3, 2), minute=88, phase="FINAL_15",
+                                 regain=("ev_00098", 9), previous_minute=71)),
     _case("goal_equaliser_away", "editorial", kind="GOAL", priority="P0", team_id=AWAY,
-          metrics={**REAL_WINDOWS, "goals.home": 1, "goals.away": 1}),
+          metrics={**REAL_WINDOWS, "goals.home": 1, "goals.away": 1},
+          context=moment_context("away", score=(1, 1), minute=44, phase="BEFORE_HALF_TIME",
+                                 direction="MIXED", regain=("ev_00133", 14))),
     _case("red_card_real_shape", "editorial", kind="RED_CARD", priority="P0", player_id=STAR,
-          metrics={**REAL_WINDOWS, "redCards.home": 1, "fouls.home": 9}),
+          metrics={**REAL_WINDOWS, "redCards.home": 1, "fouls.home": 9},
+          context=moment_context(score=(1, 1), minute=63, metric="pressures",
+                                 direction="STEADY")),
     _case("momentum_real_shape", "editorial", kind="MOMENTUM_SHIFT", confidence="high",
-          metrics={**REAL_WINDOWS, **REAL_MOMENTUM}),
+          metrics={**REAL_WINDOWS, **REAL_MOMENTUM},
+          context=moment_context(score=(2, 2), minute=77, phase="FINAL_15",
+                                 metric="finalThirdEntries", previous_minute=52)),
     _case("real_packet_shape", "rich", kind="SHOT_BURST", team_id=AWAY, squad_players=36,
           coverage=0.83, confidence="high", counter_evidence=(),
+          context=moment_context("away", score=(1, 1), minute=58),
           metrics={f"{family}.{side}.{window}": value
                    for family, value in (("shots", 3), ("shotsOnTarget", 2), ("pressures", 4),
                                          ("recoveries", 2), ("highRecoveries", 2),
