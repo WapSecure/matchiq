@@ -131,9 +131,10 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
     it('lists a waiting cue with its copy for producers only', async () => {
       const cue = await insertWaitingCue(t, fixtureId, 'q1');
       const url = `${t.baseUrl}/fixtures/${fixtureId}/overlay-reviews`;
-      const list = await jsonOf<{ items: { overlayId: string }[] }>(
-        await fetch(url, { headers: AUTH_HEADER }),
-      );
+      const list = await jsonOf<{
+        items: { overlayId: string; approvalDeadline: string }[];
+        serverTime: string;
+      }>(await fetch(url, { headers: AUTH_HEADER }));
       expect(list.items).toEqual([
         expect.objectContaining({
           overlayId: cue.overlayId,
@@ -142,6 +143,11 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
           cue: expect.objectContaining({ headline: cue.headline }),
         }),
       ]);
+      const left =
+        Date.parse(list.items[0]?.approvalDeadline ?? '') -
+        Date.parse(list.serverTime);
+      expect(left).toBeGreaterThan(40_000);
+      expect(left).toBeLessThanOrEqual(45_000);
       expect((await fetch(url)).status).toBe(403);
     });
 
@@ -227,7 +233,24 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
       );
     });
 
-    it('answers 409 once the slot has closed, for a stale revision and while frozen', async () => {
+    it('approves after the match-clock slot has closed while the wall-clock window is open', async () => {
+      await insertWaitingCue(t, fixtureId, 'q4');
+      await setSessionClock(t, fixtureId, SLOT.endMs + 30_000);
+      const res = await review('in_q4', { decision: 'APPROVE' });
+      expect(res.status).toBe(200);
+      expect(await jsonOf(res)).toMatchObject({
+        state: 'APPROVED',
+        cue: { clockStartMs: 97_000, clockEndMs: 104_000 },
+      });
+      expect(await overlayState(t, 'ov_q4')).toMatchObject({
+        status: 'LIVE',
+        editorial_state: 'APPROVED',
+        clock_end_ms: 104_000,
+      });
+      await setSessionClock(t, fixtureId, 62_000);
+    });
+
+    it('answers 409 once the window has passed, for a stale revision and while frozen', async () => {
       await insertWaitingCue(t, fixtureId, 'q3');
       const stale = await review('in_q3', { decision: 'APPROVE', revision: 2 });
       expect((await jsonOf(stale)).type).toBe(
@@ -247,7 +270,9 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
         reason,
       );
 
-      await setSessionClock(t, fixtureId, SLOT.endMs);
+      await t.sql.query(
+        "update overlay_cues set approval_deadline = now() - interval '1 second' where overlay_id = 'ov_q3'",
+      );
       const late = await review('in_q3', { decision: 'APPROVE' });
       expect(late.status).toBe(409);
       expect((await jsonOf(late)).type).toBe(
@@ -256,7 +281,12 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
       expect(await overlayState(t, 'ov_q3')).toMatchObject({
         editorial_state: 'AWAITING_APPROVAL',
       });
-      await setSessionClock(t, fixtureId, 62_000);
+      const list = await jsonOf<{ items: { overlayId: string }[] }>(
+        await fetch(`${t.baseUrl}/fixtures/${fixtureId}/overlay-reviews`, {
+          headers: AUTH_HEADER,
+        }),
+      );
+      expect(list.items.map((i) => i.overlayId)).not.toContain('ov_q3');
     });
 
     it('validates overrides and refuses viewers', async () => {
@@ -287,7 +317,7 @@ describe('Producer approve-before-air (integration, ADR-0023)', () => {
       );
       const other = (await jsonOf<{ fixture: { fixtureId: string } }>(created))
         .fixture.fixtureId;
-      await insertWaitingCue(t, other, 'b1', ORG_B);
+      await insertWaitingCue(t, other, 'b1', { orgId: ORG_B });
       const a = await t.bearer(['producer'], t.env.DEMO_ORG_ID);
       const list = await fetch(
         `${t.baseUrl}/fixtures/${other}/overlay-reviews`,

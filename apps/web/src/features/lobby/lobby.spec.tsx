@@ -31,6 +31,11 @@ const templates = [
     title: 'Press FC vs Block United',
   }),
   template({ templateId: 'fx_comeback_42' }),
+  template({
+    templateId: 'fx_disallowed-goal_42',
+    scenario: 'disallowed-goal',
+    title: 'Lynhaven Athletic vs Glenhaven Harriers',
+  }),
 ];
 
 describe('lobby', () => {
@@ -56,6 +61,12 @@ describe('lobby', () => {
       'What to expect: The visitors build a lead before the break.',
     );
     expect(cards[1]).toHaveTextContent('High press');
+    const disallowed = cards.find((c) =>
+      c.textContent?.includes('Disallowed goal'),
+    );
+    expect(disallowed).toHaveTextContent(
+      'What to expect: A goal is chalked off after it goes in.',
+    );
     const sessions = await screen.findByRole('group', {
       name: 'Recent replays',
     });

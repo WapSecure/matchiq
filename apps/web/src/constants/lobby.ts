@@ -57,6 +57,7 @@ export const LOBBY_COPY = {
 /** Display names for generator scenarios; unknown ones are title-cased. */
 export const SCENARIO_LABELS: Record<string, string> = {
   comeback: 'Late comeback',
+  'disallowed-goal': 'Disallowed goal',
   'high-press': 'High press',
   'low-event': 'Quiet match',
   'possession-dominance': 'Possession dominance',
@@ -67,6 +68,8 @@ export const SCENARIO_LABELS: Record<string, string> = {
 export const SCENARIO_PREVIEWS: Record<string, string> = {
   comeback:
     'The visitors build a lead before the break. Watch for a late turnaround.',
+  'disallowed-goal':
+    'A goal is chalked off after it goes in. Watch it come off the screen.',
   'high-press':
     'Both sides press hard. Expect tackles, turnovers and quick breaks.',
   'low-event':

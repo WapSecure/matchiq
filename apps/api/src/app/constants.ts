@@ -206,7 +206,7 @@ export const PROBLEMS = {
     slug: 'overlay-not-awaiting-approval',
   },
   approvalExpired: {
-    title: 'The cue waited past its slot and can no longer air',
+    title: 'The cue waited past its approval window and can no longer air',
     slug: 'overlay-approval-expired',
   },
   reviewStale: {

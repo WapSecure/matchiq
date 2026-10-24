@@ -8,7 +8,6 @@ import { OverlayCanvas } from '@/components/overlay/overlay-canvas';
 import { Badge, Button } from '@/components/ui';
 import { APPROVAL_COPY } from '@/constants/approval';
 import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
-import { formatClock } from '@/lib/format';
 import { CopyFitMeter } from './copy-fit-meter';
 import {
   DEFAULT_ADJUSTMENTS,
@@ -16,6 +15,7 @@ import {
   ReviewAdjust,
   type Adjustments,
 } from './review-adjust';
+import { useSecondsLeft } from './use-seconds-left';
 import { useReviewDecision } from './use-review-decision';
 
 function Preview({ review }: { review: OverlayReview }) {
@@ -32,21 +32,40 @@ function Preview({ review }: { review: OverlayReview }) {
   );
 }
 
-function Meta({ review }: { review: OverlayReview }) {
-  const closes = formatClock(review.period, review.expiresAtClockMs);
+function Meta({
+  review,
+  offsetMs,
+}: {
+  review: OverlayReview;
+  offsetMs: number;
+}) {
+  const left = useSecondsLeft(review.approvalDeadline, offsetMs);
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <Badge tone="warning" dot>
-        <ClockIcon size={12} />
-        {APPROVAL_COPY.closes(closes)}
-      </Badge>
+      {left === null ? null : (
+        <Badge
+          tone={left <= APPROVAL_COPY.urgentSeconds ? 'critical' : 'warning'}
+          data-testid="approval-countdown"
+        >
+          <ClockIcon size={12} />
+          {left === 0
+            ? APPROVAL_COPY.windowClosed
+            : APPROVAL_COPY.sendWithin(left)}
+        </Badge>
+      )}
       {review.revision > 1 ? <Badge>{APPROVAL_COPY.updated}</Badge> : null}
     </div>
   );
 }
 
 /** One waiting cue: preview, copy fit, adjustments and the decision. */
-export function ReviewCard({ review }: { review: OverlayReview }) {
+export function ReviewCard({
+  review,
+  offsetMs,
+}: {
+  review: OverlayReview;
+  offsetMs: number;
+}) {
   const [adjust, setAdjust] = useState<Adjustments>(DEFAULT_ADJUSTMENTS);
   const decision = useReviewDecision(review.insightId);
   const busy = decision.pending !== null || decision.disabled;
@@ -55,7 +74,7 @@ export function ReviewCard({ review }: { review: OverlayReview }) {
     <li className="flex flex-col gap-3 rounded-lg border border-line bg-surface-raised p-3 sm:flex-row">
       <Preview review={review} />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <Meta review={review} />
+        <Meta review={review} offsetMs={offsetMs} />
         <CopyFitMeter cue={review.cue} />
         <ReviewAdjust value={adjust} onChange={setAdjust} disabled={busy} />
         {decision.error ? (

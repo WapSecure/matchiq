@@ -101,8 +101,24 @@ describe('applyEditorialPolicy in MANUAL (ADR-0023)', () => {
     expect(out.batch.overlays[0]?.cue.headline).toBe('Cue revision 2');
   });
 
-  it.each([OVERLAY_END_REASONS.expired, OVERLAY_END_REASONS.superseded])(
-    'expires a waiting cue when its slot closes (%s) and never airs it',
+  it.each([
+    OVERLAY_END_REASONS.expired,
+    OVERLAY_END_REASONS.superseded,
+    OVERLAY_END_REASONS.periodEnded,
+  ])(
+    'keeps a waiting cue waiting when the scheduler closes its slot (%s)',
+    (reason) => {
+      const batch = emptyBatch();
+      end(batch, reason);
+      const out = applyEditorialPolicy(KEY, manual('AWAITING_APPROVAL'), batch);
+      expect(out.batch.drafts).toEqual([]);
+      expect(out.batch.overlayEnds).toEqual([]);
+      expect(out.audits).toEqual([]);
+    },
+  );
+
+  it.each([OVERLAY_END_REASONS.matchEnded, OVERLAY_END_REASONS.corrected])(
+    'lapses a waiting cue at once when the moment is over (%s)',
     (reason) => {
       const batch = emptyBatch();
       end(batch, reason);
@@ -125,30 +141,47 @@ describe('applyEditorialPolicy in MANUAL (ADR-0023)', () => {
     },
   );
 
-  it('lapses a cue offered and flushed in the same batch', () => {
+  it('opens the wall-clock window on the first copy and keeps it for later revisions', () => {
+    const timing = { nowMs: 5_000_000, windowMs: 45_000 };
+    const first = emptyBatch();
+    publish(first, cue());
+    const opened = applyEditorialPolicy(KEY, manual(), first, timing);
+    expect(opened.batch.overlays[0]?.editorial?.approvalDeadline).toEqual(
+      new Date(5_045_000),
+    );
+    const revised = emptyBatch();
+    publish(revised, cue(2));
+    const kept = applyEditorialPolicy(
+      KEY,
+      manual('AWAITING_APPROVAL'),
+      revised,
+      { ...timing, nowMs: 5_020_000 },
+    );
+    expect(kept.batch.overlays[0]?.editorial?.approvalDeadline).toBeUndefined();
+  });
+
+  it('keeps a cue offered and flushed in the same batch waiting', () => {
     const batch = emptyBatch();
     publish(batch, cue());
     end(batch, OVERLAY_END_REASONS.periodEnded);
     const out = applyEditorialPolicy(KEY, manual(), batch);
     expect(reviewOf(out.batch).map((p) => p.state)).toEqual([
       'AWAITING_APPROVAL',
-      'APPROVAL_EXPIRED',
     ]);
+    expect(out.batch.overlayEnds).toEqual([]);
     expect(out.batch.drafts.some((d) => d.type === 'overlay.publish')).toBe(
       false,
     );
   });
 
-  it('lets the scheduler end an approved cue but withholds new copy for it', () => {
+  it('leaves an approved cue to the sweep and withholds new copy for it', () => {
     const batch = emptyBatch();
     publish(batch, cue(2));
     end(batch, OVERLAY_END_REASONS.expired, 2);
     const out = applyEditorialPolicy(KEY, manual('APPROVED'), batch);
-    expect(out.batch.drafts.map((d) => d.type)).toEqual(['overlay.retract']);
+    expect(out.batch.drafts).toEqual([]);
     expect(out.batch.overlays).toEqual([]);
-    expect(out.batch.overlayEnds).toEqual([
-      { overlayId: 'ov_a', status: 'EXPIRED', reason: 'expired' },
-    ]);
+    expect(out.batch.overlayEnds).toEqual([]);
     expect(out.audits).toEqual([
       expect.objectContaining({
         action: 'overlay.blocked',
