@@ -667,7 +667,7 @@ export interface paths {
         };
         /**
          * Cues waiting for a producer to approve them
-         * @description MANUAL sessions only. Each item carries the copy it would air and the match clock at which its slot closes.
+         * @description MANUAL sessions only. Each item carries the copy it would air and the wall-clock deadline (approvalDeadline) after which it lapses. Lapsed cues are left out. serverTime is the API clock at the read.
          *
          *     Access: requires the `editorial:approve` permission.
          */
@@ -691,7 +691,7 @@ export interface paths {
         put?: never;
         /**
          * Approve or reject an insight's waiting cue
-         * @description Approve airs the cue in the slot the scheduler gave it, with optional duration and priority overrides; reject means it never airs. A cue whose slot has closed answers 409.
+         * @description Approve airs the cue from the current match clock for its normal duration, with optional duration and priority overrides; reject means it never airs. A cue whose wall-clock approval window has passed answers 409.
          *
          *     Access: requires the `editorial:approve` permission.
          */
@@ -5477,7 +5477,10 @@ export interface operations {
                             expiresAtClockMs: number;
                             /** Format: date-time */
                             waitingSince: string;
+                            approvalDeadline: string | null;
                         }[];
+                        /** Format: date-time */
+                        serverTime: string;
                     };
                 };
             };
@@ -5643,7 +5646,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description `overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its slot and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on */
+            /** @description `overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its approval window and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on */
             409: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];

@@ -25,6 +25,7 @@ import { AppEnvironment } from './environment.js';
 import { AuthFields, checkAuthEnv } from './auth-env.js';
 import {
   ApiDocsEnv,
+  ApprovalWindowEnv,
   ReplayCapacityEnv,
   RetentionEnv,
   TrustProxyEnv,
@@ -132,6 +133,7 @@ export const WorkerEnv = CommonEnv.extend({
   ...OutboxRelayEnv.shape,
   ...ReplayCapacityEnv.shape,
   ...RetentionEnv.shape,
+  ...ApprovalWindowEnv.shape,
   WORKER_PORT: port(DEFAULT_PORTS.worker),
   METRICS_PORT: metricsPort(DEFAULT_METRICS.workerPort),
   AGENTS_SERVICE_URL: z.url().default(DEFAULT_URLS.agentsService),

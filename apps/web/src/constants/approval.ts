@@ -24,7 +24,9 @@ export const APPROVAL_COPY = {
   rejecting: 'Dropping…',
   approveLabel: (headline: string) => `Send to air: ${headline}`,
   rejectLabel: (headline: string) => `Don't air: ${headline}`,
-  closes: (clock: string) => `Airs only before ${clock}`,
+  sendWithin: (seconds: number) => `Send within ${seconds} s`,
+  windowClosed: 'Time is up. This graphic will not air.',
+  urgentSeconds: 10,
   updated: 'Updated wording',
   previewLabel: (headline: string) => `Preview: ${headline}`,
   done: {
@@ -36,9 +38,9 @@ export const APPROVAL_COPY = {
   priorityLegend: 'Priority',
 } as const;
 
-/** `0` keeps the time the scheduler gave the graphic. */
+/** `0` keeps the graphic's normal time on screen. */
 export const DURATION_OPTIONS = [
-  { value: 0, label: 'Full slot' },
+  { value: 0, label: 'Normal time' },
   { value: 4_000, label: '4 seconds', short: '4s' },
   { value: 6_000, label: '6 seconds', short: '6s' },
   { value: 8_000, label: '8 seconds', short: '8s' },
@@ -97,7 +99,7 @@ export const POLICY_COPY: {
       action: 'Switch to Manual',
       title: 'Check each graphic before it airs',
       description:
-        "Fact-checked graphics wait for your OK instead of going on air. A graphic you don't send in time is dropped and never airs late.",
+        "Fact-checked graphics wait for your OK instead of going on air. A graphic you don't send within its countdown is dropped and never airs late.",
       submit: 'Switch to Manual',
       pending: 'Switching…',
       done: 'Manual on. Graphics wait for your OK.',

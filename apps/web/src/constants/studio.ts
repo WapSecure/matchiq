@@ -35,7 +35,8 @@ export const STUDIO_COPY = {
     evidence: 'Evidence',
     coverage: 'Data completeness',
     openEvidence: (headline: string) => `See the evidence for ${headline}`,
-    narrativePending: 'Write-up on its way. Here are the facts so far.',
+    narrativePending: 'Write-up on its way.',
+    narrativePendingAnalyst: 'Write-up on its way. Here are the facts so far.',
     localeFallback: (language: string) =>
       `The ${language} version isn't ready yet, so you're seeing English.`,
     source: {

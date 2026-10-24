@@ -18,9 +18,11 @@ export const usePublishPolicy = (): PublishPolicy =>
 function Body({
   items,
   policy,
+  offsetMs,
 }: {
   items: readonly OverlayReview[];
   policy: PublishPolicy;
+  offsetMs: number;
 }) {
   if (items.length === 0) {
     const empty = APPROVAL_COPY.empty[policy];
@@ -39,6 +41,7 @@ function Body({
         <ReviewCard
           key={`${review.overlayId}:${review.revision}`}
           review={review}
+          offsetMs={offsetMs}
         />
       ))}
     </ul>
@@ -54,6 +57,9 @@ export function ApprovalQueue() {
   const policy = usePublishPolicy();
   if (!allowed) return null;
   const items = query.data?.items ?? [];
+  const offsetMs = query.data
+    ? Date.parse(query.data.serverTime) - query.dataUpdatedAt
+    : 0;
   return (
     <section
       aria-labelledby={HEADING_ID}
@@ -82,7 +88,7 @@ export function ApprovalQueue() {
           onRetry={() => void query.refetch()}
         />
       ) : (
-        <Body items={items} policy={policy} />
+        <Body items={items} policy={policy} offsetMs={offsetMs} />
       )}
     </section>
   );

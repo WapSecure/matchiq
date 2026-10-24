@@ -26,6 +26,7 @@ import type {
   ReplayStatus,
 } from '@matchiq/contracts';
 import type { EditorialView } from './editorial-types.js';
+import type { ApprovalSweep, ApprovalSweepInput } from './review-types.js';
 import type { SessionActivity, SessionCapacity } from './operations-types.js';
 import type { FixtureKey, LedgerTransaction } from './ports.js';
 
@@ -81,6 +82,8 @@ export interface OverlayRecord {
   readonly editorial?: {
     readonly state: OverlayEditorialState;
     readonly reason: string;
+    /** Wall-clock end of the approval window; kept from the first await when absent. */
+    readonly approvalDeadline?: Date;
   };
 }
 
@@ -121,6 +124,11 @@ export interface PipelineTransaction extends LedgerTransaction {
     overlayIds: readonly string[],
     insightIds: readonly string[],
   ): Promise<EditorialView>;
+  /** Waiting cues past their wall-clock window and approved cues past their slot (ADR-0023). */
+  approvalSweep(
+    key: FixtureKey,
+    input: ApprovalSweepInput,
+  ): Promise<ApprovalSweep>;
   /** True only for the caller that moves an unsuppressed insight out of PENDING. */
   claimPublication(
     key: FixtureKey,

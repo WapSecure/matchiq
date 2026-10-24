@@ -64,7 +64,7 @@ export class SessionManager
     @Inject(SESSION_RUNTIME) private readonly runtime: SessionRuntime,
     private readonly recaps: RecapService,
   ) {
-    this.writer = new PipelineWriter(sources.uow);
+    this.writer = new PipelineWriter(sources.uow, env.APPROVAL_WINDOW_SECONDS);
     this.registry = new SessionRegistry(() => runtime.scheduler.now());
   }
 

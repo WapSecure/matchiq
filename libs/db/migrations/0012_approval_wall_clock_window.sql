@@ -1,0 +1,1 @@
+ALTER TABLE "overlay_cues" ADD COLUMN "approval_deadline" timestamp (3) with time zone;
