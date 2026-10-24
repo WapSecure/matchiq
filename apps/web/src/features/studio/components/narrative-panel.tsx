@@ -1,7 +1,7 @@
 import type { Insight, Persona } from '@matchiq/contracts';
 import { AnalystBreakdown } from '@/components/match/analyst-breakdown';
 import { HintBadge } from '@/components/ui';
-import { englishLanguageName } from '@/constants/match';
+import { englishLanguageName, INSIGHT_KIND_LABELS } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { SITE } from '@/constants/site';
 import { cn } from '@/lib/cn';
@@ -19,7 +19,11 @@ type NarrativePanelProps = {
   breakdownLevel?: 3 | 4;
 };
 
-/** Narrative text for one persona and locale; falls back to engine facts only. */
+/**
+ * Narrative text for one persona and locale. Until the write-up lands, Fan and
+ * Broadcast see only the kind of moment: the engine rationale carries raw
+ * index values that only the Analyst persona may read.
+ */
 export function NarrativePanel({
   insight,
   view,
@@ -32,10 +36,14 @@ export function NarrativePanel({
     return (
       <div className="flex flex-col gap-1" lang={SITE.locale}>
         <p className="text-sm leading-snug text-ink">
-          {insight.evidence.rationale}
+          {persona === 'ANALYST'
+            ? insight.evidence.rationale
+            : INSIGHT_KIND_LABELS[insight.kind]}
         </p>
         <p className="text-xs text-ink-subtle">
-          {STUDIO_COPY.insights.narrativePending}
+          {persona === 'ANALYST'
+            ? STUDIO_COPY.insights.narrativePendingAnalyst
+            : STUDIO_COPY.insights.narrativePending}
         </p>
       </div>
     );

@@ -12,6 +12,7 @@ export function RuledOutNote({
   reason?: string | null;
   className?: string;
 }) {
+  const why = reason?.replace(CORRECTION_COPY.reasonLead, '');
   return (
     <p
       role="note"
@@ -23,9 +24,7 @@ export function RuledOutNote({
       <span className="block font-semibold text-warning">
         {CORRECTION_COPY.removed(kind)}
       </span>
-      {reason ? (
-        <span className="block">{CORRECTION_COPY.why(reason)}</span>
-      ) : null}
+      {why ? <span className="block">{CORRECTION_COPY.why(why)}</span> : null}
     </p>
   );
 }

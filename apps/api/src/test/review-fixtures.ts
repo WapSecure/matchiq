@@ -34,8 +34,9 @@ export const insertWaitingCue = async (
   t: TestApp,
   fixtureId: string,
   name: string,
-  orgId = t.env.DEMO_ORG_ID,
+  options: { orgId?: string; windowSeconds?: number } = {},
 ): Promise<OverlayCue> => {
+  const { orgId = t.env.DEMO_ORG_ID, windowSeconds = 45 } = options;
   const cue = waitingCue(fixtureId, name);
   await t.sql.query(
     `insert into insights (org_id, fixture_id, insight_id, revision, kind, priority, period,
@@ -46,9 +47,9 @@ export const insertWaitingCue = async (
   await t.sql.query(
     `insert into overlay_cues (org_id, fixture_id, overlay_id, insight_id, revision, status,
        priority, period, clock_start_ms, clock_end_ms, payload, published_sequence,
-       editorial_state, editorial_reason)
+       editorial_state, editorial_reason, approval_deadline)
      values ($1, $2, $3, $4, 1, 'VERIFIED', 70, $5, $6, $7, $8, 10,
-       'AWAITING_APPROVAL', 'AWAITING_APPROVAL')`,
+       'AWAITING_APPROVAL', 'AWAITING_APPROVAL', now() + make_interval(secs => $9))`,
     [
       orgId,
       fixtureId,
@@ -58,6 +59,7 @@ export const insertWaitingCue = async (
       SLOT.startMs,
       SLOT.endMs,
       JSON.stringify(cue),
+      windowSeconds,
     ],
   );
   return cue;

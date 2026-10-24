@@ -27,6 +27,10 @@ import {
 } from '../schema/intelligence-tables.js';
 import { matchEvents } from '../schema/tables.js';
 import { insertAgentRuns, insertAgentSteps } from './agent-step-store.js';
+import {
+  readApprovalSweep,
+  withApprovalDeadline,
+} from './approval-sweep-queries.js';
 import { readEditorialView } from './editorial-queries.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
 import * as writes from './read-model-writes.js';
@@ -159,6 +163,7 @@ class PostgresPipelineTransaction
       editorialState: record.editorial?.state ?? null,
       editorialReason: record.editorial?.reason ?? null,
     };
+    const withDeadline = withApprovalDeadline(values, record);
     await this.tx
       .insert(overlayCues)
       .values({
@@ -166,7 +171,7 @@ class PostgresPipelineTransaction
         fixtureId: key.fixtureId,
         overlayId: cue.overlayId,
         insightId: cue.insightId ?? null,
-        ...values,
+        ...withDeadline,
       })
       .onConflictDoUpdate({
         target: [
@@ -174,7 +179,7 @@ class PostgresPipelineTransaction
           overlayCues.fixtureId,
           overlayCues.overlayId,
         ],
-        set: { ...values, updatedAt: sql`now()` },
+        set: { ...withDeadline, updatedAt: sql`now()` },
       });
   }
 
@@ -186,6 +191,11 @@ class PostgresPipelineTransaction
     await this.pin.to(key.orgId);
     return writes.endOverlay(this.tx, key, overlayId, end);
   }
+
+  approvalSweep: PipelineTransaction['approvalSweep'] = async (key, input) => {
+    await this.pin.to(key.orgId);
+    return readApprovalSweep(this.tx, key, input);
+  };
 
   editorialView(
     key: FixtureKey,

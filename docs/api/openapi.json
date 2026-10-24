@@ -9464,7 +9464,7 @@
       "get": {
         "operationId": "listOverlayReviews",
         "summary": "Cues waiting for a producer to approve them",
-        "description": "MANUAL sessions only. Each item carries the copy it would air and the match clock at which its slot closes.\n\nAccess: requires the `editorial:approve` permission.",
+        "description": "MANUAL sessions only. Each item carries the copy it would air and the wall-clock deadline (approvalDeadline) after which it lapses. Lapsed cues are left out. serverTime is the API clock at the read.\n\nAccess: requires the `editorial:approve` permission.",
         "tags": [
           "Editorial"
         ],
@@ -9560,6 +9560,18 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "approvalDeadline": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
@@ -9571,14 +9583,21 @@
                           "cue",
                           "period",
                           "expiresAtClockMs",
-                          "waitingSince"
+                          "waitingSince",
+                          "approvalDeadline"
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "serverTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
-                    "items"
+                    "items",
+                    "serverTime"
                   ],
                   "additionalProperties": false
                 }
@@ -9802,7 +9821,7 @@
       "post": {
         "operationId": "reviewInsight",
         "summary": "Approve or reject an insight's waiting cue",
-        "description": "Approve airs the cue in the slot the scheduler gave it, with optional duration and priority overrides; reject means it never airs. A cue whose slot has closed answers 409.\n\nAccess: requires the `editorial:approve` permission.",
+        "description": "Approve airs the cue from the current match clock for its normal duration, with optional duration and priority overrides; reject means it never airs. A cue whose wall-clock approval window has passed answers 409.\n\nAccess: requires the `editorial:approve` permission.",
         "tags": [
           "Editorial"
         ],
@@ -10089,7 +10108,7 @@
             }
           },
           "409": {
-            "description": "`overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its slot and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on",
+            "description": "`overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its approval window and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on",
             "x-problem-types": [
               "urn:matchiq:problem:overlay-not-awaiting-approval",
               "urn:matchiq:problem:overlay-approval-expired",
@@ -10116,10 +10135,10 @@
                     }
                   },
                   "overlay-approval-expired": {
-                    "summary": "The cue waited past its slot and can no longer air",
+                    "summary": "The cue waited past its approval window and can no longer air",
                     "value": {
                       "type": "urn:matchiq:problem:overlay-approval-expired",
-                      "title": "The cue waited past its slot and can no longer air",
+                      "title": "The cue waited past its approval window and can no longer air",
                       "status": 409
                     }
                   },

@@ -61,3 +61,15 @@ An approval does not offer the cue to the scheduler again. Doing that would make
 - Migration `0009_approval_publish_policy`, contract additions (`PublishPolicy`, `ReviewInsightCommand`, `ReviewInsightResult`, `OverlayReview(List)`, `SetPublishPolicyCommand`, the `overlay.review` stream message and the four new `OverlayEditorialState` values), the OpenAPI document and the producer role's `policy:configure`.
 - The studio's broadcast panel gains the approval queue (preview, copy fit, time on screen and priority, "Send to air" and "Don't air"). The producer controls gain an Auto/Manual switch with a confirmation.
 - Python codegen is unaffected: none of the cross-language contracts changed.
+
+## Amendment (MQ-081): the approval window runs on the wall clock
+
+A live walkthrough showed that the match-clock slot is unusable as an approval window: at 5x replay a 7 s cue lasts about 1.4 s of real time, and at 1x it lasts 7 to 10 s. All cues of a test session expired before a producer could act. This amendment replaces the slot-based lapse. The scheduler itself is unchanged, so AUTO output and the golden hashes are unchanged.
+
+- A cue that enters `AWAITING_APPROVAL` gets a wall-clock deadline, `APPROVAL_WINDOW_SECONDS` after it first waits (worker env, default 45, range 5 to 600). It is stored in `overlay_cues.approval_deadline` (migration 0012). A new revision of a waiting cue keeps the first deadline.
+- A scheduler end for a waiting or approved cue (expired, superseded, period ended) is no longer turned into a lapse. The policy drops it, so the cue stays waiting. A ruled-out moment (correction) or the final whistle still lapses a waiting cue at once.
+- Each worker batch sweeps under the fixture lock: waiting cues whose deadline has passed lapse exactly as before (`APPROVAL_EXPIRED`, `overlay.review` frame, audit `overlay.approval-expired`, never aired late), and approved cues whose own match-clock slot is over get a normal `overlay.retract`.
+- Approve checks the wall-clock deadline instead of the session clock (otherwise `409 overlay-approval-expired`). The cue then airs from the current match clock for its normal duration (or the producer's override, capped by the cue's `maxDisplayMs`). The stored period moves to the session's period.
+- More than one cue can now wait at once, because the scheduler frees its slot while a cue waits. The list stays capped at 20 and is ordered oldest first.
+- `GET /fixtures/{id}/overlay-reviews` adds `approvalDeadline` to each item and `serverTime` to the list. Lapsed cues are left out. The studio shows "Send within N s" from these, using the server clock offset so a wrong device clock does not matter.
+- Limits: a lapse is written by the next worker batch, so a cue in a paused session shows as unavailable (the list hides it and approve answers 409) before its row changes. Rows stored before this change have no deadline and lapse at the next batch.

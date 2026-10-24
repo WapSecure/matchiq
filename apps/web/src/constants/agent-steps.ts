@@ -76,7 +76,7 @@ export const STEP_REASONS: Record<string, string> = {
   TIME_BUDGET:
     'Skipped so the writer had enough time; a prepared summary was used.',
   MODEL_FALLBACK:
-    'The AI did not give a usable answer, so prepared wording took over.',
+    "The writer's draft wasn't usable, so prepared wording took over.",
   DRAFTED: 'Wrote the drafts and passed them to the fact checker.',
   VERIFIED: 'Every draft matched the match evidence.',
   REVISION_REQUESTED: 'Found a problem and asked the writer to fix it.',

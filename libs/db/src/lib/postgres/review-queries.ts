@@ -27,6 +27,7 @@ const reviewColumns = {
   editorialState: o.editorialState,
   cue: o.payload,
   period: o.period,
+  approvalDeadline: o.approvalDeadline,
 };
 
 const toReviewRow = (row: {
@@ -37,6 +38,7 @@ const toReviewRow = (row: {
   editorialState: ReviewCueRow['editorialState'];
   cue: OverlayCue;
   period: number;
+  approvalDeadline: Date | null;
 }): ReviewCueRow => ({ ...row, status: OverlayStatus.parse(row.status) });
 
 /** Cues waiting for a producer, oldest first; the single slot keeps this short. */
@@ -60,6 +62,7 @@ export const readReviews = async (
     period: row.period,
     expiresAtClockMs: row.cue.clockEndMs,
     waitingSince: row.updatedAt.toISOString(),
+    approvalDeadline: row.approvalDeadline?.toISOString() ?? null,
   }));
 };
 
@@ -106,6 +109,7 @@ export class PostgresReviewTransaction
         priority: cue.priority,
         clockStartMs: cue.clockStartMs,
         clockEndMs: cue.clockEndMs,
+        ...(write.period === null ? {} : { period: write.period }),
         payload: cue,
         updatedAt: sql`now()`,
       })

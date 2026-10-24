@@ -33,7 +33,9 @@ const waiting: OverlayReview = {
   period: 1,
   expiresAtClockMs: 605_000,
   waitingSince: AT,
+  approvalDeadline: '2026-10-24T14:05:38.000Z',
 };
+const SERVER_TIME = AT;
 
 const manualStatus = {
   fixtureId: FX,
@@ -72,7 +74,9 @@ describe('approval queue', () => {
 
   it('shows a waiting graphic with its preview and copy fit, then sends it to air with the chosen adjustments', async () => {
     const { api, user } = renderWith(<ApprovalQueue />, {
-      'GET /overlay-reviews': { body: { items: [waiting] } },
+      'GET /overlay-reviews': {
+        body: { items: [waiting], serverTime: SERVER_TIME },
+      },
       'POST /insights/in_1/review': {
         body: {
           insightId: 'in_1',
@@ -93,6 +97,9 @@ describe('approval queue', () => {
     ).toBeVisible();
     expect(within(queue).getByTestId('copy-fit')).toHaveTextContent('Fits');
     expect(within(queue).getByText('Updated wording')).toBeVisible();
+    expect(within(queue).getByTestId('approval-countdown')).toHaveTextContent(
+      /^Send within (37|38) s$/,
+    );
 
     await user.click(within(queue).getByRole('radio', { name: /6 seconds/ }));
     await user.click(within(queue).getByRole('radio', { name: 'Top' }));
@@ -117,12 +124,15 @@ describe('approval queue', () => {
 
   it("drops a graphic with Don't air and explains a missed moment plainly", async () => {
     const { api, user } = renderWith(<ApprovalQueue />, {
-      'GET /overlay-reviews': { body: { items: [waiting] } },
+      'GET /overlay-reviews': {
+        body: { items: [waiting], serverTime: SERVER_TIME },
+      },
       'POST /insights/in_1/review': {
         status: 409,
         body: {
           type: 'urn:matchiq:problem:overlay-approval-expired',
-          title: 'The cue waited past its slot and can no longer air',
+          title:
+            'The cue waited past its approval window and can no longer air',
           status: 409,
         },
       },
@@ -141,7 +151,7 @@ describe('approval queue', () => {
 
   it('says graphics go on air automatically when nothing waits in Auto', async () => {
     renderWith(<ApprovalQueue />, {
-      'GET /overlay-reviews': { body: { items: [] } },
+      'GET /overlay-reviews': { body: { items: [], serverTime: SERVER_TIME } },
     });
     expect(
       await screen.findByText('Graphics go on air automatically'),
@@ -157,7 +167,7 @@ describe('approval queue', () => {
               status: 409,
               body: { type: 'about:blank', title: 'Conflict', status: 409 },
             }
-          : { body: { items: [] } },
+          : { body: { items: [], serverTime: SERVER_TIME } },
     });
     const retry = await screen.findByRole('button', { name: /try again/i });
     await user.click(retry);
