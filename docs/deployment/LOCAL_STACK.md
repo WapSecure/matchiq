@@ -10,7 +10,7 @@ Everything runs on one machine with no cloud account. All published ports are bo
 | `docker compose --profile app up -d --build --wait`             | the above, plus `migrate` (one-shot), api `:3000`, worker `:3001`, agents `:8000`, web `:4200` | Full demo from production images       |
 | `docker compose --profile ai up -d ollama`                      | ollama `:11434` (CPU)                                                                          | Local model runtime on Linux hosts     |
 
-Without a profile, compose starts only Postgres and Redis. The `infra` profile adds Keycloak. The app profile reuses those same containers and volumes. The app profile was last run end to end during MQ-014 and MQ-022, before sign-in, RLS and Keycloak were added; it has not been re-run since.
+Without a profile, compose starts only Postgres and Redis. The `infra` profile adds Keycloak. The app profile reuses those same containers and volumes. CI starts the app profile with fresh volumes and verifies service readiness, fixture seeding and replay progress.
 
 The app services are built from `apps/*/Dockerfile`. Each image is multi-stage, runs as a non-root user, has a pinned base image digest and includes a `HEALTHCHECK`.
 
@@ -18,7 +18,7 @@ Start-up order:
 
 1. `migrate` applies `libs/db/migrations` using the api image.
 2. The api starts once `migrate` has finished.
-3. The worker waits for agents to be healthy.
+3. The worker starts once migration and seeding have finished and agents are healthy.
 4. web waits for the api.
 
 Stop the app services and keep the data services running:
@@ -55,6 +55,14 @@ curl -s -o /dev/null -w '%{http_code}\n' localhost:4200/   # web
 docker compose --profile app ps             # every service shows (healthy)
 ```
 
+Run the full smoke check after the stack is healthy:
+
+```bash
+bash scripts/compose-smoke.sh
+```
+
+The check runs with the Node runtime already present in the API container. It verifies API, worker, agents and web readiness, confirms the seeded late-comeback fixture, creates a replay session, and waits for real replay state and persisted events.
+
 ## Models
 
 In compose, the agents container runs `MODEL_PROVIDER=mock`, which gives deterministic templates. ADR-0012 adds `ollama` as a provider. At the time of writing, the `ollama` provider is recorded in the contracts, but `apps/agents` settings accept only `mock` and `foundry`. The compose `ollama` service is therefore ready for that provider, but nothing calls it yet.
@@ -73,9 +81,9 @@ pnpm generate:fixture --seed 42 --scenario comeback --out fixtures/comeback.json
 pnpm validate:fixture fixtures/*.json
 ```
 
-The five golden fixtures are in `fixtures/` (see `fixtures/README.md`). The API exposes:
+The six golden fixtures are in `fixtures/` (see `fixtures/README.md`). The API exposes:
 
 - ingest for the `developer` role: `POST /api/v1/fixtures` and `POST /api/v1/fixtures/:fixtureId/events:batch`, with an OIDC access token (see `docs/security/IDENTITY_AND_ACCESS.md`; the operator key is a dev/CI-only fallback behind `AUTH_OPERATOR_KEY_ENABLED`)
 - the resumable SSE stream: `GET /api/v1/fixtures/:fixtureId/stream`
 
-There is no one-command seed or replay loader yet. Loading a golden fixture into a running stack, and replay controls, belong to the backend and data workstreams.
+The app profile runs migrations and the idempotent fixture seed before the API and worker start. Use `bash scripts/compose-smoke.sh` to create and verify a replay session from the seeded data.

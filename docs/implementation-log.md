@@ -1183,3 +1183,9 @@ A full audit of the repository against the v3 specification is committed under [
 - **Corrections**: ARCHITECTURE_RULES (built libraries), IDENTITY_AND_ACCESS (`preferences:write` is guarded), THREAT_MODEL T3 and I4 test references, the API idempotency text (key optional; no `Retry-After-replay` header exists), ADR-0033 (a gap does mark state provisional; correction note added), TESTING_STRATEGY (golden replay), OBSERVABILITY (alerts use the 4 s target), the traceability CSV statuses, and the enterprise readiness review.
 - **Submission documents**: stale CI references now point to run 40105654686 on `ed46466`; the README gains a CI badge, Limitations and Team sections.
 - **Open for the owner**: ADR-0025 and ADR-0029 are proposed. The landing hero description still says "in seconds" (`apps/web/src/constants/landing.ts`).
+
+## MQ-083: Fresh-clone Compose replay smoke (24 October 2026)
+
+The app profile now orders the worker after the one-shot migration and six-fixture seed. A Docker-only smoke command checks API, worker, agents and web readiness, confirms the seeded late-comeback fixture, creates a replay session and observes both advancing replay state and persisted events. CI runs that check from fresh volumes, prints bounded sanitized diagnostics on failure and always removes containers and volumes.
+
+Local validation covers script syntax, formatting and rendered Compose configuration. The end-to-end claim requires the pull request's clean GitHub runner and will be recorded after it passes.

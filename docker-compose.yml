@@ -184,6 +184,7 @@ services:
     ports:
       - '127.0.0.1:${WORKER_PORT:-3001}:3001'
     depends_on:
+      migrate: { condition: service_completed_successfully }
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
       agents: { condition: service_healthy }
