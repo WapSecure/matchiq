@@ -1,4 +1,4 @@
-# ADR-0038: Ingest semantic checks and the Idempotency-Key policy
+# ADR-0039: Ingest semantic checks and the Idempotency-Key policy
 
 - Status: Accepted (2026-10-24). Spec §8, §24, §29, §45. Builds on ADR-0006, ADR-0033 and ADR-0037. Recorded by MQ-085 (audit R-08-17, R-24-02, R-29-02).
 

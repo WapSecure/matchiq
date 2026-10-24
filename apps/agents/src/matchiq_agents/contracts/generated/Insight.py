@@ -41,6 +41,11 @@ class CounterEvidenceItem(BaseModel):
     eventIds: list[EventId]
 
 
+class ConfidenceType(StrEnum):
+    measured = "measured"
+    heuristic = "heuristic"
+
+
 class Evidence(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -58,6 +63,9 @@ class Evidence(BaseModel):
     confidenceLabel: ConfidenceLabel
     rationale: Annotated[str, Field(max_length=400, min_length=1)]
     counterEvidence: list[CounterEvidenceItem]
+    sampleSize: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
+    limitations: Annotated[str | None, Field(max_length=200, min_length=1)] = None
+    confidenceType: ConfidenceType | None = None
     generatedAt: AwareDatetime
 
 

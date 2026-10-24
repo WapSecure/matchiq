@@ -6340,6 +6340,23 @@
                         "additionalProperties": false
                       }
                     },
+                    "sampleSize": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "limitations": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "confidenceType": {
+                      "type": "string",
+                      "enum": [
+                        "measured",
+                        "heuristic"
+                      ]
+                    },
                     "generatedAt": {
                       "type": "string",
                       "format": "date-time",
@@ -11839,6 +11856,12 @@
           "passCompletionPct": {
             "$ref": "#/components/schemas/MetricValue"
           },
+          "shotConversionPct": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "passQualityPct": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
           "possessionPct": {
             "$ref": "#/components/schemas/MetricValue"
           },
@@ -14146,6 +14169,23 @@
                   ],
                   "additionalProperties": false
                 }
+              },
+              "sampleSize": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "limitations": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "confidenceType": {
+                "type": "string",
+                "enum": [
+                  "measured",
+                  "heuristic"
+                ]
               },
               "generatedAt": {
                 "type": "string",
@@ -17494,11 +17534,11 @@
         "in": "header",
         "name": "Idempotency-Key",
         "schema": {
-          "description": "Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.",
+          "description": "Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422.",
           "type": "string",
           "pattern": "^[\\x21-\\x7e]{1,255}$"
         },
-        "description": "Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422."
+        "description": "Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422."
       },
       "LastEventId": {
         "in": "header",

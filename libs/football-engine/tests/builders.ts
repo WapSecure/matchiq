@@ -115,12 +115,12 @@ export const script = (startSequence = 0) => {
     periodStarted: () => emit({ type: 'PERIOD_STARTED' }),
     periodEnded: () => emit({ type: 'PERIOD_ENDED' }),
     matchEnded: () => emit({ type: 'MATCH_ENDED' }),
-    pass: (side: TestSide) =>
+    pass: (side: TestSide, targetX = PT.x) =>
       emit({
         type: 'PASS_ATTEMPTED',
         ...actor(side),
         location: PT,
-        targetLocation: PT,
+        targetLocation: { x: targetX, y: PT.y },
         underPressure: false,
       }),
     completed: (side: TestSide, attemptEventId: string) =>

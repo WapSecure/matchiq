@@ -901,6 +901,8 @@ export interface components {
             passesAttempted: number;
             passesCompleted: number;
             passCompletionPct: components["schemas"]["MetricValue"];
+            shotConversionPct?: components["schemas"]["MetricValue"];
+            passQualityPct?: components["schemas"]["MetricValue"];
             possessionPct: components["schemas"]["MetricValue"];
             /** @enum {string} */
             possessionBasis: "TIME_WEIGHTED" | "EVENT_SHARE_PROXY";
@@ -1412,6 +1414,10 @@ export interface components {
                     description: string;
                     eventIds: string[];
                 }[];
+                sampleSize?: number;
+                limitations?: string;
+                /** @enum {string} */
+                confidenceType?: "measured" | "heuristic";
                 /** Format: date-time */
                 generatedAt: string;
             };
@@ -2058,7 +2064,7 @@ export interface components {
     parameters: {
         /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
         RequestId: string;
-        /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+        /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
         IdempotencyKey: string;
         /** @description Resume after this `streamSequence`. Wins over `?lastEventId=` (for clients that cannot set headers). */
         LastEventId: string;
@@ -2179,7 +2185,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -2491,7 +2497,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -3425,7 +3431,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -3641,7 +3647,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4333,6 +4339,10 @@ export interface operations {
                             description: string;
                             eventIds: string[];
                         }[];
+                        sampleSize?: number;
+                        limitations?: string;
+                        /** @enum {string} */
+                        confidenceType?: "measured" | "heuristic";
                         /** Format: date-time */
                         generatedAt: string;
                     };
@@ -4627,7 +4637,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4752,7 +4762,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -4975,7 +4985,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -5090,7 +5100,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -5281,7 +5291,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -5384,7 +5394,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path?: never;
@@ -5708,7 +5718,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {
@@ -5850,7 +5860,7 @@ export interface operations {
             header?: {
                 /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
                 "X-Request-ID"?: components["parameters"]["RequestId"];
-                /** @description Optional on every route that accepts it (ADR-0038). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                /** @description Optional on every route that accepts it (ADR-0039). Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
                 "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
             };
             path: {

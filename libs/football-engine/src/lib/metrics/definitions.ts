@@ -66,6 +66,25 @@ export const MATCH_METRICS: readonly BaseMetricDefinition[] = [
     heuristic: false,
   },
   {
+    base: 'shotConversionPct',
+    label: 'Shot conversion',
+    formula: '(goals - ownGoalsFor) / shots * 100',
+    description:
+      "Share of the team's shots that became goals. Own goals credited to the team are excluded because they are not from its shots. Rounded to 1 decimal. Unavailable (ZERO_DENOMINATOR) when the team has had no shots.",
+    unit: 'percent',
+    heuristic: false,
+  },
+  {
+    base: 'passQualityPct',
+    label: 'Pass quality',
+    formula:
+      'count(completed passes with target.x - origin.x >= 10) / passesCompleted * 100',
+    description:
+      'Share of completed passes that moved the ball at least 10 pitch units (of 100) towards the opponent goal. A defined proxy, not a spec metric: it ignores defenders beaten, pass difficulty and what happens next. Unavailable (ZERO_DENOMINATOR) when no passes were completed.',
+    unit: 'percent',
+    heuristic: true,
+  },
+  {
     base: 'possessionPct',
     label: 'Possession',
     formula:

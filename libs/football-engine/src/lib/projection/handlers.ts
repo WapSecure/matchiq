@@ -3,9 +3,18 @@ import type {
   MatchEventOf,
   MatchEventType,
 } from '@matchiq/contracts';
-import { HIGH_RECOVERY_MIN_X } from '../constants.js';
+import {
+  HIGH_RECOVERY_MIN_X,
+  PLAYER_COUNT_KINDS,
+  PROGRESSIVE_PASS_MIN_GAIN,
+} from '../constants.js';
 import type { DerivedState, TrackedKind } from '../types.js';
-import { bump, countAndTrack, type Handler } from './derived-ops.js';
+import {
+  bump,
+  bumpPlayer,
+  countAndTrack,
+  type Handler,
+} from './derived-ops.js';
 import { opponentOf, sideOf } from './initial-state.js';
 import { changePossession, closeSegment } from './possession.js';
 
@@ -16,14 +25,24 @@ const shot: Handler<MatchEventOf<'SHOT'>> = (derived, event, context) => {
   if (side === null) return derived;
   const kinds: TrackedKind[] =
     event.outcome === 'ON_TARGET' ? ['shots', 'shotsOnTarget'] : ['shots'];
-  return countAndTrack(derived, side, kinds, event);
+  const counted = countAndTrack(derived, side, kinds, event);
+  return event.outcome === 'ON_TARGET'
+    ? bumpPlayer(counted, PLAYER_COUNT_KINDS.shotOnTarget, event.playerId)
+    : counted;
 };
 
 /** The GOAL's `teamId` is the scorer's team; an own goal credits the opponent. */
 const goal: Handler<MatchEventOf<'GOAL'>> = (derived, event, context) => {
   const side = sideOf(context, event.teamId);
   if (side === null) return derived;
-  return bump(derived, event.ownGoal ? opponentOf(side) : side, ['goals']);
+  if (event.ownGoal) {
+    return bump(derived, opponentOf(side), ['goals', 'ownGoalsFor']);
+  }
+  return bumpPlayer(
+    bump(derived, side, ['goals']),
+    PLAYER_COUNT_KINDS.goal,
+    event.playerId,
+  );
 };
 
 const passAttempted: Handler<MatchEventOf<'PASS_ATTEMPTED'>> = (
@@ -34,7 +53,16 @@ const passAttempted: Handler<MatchEventOf<'PASS_ATTEMPTED'>> = (
   const side = sideOf(context, event.teamId);
   if (side === null) return derived;
   const passAttempts = new Map(derived.passAttempts).set(event.eventId, side);
-  return { ...bump(derived, side, ['passesAttempted']), passAttempts };
+  const progressive =
+    event.targetLocation.x - event.location.x >= PROGRESSIVE_PASS_MIN_GAIN;
+  const progressiveAttempts = progressive
+    ? new Set(derived.progressiveAttempts).add(event.eventId)
+    : derived.progressiveAttempts;
+  return {
+    ...bump(derived, side, ['passesAttempted']),
+    passAttempts,
+    progressiveAttempts,
+  };
 };
 
 /** Spec §43: a completion counts once, and only against a known attempt by the same team. */
@@ -50,7 +78,11 @@ const passCompleted: Handler<MatchEventOf<'PASS_COMPLETED'>> = (
   const completedAttempts = new Set(derived.completedAttempts).add(
     event.attemptEventId,
   );
-  return { ...bump(derived, side, ['passesCompleted']), completedAttempts };
+  const keys: ('passesCompleted' | 'progressivePasses')[] =
+    derived.progressiveAttempts.has(event.attemptEventId)
+      ? ['passesCompleted', 'progressivePasses']
+      : ['passesCompleted'];
+  return { ...bump(derived, side, keys), completedAttempts };
 };
 
 const tracked =
@@ -79,7 +111,13 @@ const foul: Handler<MatchEventOf<'FOUL'>> = (derived, event, context) => {
 const card: Handler<MatchEventOf<'CARD'>> = (derived, event, context) => {
   const side = sideOf(context, event.teamId);
   if (side === null) return derived;
-  if (event.card === 'YELLOW') return bump(derived, side, ['yellowCards']);
+  if (event.card === 'YELLOW') {
+    return bumpPlayer(
+      bump(derived, side, ['yellowCards']),
+      PLAYER_COUNT_KINDS.yellowCard,
+      event.playerId,
+    );
+  }
   if (event.card === 'RED') return bump(derived, side, ['redCards']);
   return bump(derived, side, ['yellowCards', 'redCards']);
 };

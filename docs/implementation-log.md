@@ -1192,10 +1192,20 @@ Local validation covers script syntax, formatting and rendered Compose configura
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
 
+## MQ-086: Shot conversion, pass quality and player milestones (24 October 2026)
+
+The engine gains two snapshot metrics, `shotConversionPct` and `passQualityPct`, as `MetricValue` with numerator and denominator, unavailable (never 0) on a zero denominator. Shot conversion is goals from the team's own shots over shots; own goals credited to the team are excluded. Pass quality is the share of completed passes whose target is at least 10 pitch units nearer goal than the origin, a heuristic proxy defined in ADR-0038 because the spec never defines "quality". Three deterministic P2 `PLAYER_MILESTONE` rules (first shot on target, first goal, first yellow card) fire on the event that takes a player's count to 1, anchored to that event id, so re-scans reproduce the same insight ids. The evidence envelope gains optional `sampleSize`, `limitations` and `confidenceType`, populated by the milestone rules. Both new snapshot fields are optional in the contract so stored snapshots still parse.
+
+`ALGORITHM_VERSION` and `MOMENT_METHOD_VERSION` move to 1.1.0. The two golden `stateHash` pins changed because the snapshot body gained fields and the version changed; the golden moment sequence gains the milestone rows. No other fixture values changed. Contracts codegen, the OpenAPI document and the API client schema were updated, and the web metric definitions gained the two entries.
+
+## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
+
+The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
+
 ## MQ-085: API alignment and ingest validation (24 October 2026)
 
 - **Evidence endpoint**: `GET /insights/{insightId}/evidence` returns the stored evidence envelope (metrics, event ids, method version, coverage, counter-evidence). Permission `insights:read`; another organisation's insight is the same 404 as a missing one.
 - **Recap**: `GET /fixtures/{id}/recap` takes optional `persona` and `lang`, filtering key-moment narratives and the story. Without them the stored recap is returned unchanged (`recap-filter.spec.ts`).
 - **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
-- **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0038; ADR-0034 and ADR-0037 amended).
+- **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
 - Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.

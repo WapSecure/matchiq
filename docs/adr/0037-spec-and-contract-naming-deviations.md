@@ -24,7 +24,7 @@ The product keeps these names. A client or reviewer should read the contracts an
 
 ## Amendment (MQ-085)
 
-- `Idempotency-Key` stays optional; ADR-0038 lists the 12 routes that read it.
+- `Idempotency-Key` stays optional; ADR-0039 lists the 12 routes that read it.
 - The evidence endpoint exists as `GET /insights/{insightId}/evidence` (the spec's `/matches/...` form is the ADR-0005 rename). The recap filter parameter is `lang`; the narratives list keeps `locale`.
 
 ## Consequences

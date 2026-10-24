@@ -33,6 +33,8 @@ export const CounterEvidence = z.strictObject({
   eventIds: z.array(EventId),
 });
 
+export const ConfidenceType = z.enum(['measured', 'heuristic']);
+
 export const EvidenceEnvelope = z
   .strictObject({
     insightId: InsightId,
@@ -47,6 +49,10 @@ export const EvidenceEnvelope = z
     confidenceLabel: ConfidenceLabel,
     rationale: z.string().min(1).max(400),
     counterEvidence: z.array(CounterEvidence),
+    /** Spec §43 envelope; optional so stored insights still parse. */
+    sampleSize: z.int().nonnegative().optional(),
+    limitations: z.string().min(1).max(200).optional(),
+    confidenceType: ConfidenceType.optional(),
     generatedAt: UtcTimestamp,
   })
   .refine((e) => e.windowEndMs >= e.windowStartMs, {
@@ -87,6 +93,7 @@ export const Insight = z.strictObject({
 
 export type InsightKind = z.infer<typeof InsightKind>;
 export type InsightPriority = z.infer<typeof InsightPriority>;
+export type ConfidenceType = z.infer<typeof ConfidenceType>;
 export type CounterEvidence = z.infer<typeof CounterEvidence>;
 export type EvidenceEnvelope = z.infer<typeof EvidenceEnvelope>;
 export type PipelineStatus = z.infer<typeof PipelineStatus>;
