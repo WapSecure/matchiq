@@ -24,7 +24,7 @@ const useAccountPreferences = (): boolean =>
 
 /**
  * Restores and saves viewing choices. Device choices apply before the first
- * paint, so persona and language never flash back to the defaults; a
+ * paint, so persona and commentary language never flash back to the defaults; a
  * signed-in user's account profile then wins, or adopts the device choices
  * the first time they sign in.
  */

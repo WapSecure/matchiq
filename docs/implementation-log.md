@@ -1160,6 +1160,14 @@ Each key moment was one short sentence, and the recap had no story. The owner wa
 
 Tests: engine context spec (20), worker breakdown and story specs (16), pytest `test_breakdown.py` plus the full agents suite (509), web specs for the breakdown, the story and the report. Deferred: model polish of the story (no recap pipeline yet), a native review of the Pidgin, French and Spanish wording.
 
+## MQ-082: Interface copy and commentary-language boundary (24 October 2026)
+
+Stream E, branch `fix/MQ-082-interface-copy-audit`, cut from current `origin/dev` after checking open pull requests and worktree ownership. Audited frontend source copy for decorative em dashes, unnecessary compound-word hyphens and generic generated-product phrasing. Correction notices now use two direct sentences. Agent handoff, partway and data cleanup labels use natural closed compounds. Scorelines, numeric and time ranges, unavailable-value marks, on-air and fact-check wording retain their grammatical or domain meaning.
+
+The studio control now says “Commentary language” and explains that it changes commentary and graphic wording while interface labels, facts and figures stay the same. This makes the current English-interface boundary explicit and does not claim that interface localization has shipped. Updated the existing unit and browser assertions around this control.
+
+Local validation: web lint passed; web E2E lint passed with 35 existing warnings and no errors; web and E2E TypeScript checks passed; 26 focused tests across language boundaries, corrections, agent handoffs and audit labels passed; touched-file formatting and diff whitespace checks passed. Full browser execution and the complete test matrix remain for CI. Next three tickets: independent server-rendered interface locale and complete reviewed catalogs; long-content coverage across match, evidence and audit screens; native editorial qualification for supported commentary languages.
+
 ## MQ-081: real-time approval window and feed copy
 
 - **Approval window**: a waiting Manual cue now lapses on the wall clock (`APPROVAL_WINDOW_SECONDS`, default 45), not when the match-clock slot ends. Deadline stored in `overlay_cues.approval_deadline` (migration 0012); worker policy drops scheduler ends for cues in the manual flow; a per-batch sweep lapses expired windows and ends approved cues once their slot is over; approve checks the deadline and airs from the current match clock for the normal duration. Contract: `approvalDeadline` on `OverlayReview`, `serverTime` on the list; OpenAPI and api-client regenerated. Studio queue shows "Send within N s". ADR-0023 amended. AUTO output is unchanged (test proves pass-through for any wall clock).

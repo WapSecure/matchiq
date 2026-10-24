@@ -34,7 +34,7 @@ function SaveNote() {
   );
 }
 
-/** Favourite team and reduced motion; saved like persona and language. */
+/** Favourite team and reduced motion; saved like persona and commentary language. */
 export function ViewingPreferences({
   fixture,
   className,

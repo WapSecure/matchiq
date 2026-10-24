@@ -117,7 +117,9 @@ describe('commentary language boundaries', () => {
   it('gives language options their native tags without changing controls', async () => {
     const user = userEvent.setup();
     render(<AudienceBar />);
-    const group = screen.getByRole('radiogroup', { name: 'Language' });
+    const group = screen.getByRole('radiogroup', {
+      name: 'Commentary language',
+    });
     const french = within(group).getByRole('radio', { name: /Français/ });
     expect(languageOf(french)).toBe('fr-FR');
     expect(
@@ -128,6 +130,8 @@ describe('commentary language boundaries', () => {
     expect(
       screen.getByRole('radiogroup', { name: 'Audience' }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/The numbers never change/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Interface labels, facts and figures stay the same/),
+    ).toBeInTheDocument();
   });
 });

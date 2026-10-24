@@ -26,7 +26,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   [AUDIT_ACTIONS.fixtureCreated]: 'Match added',
   [AUDIT_ACTIONS.eventsIngested]: 'Match data loaded',
   [AUDIT_ACTIONS.sessionsPurged]: 'Old replays removed',
-  [AUDIT_ACTIONS.retentionRun]: 'Scheduled clean-up',
+  [AUDIT_ACTIONS.retentionRun]: 'Scheduled cleanup',
 };
 
 export const ACTOR_TYPE_LABELS: Record<AuditActorType, string> = {
@@ -42,7 +42,7 @@ export const TARGET_TYPE_LABELS: Record<AuditTargetType, string> = {
   overlay: 'Graphic',
   insight: 'Key moment',
   organization: 'Organisation',
-  retention: 'Data clean-up',
+  retention: 'Data cleanup',
 };
 
 const option = <T extends string>(

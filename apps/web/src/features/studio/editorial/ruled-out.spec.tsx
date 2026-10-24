@@ -9,7 +9,7 @@ import { initialMatchData, reduceMessages } from '../store';
 import { insightMarks } from './insight-marks';
 
 const REASON = 'Goal ruled out: offside in the build-up';
-const RULED_OUT = /Goal ruled out — removed from air/;
+const RULED_OUT = /Goal ruled out\. Removed from air\./;
 
 describe('a moment ruled out by a correction', () => {
   it('is marked from the stream and its write-ups are withdrawn', () => {
