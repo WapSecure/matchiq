@@ -1192,6 +1192,7 @@ Local validation covers script syntax, formatting and rendered Compose configura
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
 
+<<<<<<< HEAD
 ## MQ-084: Tests for the controls the audit found untested (24 October 2026)
 
 Tests only; no application behaviour changed.
@@ -1203,3 +1204,8 @@ Tests only; no application behaviour changed.
 - **Connection banner**: `connection-banner.spec.tsx` asserts the plain-language text and `role="status"` for reconnecting, stale and offline, and no banner for connecting and live.
 - **Reduced motion**: `reduced-motion.spec.tsx` checks the OS and in-app CSS rules stop the same animation and transition properties, the preference toggles the page attribute, and component animations are gated by `motion-safe`.
 - **Responsive widths**: `responsive.spec.ts` checks the lobby and studio at 360, 768 and 1920 px for no horizontal overflow and no serious or critical axe violations (desktop projects).
+=======
+## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
+
+The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
+>>>>>>> origin/dev

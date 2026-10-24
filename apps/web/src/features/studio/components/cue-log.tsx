@@ -3,6 +3,7 @@
 import { CAUSE_LABELS, EDITORIAL_CAUSES } from '@/constants/editorial';
 import { NATURAL_CUE_ENDS, OVERLAY_COPY } from '@/constants/overlay';
 import { cn } from '@/lib/cn';
+import { describeReason } from '@/lib/describe-reason';
 import { type Retraction, useMatchStore } from '../store';
 
 /**
@@ -15,7 +16,7 @@ const describe = (r: Retraction) => {
   const natural = NATURAL_CUE_ENDS.has(r.reason);
   return {
     label: r.cause ? CAUSE_LABELS[r.cause] : OVERLAY_COPY.ending[r.ending],
-    reason: editorial || natural ? null : r.reason,
+    reason: editorial || natural || !r.reason ? null : describeReason(r.reason),
     editorial,
   };
 };
