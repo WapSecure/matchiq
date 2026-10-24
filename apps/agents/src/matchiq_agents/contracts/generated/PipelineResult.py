@@ -151,18 +151,13 @@ class Source(StrEnum):
     TEMPLATE = "TEMPLATE"
 
 
-class NarrativeDraft(BaseModel):
+class BreakdownPart(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    persona: Persona
-    locale: Locale
-    headline: Annotated[str, Field(max_length=80, min_length=1)]
-    body: Annotated[str, Field(max_length=600, min_length=1)]
-    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
+    text: Annotated[str, Field(max_length=360, min_length=1)]
     citedValues: list[CitedValue]
-    source: Source
-    localeFallback: bool
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
 
 
 class Kind(StrEnum):
@@ -268,6 +263,15 @@ class Run(BaseModel):
     faultNote: Annotated[str | None, Field(max_length=300, min_length=1)] = None
 
 
+class AnalystBreakdown(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    whatHappened: BreakdownPart
+    whyItMatters: BreakdownPart
+    whatToWatch: BreakdownPart
+
+
 class AgentStep(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -293,6 +297,21 @@ class AgentStep(BaseModel):
     tokensOut: Annotated[int | None, Field(ge=0, le=9007199254740991)] = None
     costEstimateUsd: Annotated[float | None, Field(ge=0.0)] = None
     retries: Annotated[int, Field(ge=0, le=64)]
+
+
+class NarrativeDraft(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    persona: Persona
+    locale: Locale
+    headline: Annotated[str, Field(max_length=80, min_length=1)]
+    body: Annotated[str, Field(max_length=600, min_length=1)]
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
+    citedValues: list[CitedValue]
+    source: Source
+    localeFallback: bool
+    breakdown: AnalystBreakdown | None = None
 
 
 class PipelineResult(BaseModel):

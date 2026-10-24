@@ -8,7 +8,12 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from matchiq_agents.contracts.types import NarrativeDraft, PipelineRequest, PipelineResult
+from matchiq_agents.contracts.types import (
+    BreakdownPart,
+    NarrativeDraft,
+    PipelineRequest,
+    PipelineResult,
+)
 
 DIGITS = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)?(?!\w)")
 WORDS = re.compile(r"[^\W\d_]+")
@@ -51,6 +56,9 @@ class CaseReport:
     value_mismatches: list[str] = field(default_factory=list[str])
     identical_personas: list[str] = field(default_factory=list[str])
     locale_numeral_changes: list[str] = field(default_factory=list[str])
+    # Analyst breakdown parts (MQ-068): uncited numerals, wrong values, foreign evidence ids.
+    breakdown_problems: list[str] = field(default_factory=list[str])
+    breakdowns: int = 0
     locale_fallbacks: int = 0
 
     @property
@@ -62,6 +70,7 @@ class CaseReport:
             + self.uncited_drafts
             + len(self.value_mismatches)
             + len(self.locale_numeral_changes)
+            + len(self.breakdown_problems)
         )
 
 
@@ -76,8 +85,20 @@ def _supported(value: float, metrics: dict[str, float]) -> bool:
     )
 
 
+def _parts(draft: NarrativeDraft) -> list[tuple[str, BreakdownPart]]:
+    found = draft.breakdown
+    if found is None:
+        return []
+    return [
+        ("whatHappened", found.whatHappened),
+        ("whyItMatters", found.whyItMatters),
+        ("whatToWatch", found.whatToWatch),
+    ]
+
+
 def _texts(result: PipelineResult) -> list[str]:
     texts = [f"{d.headline}\n{d.body}" for d in result.narratives]
+    texts += [part.text for d in result.narratives for _, part in _parts(d)]
     if result.overlay is not None:
         texts.append(f"{result.overlay.headline}\n{result.overlay.body}")
     if result.analysis is not None:
@@ -112,17 +133,48 @@ def _check_text(
     report.injection_leaks += [marker for marker in INJECTION_MARKERS if marker in lowered]
 
 
+def _citable(request: PipelineRequest) -> tuple[set[str], dict[str, float]]:
+    """Evidence ids and metrics plus the moment context's, which the engine also computed."""
+    insight = request.packet.insight
+    events = {event.root for event in insight.evidence.eventIds}
+    metrics = dict(insight.evidence.computedMetrics)
+    if insight.context is not None:
+        events |= {event.root for event in insight.context.eventIds}
+        metrics |= insight.context.metrics
+    return events, metrics
+
+
+def _check_part(
+    report: CaseReport, where: str, part: BreakdownPart, events: set[str], metrics: dict[str, float]
+) -> None:
+    cited = {event.root for event in part.evidenceEventIds}
+    if not cited or not cited <= events:
+        report.breakdown_problems.append(f"{where}: evidence {sorted(cited)}")
+    values = {value.metricRef: value.value for value in part.citedValues}
+    for ref, value in values.items():
+        if metrics.get(ref) != value:
+            report.breakdown_problems.append(f"{where}: {ref}={value}")
+    for number in _numerals(part.text):
+        if not _supported(number, values):
+            report.breakdown_problems.append(f"{where}: uncited {number} in {part.text[:60]!r}")
+
+
 def _check_drafts(report: CaseReport, request: PipelineRequest, result: PipelineResult) -> None:
-    envelope = request.packet.insight.evidence
-    events = {event.root for event in envelope.eventIds}
+    events, metrics = _citable(request)
     for draft in result.narratives:
         report.sources.add(draft.source.value)
         report.locale_fallbacks += int(draft.localeFallback)
         cited = {event.root for event in draft.evidenceEventIds}
         report.uncited_drafts += int(not cited or not cited <= events)
         for value in draft.citedValues:
-            if envelope.computedMetrics.get(value.metricRef) != value.value:
+            if metrics.get(value.metricRef) != value.value:
                 report.value_mismatches.append(f"{draft.persona.value}:{value.metricRef}")
+        if draft.breakdown is not None:
+            report.breakdowns += 1
+            if draft.persona.value != "ANALYST":
+                report.breakdown_problems.append(f"{draft.persona.value}: breakdown")
+        for name, part in _parts(draft):
+            _check_part(report, f"{draft.locale.value}:{name}", part, events, metrics)
 
 
 def _check_personas(report: CaseReport, result: PipelineResult) -> None:
@@ -149,7 +201,7 @@ def _check_locales(report: CaseReport, result: PipelineResult) -> None:
 def evaluate(name: str, request: PipelineRequest, result: PipelineResult) -> CaseReport:
     PipelineResult.model_validate(result.model_dump(mode="json", exclude_unset=True))
     report = CaseReport(name=name, status=result.status.value)
-    metrics = dict(request.packet.insight.evidence.computedMetrics)
+    _, metrics = _citable(request)
     allowed = {token for name in _safe_names(request) for token in WORDS.findall(name)}
     for text in _texts(result):
         _check_text(report, text, metrics, allowed)

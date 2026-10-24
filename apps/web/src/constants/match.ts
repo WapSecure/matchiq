@@ -186,3 +186,20 @@ export const OVERLAY_KIND_LABELS: Record<OverlayKind, string> = {
 export const NOT_AVAILABLE = 'Not available';
 
 export const SIDE_LABELS = { home: 'Home', away: 'Away' } as const;
+
+export const BREAKDOWN_COPY = {
+  label: 'Analyst breakdown',
+  parts: {
+    whatHappened: 'What happened',
+    whyItMatters: 'Why it matters',
+    whatToWatch: 'What to watch',
+  },
+  expand: 'Show full breakdown',
+  collapse: 'Show less',
+} as const;
+
+export const BREAKDOWN_PARTS = [
+  'whatHappened',
+  'whyItMatters',
+  'whatToWatch',
+] as const;

@@ -11559,6 +11559,211 @@
         ],
         "additionalProperties": false
       },
+      "MomentContext": {
+        "type": "object",
+        "properties": {
+          "methodVersion": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "home",
+              "away"
+            ]
+          },
+          "scoreState": {
+            "type": "string",
+            "enum": [
+              "LEADING",
+              "LEVEL",
+              "TRAILING"
+            ]
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "EARLY",
+              "FIRST_HALF",
+              "BEFORE_HALF_TIME",
+              "SECOND_HALF",
+              "FINAL_15"
+            ]
+          },
+          "comparison": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "metric": {
+                    "type": "string",
+                    "enum": [
+                      "shots",
+                      "shotsOnTarget",
+                      "pressures",
+                      "recoveries",
+                      "highRecoveries",
+                      "finalThirdEntries"
+                    ]
+                  }
+                },
+                "required": [
+                  "metric"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "metric": {
+                    "type": "string",
+                    "enum": [
+                      "shots",
+                      "shotsOnTarget",
+                      "pressures",
+                      "recoveries",
+                      "highRecoveries",
+                      "finalThirdEntries"
+                    ]
+                  },
+                  "direction": {
+                    "type": "string",
+                    "enum": [
+                      "RISING",
+                      "FALLING",
+                      "STEADY",
+                      "MIXED"
+                    ]
+                  }
+                },
+                "required": [
+                  "metric",
+                  "direction"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "linked": {
+            "type": "object",
+            "properties": {
+              "regainEventId": {
+                "type": "string",
+                "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              },
+              "previousInsightId": {
+                "type": "string",
+                "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "methodVersion",
+          "side",
+          "scoreState",
+          "phase",
+          "comparison",
+          "trend",
+          "linked",
+          "eventIds",
+          "metrics"
+        ],
+        "additionalProperties": false
+      },
+      "AnalystBreakdown": {
+        "type": "object",
+        "properties": {
+          "whatHappened": {
+            "$ref": "#/components/schemas/BreakdownPart"
+          },
+          "whyItMatters": {
+            "$ref": "#/components/schemas/BreakdownPart"
+          },
+          "whatToWatch": {
+            "$ref": "#/components/schemas/BreakdownPart"
+          }
+        },
+        "required": [
+          "whatHappened",
+          "whyItMatters",
+          "whatToWatch"
+        ],
+        "additionalProperties": false
+      },
+      "BreakdownPart": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 360
+          },
+          "citedValues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metricRef": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "metricRef",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "evidenceEventIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          }
+        },
+        "required": [
+          "text",
+          "citedValues",
+          "evidenceEventIds"
+        ],
+        "additionalProperties": false
+      },
       "AgentStepRole": {
         "type": "string",
         "enum": [
@@ -13559,6 +13764,9 @@
               "FALLBACK"
             ]
           },
+          "context": {
+            "$ref": "#/components/schemas/MomentContext"
+          },
           "synthetic": {
             "type": "boolean",
             "const": true
@@ -13642,6 +13850,9 @@
           },
           "localeFallback": {
             "type": "boolean"
+          },
+          "breakdown": {
+            "$ref": "#/components/schemas/AnalystBreakdown"
           },
           "createdAt": {
             "type": "string",
@@ -14624,6 +14835,9 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "breakdown": {
+                  "$ref": "#/components/schemas/AnalystBreakdown"
                 }
               },
               "required": [
@@ -15542,6 +15756,107 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RecapMoment"
+            }
+          },
+          "story": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "persona": {
+                  "type": "string",
+                  "enum": [
+                    "CASUAL",
+                    "ANALYST",
+                    "BROADCAST"
+                  ]
+                },
+                "locale": {
+                  "type": "string",
+                  "enum": [
+                    "en-GB",
+                    "fr-FR",
+                    "es-ES",
+                    "pcm-NG"
+                  ]
+                },
+                "paragraphs": {
+                  "minItems": 1,
+                  "maxItems": 6,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "FIRST_HALF",
+                          "SECOND_HALF",
+                          "TURNING_POINTS",
+                          "FULL_TIME"
+                        ]
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 700
+                      },
+                      "citedValues": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "metricRef": {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+                            },
+                            "value": {
+                              "type": "number"
+                            },
+                            "insightId": {
+                              "type": "string",
+                              "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                            }
+                          },
+                          "required": [
+                            "metricRef",
+                            "value"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "eventIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                        }
+                      },
+                      "insightIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                        }
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "text",
+                      "citedValues",
+                      "eventIds",
+                      "insightIds"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "persona",
+                "locale",
+                "paragraphs"
+              ],
+              "additionalProperties": false
             }
           },
           "synthetic": {

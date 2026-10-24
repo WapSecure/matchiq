@@ -62,3 +62,13 @@ INDEX_LABEL_WORDS: Final[dict[str, re.Pattern[str]]] = {
     "xT": re.compile(r"(?<!\w)xT(?!\w)|threat", _I),
     "pressureIndex": re.compile(r"pressure", _I),
 }
+
+# Analyst breakdown (MQ-068): "what to watch" points to a question, never a forecast.
+PREDICTION_WORDS: Final = re.compile(
+    r"(?<!\w)(?:will|won't|going to|bound to|certain to|sure to|set to|guarantee\w*|"
+    r"inevitabl\w*|destined)(?!\w)",
+    _I,
+)
+BREAKDOWN_DECLINE: Final = re.compile(
+    rf"{DECLINE_WORDS.pattern}|(?<!\w)eas(?:e|ed|es|ing)(?!\w)", _I
+)

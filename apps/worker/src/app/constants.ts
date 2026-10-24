@@ -115,6 +115,9 @@ export const GATE_DETAILS = {
   metricRef: (ref: string) => `metricRef ${ref} is not in the envelope`,
   guard: (reason: string, excerpt: string | null) =>
     excerpt === null ? reason : `${reason}: "${excerpt}"`,
+  breakdownPersona: 'only ANALYST narratives carry a breakdown',
+  breakdownPart: (part: string, detail: string) => `${part}: ${detail}`,
+  breakdownRepeat: (ref: string) => `${ref} is cited in more than one part`,
 } as const;
 
 /** Demo fault scenarios (ADR-0020); a metric the engine never computes. */

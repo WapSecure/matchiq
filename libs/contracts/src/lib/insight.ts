@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MESSAGES, PATTERNS } from './constants.js';
+import { MomentContext } from './moment-context.js';
 import {
   ConfidenceLabel,
   EventId,
@@ -79,6 +80,8 @@ export const Insight = z.strictObject({
   reasonCode: z.string().regex(PATTERNS.reasonCode),
   evidence: EvidenceEnvelope,
   status: PipelineStatus,
+  /** Score, time, recent trend and linked events (MQ-068); added by the worker at detection. */
+  context: MomentContext.optional(),
   synthetic: z.literal(true),
 });
 

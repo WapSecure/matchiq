@@ -37,6 +37,8 @@ class CaseSpec:
     event_ids: tuple[str, ...] = ("ev_00101", "ev_00112", "ev_00127")
     # Squad-sized allowlist, as the worker sends for a real fixture (36 players).
     squad_players: int = 0
+    # The engine's `MomentContext` (MQ-068); None for packets that predate it.
+    context: dict[str, Any] | None = None
 
 
 FIRST_NAMES = ("Arlo", "Bram", "Cael", "Dario", "Emil", "Fenn")
@@ -82,6 +84,8 @@ def build_payload(spec: CaseSpec) -> dict[str, Any]:
             *squad(spec.squad_players),
         ],
     }
+    if spec.context is not None:
+        insight["context"] = copy.deepcopy(spec.context)
     packet["deadlineMs"] = spec.deadline_ms
     payload["personas"] = list(spec.personas)
     payload["locales"] = list(spec.locales)
@@ -90,3 +94,58 @@ def build_payload(spec: CaseSpec) -> dict[str, Any]:
 
 def build_request(spec: CaseSpec | None = None) -> PipelineRequest:
     return PipelineRequest.model_validate(build_payload(spec or CaseSpec()))
+
+
+SPELL_REFS = ("context.trend.spell1", "context.trend.spell2", "context.trend.spell3")
+SPELLS = {"RISING": (1, 2, 4), "FALLING": (4, 2, 1), "STEADY": (2, 2, 2), "MIXED": (2, 4, 1)}
+
+
+def moment_context(
+    side: str = "home",
+    *,
+    score: tuple[int, int] = (2, 1),
+    minute: int = 67,
+    phase: str = "SECOND_HALF",
+    metric: str = "shots",
+    direction: str = "RISING",
+    regain: tuple[str, int] | None = None,
+    previous_minute: int | None = None,
+) -> dict[str, Any]:
+    """A realistic `MomentContext`: the score from the subject side, the last 10 minutes
+    against the match average, and three spells of `metric` that follow `direction`."""
+    home, away = score
+    mine, theirs = (home, away) if side == "home" else (away, home)
+    state = "LEADING" if mine > theirs else "LEVEL" if mine == theirs else "TRAILING"
+    other = "away" if side == "home" else "home"
+    metrics: dict[str, float] = {
+        "context.score.home": home,
+        "context.score.away": away,
+        "context.score.margin": abs(home - away),
+        "context.minute": minute,
+        "context.compare.windowMinutes": 10,
+        f"context.compare.recent.{side}": 5,
+        f"context.compare.recent.{other}": 1,
+        f"context.compare.average.{side}": 1.8,
+        f"context.compare.average.{other}": 1.2,
+        **dict(zip(SPELL_REFS, SPELLS[direction], strict=True)),
+    }
+    linked: dict[str, str] = {}
+    event_ids: list[str] = []
+    if regain is not None:
+        linked["regainEventId"] = regain[0]
+        event_ids.append(regain[0])
+        metrics["context.linked.regainSeconds"] = regain[1]
+    if previous_minute is not None:
+        linked["previousInsightId"] = "in_previous_1"
+        metrics["context.linked.previousMinute"] = previous_minute
+    return {
+        "methodVersion": "1.0.0",
+        "side": side,
+        "scoreState": state,
+        "phase": phase,
+        "comparison": {"metric": metric},
+        "trend": {"metric": metric, "direction": direction},
+        "linked": linked,
+        "eventIds": event_ids,
+        "metrics": metrics,
+    }

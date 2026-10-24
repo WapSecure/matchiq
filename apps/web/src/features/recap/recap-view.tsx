@@ -10,6 +10,7 @@ import { RecapPlayerFocus } from '@/features/player-focus/recap-player-focus';
 import { AudienceBar } from '@/features/studio/components/audience-controls';
 import { isApiError } from '@/lib/api/api-error';
 import { useRecap } from '@/lib/api/hooks';
+import { RecapMatchStory } from './recap-match-story';
 import { FinalMetrics } from './recap-metrics';
 import { RecapMoments } from './recap-moments';
 import { RecapNotReady } from './recap-not-ready';
@@ -53,6 +54,7 @@ export function RecapView({ fixture }: { fixture: Fixture }) {
         <>
           <RecapScoreline fixture={fixture} recap={recap.data} />
           <AudienceBar />
+          <RecapMatchStory recap={recap.data} />
           <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
             <RecapMoments recap={recap.data} fixture={fixture} />
             <FinalMetrics recap={recap.data} fixture={fixture} />

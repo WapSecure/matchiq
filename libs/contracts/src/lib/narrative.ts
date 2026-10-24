@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AnalystBreakdown } from './breakdown.js';
 import { LIMITS } from './constants.js';
 import {
   EventId,
@@ -26,6 +27,8 @@ export const Narrative = z.strictObject({
   source: NarrativeSource,
   /** Set when a localisation failed and the en-GB text is served instead. */
   localeFallback: z.boolean(),
+  /** ANALYST only: the three-part breakdown (MQ-068). */
+  breakdown: AnalystBreakdown.optional(),
   createdAt: UtcTimestamp,
 });
 

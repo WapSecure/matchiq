@@ -455,6 +455,9 @@
         },
         "localeFallback": {
           "type": "boolean"
+        },
+        "breakdown": {
+          "$ref": "#/$defs/AnalystBreakdown"
         }
       },
       "required": [
@@ -466,6 +469,70 @@
         "citedValues",
         "source",
         "localeFallback"
+      ],
+      "additionalProperties": false
+    },
+    "AnalystBreakdown": {
+      "type": "object",
+      "properties": {
+        "whatHappened": {
+          "$ref": "#/$defs/BreakdownPart"
+        },
+        "whyItMatters": {
+          "$ref": "#/$defs/BreakdownPart"
+        },
+        "whatToWatch": {
+          "$ref": "#/$defs/BreakdownPart"
+        }
+      },
+      "required": [
+        "whatHappened",
+        "whyItMatters",
+        "whatToWatch"
+      ],
+      "additionalProperties": false
+    },
+    "BreakdownPart": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 360
+        },
+        "citedValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metricRef": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "metricRef",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "evidenceEventIds": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          }
+        }
+      },
+      "required": [
+        "text",
+        "citedValues",
+        "evidenceEventIds"
       ],
       "additionalProperties": false
     },

@@ -1,4 +1,10 @@
-import type { AgentRun, ReplayStatus } from '@matchiq/contracts';
+import type {
+  AgentRun,
+  AnalystBreakdown,
+  BreakdownPart,
+  MatchStory,
+  ReplayStatus,
+} from '@matchiq/contracts';
 import type {
   FixtureTemplateSummary,
   RecapDocument,
@@ -140,5 +146,42 @@ export const recap = (
   }),
   keyMoments: [moment()],
   synthetic: true,
+  ...overrides,
+});
+
+const part = (text: string): BreakdownPart => ({
+  text,
+  citedValues: [{ metricRef: 'shots.home.rolling5m', value: 4 }],
+  evidenceEventIds: ['ev_3'],
+});
+
+export const breakdown = (
+  overrides: Partial<AnalystBreakdown> = {},
+): AnalystBreakdown => ({
+  whatHappened: part('Home United scored from a corner.'),
+  whyItMatters: part('It levels the match after a spell of pressure.'),
+  whatToWatch: part('Whether Away City can clear the next set piece.'),
+  ...overrides,
+});
+
+export const story = (overrides: Partial<MatchStory> = {}): MatchStory => ({
+  persona: 'BROADCAST',
+  locale: 'en-GB',
+  paragraphs: [
+    {
+      kind: 'FIRST_HALF',
+      text: 'Away City led at the break.',
+      citedValues: [],
+      eventIds: ['ev_1'],
+      insightIds: [],
+    },
+    {
+      kind: 'FULL_TIME',
+      text: 'Home United came back to win 3–2.',
+      citedValues: [],
+      eventIds: ['ev_4'],
+      insightIds: ['in_1'],
+    },
+  ],
   ...overrides,
 });

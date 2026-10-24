@@ -1,6 +1,8 @@
 import type { Insight, MatchEvent } from '@matchiq/contracts';
 import {
   createMomentCursor,
+  derivedAt,
+  momentContext,
   redetectMoments,
   stepMoments,
   type MomentCursor,
@@ -43,7 +45,7 @@ export class MomentTracker {
     if (!needsRescan(state, event, inOrder)) {
       const step = stepMoments(this.cursor, event, state.fixture);
       this.cursor = step.cursor;
-      return { detected: this.admit(step.insights), retracted: [] };
+      return { detected: this.admit(step.insights, state), retracted: [] };
     }
     const rescan = redetectMoments(state);
     this.cursor = rescan.cursor;
@@ -55,13 +57,33 @@ export class MomentTracker {
       this.live.delete(insight.insightId);
       this.retracted.add(insight.insightId);
     }
-    return { detected: this.admit(rescan.insights), retracted };
+    return { detected: this.admit(rescan.insights, state), retracted };
   }
 
-  private admit(insights: readonly Insight[]): Insight[] {
-    const fresh = insights.filter(
-      (i) => !this.live.has(i.insightId) && !this.retracted.has(i.insightId),
-    );
+  /** New moments, each with the engine context of its own match clock (MQ-068). */
+  private admit(
+    insights: readonly Insight[],
+    state: ProjectionState,
+  ): Insight[] {
+    const fresh = insights
+      .filter(
+        (i) => !this.live.has(i.insightId) && !this.retracted.has(i.insightId),
+      )
+      .map((found): Insight => {
+        const at = { period: found.period, clockMs: found.matchClockMs };
+        const earlier = [...this.live.values()].filter(
+          (p) =>
+            p.period < at.period ||
+            (p.period === at.period && p.matchClockMs <= at.clockMs),
+        );
+        const context = momentContext({
+          derived: derivedAt(state, at),
+          fixture: state.fixture,
+          insight: found,
+          prior: earlier,
+        });
+        return { ...found, context };
+      });
     for (const insight of fresh) this.live.set(insight.insightId, insight);
     return fresh;
   }

@@ -1,3 +1,4 @@
+import { AnalystBreakdown } from '@/components/match/analyst-breakdown';
 import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { RECAP_COPY } from '@/constants/recap';
 import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
@@ -30,9 +31,18 @@ export function RecapMomentBody({
       <p className="text-[15px] font-semibold leading-snug text-ink">
         {picked.narrative.headline}
       </p>
-      <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
-        {picked.narrative.body}
-      </p>
+      {picked.narrative.breakdown ? (
+        <AnalystBreakdown
+          breakdown={picked.narrative.breakdown}
+          language={picked.language}
+          level={3}
+          className="mt-1.5"
+        />
+      ) : (
+        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
+          {picked.narrative.body}
+        </p>
+      )}
     </div>
   );
 }

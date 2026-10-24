@@ -30,6 +30,17 @@ class StrictModel(BaseModel):
     )
 
 
+class MomentLabels(StrictModel):
+    """What the `context.*` values in `computedMetrics` describe; the Analyst only (MQ-068)."""
+
+    side: str
+    score_state: str
+    phase: str
+    compare_metric: str | None
+    trend_metric: str | None
+    trend_direction: str | None
+
+
 class FactsPayload(StrictModel):
     insight_kind: InsightKind
     subject_team: str | None
@@ -46,6 +57,7 @@ class FactsPayload(StrictModel):
     rationale: str
     counter_evidence: list[str]
     entities: list[str]
+    moment_context: MomentLabels | None = None
 
 
 class AnalystInput(StrictModel):

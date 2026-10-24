@@ -29,6 +29,36 @@ class Source(StrEnum):
     TEMPLATE = "TEMPLATE"
 
 
+class CitedValue(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    metricRef: Annotated[str, Field(pattern="^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$")]
+    value: float
+
+
+class EvidenceEventId(RootModel[str]):
+    root: Annotated[str, Field(pattern="^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")]
+
+
+class BreakdownPart(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    text: Annotated[str, Field(max_length=360, min_length=1)]
+    citedValues: list[CitedValue]
+    evidenceEventIds: Annotated[list[EvidenceEventId], Field(min_length=1)]
+
+
+class AnalystBreakdown(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    whatHappened: BreakdownPart
+    whyItMatters: BreakdownPart
+    whatToWatch: BreakdownPart
+
+
 class Narrative(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -44,4 +74,5 @@ class Narrative(BaseModel):
     citations: Annotated[list[Citation], Field(min_length=1)]
     source: Source
     localeFallback: bool
+    breakdown: AnalystBreakdown | None = None
     createdAt: AwareDatetime

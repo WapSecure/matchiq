@@ -28,6 +28,9 @@ GOAL_TALLY: Final = "states '{raw}' as a goal count; give the score instead"
 MISSING_PLAYER: Final = "text does not name {player}, whom the evidence names"
 RAW_INDEX: Final = "{persona} text shows the {label} value {raw}; describe it in words"
 UNLABELLED_INDEX: Final = "shows the value {raw} without saying it is the {label}"
+REPEATED_METRIC: Final = "breakdown cites {metric_ref} again in {part}; state each metric once"
+PREDICTION: Final = "{part} states '{raw}' as a prediction; say what to watch for instead"
+BREAKDOWN_DIRECTION: Final = "{part} says {subject} are fading; this moment is their rise"
 DETAIL_MAX: Final = 300
 
 # Fine-grained rule names for the failure taxonomy (`pipeline/diagnostics.py`).
@@ -58,4 +61,7 @@ RULE_TEMPLATES: Final = {
     "MISSING_PLAYER": MISSING_PLAYER,
     "RAW_INDEX": RAW_INDEX,
     "UNLABELLED_INDEX": UNLABELLED_INDEX,
+    "REPEATED_METRIC": REPEATED_METRIC,
+    "PREDICTION": PREDICTION,
+    "BREAKDOWN_DIRECTION": BREAKDOWN_DIRECTION,
 }
