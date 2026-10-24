@@ -63,6 +63,15 @@ export const ReplayCapacityEnv = z.object({
   ),
 });
 
+/** Wall-clock time a producer has to approve a waiting graphic (ADR-0024). */
+export const ApprovalWindowEnv = z.object({
+  APPROVAL_WINDOW_SECONDS: bounded(
+    OPERATIONS_LIMITS.approvalWindowMinSeconds,
+    OPERATIONS_LIMITS.approvalWindowMaxSeconds,
+    OPERATIONS_LIMITS.approvalWindowDefaultSeconds,
+  ),
+});
+
 export const TrustProxyEnv = z.object({ TRUST_PROXY: trustProxy });
 
 /** Worker data retention (docs/operations/DATA_RETENTION.md). */

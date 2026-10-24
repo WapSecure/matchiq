@@ -46,8 +46,8 @@ export interface ApprovalOverrides {
 }
 
 /**
- * The cue as it airs: from now (or its slot start) for the requested time,
- * never past the slot the scheduler gave it, so it cannot air late.
+ * The cue as it airs: from the current match clock for its normal duration (or
+ * the producer's), so a producer's wall-clock decision never airs a cue late.
  */
 export const approvedCue = (
   row: ReviewCueRow,
@@ -55,26 +55,29 @@ export const approvedCue = (
   overrides: ApprovalOverrides,
 ): OverlayCue => {
   const { cue } = row;
-  const start = Math.max(cue.clockStartMs, clock.matchClockMs);
-  const duration = overrides.durationMs ?? cue.clockEndMs - cue.clockStartMs;
+  const duration = Math.min(
+    overrides.durationMs ?? cue.clockEndMs - cue.clockStartMs,
+    cue.maxDisplayMs,
+  );
   return {
     ...cue,
     revision: row.revision,
     priority: overrides.priority ?? cue.priority,
-    clockStartMs: start,
-    clockEndMs: Math.min(cue.clockEndMs, start + duration),
+    clockStartMs: clock.matchClockMs,
+    clockEndMs: clock.matchClockMs + duration,
     status: 'APPROVED',
   };
 };
 
-/** False once the session clock has reached the end of the cue's slot. */
-export const slotOpen = (
+/** False once the cue's wall-clock approval window has passed (ADR-0024). */
+export const windowOpen = (
   row: ReviewCueRow,
   clock: SessionClock | null,
+  now: string,
 ): clock is SessionClock =>
   clock !== null &&
-  clock.period === row.period &&
-  clock.matchClockMs < row.cue.clockEndMs;
+  row.approvalDeadline !== null &&
+  row.approvalDeadline.toISOString() > now;
 
 export interface CloseReviewInput {
   readonly key: FixtureKey;

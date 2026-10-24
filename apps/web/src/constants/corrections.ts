@@ -9,4 +9,6 @@ export const CORRECTION_COPY = {
       : 'Ruled out by a correction — removed from air',
   why: (reason: string): string => `Why: ${reason}`,
   voidedGoal: 'Goal ruled out',
+  /** The headline already says the goal was ruled out, so the reason drops the repeat. */
+  reasonLead: /^\s*goal ruled out\s*[:\-–—]\s*/i,
 } as const;

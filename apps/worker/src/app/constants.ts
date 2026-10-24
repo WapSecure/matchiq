@@ -214,4 +214,8 @@ export const EDITORIAL_REASONS = {
   awaitingApproval: 'AWAITING_APPROVAL',
   approved: 'APPROVED_COPY_LOCKED',
   manualRevision: 'MANUAL_REVISION_WITHHELD',
+  approvalWindow: 'APPROVAL_WINDOW_LAPSED',
 } as const;
+
+/** Wall-clock approval window used when none is configured (APPROVAL_WINDOW_SECONDS). */
+export const DEFAULT_APPROVAL_WINDOW_MS = 45_000;

@@ -188,6 +188,7 @@ export const overlayCues = pgTable(
     payload: jsonb('payload').$type<OverlayCue>().notNull(),
     endReason: text('end_reason'),
     ...editorialColumns<OverlayEditorialState>(),
+    approvalDeadline: utc('approval_deadline'),
     publishedSequence: integer('published_sequence').notNull(),
     createdAt: createdAt(),
     updatedAt: utc('updated_at').notNull().defaultNow(),

@@ -28,7 +28,7 @@ import {
   approvedCue,
   rejectInTx,
   reviewDraft,
-  slotOpen,
+  windowOpen,
   type ReviewContext,
 } from './review-writes';
 
@@ -58,7 +58,13 @@ export class ReviewService {
   async queue(orgId: string, fixtureId: string): Promise<OverlayReviewList> {
     const items = await this.reader.reviews({ orgId, fixtureId });
     if (items === null) throw problem('fixtureNotFound', { detail: fixtureId });
-    return { items };
+    const now = this.effects.now();
+    return {
+      items: items.filter(
+        (i) => i.approvalDeadline !== null && i.approvalDeadline > now,
+      ),
+      serverTime: now,
+    };
   }
 
   async review(
@@ -155,12 +161,16 @@ export class ReviewService {
     const mode = editorialModeOf(await tx.controls(key));
     if (mode !== 'AUTO') throw problem('airPaused', { detail: mode });
     const clock = await tx.sessionClock(key);
-    if (!slotOpen(row, clock)) {
+    const now = this.effects.now();
+    if (!windowOpen(row, clock, now)) {
       throw problem('approvalExpired', { detail: row.overlayId });
     }
     const cue = approvedCue(row, clock, command);
-    const now = this.effects.now();
-    await tx.airApproved(key, { cue, reason: ctx.reason ?? null });
+    await tx.airApproved(key, {
+      cue,
+      period: clock.period,
+      reason: ctx.reason ?? null,
+    });
     await tx.appendStreamMessages(key, [
       draft(key.fixtureId, now, { type: 'overlay.publish', payload: cue }),
       reviewDraft(key, now, row, 'APPROVED'),

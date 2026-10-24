@@ -20,7 +20,7 @@ export const REVIEW_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.editorial,
     summary: 'Cues waiting for a producer to approve them',
     description:
-      'MANUAL sessions only. Each item carries the copy it would air and the match clock at which its slot closes.',
+      'MANUAL sessions only. Each item carries the copy it would air and the wall-clock deadline (approvalDeadline) after which it lapses. Lapsed cues are left out. serverTime is the API clock at the read.',
     auth: 'editorial:approve',
     params: FixturePath,
     success: {
@@ -37,7 +37,7 @@ export const REVIEW_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.editorial,
     summary: "Approve or reject an insight's waiting cue",
     description:
-      'Approve airs the cue in the slot the scheduler gave it, with optional duration and priority overrides; reject means it never airs. A cue whose slot has closed answers 409.',
+      'Approve airs the cue from the current match clock for its normal duration, with optional duration and priority overrides; reject means it never airs. A cue whose wall-clock approval window has passed answers 409.',
     auth: 'editorial:approve',
     params: z.strictObject({ insightId: InsightId }),
     body: ReviewInsightCommand,

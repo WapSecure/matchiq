@@ -68,14 +68,18 @@ export const OverlayReview = z.strictObject({
   state: OverlayReviewState,
   cue: OverlayCue,
   period: z.int().positive(),
-  /** Match clock at which its slot closes; it never airs after this. */
+  /** Match clock at which the scheduler's slot would close; approval no longer depends on it. */
   expiresAtClockMs: MatchClockMs,
   waitingSince: UtcTimestamp,
+  /** Wall-clock time after which the cue lapses unapproved; null on rows stored before MQ-081. */
+  approvalDeadline: UtcTimestamp.nullable(),
 });
 
 /** `GET /fixtures/:id/overlay-reviews`: bounded by the single on-air slot. */
 export const OverlayReviewList = z.strictObject({
   items: z.array(OverlayReview).max(LIMITS.reviewQueueMax),
+  /** Server wall clock when the list was read, so a countdown does not depend on the browser clock. */
+  serverTime: UtcTimestamp,
 });
 
 export const SetPublishPolicyCommand = z.strictObject({

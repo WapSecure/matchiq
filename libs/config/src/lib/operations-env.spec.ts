@@ -54,6 +54,15 @@ describe('replay capacity and retention settings', () => {
     }
   });
 
+  it('gives producers 45 seconds to approve unless configured, within bounds', () => {
+    expect(loadEnv(WorkerEnv, base)).toMatchObject({
+      APPROVAL_WINDOW_SECONDS: 45,
+    });
+    expect(() =>
+      loadEnv(WorkerEnv, { ...base, APPROVAL_WINDOW_SECONDS: '1' }),
+    ).toThrow(ConfigError);
+  });
+
   it('defaults retention to 7 days of sessions and 24 hours of idempotency keys', () => {
     expect(loadEnv(WorkerEnv, base)).toMatchObject({
       RETENTION_ENABLED: true,

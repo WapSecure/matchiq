@@ -15,6 +15,8 @@ export interface ReviewCueRow {
   readonly editorialState: OverlayEditorialState | null;
   readonly cue: OverlayCue;
   readonly period: number;
+  /** Wall-clock end of the approval window; null on rows stored before MQ-081. */
+  readonly approvalDeadline: Date | null;
 }
 
 /** Where the session's applied events have reached. */
@@ -23,8 +25,27 @@ export interface SessionClock {
   readonly matchClockMs: number;
 }
 
+export interface SweptCue {
+  readonly overlayId: string;
+  readonly insightId: string | null;
+  readonly revision: number;
+}
+
+export interface ApprovalSweepInput {
+  readonly now: Date;
+  /** The batch's last applied event; null when the batch carries no events. */
+  readonly clock: { period: number; matchClockMs: number } | null;
+}
+
+/** What the clocks have closed: windows that ran out, and approved cues now off screen. */
+export interface ApprovalSweep {
+  readonly lapsed: readonly SweptCue[];
+  readonly due: readonly SweptCue[];
+}
+
 export interface ApprovedCueWrite {
   readonly cue: OverlayCue;
+  readonly period: number | null;
   readonly reason: string | null;
 }
 
