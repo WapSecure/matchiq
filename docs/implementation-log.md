@@ -1191,3 +1191,15 @@ The app profile now orders the worker after the one-shot migration and six-fixtu
 Local validation covers script syntax, formatting and rendered Compose configuration. Fresh-stack verification passed in [CI run 40127584909](https://github.com/WapSecure/matchiq/actions/runs/40127584909) for commit `8ede2a1`: every service became ready, all six fixtures seeded, a replay advanced, persisted events were observed, and cleanup completed.
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
+
+## MQ-084: Tests for the controls the audit found untested (24 October 2026)
+
+Tests only; no application behaviour changed.
+
+- **Request-size limit**: `request-limits.integration.spec.ts` posts a body over 2 MB and expects a 413 RFC 9457 problem that does not echo the payload, and a 1 MB body that is not refused for size.
+- **BFF cross-origin refusal**: `bff/[...path]/route.spec.ts` shows a state-changing request with a foreign Origin, a foreign Referer only, or neither is refused with 403 and never reaches the API, while a same-origin one is forwarded with the bearer token. The control checks Origin only; a Referer alone is not accepted.
+- **Stale graphics after a seek**: `overlay-scheduler.spec.ts` proves a forward clock jump (what the session runner replays on a seek) expires the live cue and drops queued cues, including across a period change.
+- **Ledger immutability**: `libs/db/tests/ledger-immutability.integration.spec.ts` (MQ-063) already covers UPDATE and DELETE for the app and owner roles and the retention purge, so nothing was added.
+- **Connection banner**: `connection-banner.spec.tsx` asserts the plain-language text and `role="status"` for reconnecting, stale and offline, and no banner for connecting and live.
+- **Reduced motion**: `reduced-motion.spec.tsx` checks the OS and in-app CSS rules stop the same animation and transition properties, the preference toggles the page attribute, and component animations are gated by `motion-safe`.
+- **Responsive widths**: `responsive.spec.ts` checks the lobby and studio at 360, 768 and 1920 px for no horizontal overflow and no serious or critical axe violations (desktop projects).

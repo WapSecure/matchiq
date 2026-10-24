@@ -92,6 +92,31 @@ describe('OverlayScheduler', () => {
     ]);
   });
 
+  it('shows nothing older than the new clock after a forward seek', () => {
+    const s = new OverlayScheduler();
+    s.offer(cue('live', 70, 0), at(0));
+    s.offer(cue('queued', 50, 1_000), at(1_000));
+    const seekedTo = 1_000 + OVERLAY_TIMING.maxQueueWaitMs + 60_000;
+    expect(summary(s.advance(at(seekedTo)))).toEqual([
+      'end ov_live EXPIRED',
+      'drop ov_queued',
+    ]);
+    expect(s.current).toBeNull();
+    expect(s.advance(at(seekedTo + 1_000))).toEqual([]);
+    expect(s.current).toBeNull();
+  });
+
+  it('drops every pending cue when a seek lands in a later period', () => {
+    const s = new OverlayScheduler();
+    s.offer(cue('live', 70, 2_000_000), at(2_000_000));
+    s.offer(cue('queued', 50, 2_001_000), at(2_001_000));
+    expect(summary(s.advance(at(10_000, 2)))).toEqual([
+      'end ov_live EXPIRED',
+      'drop ov_queued',
+    ]);
+    expect(s.current).toBeNull();
+  });
+
   it('ignores a repeated insight and bounds the queue', () => {
     const s = new OverlayScheduler();
     s.offer(cue('a', 90, 0), at(0));
