@@ -1,8 +1,7 @@
 import type {
-  AgentRun,
+  InsightRetraction,
   MatchSnapshot,
   Narrative,
-  OverlayCue,
   ReplayStatus,
 } from '@matchiq/contracts';
 import { and, eq, isNull, max, sql } from 'drizzle-orm';
@@ -12,6 +11,7 @@ import type {
   InsightCompletion,
   InsightPublication,
   InsightRecord,
+  OverlayEndWrite,
   OverlayRecord,
   PipelineTransaction,
   PipelineUnitOfWork,
@@ -21,15 +21,16 @@ import type {
 import type { EditorialView } from '../editorial-types.js';
 import type { FixtureKey } from '../ports.js';
 import {
-  agentRuns,
   insights,
   narratives,
   overlayCues,
 } from '../schema/intelligence-tables.js';
 import { matchEvents } from '../schema/tables.js';
+import { insertAgentRuns, insertAgentSteps } from './agent-step-store.js';
 import { readEditorialView } from './editorial-queries.js';
 import { PostgresLedgerTransaction } from './ledger-transaction.js';
 import * as writes from './read-model-writes.js';
+import { retractInsight } from './retraction-writes.js';
 
 const scoped = (
   table: { orgId: PgColumn; fixtureId: PgColumn },
@@ -180,15 +181,10 @@ class PostgresPipelineTransaction
   async endOverlay(
     key: FixtureKey,
     overlayId: string,
-    end: { status: OverlayCue['status']; reason: string },
+    end: OverlayEndWrite,
   ): Promise<void> {
     await this.pin.to(key.orgId);
-    await this.tx
-      .update(overlayCues)
-      .set({ status: end.status, endReason: end.reason, updatedAt: sql`now()` })
-      .where(
-        and(scoped(overlayCues, key), eq(overlayCues.overlayId, overlayId)),
-      );
+    return writes.endOverlay(this.tx, key, overlayId, end);
   }
 
   editorialView(
@@ -199,28 +195,23 @@ class PostgresPipelineTransaction
     return readEditorialView(this.tx, key, { overlayIds, insightIds });
   }
 
-  async insertAgentRuns(
-    key: FixtureKey,
-    insightId: string,
-    runs: readonly AgentRun[],
-  ): Promise<void> {
+  insertAgentRuns: PipelineTransaction['insertAgentRuns'] = async (
+    key,
+    insightId,
+    runs,
+  ) => {
     await this.pin.to(key.orgId);
-    if (runs.length === 0) return;
-    await this.tx.insert(agentRuns).values(
-      runs.map((run) => ({
-        orgId: key.orgId,
-        fixtureId: key.fixtureId,
-        insightId,
-        runId: run.runId,
-        correlationId: run.correlationId,
-        agent: run.agent,
-        provider: run.provider,
-        outcome: run.outcome,
-        latencyMs: run.latencyMs,
-        payload: run,
-      })),
-    );
-  }
+    return insertAgentRuns(this.tx, key, insightId, runs);
+  };
+
+  insertAgentSteps: PipelineTransaction['insertAgentSteps'] = async (
+    key,
+    insightId,
+    steps,
+  ) => {
+    await this.pin.to(key.orgId);
+    return insertAgentSteps(this.tx, key, insightId, steps);
+  };
 
   async saveSnapshot(key: FixtureKey, snapshot: MatchSnapshot): Promise<void> {
     await this.pin.to(key.orgId);
@@ -243,6 +234,14 @@ class PostgresPipelineTransaction
   async saveRecap(key: FixtureKey, recap: RecapDocument): Promise<void> {
     await this.pin.to(key.orgId);
     return writes.saveRecap(this.tx, key, recap);
+  }
+
+  async retractInsight(
+    key: FixtureKey,
+    retraction: InsightRetraction,
+  ): Promise<boolean> {
+    await this.pin.to(key.orgId);
+    return retractInsight(this.tx, key, retraction);
   }
 }
 

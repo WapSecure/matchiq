@@ -24,6 +24,9 @@ import {
 } from './editorial/editorial.controller';
 import { EditorialEffects } from './editorial/editorial-writes';
 import { EditorialService } from './editorial/editorial.service';
+import { PublishPolicyService } from './editorial/publish-policy.service';
+import { ReviewController } from './editorial/review.controller';
+import { ReviewService } from './editorial/review.service';
 import { IdempotencyService } from './http/idempotency.service';
 import { API_LIMITS, SERVICE_NAME, THROTTLERS } from './constants';
 import { FixturesController } from './fixtures/fixtures.controller';
@@ -37,7 +40,10 @@ import { OUTBOX_NOTIFIER } from './infrastructure/tokens';
 import { IngestService } from './ingest/ingest.service';
 import { OpenApiModule } from './openapi/openapi.module';
 import { MeController } from './me/me.controller';
+import { PreferencesController } from './me/preferences.controller';
+import { PreferencesService } from './me/preferences.service';
 import { OutboxRelayService } from './outbox/outbox-relay.service';
+import { AgentTracesController } from './intelligence/agent-traces.controller';
 import { IntelligenceController } from './intelligence/intelligence.controller';
 import { IntelligenceService } from './intelligence/intelligence.service';
 import { LobbyController, ReplayController } from './replay/replay.controller';
@@ -53,10 +59,13 @@ export const API_CONTROLLERS = [
   ReplayController,
   LobbyController,
   IntelligenceController,
+  AgentTracesController,
   EditorialController,
   EditorialControlsController,
+  ReviewController,
   AuditController,
   MeController,
+  PreferencesController,
 ];
 
 @Module({})
@@ -99,6 +108,8 @@ export class AppModule {
         EditorialEffects,
         EditorialService,
         EditorialControlsService,
+        ReviewService,
+        PublishPolicyService,
         IdempotencyService,
         FixturesService,
         IngestService,
@@ -106,6 +117,7 @@ export class AppModule {
         OutboxRelayService,
         ReplayService,
         IntelligenceService,
+        PreferencesService,
         StreamGauges,
         { provide: OUTBOX_NOTIFIER, useExisting: OutboxRelayService },
       ],

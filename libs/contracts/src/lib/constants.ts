@@ -61,6 +61,8 @@ export const LIMITS = {
   breakdownPartMax: 360,
   storyParagraphMax: 700,
   storyParagraphsMax: 6,
+  followedPlayersMax: 3,
+  reviewQueueMax: 20,
 } as const;
 
 export const MESSAGES = {
@@ -78,4 +80,6 @@ export const MESSAGES = {
   overlayTooLong: 'display window exceeds maxDisplayMs',
   auditRange: 'from must not be after to',
   auditTarget: 'targetId requires targetType',
+  duplicateFollowedPlayer: 'each followed player may appear once',
+  reviewOverrides: 'duration and priority apply to an approval only',
 } as const;

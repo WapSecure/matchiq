@@ -28,6 +28,7 @@ export {
 export {
   createMomentCursor,
   detectKeyMoments,
+  redetectMoments,
   stepMoments,
 } from './lib/moments/detect.js';
 export type { MomentCursor } from './lib/moments/types.js';
@@ -45,6 +46,7 @@ export {
   trendFact,
   windowFact,
 } from './lib/context/facts.js';
+export { derivedAt } from './lib/context/derived-at.js';
 export {
   momentContext,
   type MomentContextInput,
@@ -55,3 +57,4 @@ export {
   type CitedValueIssue,
   type CitedValueIssueReason,
 } from './lib/evidence/verify.js';
+export * from './player.js';

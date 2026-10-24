@@ -30,6 +30,10 @@ The freshness window means an `IDLE` session that never starts, or a `PLAYING` s
 
 The worker runs a retention pass every `RETENTION_INTERVAL_MS` (and once at boot) under a Postgres session advisory lock, so only one replica deletes at a time. Sessions untouched for `SESSION_RETENTION_DAYS` (default 7) are deleted in batches of 10 per transaction, with every dependent row. Idempotency keys older than `IDEMPOTENCY_RETENTION_HOURS` (default 24) are pruned in batches of 1,000. Each batch writes an audit row with exact counts. Templates and audit events are never deleted. Migration `0002_session_retention` adds `ON DELETE CASCADE` to every fixture foreign key as a safety net behind the explicit ordered deletes, plus indexes for the activity count, the retention scan, key pruning and pending insights. See `docs/operations/DATA_RETENTION.md`.
 
+### Ledger immutability (amended by MQ-063)
+
+`match_events` is append-only at the database level (migration `0008_ledger_immutability`). A trigger refuses every `UPDATE`, and every `DELETE` unless the transaction-local flag set by `purge_match_ledger(org_ids, fixture_ids)` is on. `UPDATE` and `DELETE` are revoked from `matchiq_app`, and the function has no `PUBLIC` execute grant, so only the owner role used by retention can remove a ledger, and only whole fixtures at a time. Corrections are always new `CORRECTION` events. A fixture delete that would cascade into a non-empty ledger fails, which is why retention purges the ledger first.
+
 ### Boot recovery of PENDING insights
 
 On boot the worker re-examines insights left `PENDING`. Within the agents deadline (`(AGENT_MAX_RETRIES + 1) × (AGENT_TIMEOUT_MS + grace)` plus backoff) the pipeline job is enqueued again. BullMQ deduplicates by job id, so a live job is not duplicated. Past the deadline, or with AI disabled, the deterministic templates are published and the recap is rebuilt. Publication is claimed in the write transaction, so racing a live job never publishes twice.

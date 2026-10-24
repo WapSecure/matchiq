@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 import { TechnicalDetails } from '@/components/ui';
+import { AGENT_STEP_COPY } from '@/constants/agent-steps';
 import { FACT_CHECKS_COPY } from '@/constants/fact-checks';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
+import { AgentStepTable } from './agent-step-table';
 import { FaultNotes } from './fault-chain';
 import { GateReportView } from './gate-report';
 import { RunTable } from './run-table';
@@ -65,6 +67,15 @@ export function TraceTechnical({
       </Section>
       <Section title={tech.runs} hint={FACT_CHECKS_COPY.technical.runsHint}>
         <RunTable runs={trace.runs} caption={caption} />
+      </Section>
+      <Section
+        title={AGENT_STEP_COPY.technical.title}
+        hint={AGENT_STEP_COPY.technical.hint}
+      >
+        <AgentStepTable
+          trace={trace}
+          caption={AGENT_STEP_COPY.technical.caption(caption)}
+        />
       </Section>
     </TechnicalDetails>
   );

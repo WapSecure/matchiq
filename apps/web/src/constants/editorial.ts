@@ -43,6 +43,7 @@ export const CAUSE_LABELS: Record<OverlayRetractCause, string> = {
   PRODUCER: 'Taken off air by a producer',
   INSIGHT_SUPPRESSED: 'Key moment dropped',
   KILL_SWITCH: 'Emergency stop',
+  CORRECTION: 'Ruled out by a correction',
 };
 
 type CommandCopy = {

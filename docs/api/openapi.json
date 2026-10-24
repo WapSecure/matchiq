@@ -2686,6 +2686,460 @@
         }
       }
     },
+    "/me/preferences": {
+      "get": {
+        "operationId": "getMyPreferences",
+        "summary": "The caller's saved viewing preferences",
+        "description": "Persona, language, favourite team, followed players (at most three) and reduced motion. A caller who has never saved gets the defaults with `updatedAt: null`. Presentation only: no statistic depends on it.\n\nAccess: requires the `preferences:write` permission.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          }
+        ],
+        "x-matchiq-permission": "preferences:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preference profile",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferenceProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putMyPreferences",
+        "summary": "Replace the caller's viewing preferences",
+        "description": "Replaces the whole profile. Idempotent: repeating the same body changes nothing, `updatedAt` included. Scoped to the caller and their organisation.\n\nAccess: requires the `preferences:write` permission.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          }
+        ],
+        "x-matchiq-permission": "preferences:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewerPreferences"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved profile",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferenceProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`bad-request`: Malformed request body",
+            "x-problem-types": [
+              "urn:matchiq:problem:bad-request"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "bad-request": {
+                    "summary": "Malformed request body",
+                    "value": {
+                      "type": "urn:matchiq:problem:bad-request",
+                      "title": "Malformed request body",
+                      "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/fixture-templates": {
       "get": {
         "operationId": "listFixtureTemplates",
@@ -6032,6 +6486,268 @@
         }
       }
     },
+    "/agents/traces/{correlationId}": {
+      "get": {
+        "operationId": "getAgentTrace",
+        "summary": "Every agent handoff of one pipeline run",
+        "description": "One record per roster stage, in order: decision and reason, input checksum, cited evidence, prompt version, model, tokens, latency and cost estimate. Holds no prompts or model output text. The correlation id is `runs[].correlationId` from the agent-runs list; another organisation's run answers 404.\n\nAccess: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.",
+        "tags": [
+          "Intelligence"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          },
+          {}
+        ],
+        "x-matchiq-permission": "agents:traces:read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "correlationId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The handoff records of the run",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentStepTrace"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`trace-not-found`: Agent trace not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:trace-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "trace-not-found": {
+                    "summary": "Agent trace not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:trace-not-found",
+                      "title": "Agent trace not found",
+                      "status": 404
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/overlays/{overlayId}/retract": {
       "post": {
         "operationId": "retractOverlay",
@@ -8744,6 +9460,1168 @@
         }
       }
     },
+    "/fixtures/{fixtureId}/overlay-reviews": {
+      "get": {
+        "operationId": "listOverlayReviews",
+        "summary": "Cues waiting for a producer to approve them",
+        "description": "MANUAL sessions only. Each item carries the copy it would air and the match clock at which its slot closes.\n\nAccess: requires the `editorial:approve` permission.",
+        "tags": [
+          "Editorial"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          }
+        ],
+        "x-matchiq-permission": "editorial:approve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fixtureId",
+            "schema": {
+              "type": "string",
+              "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The approval queue, oldest first",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "maxItems": 20,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "overlayId": {
+                            "type": "string",
+                            "pattern": "^ov_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "insightId": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "fixtureId": {
+                            "type": "string",
+                            "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "revision": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "AWAITING_APPROVAL",
+                              "APPROVED",
+                              "REJECTED",
+                              "APPROVAL_EXPIRED"
+                            ]
+                          },
+                          "cue": {
+                            "$ref": "#/components/schemas/OverlayCue"
+                          },
+                          "period": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "expiresAtClockMs": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "waitingSince": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          }
+                        },
+                        "required": [
+                          "overlayId",
+                          "insightId",
+                          "fixtureId",
+                          "revision",
+                          "state",
+                          "cue",
+                          "period",
+                          "expiresAtClockMs",
+                          "waitingSince"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`fixture-not-found`: Fixture not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:fixture-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "fixture-not-found": {
+                    "summary": "Fixture not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:fixture-not-found",
+                      "title": "Fixture not found",
+                      "status": 404
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/insights/{insightId}/review": {
+      "post": {
+        "operationId": "reviewInsight",
+        "summary": "Approve or reject an insight's waiting cue",
+        "description": "Approve airs the cue in the slot the scheduler gave it, with optional duration and priority overrides; reject means it never airs. A cue whose slot has closed answers 409.\n\nAccess: requires the `editorial:approve` permission.",
+        "tags": [
+          "Editorial"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          }
+        ],
+        "x-matchiq-permission": "editorial:approve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "insightId",
+            "schema": {
+              "type": "string",
+              "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "APPROVE",
+                      "REJECT"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 280
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "durationMs": {
+                    "type": "integer",
+                    "minimum": 2000,
+                    "maximum": 15000
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reviewed, or already in that state (`changed: false`)",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Idempotent-Replayed": {
+                "$ref": "#/components/headers/IdempotentReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "insightId": {
+                      "type": "string",
+                      "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "overlayId": {
+                      "type": "string",
+                      "pattern": "^ov_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "fixtureId": {
+                      "type": "string",
+                      "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "AWAITING_APPROVAL",
+                        "APPROVED",
+                        "REJECTED",
+                        "APPROVAL_EXPIRED"
+                      ]
+                    },
+                    "changed": {
+                      "type": "boolean"
+                    },
+                    "auditId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cue": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/OverlayCue"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "insightId",
+                    "overlayId",
+                    "fixtureId",
+                    "revision",
+                    "state",
+                    "changed",
+                    "auditId",
+                    "cue"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`bad-request`: Malformed request body; `invalid-header`: Invalid request header",
+            "x-problem-types": [
+              "urn:matchiq:problem:bad-request",
+              "urn:matchiq:problem:invalid-header"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "bad-request": {
+                    "summary": "Malformed request body",
+                    "value": {
+                      "type": "urn:matchiq:problem:bad-request",
+                      "title": "Malformed request body",
+                      "status": 400
+                    }
+                  },
+                  "invalid-header": {
+                    "summary": "Invalid request header",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-header",
+                      "title": "Invalid request header",
+                      "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`insight-not-found`: Insight not found; `overlay-not-found`: Overlay cue not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:insight-not-found",
+              "urn:matchiq:problem:overlay-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "insight-not-found": {
+                    "summary": "Insight not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:insight-not-found",
+                      "title": "Insight not found",
+                      "status": 404
+                    }
+                  },
+                  "overlay-not-found": {
+                    "summary": "Overlay cue not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:overlay-not-found",
+                      "title": "Overlay cue not found",
+                      "status": 404
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its slot and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on",
+            "x-problem-types": [
+              "urn:matchiq:problem:overlay-not-awaiting-approval",
+              "urn:matchiq:problem:overlay-approval-expired",
+              "urn:matchiq:problem:overlay-revision-stale",
+              "urn:matchiq:problem:editorial-air-paused"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "overlay-not-awaiting-approval": {
+                    "summary": "The cue is not waiting for approval",
+                    "value": {
+                      "type": "urn:matchiq:problem:overlay-not-awaiting-approval",
+                      "title": "The cue is not waiting for approval",
+                      "status": 409
+                    }
+                  },
+                  "overlay-approval-expired": {
+                    "summary": "The cue waited past its slot and can no longer air",
+                    "value": {
+                      "type": "urn:matchiq:problem:overlay-approval-expired",
+                      "title": "The cue waited past its slot and can no longer air",
+                      "status": 409
+                    }
+                  },
+                  "overlay-revision-stale": {
+                    "summary": "The cue has newer copy than the one reviewed",
+                    "value": {
+                      "type": "urn:matchiq:problem:overlay-revision-stale",
+                      "title": "The cue has newer copy than the one reviewed",
+                      "status": 409
+                    }
+                  },
+                  "editorial-air-paused": {
+                    "summary": "Graphics are frozen or the kill switch is on",
+                    "value": {
+                      "type": "urn:matchiq:problem:editorial-air-paused",
+                      "title": "Graphics are frozen or the kill switch is on",
+                      "status": 409
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed; `idempotency-key-reused`: Idempotency-Key was reused with a different request",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed",
+              "urn:matchiq:problem:idempotency-key-reused"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  },
+                  "idempotency-key-reused": {
+                    "summary": "Idempotency-Key was reused with a different request",
+                    "value": {
+                      "type": "urn:matchiq:problem:idempotency-key-reused",
+                      "title": "Idempotency-Key was reused with a different request",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fixtures/{fixtureId}/editorial/publish-policy": {
+      "post": {
+        "operationId": "setPublishPolicy",
+        "summary": "Publish cues automatically or after a producer approves each one",
+        "description": "Access: requires the `policy:configure` permission.",
+        "tags": [
+          "Editorial"
+        ],
+        "security": [
+          {
+            "oidc": []
+          },
+          {
+            "operatorKey": []
+          }
+        ],
+        "x-matchiq-permission": "policy:configure",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fixtureId",
+            "schema": {
+              "type": "string",
+              "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/RequestId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "type": "string",
+                    "enum": [
+                      "AUTO",
+                      "MANUAL"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 280
+                  }
+                },
+                "required": [
+                  "policy",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Changed, or already set (`changed: false`)",
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Idempotent-Replayed": {
+                "$ref": "#/components/headers/IdempotentReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorialStatusResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`bad-request`: Malformed request body; `invalid-header`: Invalid request header",
+            "x-problem-types": [
+              "urn:matchiq:problem:bad-request",
+              "urn:matchiq:problem:invalid-header"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "bad-request": {
+                    "summary": "Malformed request body",
+                    "value": {
+                      "type": "urn:matchiq:problem:bad-request",
+                      "title": "Malformed request body",
+                      "status": 400
+                    }
+                  },
+                  "invalid-header": {
+                    "summary": "Invalid request header",
+                    "value": {
+                      "type": "urn:matchiq:problem:invalid-header",
+                      "title": "Invalid request header",
+                      "status": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: Authentication required",
+            "x-problem-types": [
+              "urn:matchiq:problem:unauthorized"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Authentication required",
+                    "value": {
+                      "type": "urn:matchiq:problem:unauthorized",
+                      "title": "Authentication required",
+                      "status": 401
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`forbidden`: You do not have permission for this action",
+            "x-problem-types": [
+              "urn:matchiq:problem:forbidden"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "You do not have permission for this action",
+                    "value": {
+                      "type": "urn:matchiq:problem:forbidden",
+                      "title": "You do not have permission for this action",
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`fixture-not-found`: Fixture not found",
+            "x-problem-types": [
+              "urn:matchiq:problem:fixture-not-found"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "fixture-not-found": {
+                    "summary": "Fixture not found",
+                    "value": {
+                      "type": "urn:matchiq:problem:fixture-not-found",
+                      "title": "Fixture not found",
+                      "status": 404
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation-failed`: Request validation failed; `idempotency-key-reused`: Idempotency-Key was reused with a different request",
+            "x-problem-types": [
+              "urn:matchiq:problem:validation-failed",
+              "urn:matchiq:problem:idempotency-key-reused"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "validation-failed": {
+                    "summary": "Request validation failed",
+                    "value": {
+                      "type": "urn:matchiq:problem:validation-failed",
+                      "title": "Request validation failed",
+                      "status": 422
+                    }
+                  },
+                  "idempotency-key-reused": {
+                    "summary": "Idempotency-Key was reused with a different request",
+                    "value": {
+                      "type": "urn:matchiq:problem:idempotency-key-reused",
+                      "title": "Idempotency-Key was reused with a different request",
+                      "status": 422
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate-limited`: Too many requests",
+            "x-problem-types": [
+              "urn:matchiq:problem:rate-limited"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "rate-limited": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "type": "urn:matchiq:problem:rate-limited",
+                      "title": "Too many requests",
+                      "status": 429
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`internal-error`: Internal server error",
+            "x-problem-types": [
+              "urn:matchiq:problem:internal-error"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "internal-error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "type": "urn:matchiq:problem:internal-error",
+                      "title": "Internal server error",
+                      "status": 500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`auth-unavailable`: The identity provider is unreachable",
+            "x-problem-types": [
+              "urn:matchiq:problem:auth-unavailable"
+            ],
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d{0,15})$",
+                  "description": "Seconds to wait before retrying."
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "auth-unavailable": {
+                    "summary": "The identity provider is unreachable",
+                    "value": {
+                      "type": "urn:matchiq:problem:auth-unavailable",
+                      "title": "The identity provider is unreachable",
+                      "status": 503
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health/live": {
       "get": {
         "operationId": "getLiveness",
@@ -9885,6 +11763,26 @@
           "evidenceEventIds"
         ],
         "additionalProperties": false
+      },
+      "AgentStepRole": {
+        "type": "string",
+        "enum": [
+          "MATCH_ANALYST",
+          "NARRATIVE_WRITER",
+          "FACT_CHECKER",
+          "BROADCAST_PRODUCER",
+          "LOCALIZATION",
+          "TEMPLATE_FALLBACK"
+        ]
+      },
+      "AgentStepDecision": {
+        "type": "string",
+        "enum": [
+          "PASS",
+          "REVISE",
+          "REJECT",
+          "FALLBACK"
+        ]
       },
       "Fixture": {
         "type": "object",
@@ -12274,6 +14172,168 @@
         ],
         "additionalProperties": false
       },
+      "AgentStep": {
+        "type": "object",
+        "properties": {
+          "stepIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32
+          },
+          "role": {
+            "$ref": "#/components/schemas/AgentStepRole"
+          },
+          "runId": {
+            "type": "string",
+            "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "agentVersion": {
+            "type": "object",
+            "properties": {
+              "promptVersion": {
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
+              },
+              "promptHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "promptVersion"
+            ],
+            "additionalProperties": false
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "foundry",
+              "ollama",
+              "mock",
+              "template"
+            ]
+          },
+          "modelDeployment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "fromStatus": {
+            "type": "string",
+            "enum": [
+              "DETECTED",
+              "ANALYZED",
+              "DRAFTED",
+              "VERIFIED",
+              "SCHEDULED",
+              "PUBLISHED",
+              "REJECTED",
+              "EXPIRED",
+              "FALLBACK"
+            ]
+          },
+          "toStatus": {
+            "type": "string",
+            "enum": [
+              "DETECTED",
+              "ANALYZED",
+              "DRAFTED",
+              "VERIFIED",
+              "SCHEDULED",
+              "PUBLISHED",
+              "REJECTED",
+              "EXPIRED",
+              "FALLBACK"
+            ]
+          },
+          "decision": {
+            "$ref": "#/components/schemas/AgentStepDecision"
+          },
+          "reasonCode": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "inputChecksum": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "evidenceEventIds": {
+            "maxItems": 64,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "metricRefs": {
+            "maxItems": 64,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9]*(\\.[a-zA-Z0-9]+)+$"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "latencyMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "tokensIn": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "tokensOut": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "costEstimateUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "retries": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          }
+        },
+        "required": [
+          "stepIndex",
+          "role",
+          "runId",
+          "correlationId",
+          "agentVersion",
+          "provider",
+          "fromStatus",
+          "toStatus",
+          "decision",
+          "reasonCode",
+          "reason",
+          "inputChecksum",
+          "evidenceEventIds",
+          "metricRefs",
+          "startedAt",
+          "latencyMs",
+          "retries"
+        ],
+        "additionalProperties": false
+      },
       "ReplayCommand": {
         "oneOf": [
           {
@@ -12790,6 +14850,19 @@
               ],
               "additionalProperties": false
             }
+          },
+          "retracted": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -12995,7 +15068,8 @@
                   {
                     "type": "string",
                     "enum": [
-                      "SUPPRESSED"
+                      "SUPPRESSED",
+                      "RETRACTED"
                     ]
                   },
                   {
@@ -13016,7 +15090,11 @@
                     "enum": [
                       "RETRACTED",
                       "HELD",
-                      "SUPPRESSED"
+                      "SUPPRESSED",
+                      "AWAITING_APPROVAL",
+                      "APPROVED",
+                      "REJECTED",
+                      "APPROVAL_EXPIRED"
                     ]
                   },
                   {
@@ -13128,6 +15206,35 @@
             },
             "required": [
               "active",
+              "changedAt"
+            ],
+            "additionalProperties": false
+          },
+          "publishPolicy": {
+            "type": "object",
+            "properties": {
+              "policy": {
+                "type": "string",
+                "enum": [
+                  "AUTO",
+                  "MANUAL"
+                ]
+              },
+              "changedAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "policy",
               "changedAt"
             ],
             "additionalProperties": false
@@ -13306,6 +15413,58 @@
         ],
         "additionalProperties": false
       },
+      "ViewerPreferences": {
+        "type": "object",
+        "properties": {
+          "persona": {
+            "type": "string",
+            "enum": [
+              "CASUAL",
+              "ANALYST",
+              "BROADCAST"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en-GB",
+              "fr-FR",
+              "es-ES",
+              "pcm-NG"
+            ]
+          },
+          "favouriteTeamId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "followedPlayerIds": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "reducedMotion": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "persona",
+          "locale",
+          "favouriteTeamId",
+          "followedPlayerIds",
+          "reducedMotion"
+        ],
+        "additionalProperties": false
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -13453,6 +15612,43 @@
           "rejected",
           "ingestionId",
           "lastAcceptedSequence"
+        ],
+        "additionalProperties": false
+      },
+      "AgentStepTrace": {
+        "type": "object",
+        "properties": {
+          "correlationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "runId": {
+            "type": "string",
+            "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "fixtureId": {
+            "type": "string",
+            "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "insightId": {
+            "type": "string",
+            "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "steps": {
+            "maxItems": 32,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentStep"
+            }
+          }
+        },
+        "required": [
+          "correlationId",
+          "runId",
+          "fixtureId",
+          "insightId",
+          "steps"
         ],
         "additionalProperties": false
       },
@@ -14189,6 +16385,71 @@
         ],
         "additionalProperties": false
       },
+      "PreferenceProfile": {
+        "type": "object",
+        "properties": {
+          "persona": {
+            "type": "string",
+            "enum": [
+              "CASUAL",
+              "ANALYST",
+              "BROADCAST"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en-GB",
+              "fr-FR",
+              "es-ES",
+              "pcm-NG"
+            ]
+          },
+          "favouriteTeamId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^tm_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "followedPlayerIds": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^pl_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+            }
+          },
+          "reducedMotion": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "persona",
+          "locale",
+          "favouriteTeamId",
+          "followedPlayerIds",
+          "reducedMotion",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
       "StreamMessage": {
         "oneOf": [
           {
@@ -14351,6 +16612,79 @@
               },
               "type": {
                 "type": "string",
+                "const": "insight.retract"
+              },
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "insightId": {
+                    "type": "string",
+                    "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "cause": {
+                    "type": "string",
+                    "enum": [
+                      "CORRECTION",
+                      "LATE_EVENT"
+                    ]
+                  },
+                  "causeEventId": {
+                    "type": "string",
+                    "pattern": "^ev_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "required": [
+                  "insightId",
+                  "cause",
+                  "causeEventId",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "streamSequence",
+              "fixtureId",
+              "emittedAt",
+              "type",
+              "payload"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "number",
+                "const": 1
+              },
+              "streamSequence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "fixtureId": {
+                "type": "string",
+                "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              },
+              "emittedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "traceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "type": {
+                "type": "string",
                 "const": "narrative.ready"
               },
               "payload": {
@@ -14467,7 +16801,8 @@
                       "MATCH_ENDED",
                       "PRODUCER",
                       "INSIGHT_SUPPRESSED",
-                      "KILL_SWITCH"
+                      "KILL_SWITCH",
+                      "CORRECTION"
                     ]
                   }
                 },
@@ -14475,6 +16810,80 @@
                   "overlayId",
                   "revision",
                   "reason"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "streamSequence",
+              "fixtureId",
+              "emittedAt",
+              "type",
+              "payload"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "number",
+                "const": 1
+              },
+              "streamSequence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "fixtureId": {
+                "type": "string",
+                "pattern": "^fx_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+              },
+              "emittedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "traceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "type": {
+                "type": "string",
+                "const": "overlay.review"
+              },
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "overlayId": {
+                    "type": "string",
+                    "pattern": "^ov_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "insightId": {
+                    "type": "string",
+                    "pattern": "^in_[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "AWAITING_APPROVAL",
+                      "APPROVED",
+                      "REJECTED",
+                      "APPROVAL_EXPIRED"
+                    ]
+                  }
+                },
+                "required": [
+                  "overlayId",
+                  "revision",
+                  "state"
                 ],
                 "additionalProperties": false
               }

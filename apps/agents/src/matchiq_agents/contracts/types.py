@@ -23,9 +23,9 @@ from matchiq_agents.contracts.generated.PipelineResult import (
     Agent as AgentName,
 )
 from matchiq_agents.contracts.generated.PipelineResult import (
-    Analysis as AgentResult,
-)
-from matchiq_agents.contracts.generated.PipelineResult import (
+    AgentStep,
+    AgentStepDecision,
+    AgentStepRole,
     AnalystBreakdown,
     BreakdownPart,
     CitedValue,
@@ -41,6 +41,9 @@ from matchiq_agents.contracts.generated.PipelineResult import (
     Persona,
     PipelineResult,
     Verdict,
+)
+from matchiq_agents.contracts.generated.PipelineResult import (
+    Analysis as AgentResult,
 )
 from matchiq_agents.contracts.generated.PipelineResult import Code as IssueCode
 from matchiq_agents.contracts.generated.PipelineResult import Kind as OverlayKind
@@ -59,6 +62,9 @@ __all__ = [
     "AgentRun",
     "AnalystBreakdown",
     "BreakdownPart",
+    "AgentStep",
+    "AgentStepDecision",
+    "AgentStepRole",
     "CitedValue",
     "Claim",
     "ClaimType",

@@ -79,6 +79,8 @@ export const NAMED_SCHEMAS = {
   Narrative: contracts.Narrative,
   OverlayCue: contracts.OverlayCue,
   AgentRun: contracts.AgentRun,
+  AgentStep: contracts.AgentStep,
+  AgentStepTrace: contracts.AgentStepTrace,
   ReplayCommand: contracts.ReplayCommand,
   ReplayStatus: contracts.ReplayStatus,
   FixtureTemplateSummary: contracts.FixtureTemplateSummary,
@@ -106,4 +108,6 @@ export const NAMED_SCHEMAS = {
   HealthStatus: contracts.HealthStatus,
   StreamTicket: contracts.StreamTicket,
   AccessProfile: contracts.AccessProfile,
+  ViewerPreferences: contracts.ViewerPreferences,
+  PreferenceProfile: contracts.PreferenceProfile,
 } as const;

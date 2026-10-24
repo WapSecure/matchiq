@@ -21,6 +21,7 @@ import {
   RunId,
   SchemaVersion,
 } from './primitives.js';
+import { AgentStep, TRACE_LIMITS } from './trace.js';
 
 /** Worker → agents: one insight, every audience variant requested. */
 export const PipelineRequest = z
@@ -76,6 +77,8 @@ export const PipelineResult = z
     narratives: z.array(NarrativeDraft),
     overlay: OverlayProposal.nullable(),
     runs: z.array(AgentRun),
+    /** One record per roster handoff; older services omit it. */
+    steps: z.array(AgentStep).max(TRACE_LIMITS.maxAgentSteps).default([]),
     /** Present whenever any stage fell back to templates or was suppressed. */
     fallbackReason: z.string().min(1).max(200).optional(),
   })

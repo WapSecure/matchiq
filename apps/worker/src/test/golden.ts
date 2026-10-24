@@ -21,6 +21,7 @@ import { emptyBatch } from '../app/pipeline/pipeline-batch';
 
 export const GOLDEN_SCENARIOS = [
   'comeback',
+  'disallowed-goal',
   'high-press',
   'low-event',
   'possession-dominance',

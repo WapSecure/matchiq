@@ -1,4 +1,9 @@
-import { AccessProfile, StreamTicket } from '@matchiq/contracts';
+import {
+  AccessProfile,
+  PreferenceProfile,
+  StreamTicket,
+  ViewerPreferences,
+} from '@matchiq/contracts';
 import { TAGS } from '../openapi.constants';
 import { type ApiRoute, json } from '../route-types';
 import { FixturePath } from './fixture.routes';
@@ -54,5 +59,38 @@ export const IDENTITY_ROUTES: readonly ApiRoute[] = [
     auth: 'authenticated',
     success: { status: 204, description: 'Recorded', body: NO_CONTENT },
     problems: [],
+  },
+  {
+    operationId: 'getMyPreferences',
+    method: 'get',
+    path: '/me/preferences',
+    tag: TAGS.identity,
+    summary: "The caller's saved viewing preferences",
+    description:
+      'Persona, language, favourite team, followed players (at most three) and reduced motion. A caller who has never saved gets the defaults with `updatedAt: null`. Presentation only: no statistic depends on it.',
+    auth: 'preferences:write',
+    success: {
+      status: 200,
+      description: 'Preference profile',
+      body: json(PreferenceProfile),
+    },
+    problems: [],
+  },
+  {
+    operationId: 'putMyPreferences',
+    method: 'put',
+    path: '/me/preferences',
+    tag: TAGS.identity,
+    summary: "Replace the caller's viewing preferences",
+    description:
+      'Replaces the whole profile. Idempotent: repeating the same body changes nothing, `updatedAt` included. Scoped to the caller and their organisation.',
+    auth: 'preferences:write',
+    body: ViewerPreferences,
+    success: {
+      status: 200,
+      description: 'Saved profile',
+      body: json(PreferenceProfile),
+    },
+    problems: ['badRequest', 'validation'],
   },
 ];

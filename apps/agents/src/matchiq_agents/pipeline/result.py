@@ -6,6 +6,7 @@ from typing import Final
 from matchiq_agents.contracts.types import (
     AgentRun,
     AnalystBreakdown,
+    AgentStep,
     IssueCode,
     Locale,
     NarrativeDraft,
@@ -45,7 +46,9 @@ def with_breakdowns(view: FactView, drafts: Sequence[NarrativeDraft]) -> list[Na
     return out
 
 
-def build_result(view: FactView, state: PipelineState) -> PipelineResult:
+def build_result(
+    view: FactView, state: PipelineState, steps: Sequence[AgentStep] = ()
+) -> PipelineResult:
     narratives = [draft for draft in state.localised if draft.persona in view.personas]
     if state.status is not PipelineStatus.REJECTED:
         narratives = with_breakdowns(view, narratives)
@@ -59,6 +62,7 @@ def build_result(view: FactView, state: PipelineState) -> PipelineResult:
         "narratives": narratives if state.status is not PipelineStatus.REJECTED else [],
         "overlay": state.overlay if state.status is not PipelineStatus.REJECTED else None,
         "runs": list(state.runs),
+        "steps": list(steps),
     }
     reason = join_reasons(state.fallback_reasons)
     if reason is not None:

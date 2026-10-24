@@ -50,6 +50,17 @@ The overlay scheduler holds one broadcast slot on the match clock (spec §26, §
 
 An agent overlay proposal that passes the gate updates the copy of the cue as revision 2 if that cue is still live, and keeps the deterministic timing. Selection and timing therefore stay deterministic (ADR-0008), and a slow model never yields a stale graphic. At 30× a 7 s cue lasts about 230 ms of wall time, so clients may hold a cue for a minimum real-time display.
 
+### Corrections downstream (amended by MQ-063)
+
+A `CORRECTION` (VOID) or a late event refolds the projection (ADR-0002), and the moment detector follows. `MomentTracker` re-runs the engine's `redetectMoments` over the corrected ledger whenever the event is a CORRECTION, arrives out of order or was already voided, and diffs by `insightId`. A moment that no longer holds goes through the editorial retraction path of ADR-0016 with cause `CORRECTION`, in the same batch transaction:
+
+- `insight.retract` (`insightId`, `cause`, `causeEventId`, `reason`) on the stream;
+- the live cue ends with `overlay.retract` (`cause: CORRECTION`), and a queued cue is dropped, so it never airs. The scheduler learns this from the stream itself, so its decisions stay a pure function of the events;
+- the insight becomes `REJECTED` with editorial state `RETRACTED`, its narratives get `retracted_at` and are no longer served, and its cue row is marked `RETRACTED`, so no later agent revision or publication goes out;
+- one audit row `insight.retracted` (actor `system:worker`, type `SYSTEM`).
+
+New moments from a re-scan flow through the normal pipeline, but a cue airs only while the moment is current. A retracted id is never re-admitted. The same event sequence gives the same retractions, so replays and restarts stay deterministic. The recap keeps a retracted moment, marked, without narratives.
+
 ## Alternatives considered
 
 - **Replay the template fixture in place.** Rejected: an append-only ledger cannot be replayed twice, and viewers starting at different times would interfere.

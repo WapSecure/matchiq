@@ -5,6 +5,7 @@ import { IDENTITY_ROUTES } from './identity.routes';
 import { INTELLIGENCE_ROUTES } from './intelligence.routes';
 import { PLATFORM_ROUTES } from './platform.routes';
 import { REPLAY_ROUTES } from './replay.routes';
+import { REVIEW_ROUTES } from './review.routes';
 
 /** Every HTTP route the API serves. A new controller route must be added here. */
 export const API_ROUTES: readonly ApiRoute[] = [
@@ -13,5 +14,6 @@ export const API_ROUTES: readonly ApiRoute[] = [
   ...REPLAY_ROUTES,
   ...INTELLIGENCE_ROUTES,
   ...EDITORIAL_ROUTES,
+  ...REVIEW_ROUTES,
   ...PLATFORM_ROUTES,
 ];

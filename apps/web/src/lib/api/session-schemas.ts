@@ -65,6 +65,7 @@ export const RecapMoment = z.object({
   evidenceEventIds: z.array(z.string()),
   metricRefs: z.array(z.string()),
   narratives: z.array(RecapNarrativeSchema),
+  retracted: z.object({ reason: z.string() }).optional(),
 });
 
 export const RecapDocument = z.object({

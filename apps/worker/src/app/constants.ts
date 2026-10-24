@@ -91,6 +91,12 @@ export const OVERLAY_END_REASONS = {
   matchEnded: 'match ended',
   stale: 'stale: not shown before the queue wait limit',
   queueFull: 'dropped: overlay queue full',
+  corrected: 'retracted: the moment was ruled out by a correction',
+} as const;
+
+/** Why a moment was ruled out when the trigger was not a CORRECTION. */
+export const RETRACTION_REASONS = {
+  lateEvent: 'a late event changed the match record',
 } as const;
 
 export const GATE_DETAILS = {
@@ -205,4 +211,7 @@ export const EDITORIAL_REASONS = {
   KILLED: 'KILL_SWITCH',
   suppressed: 'INSIGHT_SUPPRESSED',
   offAir: 'CUE_OFF_AIR',
+  awaitingApproval: 'AWAITING_APPROVAL',
+  approved: 'APPROVED_COPY_LOCKED',
+  manualRevision: 'MANUAL_REVISION_WITHHELD',
 } as const;

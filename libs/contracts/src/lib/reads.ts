@@ -60,6 +60,8 @@ export const RecapMoment = z.strictObject({
   evidenceEventIds: z.array(z.string()),
   metricRefs: z.array(z.string()),
   narratives: z.array(RecapNarrative),
+  /** Set when a correction ruled the moment out; its narratives are withdrawn. */
+  retracted: z.strictObject({ reason: z.string().min(1) }).optional(),
 });
 
 /** Built once at full time from published outputs; numbers come from `finalSnapshot`. */
@@ -103,13 +105,22 @@ export const GateReport = z.strictObject({
 
 export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 
-/** RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its insight was suppressed. */
+/**
+ * RETRACTED: pulled after airing. HELD: frozen or killed. SUPPRESSED: its
+ * insight was suppressed. The rest are the MANUAL review states (ADR-0023);
+ * only APPROVED and RETRACTED cues ever aired.
+ */
 export const OverlayEditorialState = z.enum([
   'RETRACTED',
   'HELD',
   'SUPPRESSED',
+  'AWAITING_APPROVAL',
+  'APPROVED',
+  'REJECTED',
+  'APPROVAL_EXPIRED',
 ]);
-export const InsightEditorialState = z.enum(['SUPPRESSED']);
+/** SUPPRESSED: a producer dropped it. RETRACTED: a correction ruled it out. */
+export const InsightEditorialState = z.enum(['SUPPRESSED', 'RETRACTED']);
 
 export const InsightEditorialTrace = z.strictObject({
   insight: InsightEditorialState.nullable(),

@@ -12,6 +12,7 @@ import {
   gateAudits,
 } from '../pipeline/editorial-policy';
 import type { PipelineBatch } from '../pipeline/pipeline-batch';
+import { writeRetractions } from '../pipeline/retractions';
 
 export type WriteOutcome = 'written' | 'already-applied' | 'already-published';
 
@@ -67,6 +68,9 @@ const writeArtifacts = async (
   for (const { insightId, runs } of batch.agentRuns) {
     await tx.insertAgentRuns(key, insightId, runs);
   }
+  for (const { insightId, steps } of batch.agentSteps) {
+    await tx.insertAgentSteps(key, insightId, steps);
+  }
   if (batch.snapshot !== null) await tx.saveSnapshot(key, batch.snapshot);
   if (batch.status !== null) await tx.updateSession(key, batch.status);
   // After the status: a batch may start with a command and continue with events.
@@ -115,7 +119,8 @@ export class PipelineWriter {
         const effective = await editorialBatch(tx, key, batch);
         await tx.appendStreamMessages(key, effective.batch.drafts);
         await writeArtifacts(tx, key, effective.batch);
-        await tx.appendAudits(effective.audits);
+        const retracted = await writeRetractions(tx, key, effective.batch);
+        await tx.appendAudits([...effective.audits, ...retracted]);
       });
     } catch (error) {
       if (error instanceof SkipBatch) return error.outcome;

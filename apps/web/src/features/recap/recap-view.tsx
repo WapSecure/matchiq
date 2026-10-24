@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui';
 import { HTTP_STATUS } from '@/constants/api';
 import { RECAP_COPY } from '@/constants/recap';
 import { MAIN_CONTENT_ID } from '@/constants/site';
+import { RecapPlayerFocus } from '@/features/player-focus/recap-player-focus';
 import { AudienceBar } from '@/features/studio/components/audience-controls';
 import { isApiError } from '@/lib/api/api-error';
 import { useRecap } from '@/lib/api/hooks';
@@ -58,6 +59,7 @@ export function RecapView({ fixture }: { fixture: Fixture }) {
             <RecapMoments recap={recap.data} fixture={fixture} />
             <FinalMetrics recap={recap.data} fixture={fixture} />
           </div>
+          <RecapPlayerFocus fixture={fixture} recap={recap.data} />
         </>
       ) : null}
     </main>

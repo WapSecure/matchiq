@@ -16,9 +16,9 @@ import type { RecapMoment as Moment } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
+import { RecapMomentBody } from './recap-moment-body';
 import { momentAnchor } from './recap-order';
 import { RecapMomentTechnical } from './recap-moment-technical';
-import { RecapMomentText } from './recap-moment-text';
 import { recapTranslationNotice } from './recap-translation-notice';
 
 type RecapMomentProps = {
@@ -129,7 +129,7 @@ export function RecapMomentItem({
             {CONFIDENCE_LABELS[moment.confidenceLabel]}
           </span>
         </header>
-        <RecapMomentText picked={picked} />
+        <RecapMomentBody moment={moment} picked={picked} />
         <Meta
           moment={moment}
           picked={picked}

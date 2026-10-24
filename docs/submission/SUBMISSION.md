@@ -113,7 +113,7 @@ Does not exist yet:
 - **Not deployed.** The owner decided not to host before the verdict. The local setup is the test build ([checklist](CHECKLIST.md)).
 - **Foundry, Entra ID and Azure are unverified.** The code paths exist; none has run against a real service.
 - **Local AI is slow.** p50 is about 65 s per insight on an M1 Pro, so agent copy arrives after the template, and under load it may not arrive at all.
-- **Feature gaps against the challenge brief (rules §4.1 ii).** There is no pass distance or pass difficulty rating, no ball or shot speed metric (the generator records `SHOT.speedKph`, but the engine does not publish it), no player-speed tagging, no video auto-eventing, and no favourite-club or player-focus mode. Personalisation is by persona and language.
+- **Feature gaps against the challenge brief (rules §4.1 ii).** There is no pass distance or pass difficulty rating, no ball or shot speed metric (the generator records `SHOT.speedKph`, but the engine does not publish it), no player-speed tagging, and no video auto-eventing. Player Focus counts from match events only: without tracking data it shows no speed or distance ([ADR-0023](../adr/0023-player-focus-scope.md)).
 - **Single worker replica.** Replay sessions are owned by one worker ([ADR-0013](../adr/0013-replay-sessions-and-intelligence-pipeline.md)).
 - **Simulated faults are instant.** Their latency is not representative ([ADR-0020](../adr/0020-demo-fault-scenarios.md)).
 - **Pidgin glossary** is pending native-speaker review ([`PIDGIN_GLOSSARY.md`](../localization/PIDGIN_GLOSSARY.md)).
@@ -122,7 +122,7 @@ Does not exist yet:
 
 1. **Hosting (deferred until after the verdict).** A public demo on the single-VPS path (compose and Caddy, `infra/vps`), with an uptime check.
 2. **Azure.** With a subscription: `what-if`, deploy the Bicep, run `foundry_probe.py`, record a Foundry evaluation baseline, then switch Entra ID on by configuration.
-3. **Challenge features.** Pass difficulty and distance, shot speed from the event data, and a player-focus and favourite-club mode.
+3. **Challenge features.** Pass difficulty and distance, shot speed from the event data, and player speed and distance in Player Focus once fixtures carry tracking data.
 4. **Enterprise.** SCIM, a per-tenant publication policy, Azure AI Content Safety, DAST, signed images, a privacy and DPA pack, and load tests with SLO burn-in.
 5. **Data.** A licensed-provider adapter framework with rights and provenance propagation (spec §42). Synthetic data stays the default for demos.
 

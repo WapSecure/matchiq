@@ -200,6 +200,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The caller's saved viewing preferences
+         * @description Persona, language, favourite team, followed players (at most three) and reduced motion. A caller who has never saved gets the defaults with `updatedAt: null`. Presentation only: no statistic depends on it.
+         *
+         *     Access: requires the `preferences:write` permission.
+         */
+        get: operations["getMyPreferences"];
+        /**
+         * Replace the caller's viewing preferences
+         * @description Replaces the whole profile. Idempotent: repeating the same body changes nothing, `updatedAt` included. Scoped to the caller and their organisation.
+         *
+         *     Access: requires the `preferences:write` permission.
+         */
+        put: operations["putMyPreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/fixture-templates": {
         parameters: {
             query?: never;
@@ -424,6 +452,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/agents/traces/{correlationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every agent handoff of one pipeline run
+         * @description One record per roster stage, in order: decision and reason, input checksum, cited evidence, prompt version, model, tokens, latency and cost estimate. Holds no prompts or model output text. The correlation id is `runs[].correlationId` from the agent-runs list; another organisation's run answers 404.
+         *
+         *     Access: requires the `agents:traces:read` permission. The anonymous demo principal holds it when `AUTH_ANONYMOUS_DEMO_ENABLED=true`.
+         */
+        get: operations["getAgentTrace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/overlays/{overlayId}/retract": {
         parameters: {
             query?: never;
@@ -602,6 +652,70 @@ export interface paths {
         get: operations["listAuditEvents"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fixtures/{fixtureId}/overlay-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cues waiting for a producer to approve them
+         * @description MANUAL sessions only. Each item carries the copy it would air and the match clock at which its slot closes.
+         *
+         *     Access: requires the `editorial:approve` permission.
+         */
+        get: operations["listOverlayReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/insights/{insightId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject an insight's waiting cue
+         * @description Approve airs the cue in the slot the scheduler gave it, with optional duration and priority overrides; reject means it never airs. A cue whose slot has closed answers 409.
+         *
+         *     Access: requires the `editorial:approve` permission.
+         */
+        post: operations["reviewInsight"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fixtures/{fixtureId}/editorial/publish-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish cues automatically or after a producer approves each one
+         * @description Access: requires the `policy:configure` permission.
+         */
+        post: operations["setPublishPolicy"];
         delete?: never;
         options?: never;
         head?: never;
@@ -838,6 +952,10 @@ export interface components {
             }[];
             evidenceEventIds: string[];
         };
+        /** @enum {string} */
+        AgentStepRole: "MATCH_ANALYST" | "NARRATIVE_WRITER" | "FACT_CHECKER" | "BROADCAST_PRODUCER" | "LOCALIZATION" | "TEMPLATE_FALLBACK";
+        /** @enum {string} */
+        AgentStepDecision: "PASS" | "REVISE" | "REJECT" | "FALLBACK";
         Fixture: {
             /** @constant */
             schemaVersion: 1;
@@ -1360,6 +1478,37 @@ export interface components {
             faultInjected?: components["schemas"]["FaultScenario"];
             faultNote?: string;
         };
+        AgentStep: {
+            stepIndex: number;
+            role: components["schemas"]["AgentStepRole"];
+            runId: string;
+            /** Format: uuid */
+            correlationId: string;
+            agentVersion: {
+                promptVersion: string;
+                promptHash?: string;
+            };
+            /** @enum {string} */
+            provider: "foundry" | "ollama" | "mock" | "template";
+            modelDeployment?: string;
+            /** @enum {string} */
+            fromStatus: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";
+            /** @enum {string} */
+            toStatus: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";
+            decision: components["schemas"]["AgentStepDecision"];
+            reasonCode: string;
+            reason: string;
+            inputChecksum: string;
+            evidenceEventIds: string[];
+            metricRefs: string[];
+            /** Format: date-time */
+            startedAt: string;
+            latencyMs: number;
+            tokensIn?: number;
+            tokensOut?: number;
+            costEstimateUsd?: number;
+            retries: number;
+        };
         ReplayCommand: {
             /** @constant */
             action: "start";
@@ -1459,6 +1608,9 @@ export interface components {
                 citations: string[];
                 breakdown?: components["schemas"]["AnalystBreakdown"];
             }[];
+            retracted?: {
+                reason: string;
+            };
         };
         GateReport: {
             /** @enum {string} */
@@ -1492,9 +1644,9 @@ export interface components {
             gate: components["schemas"]["GateReport"] | null;
             runs: components["schemas"]["AgentRun"][];
             editorial: {
-                insight: "SUPPRESSED" | null;
+                insight: ("SUPPRESSED" | "RETRACTED") | null;
                 insightReason: string | null;
-                overlay: ("RETRACTED" | "HELD" | "SUPPRESSED") | null;
+                overlay: ("RETRACTED" | "HELD" | "SUPPRESSED" | "AWAITING_APPROVAL" | "APPROVED" | "REJECTED" | "APPROVAL_EXPIRED") | null;
                 overlayReason: string | null;
             };
         };
@@ -1511,6 +1663,11 @@ export interface components {
             };
             killSwitch: {
                 active: boolean;
+                changedAt: string | null;
+            };
+            publishPolicy?: {
+                /** @enum {string} */
+                policy: "AUTO" | "MANUAL";
                 changedAt: string | null;
             };
         };
@@ -1545,6 +1702,15 @@ export interface components {
             /** Format: date-time */
             at: string;
         };
+        ViewerPreferences: {
+            /** @enum {string} */
+            persona: "CASUAL" | "ANALYST" | "BROADCAST";
+            /** @enum {string} */
+            locale: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+            favouriteTeamId: string | null;
+            followedPlayerIds: string[];
+            reducedMotion: boolean;
+        };
         ProblemDetails: {
             type: string;
             title: string;
@@ -1572,6 +1738,14 @@ export interface components {
             rejected: number;
             ingestionId: string;
             lastAcceptedSequence: number;
+        };
+        AgentStepTrace: {
+            /** Format: uuid */
+            correlationId: string;
+            runId: string;
+            fixtureId: string;
+            insightId: string;
+            steps: components["schemas"]["AgentStep"][];
         };
         FixtureTemplateList: {
             items: components["schemas"]["FixtureTemplateSummary"][];
@@ -1706,6 +1880,16 @@ export interface components {
             roles: string[];
             permissions: string[];
         };
+        PreferenceProfile: {
+            /** @enum {string} */
+            persona: "CASUAL" | "ANALYST" | "BROADCAST";
+            /** @enum {string} */
+            locale: "en-GB" | "fr-FR" | "es-ES" | "pcm-NG";
+            favouriteTeamId: string | null;
+            followedPlayerIds: string[];
+            reducedMotion: boolean;
+            updatedAt: string | null;
+        };
         StreamMessage: {
             /** @constant */
             schemaVersion: 1;
@@ -1748,6 +1932,23 @@ export interface components {
             emittedAt: string;
             traceId?: string;
             /** @constant */
+            type: "insight.retract";
+            payload: {
+                insightId: string;
+                /** @enum {string} */
+                cause: "CORRECTION" | "LATE_EVENT";
+                causeEventId: string;
+                reason: string;
+            };
+        } | {
+            /** @constant */
+            schemaVersion: 1;
+            streamSequence: number;
+            fixtureId: string;
+            /** Format: date-time */
+            emittedAt: string;
+            traceId?: string;
+            /** @constant */
             type: "narrative.ready";
             payload: components["schemas"]["Narrative"];
         } | {
@@ -1776,7 +1977,24 @@ export interface components {
                 revision: number;
                 reason: string;
                 /** @enum {string} */
-                cause?: "EXPIRED" | "SUPERSEDED" | "PERIOD_ENDED" | "MATCH_ENDED" | "PRODUCER" | "INSIGHT_SUPPRESSED" | "KILL_SWITCH";
+                cause?: "EXPIRED" | "SUPERSEDED" | "PERIOD_ENDED" | "MATCH_ENDED" | "PRODUCER" | "INSIGHT_SUPPRESSED" | "KILL_SWITCH" | "CORRECTION";
+            };
+        } | {
+            /** @constant */
+            schemaVersion: 1;
+            streamSequence: number;
+            fixtureId: string;
+            /** Format: date-time */
+            emittedAt: string;
+            traceId?: string;
+            /** @constant */
+            type: "overlay.review";
+            payload: {
+                overlayId: string;
+                insightId?: string;
+                revision: number;
+                /** @enum {string} */
+                state: "AWAITING_APPROVAL" | "APPROVED" | "REJECTED" | "APPROVAL_EXPIRED";
             };
         } | {
             /** @constant */
@@ -2762,6 +2980,182 @@ export interface operations {
             };
             /** @description `forbidden`: You do not have permission for this action */
             403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preference profile */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferenceProfile"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    putMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ViewerPreferences"];
+            };
+        };
+        responses: {
+            /** @description Saved profile */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferenceProfile"];
+                };
+            };
+            /** @description `bad-request`: Malformed request body */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
@@ -3985,6 +4379,104 @@ export interface operations {
             };
         };
     };
+    getAgentTrace: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path: {
+                correlationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The handoff records of the run */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentStepTrace"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `trace-not-found`: Agent trace not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     retractOverlay: {
         parameters: {
             query?: never;
@@ -4908,6 +5400,379 @@ export interface operations {
                 };
             };
             /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listOverlayReviews: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+            };
+            path: {
+                fixtureId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The approval queue, oldest first */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            overlayId: string;
+                            insightId: string | null;
+                            fixtureId: string;
+                            revision: number;
+                            /** @enum {string} */
+                            state: "AWAITING_APPROVAL" | "APPROVED" | "REJECTED" | "APPROVAL_EXPIRED";
+                            cue: components["schemas"]["OverlayCue"];
+                            period: number;
+                            expiresAtClockMs: number;
+                            /** Format: date-time */
+                            waitingSince: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `fixture-not-found`: Fixture not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    reviewInsight: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                insightId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "APPROVE" | "REJECT";
+                    reason?: string;
+                    revision?: number;
+                    durationMs?: number;
+                    priority?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Reviewed, or already in that state (`changed: false`) */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Idempotent-Replayed": components["headers"]["IdempotentReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        insightId: string;
+                        overlayId: string;
+                        fixtureId: string;
+                        revision: number;
+                        /** @enum {string} */
+                        state: "AWAITING_APPROVAL" | "APPROVED" | "REJECTED" | "APPROVAL_EXPIRED";
+                        changed: boolean;
+                        auditId: string | null;
+                        cue: components["schemas"]["OverlayCue"] | null;
+                    };
+                };
+            };
+            /** @description `bad-request`: Malformed request body; `invalid-header`: Invalid request header */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `insight-not-found`: Insight not found; `overlay-not-found`: Overlay cue not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `overlay-not-awaiting-approval`: The cue is not waiting for approval; `overlay-approval-expired`: The cue waited past its slot and can no longer air; `overlay-revision-stale`: The cue has newer copy than the one reviewed; `editorial-air-paused`: Graphics are frozen or the kill switch is on */
+            409: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed; `idempotency-key-reused`: Idempotency-Key was reused with a different request */
+            422: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `rate-limited`: Too many requests */
+            429: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `internal-error`: Internal server error */
+            500: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `auth-unavailable`: The identity provider is unreachable */
+            503: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    setPublishPolicy: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller request ID (8-128 of `A-Za-z0-9._:-`); a malformed one is replaced. Echoed on every response. */
+                "X-Request-ID"?: components["parameters"]["RequestId"];
+                /** @description Client-chosen key (1-255 visible ASCII). A retry with the same key and body replays the stored response; a different body is a 422. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                fixtureId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    policy: "AUTO" | "MANUAL";
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed, or already set (`changed: false`) */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    "Idempotent-Replayed": components["headers"]["IdempotentReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditorialStatusResult"];
+                };
+            };
+            /** @description `bad-request`: Malformed request body; `invalid-header`: Invalid request header */
+            400: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `unauthorized`: Authentication required */
+            401: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `forbidden`: You do not have permission for this action */
+            403: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `fixture-not-found`: Fixture not found */
+            404: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description `validation-failed`: Request validation failed; `idempotency-key-reused`: Idempotency-Key was reused with a different request */
             422: {
                 headers: {
                     "X-Request-ID": components["headers"]["RequestId"];

@@ -36,16 +36,18 @@ export function SiteHeader() {
                 </ButtonLink>
               </span>
             ))}
-            <ButtonLink
-              href={SITE.repositoryUrl}
-              variant="ghost"
-              size="sm"
-              external
-              aria-label={HEADER_LABELS.repository}
-              leadingIcon={<GithubIcon size={16} />}
-            >
-              <span className="hidden lg:inline">GitHub</span>
-            </ButtonLink>
+            <span className="hidden sm:contents">
+              <ButtonLink
+                href={SITE.repositoryUrl}
+                variant="ghost"
+                size="sm"
+                external
+                aria-label={HEADER_LABELS.repository}
+                leadingIcon={<GithubIcon size={16} />}
+              >
+                <span className="hidden lg:inline">GitHub</span>
+              </ButtonLink>
+            </span>
           </nav>
           <span aria-hidden className="h-5 w-px bg-line" />
           <ThemeToggle />

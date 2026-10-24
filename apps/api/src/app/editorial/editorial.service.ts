@@ -25,6 +25,7 @@ import {
   EditorialEffects,
   retractInTx,
 } from './editorial-writes';
+import { isOnAir, rejectInTx } from './review-writes';
 
 const OK = HttpStatus.OK;
 
@@ -116,7 +117,7 @@ export class EditorialService {
     if (overlay.editorialState === 'RETRACTED') {
       return { status: OK, body: { ...base, changed: false, auditId: null } };
     }
-    if (overlay.status !== 'LIVE' || overlay.editorialState !== null) {
+    if (!isOnAir(overlay)) {
       throw problem('overlayNotOnAir', {
         detail: EDITORIAL_DETAILS.overlayState(
           overlay.editorialState ?? overlay.status,
@@ -183,7 +184,7 @@ export class EditorialService {
     };
   }
 
-  /** The insight's cue, if it was on air and has now been retracted with it. */
+  /** The insight's cue, if it was on air and has now been retracted with it; a waiting cue is rejected. */
   private async retractInsightCue(
     tx: EditorialTransaction,
     key: FixtureKey,
@@ -191,9 +192,16 @@ export class EditorialService {
     ctx: CommandContext,
   ): Promise<OverlayRow | null> {
     const overlay = await tx.overlayOfInsight(key, insightId);
-    if (overlay?.status !== 'LIVE' || overlay.editorialState !== null) {
+    if (overlay?.editorialState === 'AWAITING_APPROVAL') {
+      const now = this.effects.now();
+      await rejectInTx(
+        tx,
+        { key, overlay, now, cause: 'INSIGHT_SUPPRESSED' },
+        ctx,
+      );
       return null;
     }
+    if (overlay === null || !isOnAir(overlay)) return null;
     const now = this.effects.now();
     await retractInTx(
       tx,

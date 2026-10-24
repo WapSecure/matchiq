@@ -1,5 +1,6 @@
 import type {
   AgentRun,
+  AgentStep,
   Fixture,
   Insight,
   Narrative,
@@ -40,6 +41,8 @@ export interface Publication {
   readonly narratives: Narrative[];
   readonly completion: InsightCompletion;
   readonly runs: AgentRun[];
+  /** Handoff records from the agents service; templates published by the worker have none. */
+  readonly steps?: AgentStep[];
   /** A gated agent overlay to apply as a new cue revision, if any. */
   readonly overlay: OverlayProposal | null;
 }
@@ -191,6 +194,7 @@ export const agentPublication = (input: AgentInput): Publication => {
       ...(fallbackReason === undefined ? {} : { fallbackReason }),
     },
     runs: [...result.runs],
+    steps: [...result.steps],
     overlay,
   };
 };

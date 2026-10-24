@@ -54,7 +54,7 @@ export const RECAP_COPY = {
     dataFile: (name: string) => `matchiq-recap-${name}.json`,
   },
   report: {
-    heading: (title: string) => `${title} — match report`,
+    heading: (title: string) => `${title}: match report`,
     score: (home: string, away: string, h: number, a: number) =>
       `Final score: ${home} ${h}–${a} ${away}`,
     story: 'Match story',
@@ -63,7 +63,7 @@ export const RECAP_COPY = {
     moments: 'Key moments',
     stats: 'Final stats',
     statLine: (label: string, home: string, away: string) =>
-      `${label}: ${home}–${away}`,
+      `${label}: ${home}; ${away}`,
     unavailable: 'not available',
     footer: 'Simulated match. Every number comes from the match data.',
     disclosure:
