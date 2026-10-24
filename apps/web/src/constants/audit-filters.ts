@@ -18,6 +18,7 @@ export const AUDIT_ACTION_GROUPS = {
     AUDIT_ACTIONS.overlayHeld,
     AUDIT_ACTIONS.overlayBlocked,
     AUDIT_ACTIONS.insightSuppressed,
+    AUDIT_ACTIONS.insightRetracted,
     AUDIT_ACTIONS.publicationGated,
     AUDIT_ACTIONS.editorialFrozen,
     AUDIT_ACTIONS.editorialResumed,

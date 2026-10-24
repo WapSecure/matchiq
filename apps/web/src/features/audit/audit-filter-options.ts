@@ -4,6 +4,7 @@ import {
   AUDIT_ACTION_LABELS,
   AUDIT_FILTER_OPTIONS,
 } from '@/constants/audit';
+import { describeAction } from '@/lib/describe-reason';
 import {
   ANY_KEY,
   AUDIT_ACTION_GROUPS,
@@ -31,7 +32,7 @@ export const ACTION_SECTIONS: ChoiceSection[] = [
     title: AUDIT_FILTER_COPY.groups[group],
     options: AUDIT_ACTION_GROUPS[group].map((action) => ({
       id: action,
-      label: AUDIT_ACTION_LABELS[action] ?? action,
+      label: describeAction(action, AUDIT_ACTION_LABELS),
     })),
   })),
 ];
