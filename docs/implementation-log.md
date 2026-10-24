@@ -1166,7 +1166,7 @@ Stream E, branch `fix/MQ-082-interface-copy-audit`, cut from current `origin/dev
 
 The studio control now says “Commentary language” and explains that it changes commentary and graphic wording while interface labels, facts and figures stay the same. This makes the current English-interface boundary explicit and does not claim that interface localization has shipped. Updated the existing unit and browser assertions around this control.
 
-Local validation: web lint passed; web E2E lint passed with 35 existing warnings and no errors; web and E2E TypeScript checks passed; 25 focused tests across language boundaries, corrections, agent handoffs and audit labels passed; touched-file formatting and diff whitespace checks passed. Full browser execution and the complete test matrix remain for CI. Next three tickets: independent server-rendered interface locale and complete reviewed catalogs; long-content coverage across match, evidence and audit screens; native editorial qualification for supported commentary languages.
+Local validation: web lint passed; web E2E lint passed with 35 existing warnings and no errors; web and E2E TypeScript checks passed; 26 focused tests across language boundaries, corrections, agent handoffs and audit labels passed; touched-file formatting and diff whitespace checks passed. Full browser execution and the complete test matrix remain for CI. Next three tickets: independent server-rendered interface locale and complete reviewed catalogs; long-content coverage across match, evidence and audit screens; native editorial qualification for supported commentary languages.
 
 ## MQ-081: real-time approval window and feed copy
 
