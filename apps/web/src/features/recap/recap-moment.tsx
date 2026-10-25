@@ -1,6 +1,5 @@
 import type { Locale, Persona } from '@matchiq/contracts';
 import { SparkIcon } from '@/components/icons';
-import { SIDE_BG } from '@/components/match/team-swatch';
 import { Badge } from '@/components/ui';
 import {
   CONFIDENCE_LABELS,
@@ -17,7 +16,9 @@ import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { pickNarrative } from './pick-narrative';
 import { RecapMomentBody } from './recap-moment-body';
+import { RecapRail as Rail } from './recap-rail';
 import { momentAnchor } from './recap-order';
+import { HowWritten } from '@/features/how-written/how-written';
 import { RecapMomentTechnical } from './recap-moment-technical';
 import { recapTranslationNotice } from './recap-translation-notice';
 
@@ -26,22 +27,8 @@ type RecapMomentProps = {
   team: RosterTeam | null;
   persona: Persona;
   locale: Locale;
+  fixtureId?: string;
 };
-
-function Rail({ team, major }: { team: RosterTeam | null; major: boolean }) {
-  return (
-    <span aria-hidden className="relative flex justify-center">
-      <span className="absolute inset-y-0 w-px bg-line group-first/moment:top-4 group-last/moment:bottom-[calc(100%-1rem)]" />
-      <span
-        className={cn(
-          'relative mt-1.5 rounded-full ring-4 ring-surface',
-          major ? 'size-3' : 'size-2.5',
-          team ? SIDE_BG[team.side] : 'bg-ink-subtle',
-        )}
-      />
-    </span>
-  );
-}
 
 type Picked = ReturnType<typeof pickNarrative>;
 
@@ -93,6 +80,7 @@ export function RecapMomentItem({
   team,
   persona,
   locale,
+  fixtureId,
 }: RecapMomentProps) {
   const picked = pickNarrative(moment.narratives, persona, locale);
   const kind = INSIGHT_KIND_LABELS[moment.kind];
@@ -136,6 +124,15 @@ export function RecapMomentItem({
           locale={locale}
           persona={persona}
         />
+        {fixtureId ? (
+          <div className="mt-1.5">
+            <HowWritten
+              fixtureId={fixtureId}
+              insightId={moment.insightId}
+              moment={picked?.narrative.headline ?? kind}
+            />
+          </div>
+        ) : null}
         <RecapMomentTechnical moment={moment} />
       </article>
     </li>
