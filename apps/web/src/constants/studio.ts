@@ -56,6 +56,8 @@ export const STUDIO_COPY = {
     possession: 'Possession',
     comparison: 'Team comparison',
     passCompletion: 'Pass completion',
+    shotConversion: 'Shot conversion',
+    passQuality: 'Pass quality',
     momentum: 'Momentum',
     momentumDescription:
       'Who is on top, from shots, final third entries, pressing and high ball wins, compared with the rest of the match',
