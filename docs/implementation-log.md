@@ -1192,6 +1192,18 @@ Local validation covers script syntax, formatting and rendered Compose configura
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
 
+## MQ-084: Tests for the controls the audit found untested (24 October 2026)
+
+Tests only; no application behaviour changed.
+
+- **Request-size limit**: `request-limits.integration.spec.ts` posts a body over 2 MB and expects a 413 RFC 9457 problem that does not echo the payload, and a 1 MB body that is not refused for size.
+- **BFF cross-origin refusal**: `bff/[...path]/route.spec.ts` shows a state-changing request with a foreign Origin, a foreign Referer only, or neither is refused with 403 and never reaches the API, while a same-origin one is forwarded with the bearer token. The control checks Origin only; a Referer alone is not accepted.
+- **Stale graphics after a seek**: `overlay-scheduler.spec.ts` proves a forward clock jump (what the session runner replays on a seek) expires the live cue and drops queued cues, including across a period change.
+- **Ledger immutability**: `libs/db/tests/ledger-immutability.integration.spec.ts` (MQ-063) already covers UPDATE and DELETE for the app and owner roles and the retention purge, so nothing was added.
+- **Connection banner**: `connection-banner.spec.tsx` asserts the plain-language text and `role="status"` for reconnecting, stale and offline, and no banner for connecting and live.
+- **Reduced motion**: `reduced-motion.spec.tsx` checks the OS and in-app CSS rules stop the same animation and transition properties, the preference toggles the page attribute, and component animations are gated by `motion-safe`.
+- **Responsive widths**: `responsive.spec.ts` checks the lobby and studio at 360, 768 and 1920 px for no horizontal overflow and no serious or critical axe violations (desktop projects).
+
 ## MQ-086: Shot conversion, pass quality and player milestones (24 October 2026)
 
 The engine gains two snapshot metrics, `shotConversionPct` and `passQualityPct`, as `MetricValue` with numerator and denominator, unavailable (never 0) on a zero denominator. Shot conversion is goals from the team's own shots over shots; own goals credited to the team are excluded. Pass quality is the share of completed passes whose target is at least 10 pitch units nearer goal than the origin, a heuristic proxy defined in ADR-0038 because the spec never defines "quality". Three deterministic P2 `PLAYER_MILESTONE` rules (first shot on target, first goal, first yellow card) fire on the event that takes a player's count to 1, anchored to that event id, so re-scans reproduce the same insight ids. The evidence envelope gains optional `sampleSize`, `limitations` and `confidenceType`, populated by the milestone rules. Both new snapshot fields are optional in the contract so stored snapshots still parse.
@@ -1201,6 +1213,10 @@ The engine gains two snapshot metrics, `shotConversionPct` and `passQualityPct`,
 ## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
 
 The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
+
+## MQ-086 follow-up: milestone insights in the worker pipeline (25 October 2026)
+
+The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs that pin fixture moment sets were corrected. The recap sorts same-clock moments by priority then insight id, so replay output stays identical across databases. A milestone has no earlier occurrence, so its Analyst breakdown omits the previous-spell sentence, which had repeated the minute and failed the gate. A voided goal also retracts the first-goal milestone built on it, which is intended. The agents integration spec picks its insights from the non-milestone moments. Milestone cues keep the existing P2 overlay priority; overlay behaviour is unchanged.
 
 ## MQ-085: API alignment and ingest validation (24 October 2026)
 
