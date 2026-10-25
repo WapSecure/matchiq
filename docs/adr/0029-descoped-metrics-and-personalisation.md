@@ -15,10 +15,14 @@ The delivered ADR-0038 items are no longer part of this deferral. The remaining 
 | Pass distance and pass difficulty                                                        | `targetLocation` is an intended destination, not a measured delivery end point, and there is no opponent or receiver tracking | A measured end point and tracking context, a calibrated formula, contract and generator changes, then registry and presentation entries     |
 | Shot speed, ball speed, player speed and distance                                        | Some synthetic shots carry `speedKph`, but no metric consumes it; ball and player movement have no tracking feed              | A tracking feed or governed synthetic measurement, a provider capability flag (ADR-0033), metrics with units, and honest unavailable states |
 | Audience dimensions: spoiler preference, alert frequency, metric interests, device class | Preferences hold persona, locale, favourite team and player focus only                                                        | Fields on the preferences contract, a migration, API and UI controls, and the scheduler and gate respecting them                            |
-| Spec §47 analyst baseline and comparison windows                                         | Only the last 10 minutes against the match average, and the last three 5-minute spells, are computed                          | Baseline and comparison window definitions in the engine, citable metric refs, and a UI control                                             |
+| Spec §47 analyst baseline and comparison windows (delivered by MQ-089)                   | Only the last 10 minutes against the match average, and the last three 5-minute spells, are computed                          | Baseline and comparison window definitions in the engine, citable metric refs, and a UI control                                             |
 
 ## Consequences
 
 - The README and submission feature-gap lists must match this table.
 - `NO_TRACKING_DATA` remains the truthful unavailable reason for player tracking views. Metre and kph units remain reserved contract values and do not imply that a speed or distance metric ships.
 - A later ticket can deliver a deferred row, but it must define the evidence source, limitations and tests and then amend this ADR.
+
+## Update (MQ-089, 2026-10-25)
+
+The Analyst baseline and comparison windows item is delivered in the web app from data the API already returns (`insight.context`, `evidence.sampleSize`, `evidence.limitations`). The Analyst evidence drawer has a "Compared with" block with a 5 minute, 10 minute and whole-match picker (default 10 minutes, remembered per device), sample sizes and a three-spell trend with a table view. Limits kept: the 5 minute view covers only the moment's team because the engine stores spell counts for that team alone, and whole-match totals are estimated from the stored match average. No new backend numbers were added.

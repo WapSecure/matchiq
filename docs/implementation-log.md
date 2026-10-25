@@ -1250,3 +1250,11 @@ The hosted-authentication guard discovers every file under `infra/` except the e
 Docker jobs now use the pinned cache action's restore and save entry points. Each container and Compose job records an exact hit, prefix restore or miss, the requested and restored keys, and the resulting cache size in the job summary. Cache saving still happens only after the job succeeds, and a miss still performs a clean build.
 
 Local validation: shell syntax passed; current hosted configuration passed; explicit and newly discovered hosted fixtures containing local authentication material were rejected; an `infra/keycloak` fixture remained excluded; cache reports were verified for exact hit, prefix restore and miss; workflow and documentation formatting and diff whitespace checks passed. Docker builds and the complete suite remain for CI under the repository testing policy.
+
+## MQ-089: Analyst baseline, sample sizes and comparison windows (25 October 2026)
+
+- **Compared with** block in the Analyst evidence drawer: the moment's key count over the last 5 minutes, last 10 minutes or whole match against the match average, for both teams (5 minutes: the moment's team only), with the plays behind each figure, the moment's `sampleSize` and the envelope `limitations` when present. Plain wording; no raw index values. Fan and Broadcast never see it.
+- **Window picker**: React Aria `SegmentedControl`, default 10 minutes, kept per device in `localStorage` (guarded).
+- **Pressure trend**: three bars for the latest 5-minute spells with an accessible name and a table view (`spell-trend.tsx`).
+- States: loading, "Not enough match time yet to compare", and hidden for non-Analyst personas. Numbers come only from `insight.context`; nothing is shown when a figure is not in the payload.
+- Tests: `compared-with.spec.tsx`. No backend change. ADR-0029 updated.
