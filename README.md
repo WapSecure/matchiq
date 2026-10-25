@@ -198,6 +198,10 @@ pnpm nx run web:build && pnpm e2e                              # Playwright + ax
 cd apps/agents && uv run python scripts/run_eval.py --provider mock   # agent evaluation
 ```
 
+## Judge path
+
+Short on time? Follow the [three-minute tour](apps/web/src/constants/guide.ts) at `/guide` in the running app. It walks through the replay, evidence, audiences and languages, Listen, fact-checks, the producer view and the recap. The Live studio also has an optional **Take the tour** button.
+
 ## Limitations
 
 - **Foundry and Azure are not exercised.** The Foundry provider and the Azure templates are authored and unit-tested only. Nothing has been run against a Foundry project or an Azure subscription (ADR-0003, ADR-0007).

@@ -46,6 +46,7 @@ export function AudienceBar({
 }) {
   return (
     <div
+      data-tour="audience"
       className={cn(
         'flex flex-wrap items-end gap-x-4 gap-y-2 px-4 py-2.5',
         // Scroll margin keeps a focused option clear of the sticky page header.

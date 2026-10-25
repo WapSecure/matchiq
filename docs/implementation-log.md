@@ -1282,3 +1282,10 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Voice matches the narrative language; Pidgin only with an `en-NG` voice, else a plain "not available" note. Start by the viewer only, one reading at a time, Stop on the same button, stops on navigation, audience or language change and a hidden tab. Start and stop are announced once, throttled.
 - Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
 - Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.
+
+## MQ-101: judge guide and studio tour (25 October 2026)
+
+- Public `/guide` page, "A three-minute tour": eight numbered steps (what to do, what it shows) with links to `/fixtures` and `/sign-in`; studio, recap, fact-check and activity-log steps name what to click because session ids differ per machine. Linked from the site header ("Tour") and the matches page. The demo password is not repeated; the sign-in page remains the only place it shows.
+- Opt-in "Take the tour" in the Live studio header: a non-modal panel (focus moves in, Escape or Close returns it) that outlines five regions (score and preview, key moments, audience and language, Evidence, Match stats), skips any not on screen, never auto-starts and never blocks the replay. Dismissal is kept per device in guarded `localStorage`; after that the button is icon-only.
+- Code: `apps/web/src/features/guide` (`guide-page`, `tour/`), `constants/guide.ts`, `compass-icon`, a `data-tour="audience"` anchor and a `[data-tour-active]` outline rule.
+- Tests: `guide-page.spec.tsx`, `tour-launcher.spec.tsx`. No e2e change: no page list for axe exists beyond per-page specs.
