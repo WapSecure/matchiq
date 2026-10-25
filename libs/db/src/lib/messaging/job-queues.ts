@@ -1,7 +1,14 @@
-import { FixtureId, InsightId, OrgId, ReplayCommand } from '@matchiq/contracts';
+import {
+  FixtureId,
+  InsightId,
+  type InsightPriority,
+  OrgId,
+  ReplayCommand,
+} from '@matchiq/contracts';
 import { Queue, type ConnectionOptions, type Telemetry } from 'bullmq';
 import { z } from 'zod';
 import {
+  INSIGHT_JOB_PRIORITY,
   JOB_ID_SEPARATOR,
   JOB_NAMES,
   QUEUE_RETENTION,
@@ -31,7 +38,8 @@ export interface ReplayCommandBus {
 }
 
 export interface InsightJobQueue {
-  enqueue(job: InsightPipelineJob): Promise<void>;
+  /** `priority` orders a backlog: P0 jobs are served before P1 and P2. */
+  enqueue(job: InsightPipelineJob, priority?: InsightPriority): Promise<void>;
 }
 
 export interface JobRetryPolicy {
@@ -84,12 +92,16 @@ export class BullMqInsightJobQueue implements InsightJobQueue {
     this.queue = new Queue(QUEUES.insightPipeline, options);
   }
 
-  async enqueue(job: InsightPipelineJob): Promise<void> {
+  async enqueue(
+    job: InsightPipelineJob,
+    priority?: InsightPriority,
+  ): Promise<void> {
     await this.queue.add(
       JOB_NAMES.insightPipeline,
       InsightPipelineJob.parse(job),
       {
         jobId: insightJobId(job),
+        ...(priority && { priority: INSIGHT_JOB_PRIORITY[priority] }),
         attempts: this.retry.attempts,
         backoff: { type: 'exponential', delay: this.retry.backoffMs },
         ...retention,

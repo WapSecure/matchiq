@@ -254,7 +254,7 @@ export class SessionManager
       revision: record.revision,
     };
     this.runtime.jobs
-      .enqueue(job)
+      .enqueue(job, record.insight.priority)
       .catch(() => this.publishFallback(key, record.insight));
   }
 

@@ -5,6 +5,7 @@ Follows Microsoft Learn, "Ollama" provider page (updated 2026-10-15), OpenAI Com
 `agent-framework-ollama` package is deliberately not used.
 """
 
+import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -16,16 +17,20 @@ from agent_framework.openai import OpenAIChatClient
 from pydantic import BaseModel
 
 from matchiq_agents.constants import (
+    OLLAMA_GENERATE_PATH,
     OLLAMA_PLACEHOLDER_API_KEY,
     OLLAMA_PROBE_TIMEOUT_S,
     OLLAMA_TAGS_PATH,
+    OLLAMA_WARMUP_TIMEOUT_S,
 )
 from matchiq_agents.settings import ModelProvider, Settings
 
+logger = logging.getLogger(__name__)
 LATEST_TAG = ":latest"
 # Ollama's OpenAI-compatible `/v1/responses` honours `temperature` and `max_output_tokens` but
 # ignores `keep_alive` and `options` (num_ctx, num_predict), measured on Ollama 0.40.7. Those
-# are server settings: OLLAMA_KEEP_ALIVE, OLLAMA_CONTEXT_LENGTH (see `.env.example`).
+# are server settings: OLLAMA_KEEP_ALIVE, OLLAMA_CONTEXT_LENGTH (see `.env.example`). The
+# native `/api/generate` honours `keep_alive`, so the start-up warm-up loads the model there.
 OLLAMA_TEMPERATURE: Final = 0.2
 OLLAMA_RUN_OPTIONS: Final[Mapping[str, object]] = MappingProxyType(
     {"temperature": OLLAMA_TEMPERATURE}
@@ -87,3 +92,35 @@ async def probe_ollama(
             return OllamaProbe(reachable=True, model_available=_has_model(response.content, model))
     except (httpx.HTTPError, ValueError):
         return OllamaProbe(reachable=False, model_available=False)
+
+
+def generate_url(endpoint: str) -> str:
+    parts = urlsplit(endpoint)
+    return urlunsplit((parts.scheme, parts.netloc, OLLAMA_GENERATE_PATH, "", ""))
+
+
+async def warm_up_ollama(
+    settings: Settings, transport: httpx.AsyncBaseTransport | None = None
+) -> bool:
+    """Loads the model with an empty prompt and pins it for `ollama_keep_alive`.
+
+    Never raises: the first real call then only pays a load if this failed.
+    """
+    try:
+        endpoint, model = _require(settings)
+        body = {
+            "model": model,
+            "prompt": "",
+            "stream": False,
+            "keep_alive": settings.ollama_keep_alive,
+        }
+        async with httpx.AsyncClient(
+            timeout=OLLAMA_WARMUP_TIMEOUT_S, transport=transport
+        ) as client:
+            response = await client.post(generate_url(endpoint), json=body)
+            response.raise_for_status()
+    except (httpx.HTTPError, OllamaNotConfiguredError) as error:
+        logger.warning("Model warm-up skipped: %s", error.__class__.__name__)
+        return False
+    logger.info("Model %s is loaded and kept for %s", model, settings.ollama_keep_alive)
+    return True

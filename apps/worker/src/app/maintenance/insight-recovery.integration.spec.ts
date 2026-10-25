@@ -74,6 +74,11 @@ describe('boot recovery of PENDING insights (integration)', () => {
     await agents.close();
   });
 
+  const queued = async () => {
+    const counts = await queue.getJobCounts('waiting', 'prioritized');
+    return (counts.waiting ?? 0) + (counts.prioritized ?? 0);
+  };
+
   it('re-enqueues insights whose jobs were lost, once, while within the agents deadline', async () => {
     const pending = await pendingIds();
     expect(pending.length).toBeGreaterThan(0);
@@ -81,12 +86,12 @@ describe('boot recovery of PENDING insights (integration)', () => {
 
     const restarted = await reboot({ AI_ENABLED: 'true' });
     try {
-      expect(await queue.getWaitingCount()).toBe(pending.length);
+      expect(await queued()).toBe(pending.length);
       expect(await restarted.recovery.recover()).toEqual({
         requeued: pending.length,
         fallbacks: 0,
       });
-      expect(await queue.getWaitingCount()).toBe(pending.length);
+      expect(await queued()).toBe(pending.length);
       expect(await pendingIds()).toEqual(pending);
     } finally {
       await restarted.close({ keepDatabase: true });

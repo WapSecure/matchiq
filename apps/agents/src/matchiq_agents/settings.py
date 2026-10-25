@@ -10,15 +10,18 @@ from matchiq_agents.constants import (
     DEFAULT_CIRCUIT_FAILURE_THRESHOLD,
     DEFAULT_CIRCUIT_RESET_MS,
     DEFAULT_OLLAMA_ENDPOINT,
+    DEFAULT_OLLAMA_KEEP_ALIVE,
     DEFAULT_OLLAMA_MODEL,
     DEFAULT_PORT,
     DEFAULT_RUN_BUDGET,
     LOCAL_CIRCUIT_TIMEOUT_THRESHOLD,
+    OLLAMA_KEEP_ALIVE_PATTERN,
     SECRET_MIN_LENGTH,
 )
 from matchiq_agents.limits import MAX_AGENT_RETRIES
 from matchiq_agents.models.pricing import Price
 from matchiq_agents.pipeline.budget import BudgetLimits
+from matchiq_agents.roster.modes import PromptMode
 
 
 class ModelProvider(StrEnum):
@@ -51,6 +54,11 @@ class Settings(BaseSettings):
     azure_client_id: str | None = None
     ollama_endpoint: HttpUrl | None = HttpUrl(DEFAULT_OLLAMA_ENDPOINT)
     ollama_model: str | None = Field(default=DEFAULT_OLLAMA_MODEL, min_length=1)
+    ollama_keep_alive: str = Field(
+        default=DEFAULT_OLLAMA_KEEP_ALIVE, pattern=OLLAMA_KEEP_ALIVE_PATTERN
+    )
+    ollama_warmup: bool = True
+    agent_prompt_mode: PromptMode = PromptMode.STANDARD
     agent_max_retries: int = Field(default=MAX_AGENT_RETRIES, ge=0, le=MAX_AGENT_RETRIES)
     agent_circuit_failure_threshold: int = Field(default=DEFAULT_CIRCUIT_FAILURE_THRESHOLD, ge=1)
     agent_circuit_reset_ms: int = Field(default=DEFAULT_CIRCUIT_RESET_MS, ge=1)

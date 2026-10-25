@@ -2,6 +2,11 @@
 
 Newest entries first. Each entry records what was delivered, the evidence, and what remains. Status labels: **Done**, **Partial**, **Blocked**.
 
+## MQ-088: AI-written moments at demo speed (25 October 2026)
+
+- **Done, unit-tested without a model**: model warm-up with a validated `OLLAMA_KEEP_ALIVE` (`test_throughput.py`, fake HTTP transport; a failure only logs); BullMQ priority from the insight priority; `AGENT_MAX_AGE_SECONDS` stale skip with reason `SKIPPED_STALE` and no agents call (`insight-pipeline.stale.spec.ts`); `AGENT_PROMPT_MODE=compact` with recorded registry hashes, passing the golden cases against the mock model; plain-language labels for every fallback reason (`fallback-reasons.spec.ts`).
+- **Not measured**: the effect on the live AI share. Per-request `keep_alive` is not sent because `/v1/responses` ignores it. Re-measure with the steps in docs/ai/EVALUATION.md, "Throughput at demo speeds". ADR-0011 addendum 6.
+
 ## 2026-10-23 — MQ-066: Player Focus, favourite team and saved viewing preferences
 
 | Area                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Status | Evidence                                                                                                                                                                |

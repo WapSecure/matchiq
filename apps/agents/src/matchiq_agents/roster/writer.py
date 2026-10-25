@@ -59,7 +59,7 @@ async def write(
 ) -> tuple[list[NarrativeDraft] | None, AgentRun]:
     log: list[Repair] = []
     call = ModelCall(
-        prompt=NARRATIVE_WRITER,
+        prompt=ctx.prompt(NARRATIVE_WRITER.agent),
         payload=writer_input(ctx, analysis, notes, personas),
         response_model=WriterOutput,
         convert=lambda output: to_drafts(

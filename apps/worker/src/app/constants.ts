@@ -130,13 +130,14 @@ export const DEMO_FAULTS = {
 export const FALLBACK_REASONS = {
   aiDisabled: 'AI_ENABLED=false: deterministic templates only',
   circuitOpen: 'agents circuit breaker open',
+  skippedStale: 'SKIPPED_STALE: queued too long, template kept',
   timeout: 'agents service timed out',
   unreachable: 'agents service unreachable',
   invalidResponse: 'agents service returned an invalid PipelineResult',
   httpStatus: (status: number) => `agents service answered HTTP ${status}`,
   enqueueFailed: 'could not enqueue the agents pipeline job',
   gateRejectedAll: 'every agent draft failed the publish gate',
-  agentsRejected: 'agents pipeline rejected the insight; templates published',
+  agentsRejected: 'agents pipeline rejected the insight, templates published',
 } as const;
 
 export const ID_PREFIXES = {

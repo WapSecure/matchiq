@@ -23,7 +23,7 @@ def analyst_payload(ctx: AgentContext, issues: Sequence[Issue] = ()) -> AnalystI
     view = ctx.view
     refs = set(ranked_refs(view.metrics, view.kind, view.subject_side))
     return AnalystInput(
-        facts=facts_payload(view, metric_refs=refs, context=True),
+        facts=facts_payload(view, metric_refs=refs, context=True, compact=ctx.compact),
         revision_notes=revision_notes(issues),
     )
 
@@ -56,7 +56,7 @@ async def analyse(ctx: AgentContext) -> tuple[AgentResult, tuple[AgentRun, ...],
         return ctx.fallback.analysis(), (skipped,), reasons.ANALYST_SKIPPED
     log: list[Repair] = []
     call = ModelCall(
-        prompt=MATCH_ANALYST,
+        prompt=ctx.prompt(MATCH_ANALYST.agent),
         payload=analyst_payload(ctx),
         response_model=AnalystOutput,
         convert=lambda output: _accept(output, ctx, log),

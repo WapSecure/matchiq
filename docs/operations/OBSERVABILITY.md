@@ -84,7 +84,7 @@ Every series carries `service`. Labels are bounded enums; ids are never labels.
 | `matchiq_pipeline_commit_duration_seconds`     | histogram | —                        | Worker: committed pipeline transactions (event-to-state proxy)                           |
 | `matchiq_outbox_backlog`                       | gauge     | —                        | Worker: unpublished outbox rows                                                          |
 | `matchiq_outbox_oldest_age_seconds`            | gauge     | —                        | Worker: relay lag                                                                        |
-| `matchiq_queue_jobs`                           | gauge     | queue, state             | Worker: BullMQ waiting / active / delayed / failed                                       |
+| `matchiq_queue_jobs`                           | gauge     | queue, state             | Worker: BullMQ waiting (incl. prioritized) / active / delayed / failed                   |
 | `matchiq_queue_job_duration_seconds`           | histogram | queue, outcome           | Worker: job processing time, completed or failed                                         |
 | `matchiq_agent_pipeline_call_duration_seconds` | histogram | outcome                  | Worker: success, timeout, unreachable, http, invalid-response, circuit-open, ai-disabled |
 | `matchiq_agent_runs_total`                     | counter   | agent, provider, outcome | Worker: stored agent runs (SUCCEEDED, FAILED, TIMED_OUT, FALLBACK)                       |

@@ -4,6 +4,7 @@ import type {
   ModelProvider,
 } from '@matchiq/contracts';
 import type { FallbackGroup } from './fact-checks';
+import { THROUGHPUT_REASON_COPY } from './throughput-reasons';
 
 export const OBSERVATORY_COPY = {
   metaTitle: 'Fact-checks',
@@ -111,6 +112,7 @@ export const FALLBACK_REASON_COPY: readonly {
   text: string;
   group: FallbackGroup;
 }[] = [
+  ...THROUGHPUT_REASON_COPY,
   {
     pattern: /AI_ENABLED=false/i,
     text: 'AI writing is switched off here.',

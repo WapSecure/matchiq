@@ -16,9 +16,9 @@ export const RECOVERY = {
 
 export const RECOVERY_REASONS = {
   expired:
-    'recovered after a worker restart past the agents deadline; templates published',
+    'recovered after a worker restart past the agents deadline, templates published',
   aiDisabled:
-    'recovered after a worker restart with AI disabled; templates published',
+    'recovered after a worker restart with AI disabled, templates published',
 } as const;
 
 export const MAINTENANCE_LOG = {

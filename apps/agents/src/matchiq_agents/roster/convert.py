@@ -22,11 +22,13 @@ from matchiq_agents.contracts.types import (
     OverlayProposal,
     Persona,
 )
+from matchiq_agents.domain.context import SPELLS
 from matchiq_agents.domain.facts import CANONICAL_LOCALE, FactView
 from matchiq_agents.guard.editorial import event_line, key_refs
 from matchiq_agents.guard.text import restore_names
 from matchiq_agents.limits import OVERLAY_DURATION_MS, OVERLAY_PRIORITY
 from matchiq_agents.pipeline.diagnostics import OutputRejectedError
+from matchiq_agents.roster.compact import KEPT_SPELLS
 from matchiq_agents.roster.schemas import (
     AnalystOutput,
     CitedValueOut,
@@ -38,6 +40,7 @@ from matchiq_agents.roster.schemas import (
 
 SCHEMA_VERSION: Final = 1
 HASHTAG_REGEX: Final = re.compile(r"(?<!\w)#\w+")
+DROPPED_COMPACT: Final = frozenset(SPELLS) - frozenset(KEPT_SPELLS)
 NO_USABLE_DRAFT: Final = "model output has no usable draft for personas: {personas}"
 
 OVERLAY_KINDS: Final[dict[InsightKind, OverlayKind]] = {
@@ -71,6 +74,7 @@ def facts_payload(
     free_text: bool = True,
     metric_refs: Collection[str] | None = None,
     context: bool = False,
+    compact: bool = False,
 ) -> FactsPayload:
     """The data block for one agent, trimmed to what that agent needs (ADR-0011 addendum).
 
@@ -78,7 +82,8 @@ def facts_payload(
     (and the critique) reason over it, and small models otherwise copy its wording and numbers
     into drafts. `metric_refs` keeps only the metrics already cited upstream (a real packet has
     about 28), plus the metrics the moment's headline must state (the score after a goal).
-    Output is checked against the full evidence either way. `context=True` (the Analyst) adds
+    `compact=True` keeps only the first trend spell. Output is checked against the full
+    evidence either way. `context=True` (the Analyst) adds
     every `context.*` value and what they describe; other agents see only the ones cited upstream.
     """
     keep = None if metric_refs is None else {*metric_refs, *key_refs(view)}
@@ -86,7 +91,8 @@ def facts_payload(
     metrics |= {
         ref: value
         for ref, value in view.context_metrics.items()
-        if context or (keep is not None and ref in keep)
+        if (context or (keep is not None and ref in keep))
+        and not (compact and ref in DROPPED_COMPACT)
     }
     return FactsPayload(
         insight_kind=view.kind,

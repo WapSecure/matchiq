@@ -87,3 +87,7 @@ The six golden fixtures are in `fixtures/` (see `fixtures/README.md`). The API e
 - the resumable SSE stream: `GET /api/v1/fixtures/:fixtureId/stream`
 
 The app profile runs migrations and the idempotent fixture seed before the API and worker start. Use `bash scripts/compose-smoke.sh` to create and verify a replay session from the seeded data.
+
+### Memory for local models
+
+Local inference is memory bound. On a 16 GB laptop give the Docker VM about 4 GB, close other heavy apps, and run Ollama natively. If swap fills, the model is evicted and each moment pays a 50 to 90 s reload, so few moments are AI-written. The agents service loads the model at start-up and keeps it for `OLLAMA_KEEP_ALIVE` (default 30 minutes); wait for the "Model ... is loaded" log line before starting a session. Set `OLLAMA_KEEP_ALIVE` on the Ollama server too, because Ollama ignores it on the OpenAI-compatible calls. See docs/ai/EVALUATION.md, "Throughput at demo speeds".
