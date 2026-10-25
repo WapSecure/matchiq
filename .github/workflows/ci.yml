@@ -253,7 +253,9 @@ jobs:
       DOCKER_BUILD_CACHE_DIR: /tmp/matchiq-docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - name: Restore Docker build cache
+        id: build-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /tmp/matchiq-docker-cache/${{ matrix.app }}
           key: docker-container-${{ matrix.app }}-${{ runner.os }}-${{ github.sha }}
@@ -266,6 +268,14 @@ jobs:
           DOCKERFILE: ${{ matrix.dockerfile }}
           CONTEXT: ${{ matrix.context }}
         run: .github/scripts/build-image-with-cache.sh "$APP" "$IMAGE" "$DOCKERFILE" "$CONTEXT"
+      - name: Report Docker build cache
+        env:
+          CACHE_HIT: ${{ steps.build-cache.outputs.cache-hit }}
+          CACHE_MATCHED_KEY: ${{ steps.build-cache.outputs.cache-matched-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.build-cache.outputs.cache-primary-key }}
+        run: >-
+          .github/scripts/report-build-cache.sh "${{ matrix.app }}" "$DOCKER_BUILD_CACHE_DIR/${{ matrix.app }}"
+          "$CACHE_PRIMARY_KEY" "$CACHE_MATCHED_KEY" "$CACHE_HIT"
       - name: Install Trivy
         run: .github/scripts/install-trivy.sh
       - name: CycloneDX SBOM
@@ -281,6 +291,11 @@ jobs:
         run: >-
           trivy image --quiet --scanners vuln --severity HIGH,CRITICAL
           --ignore-unfixed --ignorefile .trivyignore.yaml --exit-code 1 "$IMAGE"
+      - name: Save Docker build cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/matchiq-docker-cache/${{ matrix.app }}
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   compose-smoke:
     name: Compose stack and replay smoke
@@ -294,7 +309,9 @@ jobs:
       DOCKER_BUILD_CACHE_DIR: /tmp/matchiq-docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - name: Restore Docker build cache
+        id: build-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /tmp/matchiq-docker-cache
           key: docker-compose-${{ runner.os }}-${{ github.sha }}
@@ -311,6 +328,14 @@ jobs:
           .github/scripts/build-image-with-cache.sh web matchiq-web:local apps/web/Dockerfile . \
             --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1 \
             --build-arg NEXT_PUBLIC_DEMO_MODE=true
+      - name: Report Docker build cache
+        env:
+          CACHE_HIT: ${{ steps.build-cache.outputs.cache-hit }}
+          CACHE_MATCHED_KEY: ${{ steps.build-cache.outputs.cache-matched-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.build-cache.outputs.cache-primary-key }}
+        run: >-
+          .github/scripts/report-build-cache.sh compose "$DOCKER_BUILD_CACHE_DIR"
+          "$CACHE_PRIMARY_KEY" "$CACHE_MATCHED_KEY" "$CACHE_HIT"
       - name: Start fresh application stack
         run: docker compose --profile app up -d --no-build --wait --wait-timeout 360
       - name: Verify services, seed and replay
@@ -327,6 +352,11 @@ jobs:
       - name: Stop application stack
         if: always()
         run: docker compose --profile app down -v --remove-orphans
+      - name: Save Docker build cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/matchiq-docker-cache
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   iac:
     name: IaC and filesystem scan

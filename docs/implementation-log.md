@@ -1231,3 +1231,13 @@ The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs tha
 - **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
 - **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
 - Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.
+
+## MQ-091: Accepted metric scope and CI cache reporting (25 October 2026)
+
+The product owner accepted ADR-0029, closing the remaining REM-09 decision. The ADR now separates the shot-conversion, pass-quality and player-milestone work delivered by ADR-0038 from the remaining hackathon deferrals: pass distance and difficulty, tracking-dependent speed and distance metrics, additional audience dimensions, and the full analyst baseline/window controls. The submission judging map now reflects the delivered pass heuristic and milestone pipeline.
+
+The hosted-authentication guard discovers every file under `infra/` except the explicitly local `infra/keycloak/` tree and every deployment workflow named `deploy*.yml` or `deploy*.yaml`. A future hosted target is covered without editing the guard's path list. The existing prohibited local realm path, shared password and local issuers remain unchanged.
+
+Docker jobs now use the pinned cache action's restore and save entry points. Each container and Compose job records an exact hit, prefix restore or miss, the requested and restored keys, and the resulting cache size in the job summary. Cache saving still happens only after the job succeeds, and a miss still performs a clean build.
+
+Local validation: shell syntax passed; current hosted configuration passed; explicit and newly discovered hosted fixtures containing local authentication material were rejected; an `infra/keycloak` fixture remained excluded; cache reports were verified for exact hit, prefix restore and miss; workflow and documentation formatting and diff whitespace checks passed. Docker builds and the complete suite remain for CI under the repository testing policy.
