@@ -1,6 +1,6 @@
 # Pitch deck outline
 
-This is an outline of 11 slides with speaker notes. It is the source text for whichever deck format the owner chooses: a PowerPoint file, a hosted slide deck, or slides inside the video. Nothing has been published.
+This is an outline of 11 slides with speaker notes. It is the source text for whichever deck format the owner chooses: a PowerPoint file, a hosted slide deck, or slides inside the video. The 12-slide deck was built on 2026-10-25 as a Slides artifact from this outline, with today's measured results and caveats; the owner exports it as .pptx and PDF.
 
 Rules for every slide:
 
