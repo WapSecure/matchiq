@@ -50,7 +50,7 @@ describe('a moment ruled out by a correction', () => {
     );
     expect(screen.getByRole('note')).toHaveTextContent(RULED_OUT);
     const note = screen.getByRole('note');
-    expect(note).toHaveTextContent('Why: offside in the build-up');
+    expect(note).toHaveTextContent('Why: Offside in the build-up');
     expect(note).not.toHaveTextContent(/Why: Goal ruled out/);
   });
 
@@ -74,7 +74,7 @@ describe('a moment ruled out by a correction', () => {
     );
     expect(screen.getByRole('note')).toHaveTextContent(RULED_OUT);
     expect(screen.getByRole('note')).toHaveTextContent(
-      'Why: offside in the build-up',
+      'Why: Offside in the build-up',
     );
   });
 });

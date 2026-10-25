@@ -22,6 +22,10 @@ export interface TeamTally {
   readonly fouls: number;
   readonly yellowCards: number;
   readonly redCards: number;
+  /** Own goals credited to this team; they are not from its shots. */
+  readonly ownGoalsFor: number;
+  /** Completed passes that advanced the ball at least PROGRESSIVE_PASS_MIN_GAIN. */
+  readonly progressivePasses: number;
 }
 
 /** Event kinds kept on a per-team timeline for windowed metrics and moments. */
@@ -80,6 +84,10 @@ export interface DerivedState {
   /** PASS_ATTEMPTED eventId -> side; completions only count against these. */
   readonly passAttempts: ReadonlyMap<string, Side>;
   readonly completedAttempts: ReadonlySet<string>;
+  /** PASS_ATTEMPTED eventIds whose target gains PROGRESSIVE_PASS_MIN_GAIN or more. */
+  readonly progressiveAttempts: ReadonlySet<string>;
+  /** Per-player counts keyed by `PLAYER_COUNT_KEYS` kind and player id. */
+  readonly playerCounts: ReadonlyMap<string, number>;
 }
 
 export interface ProjectionState {

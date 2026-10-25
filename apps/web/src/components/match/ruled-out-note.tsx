@@ -1,6 +1,7 @@
 import type { InsightKind } from '@matchiq/contracts';
 import { CORRECTION_COPY } from '@/constants/corrections';
 import { cn } from '@/lib/cn';
+import { describeReason } from '@/lib/describe-reason';
 
 /** Says plainly that a moment was ruled out and taken off air, and why. */
 export function RuledOutNote({
@@ -12,7 +13,8 @@ export function RuledOutNote({
   reason?: string | null;
   className?: string;
 }) {
-  const why = reason?.replace(CORRECTION_COPY.reasonLead, '');
+  const stripped = reason?.replace(CORRECTION_COPY.reasonLead, '');
+  const why = stripped ? describeReason(stripped) : null;
   return (
     <p
       role="note"

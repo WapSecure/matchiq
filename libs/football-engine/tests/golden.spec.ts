@@ -101,10 +101,15 @@ describe('golden: late comeback', () => {
     expect(
       insights.map((i) => [i.kind, i.priority, i.reasonCode, i.matchClockMs]),
     ).toEqual([
+      ['PLAYER_MILESTONE', 'P2', 'FIRST_SHOT_ON_TARGET', 6 * MIN],
       ['GOAL', 'P0', 'GOAL_SCORED', 6 * MIN],
+      ['PLAYER_MILESTONE', 'P2', 'FIRST_GOAL', 6 * MIN],
+      ['PLAYER_MILESTONE', 'P2', 'FIRST_YELLOW_CARD', 30 * MIN],
       ['RED_CARD', 'P0', 'SECOND_YELLOW_DISMISSAL', 10 * MIN],
       ['HIGH_REGAINS', 'P1', 'HIGH_REGAINS_THRESHOLD', 31 * MIN + 30 * SEC],
+      ['PLAYER_MILESTONE', 'P2', 'FIRST_SHOT_ON_TARGET', 33 * MIN],
       ['GOAL', 'P0', 'GOAL_SCORED', 33 * MIN],
+      ['PLAYER_MILESTONE', 'P2', 'FIRST_GOAL', 33 * MIN],
       ['SHOT_BURST', 'P1', 'SHOT_BURST_THRESHOLD', 34 * MIN],
       ['GOAL', 'P0', 'OWN_GOAL_SCORED', 34 * MIN],
     ]);
@@ -119,10 +124,10 @@ describe('golden: late comeback', () => {
 });
 
 /**
- * Pinned at ALGORITHM_VERSION 1.0.0. A change here means replay output changed:
+ * Pinned at ALGORITHM_VERSION 1.1.0 (MQ-086 added shotConversionPct and passQualityPct). A change here means replay output changed:
  * bump ALGORITHM_VERSION and re-pin deliberately, never silently.
  */
 const GOLDEN_HASH = {
-  empty: '3a986bece53d4da6b99f2cd6f73c3d6d34317c3c575b320245f2f35d78070e80',
-  comeback: 'c09cb15bb460506b06b16fb1c88182d4ce15231bc9b1458f1b6a9590f5a77019',
+  empty: '4223958851a87050291126c233097c4d045b25b9f27264b4f167cb1c766519fc',
+  comeback: '946d828fda5be21393ae67d58b6561cc7972e2bfa828bb98f2ff197db02c42c6',
 } as const;

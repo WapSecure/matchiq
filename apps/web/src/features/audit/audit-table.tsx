@@ -6,6 +6,7 @@ import {
   AUDIT_ACTION_LABELS,
   AUDIT_COPY,
 } from '@/constants/audit';
+import { describeAction, describeReason } from '@/lib/describe-reason';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
 import { AuditDiff } from './audit-diff';
 import { AuditTargetCell } from './audit-target-cell';
@@ -56,6 +57,12 @@ function AuditTechnical({ event }: { event: AuditEvent }) {
   const t = AUDIT_COPY.technical;
   const rows = [
     [t.action, event.action],
+    [
+      t.reason,
+      event.reason && describeReason(event.reason) !== event.reason
+        ? event.reason
+        : null,
+    ],
     [t.actor, event.actor.id],
     [t.target, event.target.id],
     [t.entry, event.id],
@@ -90,7 +97,7 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
         scope="row"
         className={`${CELL} text-left text-[13px] font-semibold text-ink max-md:order-first max-md:p-0`}
       >
-        {AUDIT_ACTION_LABELS[event.action] ?? event.action}
+        {describeAction(event.action, AUDIT_ACTION_LABELS)}
       </th>
       <Cell label={columns.actor}>
         <AuditActorCell event={event} />
@@ -100,7 +107,7 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
       </Cell>
       <Cell label={columns.reason} className="md:max-w-[22rem]">
         {event.reason ? (
-          <span className="text-ink">{event.reason}</span>
+          <span className="text-ink">{describeReason(event.reason)}</span>
         ) : (
           <span className="text-ink-subtle">{AUDIT_COPY.noReason}</span>
         )}

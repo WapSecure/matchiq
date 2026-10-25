@@ -1,7 +1,7 @@
 /** Bump on any change that can alter a snapshot value or `stateHash`. */
-export const ALGORITHM_VERSION = '1.0.0';
+export const ALGORITHM_VERSION = '1.1.0';
 /** Bump on any change to key-moment rules, thresholds or evidence wording. */
-export const MOMENT_METHOD_VERSION = '1.0.0';
+export const MOMENT_METHOD_VERSION = '1.1.0';
 
 /** Sequences are gap-free from 0 per fixture (`ReplayStatus.appliedSequence` starts at -1). */
 export const FIRST_SEQUENCE = 0;
@@ -26,6 +26,20 @@ export const ROUNDING = {
 } as const;
 
 export const PERCENT = 100;
+
+/** A completed pass is progressive when its target is this many pitch units nearer goal (0-100 scale). */
+export const PROGRESSIVE_PASS_MIN_GAIN = 10;
+
+/** Per-player running counts in `DerivedState.playerCounts`, keyed `<kind>|<playerId>`. */
+export const PLAYER_COUNT_KINDS = {
+  shotOnTarget: 'shotOnTarget',
+  goal: 'goal',
+  yellowCard: 'yellowCard',
+} as const;
+export type PlayerCountKind =
+  (typeof PLAYER_COUNT_KINDS)[keyof typeof PLAYER_COUNT_KINDS];
+export const playerCountKey = (kind: PlayerCountKind, playerId: string) =>
+  `${kind}|${playerId}`;
 
 /**
  * Spec §9 momentum weights. Each component is a bounded z-score against a
@@ -91,6 +105,9 @@ export const REASON_CODES = {
   highRegains: 'HIGH_REGAINS_THRESHOLD',
   pressureSwing: 'PRESSURE_SWING_THRESHOLD',
   momentumShift: 'MOMENTUM_SHIFT_THRESHOLD',
+  firstShotOnTarget: 'FIRST_SHOT_ON_TARGET',
+  firstGoal: 'FIRST_GOAL',
+  firstYellowCard: 'FIRST_YELLOW_CARD',
 } as const;
 
 export const ERRORS = {

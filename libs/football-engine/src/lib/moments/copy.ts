@@ -26,7 +26,16 @@ export const RATIONALE = {
     `${team} applied ${now} pressures in the latest five minutes, up from ${before} in the five before; this suggests a rise in pressing intensity.`,
   momentumShift: (team: string, m: MomentumPair) =>
     `The momentum index favours ${team} at ${m.now} against ${m.opponentNow}, from ${m.before} against ${m.opponentBefore} in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.`,
+  firstShotOnTarget: (team: string) =>
+    `A ${team} player had their first shot on target of the match.`,
+  firstGoal: (team: string) =>
+    `A ${team} player scored their first goal of the match.`,
+  firstYellowCard: (team: string) =>
+    `A ${team} player received their first yellow card of the match.`,
 } as const;
+
+export const MILESTONE_LIMITATION =
+  'Counts only events recorded in this synthetic match feed.';
 
 export const COUNTER = {
   opponentShots: (team: string, shots: number) =>
