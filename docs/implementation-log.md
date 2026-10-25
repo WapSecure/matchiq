@@ -1231,3 +1231,11 @@ The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs tha
 - **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
 - **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
 - Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.
+
+## MQ-089: Analyst baseline, sample sizes and comparison windows (25 October 2026)
+
+- **Compared with** block in the Analyst evidence drawer: the moment's key count over the last 5 minutes, last 10 minutes or whole match against the match average, for both teams (5 minutes: the moment's team only), with the plays behind each figure, the moment's `sampleSize` and the envelope `limitations` when present. Plain wording; no raw index values. Fan and Broadcast never see it.
+- **Window picker**: React Aria `SegmentedControl`, default 10 minutes, kept per device in `localStorage` (guarded).
+- **Pressure trend**: three bars for the latest 5-minute spells with an accessible name and a table view (`spell-trend.tsx`).
+- States: loading, "Not enough match time yet to compare", and hidden for non-Analyst personas. Numbers come only from `insight.context`; nothing is shown when a figure is not in the payload.
+- Tests: `compared-with.spec.tsx`. No backend change. ADR-0029 updated.

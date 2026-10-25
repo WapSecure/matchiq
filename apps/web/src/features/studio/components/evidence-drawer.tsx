@@ -1,6 +1,7 @@
 'use client';
 
 import { Drawer } from '@/components/ui/drawer';
+import { COMPARISON_COPY } from '@/constants/comparison';
 import { EVIDENCE_COPY } from '@/constants/evidence';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { useEvidenceEvents } from '../hooks/use-evidence-events';
@@ -20,6 +21,7 @@ import {
   EvidenceSummary,
   EvidenceTechnical,
 } from './evidence-sections';
+import { ComparedWith } from './compared-with';
 import { NarrativePanel } from './narrative-panel';
 
 const NO_IDS: readonly string[] = [];
@@ -39,6 +41,9 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
   const title =
     view?.narrative.headline ??
     (insight ? INSIGHT_KIND_LABELS[insight.kind] : EVIDENCE_COPY.title);
+
+  const subject = roster.team(insight?.teamId);
+  const subjectNames = subject ? { [subject.side]: subject.name } : undefined;
 
   return (
     <Drawer
@@ -64,6 +69,18 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
               </p>
             ) : null}
           </EvidenceSection>
+          {persona === 'ANALYST' ? (
+            <EvidenceSection title={COMPARISON_COPY.title}>
+              <ComparedWith
+                insight={insight}
+                persona={persona}
+                names={subjectNames}
+                loading={
+                  insight.context === undefined && insight.status === 'DETECTED'
+                }
+              />
+            </EvidenceSection>
+          ) : null}
           <EvidenceSection title={EVIDENCE_COPY.sections.window}>
             <EvidenceSummary insight={insight} />
           </EvidenceSection>
