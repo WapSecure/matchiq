@@ -115,13 +115,18 @@ export const script = (startSequence = 0) => {
     periodStarted: () => emit({ type: 'PERIOD_STARTED' }),
     periodEnded: () => emit({ type: 'PERIOD_ENDED' }),
     matchEnded: () => emit({ type: 'MATCH_ENDED' }),
-    pass: (side: TestSide, targetX = PT.x) =>
+    pass: (
+      side: TestSide,
+      targetX = PT.x,
+      extra: Record<string, unknown> = {},
+    ) =>
       emit({
         type: 'PASS_ATTEMPTED',
         ...actor(side),
         location: PT,
         targetLocation: { x: targetX, y: PT.y },
         underPressure: false,
+        ...extra,
       }),
     completed: (side: TestSide, attemptEventId: string) =>
       emit({
@@ -130,13 +135,18 @@ export const script = (startSequence = 0) => {
         attemptEventId,
         location: PT,
       }),
-    shot: (side: TestSide, outcome = 'OFF_TARGET') =>
+    shot: (
+      side: TestSide,
+      outcome = 'OFF_TARGET',
+      extra: Record<string, unknown> = {},
+    ) =>
       emit({
         type: 'SHOT',
         ...actor(side),
         location: { x: 88, y: 50 },
         outcome,
         bodyPart: 'RIGHT_FOOT',
+        ...extra,
       }),
     goal: (side: TestSide, shotEventId: string, ownGoal = false) =>
       emit({ type: 'GOAL', ...actor(side), shotEventId, ownGoal }),

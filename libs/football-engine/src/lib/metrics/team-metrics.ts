@@ -7,6 +7,7 @@ import { PERCENT, ROUNDING } from '../constants.js';
 import { possessionTotals } from '../projection/possession.js';
 import type { DerivedState, Side, TeamTally } from '../types.js';
 import { largestRemainderShares, roundTo } from '../util/numbers.js';
+import { measureMetrics } from './measure-metrics.js';
 import { momentumFor } from './momentum.js';
 import { rollingWindow } from './windows.js';
 
@@ -119,6 +120,7 @@ export const teamMetrics = (
       ),
       shotConversionPct: shotConversion(tally),
       passQualityPct: passQuality(tally),
+      ...measureMetrics(tally),
       possessionPct: possession.value[side],
       possessionBasis: possession.basis,
       momentum: momentumNow(derived, side),

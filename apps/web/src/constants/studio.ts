@@ -58,6 +58,9 @@ export const STUDIO_COPY = {
     passCompletion: 'Pass completion',
     shotConversion: 'Shot conversion',
     passQuality: 'Pass quality',
+    passDistance: 'Pass distance (m)',
+    passDifficulty: 'Pass difficulty (synthetic)',
+    shotSpeed: 'Shot speed (km/h)',
     momentum: 'Momentum',
     momentumDescription:
       'Who is on top, from shots, final third entries, pressing and high ball wins, compared with the rest of the match',

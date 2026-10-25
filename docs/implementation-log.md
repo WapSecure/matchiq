@@ -1268,6 +1268,12 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 ## MQ-094: milestone wording at detection (25 October 2026)
 
 - The match pipeline publishes `PLAYER_MILESTONE` standard wording when the moment is detected (publication `TEMPLATE`, reason `TEMPLATE_ONLY`) instead of queueing an agents job, so milestones are never left "being written" behind a slow writer. The job-level check from MQ-093 stays as a guard.
+
+## MQ-097: pass distance, difficulty, shot speed and xG baseline (25 October 2026)
+
+- Engine 1.2.0 publishes average pass distance (m), synthetic pass difficulty (0-100), average and fastest shot speed (from `SHOT.speedKph` only) and an "xG baseline (synthetic, not calibrated)". New optional snapshot fields, `xg` metric unit, codegen and OpenAPI regenerated, golden hashes re-pinned. ADR-0040.
+- Team comparison gains pass distance, pass difficulty and shot speed rows when both teams have values; the xG baseline appears only in metric definitions and evidence.
+- Tests: `pass-shot-xg-metrics.spec.ts`, `stat-rows.spec.ts`, `golden.spec.ts`.
 - Tests: `template-only.spec.ts` (new); worker integration specs now exclude milestones where they expect agent-written or pending moments.
 
 ## MQ-098: Listen to a narrative (25 October 2026)

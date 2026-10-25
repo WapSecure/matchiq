@@ -36,6 +36,7 @@ class Unit(StrEnum):
     percent = "percent"
     index = "index"
     metres = "metres"
+    xg = "xg"
     kph = "kph"
     mps = "mps"
 
@@ -82,6 +83,11 @@ class TeamMatchMetrics(BaseModel):
     passCompletionPct: MetricValue
     shotConversionPct: MetricValue | None = None
     passQualityPct: MetricValue | None = None
+    passDistanceAvgM: MetricValue | None = None
+    passDifficultyAvg: MetricValue | None = None
+    shotSpeedAvgKph: MetricValue | None = None
+    shotSpeedMaxKph: MetricValue | None = None
+    xgBaseline: MetricValue | None = None
     possessionPct: MetricValue
     possessionBasis: PossessionBasis
     pressures: Annotated[int, Field(ge=0, le=9007199254740991)]

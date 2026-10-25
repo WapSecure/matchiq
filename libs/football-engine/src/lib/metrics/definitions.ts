@@ -85,6 +85,54 @@ export const MATCH_METRICS: readonly BaseMetricDefinition[] = [
     heuristic: true,
   },
   {
+    base: 'passDistanceAvgM',
+    label: 'Average pass distance',
+    formula:
+      'mean(hypot(dx * lengthM / 100, dy * widthM / 100)) over completed passes with a known start and end',
+    description:
+      'Straight-line distance in metres between where a completed pass started and where it was aimed, scaled to the fixture pitch size. Unavailable (ZERO_DENOMINATOR) when no passes were completed.',
+    unit: 'metres',
+    heuristic: false,
+  },
+  {
+    base: 'passDifficultyAvg',
+    label: 'Synthetic pass difficulty',
+    formula:
+      'mean(40 * min(distanceM / 40, 1) + 20 * |dy| / distance + 20 * underPressure + 20 * clamp(forwardM / 30, 0, 1)) over completed passes',
+    description:
+      'Synthetic pass difficulty, 0 to 100, from pass distance, sideways angle, whether the passer was under pressure and forward progress. A product score for synthetic fixtures, never calibrated to real-world difficulty. Unavailable (ZERO_DENOMINATOR) when no passes were completed.',
+    unit: 'index',
+    heuristic: true,
+  },
+  {
+    base: 'shotSpeedAvgKph',
+    label: 'Average shot speed',
+    formula: 'mean(speedKph) over SHOT events that carry speedKph',
+    description:
+      'Only from the speed recorded on the shot event, in km/h. Unavailable (NOT_GENERATED) when no shot carries a speed.',
+    unit: 'kph',
+    heuristic: false,
+  },
+  {
+    base: 'shotSpeedMaxKph',
+    label: 'Fastest shot',
+    formula: 'max(speedKph) over SHOT events that carry speedKph',
+    description:
+      'Highest speed recorded on a shot event, in km/h. Unavailable (NOT_GENERATED) when no shot carries a speed.',
+    unit: 'kph',
+    heuristic: false,
+  },
+  {
+    base: 'xgBaseline',
+    label: 'xG baseline (synthetic, not calibrated)',
+    formula:
+      'sum over shots of 1 / (1 + exp(-(-0.2 - 0.12 * distanceToGoalM + angleOfGoalMouthRad)))',
+    description:
+      'xG baseline (synthetic, not calibrated): a geometric estimate from shot distance and the angle of the goal mouth only. It ignores defenders, body part, assist type and shot type, has no training data or validation, and must not be read as real-world expected goals. Unavailable (ZERO_DENOMINATOR) when the team has had no shots.',
+    unit: 'xg',
+    heuristic: true,
+  },
+  {
     base: 'possessionPct',
     label: 'Possession',
     formula:
