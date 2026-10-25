@@ -51,14 +51,17 @@ pnpm dev
 
 Check that `curl -s localhost:8000/api/v1/health/ready` does not report `degraded` for the model.
 
-### 3. Pre-run sessions
+### 3. Sessions to show
 
-Local inference takes about a minute per insight (p50 64.7 s in the recorded baseline), so agent copy cannot appear inside a 2-minute take. Prepare two sessions in advance and say on screen that they were run earlier:
+**Decision (25 October 2026): record with standard wording.** On the development laptop the local model cannot finish a write-up inside a 5x replay: the last two measured matches (3B model, memory almost full) wrote 0 of 41 moments with AI, while the fact check caught 12 to 16 problems per match and nothing wrong aired. The video therefore shows the live studio on standard wording and the agent evidence from sessions recorded earlier with real local inference. Say so on screen.
 
-1. **Session A (real agent chain).** In the lobby, start _Late comeback_ at 5× with "No simulated failure". Let it finish; it takes about 12 minutes. Its Observatory then shows `ollama` runs for Analyst, Writer, Producer and Localization, with the deterministic Fact Checker.
-2. **Session B (simulated failure).** Start _Late comeback_ with Demo scenario **"Fact Checker rejects a draft, then a revision passes"** (`WRITER_REVISE`), or **"Model times out; templates air, breaker opens"** (`MODEL_TIMEOUT`). Let at least the first insight finish.
+1. **Live takes (shots 2 to 5, 8, 9).** Set `AI_ENABLED=false` in `.env` and restart the worker (`pnpm nx serve worker`, or restart the compiled worker). Every moment then carries standard wording at once, with no "being written" states, and the Fact-checks page says why. Start _Late comeback_ at 20x.
+2. **Session A (real agent chain), shot 6.** `fx_comeback_42_s7`: 19 of 19 moments written by the local model (`ollama` runs for Analyst, Writer, Fact Checker, Translator and Graphics writer, about 29 s per write-up). Open `/studio/fx_comeback_42_s7/observatory`.
+3. **Session B (simulated failure), shot 7.** `fx_comeback_42_s10`: _Late comeback_ with the "Fact Checker rejects a draft, then a revision passes" scenario (`WRITER_REVISE`), 10 of 19 moments model-written. Open `/studio/fx_comeback_42_s10/observatory` and show the "Simulated failure (demo)" badge.
 
-Close other heavy applications while these run. Under heavy load, local calls time out and templates stay on air. That is correct behaviour, but it is not what this shot list shows.
+Sessions A and B live in the local Postgres volume of the recording machine. If it was reset, run _Late comeback_ again with a quiet machine (see "Memory for local models" in `docs/deployment/LOCAL_STACK.md`) and use the new session ids. Do not claim a share the Fact-checks page does not show.
+
+Close other heavy applications before recording, because the studio and the browser need the memory.
 
 ### 4. Browser
 
@@ -102,9 +105,9 @@ The same shots as the submission cut, plus:
 - [ ] Final length checked in the editor: **under 2:00**, ideally 1:50.
 - [ ] Every shot is the real running app, with no mock-ups (spec §19).
 - [ ] The synthetic-data label is visible in the opening shot and in the studio.
-- [ ] Session A's Observatory shows `ollama` rows. Mock rows are labelled mock and never presented as a model.
+- [ ] Session A's Observatory (`fx_comeback_42_s7`) shows `ollama` rows. Mock rows are labelled mock and never presented as a model.
 - [ ] The fault chain is captioned "Simulated failure".
-- [ ] The narration says the agent sessions were recorded earlier.
+- [ ] The narration says the agent sessions were recorded earlier and that the live take uses standard wording.
 - [ ] Nothing claims that Foundry or Azure is running.
 - [ ] No Premier League marks, real club names, real players, footage or copyrighted music.
 - [ ] Dev-only credentials are acceptable on screen, since they are public in the repository. No real secrets, `.env` contents or terminal tokens are visible.

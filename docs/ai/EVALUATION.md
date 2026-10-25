@@ -130,7 +130,18 @@ What limits AI-written moments is wall-clock service time, not grounding. Measur
 
 Each call takes 20 to 100 s and a moment arrives every 10 to 20 s, so the backlog only grows. ADR-0011 addendum 6 changes four things: a start-up warm-up that pins the model (`OLLAMA_KEEP_ALIVE`), priority ordering with a stale cut-off (`AGENT_MAX_AGE_SECONDS`, reason `SKIPPED_STALE`), an optional compact prompt mode (`AGENT_PROMPT_MODE=compact`), and a plain-language label for every fallback reason. Prompt sizes are asserted in `apps/agents/tests/test_throughput.py`: compact prompts are shorter than the standard ones and keep the grounding rules byte for byte.
 
-The effect of these changes on the AI share has not been re-measured yet. To measure:
+Re-measured 2026-10-25 after ADR-0011 addendum 6 (qwen2.5:3b, Late comeback, 5x, `AGENT_JOB_CONCURRENCY=1`, swap almost full on the laptop). Counts come from `insights.publication` and `agent_runs`:
+
+| Run                               | Moments | AI-written | Writer calls                            | Notes                                                |
+| --------------------------------- | ------- | ---------- | --------------------------------------- | ---------------------------------------------------- |
+| s14 (standard prompts)            | 41      | 14         | 18 succeeded (avg 51 s), 12 timed out   | memory less tight                                    |
+| s15 (standard prompts)            | 41      | 6          | 8 succeeded (avg 42 s), 2 timed out     | 29 moments still queued at full time                 |
+| s16 (standard prompts, MQ-093)    | 41      | 0          | 0 succeeded, 7 timed out (101 to 104 s) | milestones on standard wording; fact check caught 12 |
+| s17 (`AGENT_PROMPT_MODE=compact`) | 41      | 0          | 0 succeeded, 7 timed out (101 to 104 s) | same distribution as s16; fact check caught 16       |
+
+Conclusion: on this machine the model cannot finish a write-up inside the call limit once memory is exhausted, and neither milestone-only standard wording (MQ-093, MQ-094) nor compact prompts changes that. Nothing wrong aired in any run: the fact check stopped 12 to 16 drafts per match and standard wording went out instead. The demo is recorded with standard wording and earlier agent sessions (docs/submission/DEMO_SCRIPT.md). A clean AI-share figure needs a quiet machine with enough memory for the 7B model; that run has not been done.
+
+To measure again:
 
 1. Start the stack with `AI_ENABLED=true`, `MODEL_PROVIDER=ollama`, `AGENT_TIMEOUT_MS=120000`, `AGENT_JOB_CONCURRENCY=1`, and wait for the agents log line "Model ... is loaded".
 2. Start a replay session of the Late comeback fixture at 5x and let it finish.
