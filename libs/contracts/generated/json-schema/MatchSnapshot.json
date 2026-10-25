@@ -133,6 +133,21 @@
         "passQualityPct": {
           "$ref": "#/$defs/MetricValue"
         },
+        "passDistanceAvgM": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "passDifficultyAvg": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "shotSpeedAvgKph": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "shotSpeedMaxKph": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "xgBaseline": {
+          "$ref": "#/$defs/MetricValue"
+        },
         "possessionPct": {
           "$ref": "#/$defs/MetricValue"
         },
@@ -223,6 +238,7 @@
             "percent",
             "index",
             "metres",
+            "xg",
             "kph",
             "mps"
           ]

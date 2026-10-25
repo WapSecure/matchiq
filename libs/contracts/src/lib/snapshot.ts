@@ -21,6 +21,7 @@ export const MetricUnit = z.enum([
   'percent',
   'index',
   'metres',
+  'xg',
   'kph',
   'mps',
 ]);
@@ -58,6 +59,14 @@ export const TeamMatchMetrics = z
     /** Optional so snapshots stored before algorithm 1.1.0 still parse. */
     shotConversionPct: MetricValue.optional(),
     passQualityPct: MetricValue.optional(),
+    /** Optional so snapshots stored before algorithm 1.2.0 still parse (ADR-0040). */
+    passDistanceAvgM: MetricValue.optional(),
+    /** Synthetic 0-100 score, not calibrated to real play. */
+    passDifficultyAvg: MetricValue.optional(),
+    shotSpeedAvgKph: MetricValue.optional(),
+    shotSpeedMaxKph: MetricValue.optional(),
+    /** xG baseline (synthetic, not calibrated): geometry only. */
+    xgBaseline: MetricValue.optional(),
     possessionPct: MetricValue,
     possessionBasis: PossessionBasis,
     pressures: z.int().nonnegative(),

@@ -16,6 +16,11 @@ import {
   type Handler,
 } from './derived-ops.js';
 import { opponentOf, sideOf } from './initial-state.js';
+import {
+  passGeometryOf,
+  withPassMeasures,
+  withShotMeasures,
+} from './measures.js';
 import { changePossession, closeSegment } from './possession.js';
 
 type HandlerMap = { readonly [T in MatchEventType]?: Handler<MatchEventOf<T>> };
@@ -25,7 +30,12 @@ const shot: Handler<MatchEventOf<'SHOT'>> = (derived, event, context) => {
   if (side === null) return derived;
   const kinds: TrackedKind[] =
     event.outcome === 'ON_TARGET' ? ['shots', 'shotsOnTarget'] : ['shots'];
-  const counted = countAndTrack(derived, side, kinds, event);
+  const counted = withShotMeasures(
+    countAndTrack(derived, side, kinds, event),
+    side,
+    event,
+    context,
+  );
   return event.outcome === 'ON_TARGET'
     ? bumpPlayer(counted, PLAYER_COUNT_KINDS.shotOnTarget, event.playerId)
     : counted;
@@ -62,6 +72,10 @@ const passAttempted: Handler<MatchEventOf<'PASS_ATTEMPTED'>> = (
     ...bump(derived, side, ['passesAttempted']),
     passAttempts,
     progressiveAttempts,
+    passGeometry: new Map(derived.passGeometry).set(
+      event.eventId,
+      passGeometryOf(event, context),
+    ),
   };
 };
 
@@ -82,7 +96,12 @@ const passCompleted: Handler<MatchEventOf<'PASS_COMPLETED'>> = (
     derived.progressiveAttempts.has(event.attemptEventId)
       ? ['passesCompleted', 'progressivePasses']
       : ['passesCompleted'];
-  return { ...bump(derived, side, keys), completedAttempts };
+  const measured = withPassMeasures(
+    bump(derived, side, keys),
+    side,
+    derived.passGeometry.get(event.attemptEventId),
+  );
+  return { ...measured, completedAttempts };
 };
 
 const tracked =

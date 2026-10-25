@@ -2,19 +2,43 @@ import type { MatchSnapshot } from '@matchiq/contracts';
 import type { StatRow } from '@/components/match/stat-comparison';
 import { STAT_ROWS, STUDIO_COPY } from '@/constants/studio';
 
+type MetricKey =
+  | 'passCompletionPct'
+  | 'shotConversionPct'
+  | 'passQualityPct'
+  | 'passDistanceAvgM'
+  | 'passDifficultyAvg'
+  | 'shotSpeedAvgKph';
+
+const hasValue = (
+  metric: { status: string } | undefined,
+): metric is NonNullable<typeof metric> => metric?.status === 'available';
+
+/** Extra rows appear only when both teams have a measured value. */
+const EXTRA_KEYS: readonly MetricKey[] = [
+  'passDistanceAvgM',
+  'passDifficultyAvg',
+  'shotSpeedAvgKph',
+];
+
 const metricRows = (snapshot: MatchSnapshot): StatRow[] => {
-  const { passCompletion, shotConversion, passQuality } = STUDIO_COPY.metrics;
-  const defs = [
-    ['passCompletionPct', passCompletion],
-    ['shotConversionPct', shotConversion],
-    ['passQualityPct', passQuality],
-  ] as const;
+  const m = STUDIO_COPY.metrics;
+  const defs: readonly (readonly [MetricKey, string])[] = [
+    ['passCompletionPct', m.passCompletion],
+    ['shotConversionPct', m.shotConversion],
+    ['passQualityPct', m.passQuality],
+    ['passDistanceAvgM', m.passDistance],
+    ['passDifficultyAvg', m.passDifficulty],
+    ['shotSpeedAvgKph', m.shotSpeed],
+  ];
   return defs.flatMap(([key, label]) => {
     const home = snapshot.home[key];
     const away = snapshot.away[key];
-    return home && away
-      ? [{ key, label, kind: 'metric' as const, home, away }]
-      : [];
+    if (!home || !away) return [];
+    if (EXTRA_KEYS.includes(key) && !(hasValue(home) && hasValue(away))) {
+      return [];
+    }
+    return [{ key, label, kind: 'metric' as const, home, away }];
   });
 };
 

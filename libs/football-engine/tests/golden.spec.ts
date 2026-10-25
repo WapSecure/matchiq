@@ -124,10 +124,10 @@ describe('golden: late comeback', () => {
 });
 
 /**
- * Pinned at ALGORITHM_VERSION 1.1.0 (MQ-086 added shotConversionPct and passQualityPct). A change here means replay output changed:
+ * Pinned at ALGORITHM_VERSION 1.2.0 (MQ-097 added pass distance, synthetic pass difficulty, shot speed and the xG baseline). A change here means replay output changed:
  * bump ALGORITHM_VERSION and re-pin deliberately, never silently.
  */
 const GOLDEN_HASH = {
-  empty: '4223958851a87050291126c233097c4d045b25b9f27264b4f167cb1c766519fc',
-  comeback: '946d828fda5be21393ae67d58b6561cc7972e2bfa828bb98f2ff197db02c42c6',
+  empty: 'fe78155c55f66774028f17859e0a1986517951e2398602466e5137687042cdc7',
+  comeback: '648f77f9020c3d07b9decebc396c86d0d9d56968a268dba94ee43035b4ef9e42',
 } as const;

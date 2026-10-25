@@ -50,6 +50,33 @@ export const METRIC_BASES: Record<
     formula:
       'completed passes gaining ≥ 10 pitch units / passesCompleted × 100',
   },
+  passDistanceAvgM: {
+    label: 'Average pass distance',
+    plain: 'How far completed passes travelled on average, in metres',
+    formula: 'mean pass length over completed passes, scaled to the pitch size',
+  },
+  passDifficultyAvg: {
+    label: 'Synthetic pass difficulty',
+    plain:
+      'A 0 to 100 score for how hard the completed passes were, from length, direction, pressure and forward progress. It is made up for this synthetic data and is not a real-world rating',
+    formula: 'mean of a weighted score per completed pass (synthetic)',
+  },
+  shotSpeedAvgKph: {
+    label: 'Average shot speed',
+    plain: 'Average speed of shots, only where the match data records a speed',
+    formula: 'mean(speedKph) over shots that carry a speed',
+  },
+  shotSpeedMaxKph: {
+    label: 'Fastest shot',
+    plain: 'Fastest shot, only where the match data records a speed',
+    formula: 'max(speedKph) over shots that carry a speed',
+  },
+  xgBaseline: {
+    label: 'xG baseline (synthetic, not calibrated)',
+    plain:
+      'A rough chance-quality guess from shot distance and angle alone. It is synthetic, not calibrated and not a real-world expected-goals figure',
+    formula: 'sum over shots of a distance and angle score (uncalibrated)',
+  },
   possessionPct: {
     label: 'Possession',
     plain: 'Share of the time the team had the ball',
