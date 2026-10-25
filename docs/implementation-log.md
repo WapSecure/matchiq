@@ -1235,6 +1235,7 @@ The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs tha
 ## MQ-090: Stricter accessibility gate and audit status (25 October 2026)
 
 The axe helper now fails on moderate, serious and critical violations of the WCAG 2.x A and AA rules (`BLOCKING_IMPACT_THRESHOLD`). Reading the source found no pattern that triggers the moderate WCAG rules (document language is set, the viewport does not lock zoom, no media, single labels). A second pass runs the best-practice rules (landmarks, heading order, region) and logs each finding as an `axe-advisory` annotation rather than failing, until a CI run confirms them. No rule is disabled. The README claim matches this, `docs/design/ACCESSIBILITY_CHECKLIST.md` lists the manual VoiceOver, keyboard, reduced-motion and zoom checks (all not yet performed), and `docs/audits/STATUS_UPDATE_2026-10-25.md` records the audit findings' current status. Traceability rows REQ-028 and REQ-033 updated. Browser specs were not run locally; CI runs them.
+
 ## MQ-091: Accepted metric scope and CI cache reporting (25 October 2026)
 
 The product owner accepted ADR-0029, closing the remaining REM-09 decision. The ADR now separates the shot-conversion, pass-quality and player-milestone work delivered by ADR-0038 from the remaining hackathon deferrals: pass distance and difficulty, tracking-dependent speed and distance metrics, additional audience dimensions, and the full analyst baseline/window controls. The submission judging map now reflects the delivered pass heuristic and milestone pipeline.
