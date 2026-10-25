@@ -77,9 +77,16 @@ export class WorkerGauges implements OnModuleInit, OnApplicationShutdown {
       async collect() {
         for (const queue of queues) {
           await tolerant(async () => {
-            const counts = await queue.getJobCounts(...queueStates);
+            const counts = await queue.getJobCounts(
+              ...queueStates,
+              'prioritized',
+            );
             for (const state of queueStates) {
-              this.set({ queue: queue.name, state }, counts[state] ?? 0);
+              const prioritized = state === 'waiting' ? counts.prioritized : 0;
+              this.set(
+                { queue: queue.name, state },
+                (counts[state] ?? 0) + (prioritized ?? 0),
+              );
             }
           });
         }
