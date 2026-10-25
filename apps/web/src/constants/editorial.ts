@@ -125,7 +125,7 @@ export const RETRACT_COPY: CommandCopy & {
   idle: string;
 } = {
   action: 'Take off air',
-  idle: 'Take off air: nothing on air to take off',
+  idle: 'Take off air, nothing on air to take off',
   label: (headline) => `Take off air: ${headline}`,
   title: 'Take this graphic off air',
   description:
