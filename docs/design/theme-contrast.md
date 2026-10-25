@@ -57,3 +57,7 @@ Accent-ink `#ffffff` on accent: 5.48.
 Home and away are a two-slot categorical pair, validated per theme with the dataviz palette validator (lightness band, chroma, CVD and normal-vision separation, contrast): light `#2563eb`/`#b45a09` against `#ffffff`, dark `#4d8dff`/`#c98500` against `#0e1218`, all checks pass (worst CVD ΔE 29.8). Team identity is never colour-only: monograms differ in shape (home square, away pill), swatches differ in shape, the pitch map gives each team its own attacking direction, and every chart has a table.
 
 Axe (WCAG 2.2 AA tags) runs on every screen in both themes in Playwright and reports no serious or critical violations.
+
+## Automated gate threshold
+
+The axe helper (`apps/web-e2e/src/support/a11y.ts`) fails on WCAG 2.x A and AA rule violations at moderate impact and above (`BLOCKING_IMPACT_THRESHOLD` in `a11y-constants.ts`). Colour contrast was already blocking because axe rates it serious. A second pass runs the `best-practice` rules (landmarks, heading order, region) and records each finding as an `axe-advisory` annotation in the Playwright report instead of failing, because those rules have not yet been confirmed against every screen. No rule is disabled. Manual checks are in [`ACCESSIBILITY_CHECKLIST.md`](ACCESSIBILITY_CHECKLIST.md).

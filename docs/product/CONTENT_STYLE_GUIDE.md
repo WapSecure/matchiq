@@ -250,7 +250,7 @@ Technical details never contain secrets, prompts or tokens.
 - [ ] It passes the glossary: no "cue", "insight", "gate", "template", "fixture", "session", "deterministic", "pipeline", "payload" or "ledger" on a default view.
 - [ ] Errors use `humanizeError` and never print `error.message` or `problem.detail`.
 - [ ] Every loading surface has loading, empty and error states.
-- [ ] Accessible names describe the action and its object.
+- [ ] Accessible names describe the action and its object, and the announced wording is checked in the [manual accessibility checklist](../design/ACCESSIBILITY_CHECKLIST.md).
 - [ ] Tests assert on the new strings or on test ids.
 
 ## 12. Talking about AI
