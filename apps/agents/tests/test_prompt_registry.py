@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from matchiq_agents.roster import registry
+from matchiq_agents.roster.compact import COMPACT_PROMPTS
 from matchiq_agents.roster.prompts import MATCH_ANALYST, PROMPTS
 
 BASELINE = Path(__file__).parent / "eval" / "baselines" / "ollama-qwen2.5-7b-instruct.json"
@@ -20,6 +21,10 @@ BASELINE = Path(__file__).parent / "eval" / "baselines" / "ollama-qwen2.5-7b-ins
 
 def test_every_prompt_is_recorded_in_the_registry() -> None:
     assert registry.problems(PROMPTS.values(), registry.load()) == []
+
+
+def test_every_compact_prompt_is_recorded_in_the_registry() -> None:
+    assert registry.problems(COMPACT_PROMPTS.values(), registry.load()) == []
 
 
 def test_changed_text_under_an_old_version_is_caught() -> None:

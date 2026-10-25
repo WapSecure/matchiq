@@ -118,3 +118,21 @@ uv run python scripts/run_eval.py --provider ollama --deadline-ms 120000 \
 ## Handoff records
 
 Each run also returns one `AgentStep` per roster stage (ADR-0011 addendum 4). For evaluation they give, per stage, the decision and reason code, the evidence cited and the usage. `inputChecksum` is deterministic for a given request and model output, so two runs of a case can be compared stage by stage: the first differing checksum shows where they diverged. A step with reason code `BUDGET_EXCEEDED` means the per-run budget, not the model, ended the stage; such runs are reported separately and are not counted as model failures.
+
+## Throughput at demo speeds
+
+What limits AI-written moments is wall-clock service time, not grounding. Measured 2026-10-24/25 on the owner's laptop, Late comeback at 5x, local Ollama, `AGENT_JOB_CONCURRENCY=1`:
+
+| Model                                 | Moments | AI-written | Fallbacks | Notes                                       |
+| ------------------------------------- | ------- | ---------- | --------- | ------------------------------------------- |
+| qwen2.5:3b                            | 19      | 5          | 14        | 17 TIMED_OUT, 7 rejected, 42 fallback steps |
+| qwen2.5:7b-instruct (memory pressure) | 19      | 0          | 19        | run under memory pressure                   |
+
+Each call takes 20 to 100 s and a moment arrives every 10 to 20 s, so the backlog only grows. ADR-0011 addendum 6 changes four things: a start-up warm-up that pins the model (`OLLAMA_KEEP_ALIVE`), priority ordering with a stale cut-off (`AGENT_MAX_AGE_SECONDS`, reason `SKIPPED_STALE`), an optional compact prompt mode (`AGENT_PROMPT_MODE=compact`), and a plain-language label for every fallback reason. Prompt sizes are asserted in `apps/agents/tests/test_throughput.py`: compact prompts are shorter than the standard ones and keep the grounding rules byte for byte.
+
+The effect of these changes on the AI share has not been re-measured yet. To measure:
+
+1. Start the stack with `AI_ENABLED=true`, `MODEL_PROVIDER=ollama`, `AGENT_TIMEOUT_MS=120000`, `AGENT_JOB_CONCURRENCY=1`, and wait for the agents log line "Model ... is loaded".
+2. Start a replay session of the Late comeback fixture at 5x and let it finish.
+3. Poll `insights`, `narratives` and `agent_runs` for the fixture. Count insights by `publication` (AGENT or TEMPLATE) and `agent_runs` by `outcome`; read `fallback_reason` on template insights (`SKIPPED_STALE` counts the moments skipped for age).
+4. Repeat with `AGENT_PROMPT_MODE=compact` and compare the AI share and the timed-out count.

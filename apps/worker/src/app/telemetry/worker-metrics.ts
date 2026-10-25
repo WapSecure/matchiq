@@ -17,7 +17,8 @@ export type PipelineCallOutcome =
   | 'http'
   | 'invalid-response'
   | 'circuit-open'
-  | 'ai-disabled';
+  | 'ai-disabled'
+  | 'stale';
 
 const { names, help, buckets } = WORKER_METRICS;
 

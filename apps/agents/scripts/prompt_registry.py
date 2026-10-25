@@ -14,11 +14,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from matchiq_agents.roster import registry
+from matchiq_agents.roster.compact import COMPACT_PROMPTS
 from matchiq_agents.roster.prompts import PROMPTS
 
 
 def main(*, record: bool) -> int:
-    prompts = list(PROMPTS.values())
+    prompts = [*PROMPTS.values(), *COMPACT_PROMPTS.values()]
     if record:
         try:
             registry.dump(registry.record(prompts, registry.load()))

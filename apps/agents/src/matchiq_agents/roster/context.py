@@ -9,6 +9,9 @@ from matchiq_agents.guard.safety import ContentSafetyScreen
 from matchiq_agents.pipeline.recorder import RunRecord
 from matchiq_agents.pipeline.runner import ModelRunner
 from matchiq_agents.pipeline.steps import StepRecorder
+from matchiq_agents.roster.compact import prompt_for
+from matchiq_agents.roster.modes import PromptMode
+from matchiq_agents.roster.prompts import Prompt
 from matchiq_agents.templates.fallback import TEMPLATE_VERSION, TemplateFallback
 
 DETERMINISTIC_CHECKS_VERSION: Final = "1.0.0"
@@ -22,6 +25,14 @@ class AgentContext:
     critique_enabled: bool
     safety: ContentSafetyScreen | None = None
     recorder: StepRecorder = field(kw_only=True)
+    prompt_mode: PromptMode = field(default=PromptMode.STANDARD, kw_only=True)
+
+    def prompt(self, agent: AgentName) -> Prompt:
+        return prompt_for(self.prompt_mode, agent)
+
+    @property
+    def compact(self) -> bool:
+        return self.prompt_mode is PromptMode.COMPACT
 
     @property
     def canonical_personas(self) -> tuple[Persona, ...]:

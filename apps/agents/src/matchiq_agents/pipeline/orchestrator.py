@@ -31,6 +31,7 @@ from matchiq_agents.pipeline.workflow import build_workflow
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.fact_checker import decide, deterministic_issues
 from matchiq_agents.roster.localization import localise_all
+from matchiq_agents.roster.modes import PromptMode
 from matchiq_agents.templates.fallback import TemplateFallback
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ class PipelineConfig:
     prices: PriceTable = EMPTY_PRICES
     safety: ContentSafetyScreen | None = None
     budget: BudgetLimits = DEFAULT_RUN_BUDGET
+    prompt_mode: PromptMode = PromptMode.STANDARD
 
 
 class PipelineOrchestrator:
@@ -90,6 +92,7 @@ class PipelineOrchestrator:
             self._config.critique_enabled,
             self._config.safety,
             recorder=StepRecorder(runner, request_checksum),
+            prompt_mode=self._config.prompt_mode,
         )
 
     async def run(self, request: PipelineRequest) -> PipelineResult:

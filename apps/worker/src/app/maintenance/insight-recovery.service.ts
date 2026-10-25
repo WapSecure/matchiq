@@ -104,11 +104,14 @@ export class InsightRecoveryService implements OnApplicationBootstrap {
     if (!this.env.AI_ENABLED) return RECOVERY_REASONS.aiDisabled;
     if (expired) return RECOVERY_REASONS.expired;
     try {
-      await this.deps.jobs.enqueue({
-        ...ref.key,
-        insightId: ref.insight.insightId,
-        revision: ref.revision,
-      });
+      await this.deps.jobs.enqueue(
+        {
+          ...ref.key,
+          insightId: ref.insight.insightId,
+          revision: ref.revision,
+        },
+        ref.insight.priority,
+      );
       return null;
     } catch {
       return FALLBACK_REASONS.enqueueFailed;

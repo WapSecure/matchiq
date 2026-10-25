@@ -149,7 +149,8 @@ async def _critique(
     call = ModelCall(
         prompt=FACT_CHECKER,
         payload=CritiqueInput(
-            facts=facts_payload(ctx.view, context=True), drafts=text_pairs(drafts)
+            facts=facts_payload(ctx.view, context=True, compact=ctx.compact),
+            drafts=text_pairs(drafts),
         ),
         response_model=CritiqueOutput,
         convert=lambda output: output,

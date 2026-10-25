@@ -101,6 +101,9 @@ export const JOB_NAMES = {
 /** BullMQ forbids ':' in custom job ids. */
 export const JOB_ID_SEPARATOR = '__';
 
+/** BullMQ serves lower numbers first: goals and red cards (P0) ahead of milestones (P2). */
+export const INSIGHT_JOB_PRIORITY = { P0: 1, P1: 2, P2: 3 } as const;
+
 export const QUEUE_RETENTION = {
   completedCount: 1_000,
   failedCount: 1_000,

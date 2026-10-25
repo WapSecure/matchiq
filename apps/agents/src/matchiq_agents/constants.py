@@ -59,3 +59,7 @@ OLLAMA_PLACEHOLDER_API_KEY: Final = "ollama"
 OLLAMA_TAGS_PATH: Final = "/api/tags"
 OLLAMA_PROBE_TIMEOUT_S: Final = 1.5
 OLLAMA_CHECK: Final = "ollama"
+OLLAMA_GENERATE_PATH: Final = "/api/generate"
+OLLAMA_WARMUP_TIMEOUT_S: Final = 240.0
+DEFAULT_OLLAMA_KEEP_ALIVE: Final = "30m"
+OLLAMA_KEEP_ALIVE_PATTERN: Final = r"^(-1|\d+[smh])$"

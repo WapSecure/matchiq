@@ -82,6 +82,7 @@ export class QueueConsumers
         this.pipeline.process(InsightPipelineJob.parse(job.data), {
           attemptsMade: job.attemptsMade,
           maxAttempts: job.opts.attempts ?? 1,
+          enqueuedAtMs: job.timestamp,
         }),
       ),
       { ...options, concurrency: this.config.insightConcurrency },

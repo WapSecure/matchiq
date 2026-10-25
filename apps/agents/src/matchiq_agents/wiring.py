@@ -91,6 +91,7 @@ def pipeline_config(settings: Settings) -> PipelineConfig:
         grace_ms=LOCAL_WORKFLOW_GRACE_MS if settings.is_local else WORKFLOW_GRACE_MS,
         prices=PriceTable(settings.agent_price_table),
         budget=settings.run_budget,
+        prompt_mode=settings.agent_prompt_mode,
     )
 
 

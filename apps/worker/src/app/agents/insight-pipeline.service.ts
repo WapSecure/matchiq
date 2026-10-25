@@ -32,15 +32,21 @@ export interface JobAttempt {
   /** Attempts already made before this one (BullMQ `attemptsMade`). */
   readonly attemptsMade: number;
   readonly maxAttempts: number;
+  /** Wall-clock time the job was queued; stale moments skip AI writing. */
+  readonly enqueuedAtMs?: number;
 }
 
 export type JobOutcome = WriteOutcome | 'skipped';
 
-type SkipOutcome = Extract<PipelineCallOutcome, 'ai-disabled' | 'circuit-open'>;
+type SkipOutcome = Extract<
+  PipelineCallOutcome,
+  'ai-disabled' | 'circuit-open' | 'stale'
+>;
 
 const SKIP_REASONS: Readonly<Record<SkipOutcome, string>> = {
   'ai-disabled': FALLBACK_REASONS.aiDisabled,
   'circuit-open': FALLBACK_REASONS.circuitOpen,
+  stale: FALLBACK_REASONS.skippedStale,
 };
 
 interface Decided {
@@ -96,8 +102,15 @@ export class InsightPipelineService {
     return this.sessions.publish(key, { insight: pending, ...decided });
   }
 
-  private skipReason(): SkipOutcome | null {
+  private isStale(attempt: JobAttempt): boolean {
+    if (attempt.enqueuedAtMs === undefined) return false;
+    const ageMs = this.deps.clock.now().getTime() - attempt.enqueuedAtMs;
+    return ageMs > this.env.AGENT_MAX_AGE_SECONDS * 1_000;
+  }
+
+  private skipReason(attempt: JobAttempt): SkipOutcome | null {
     if (!this.env.AI_ENABLED) return 'ai-disabled';
+    if (this.isStale(attempt)) return 'stale';
     return this.breaker.tryAcquire() ? null : 'circuit-open';
   }
 
@@ -120,7 +133,7 @@ export class InsightPipelineService {
         retries: attempt.attemptsMade,
       }),
     });
-    const skipped = this.skipReason();
+    const skipped = this.skipReason(attempt);
     if (skipped !== null) {
       this.metrics.pipelineCall(skipped, 0);
       return fallback(SKIP_REASONS[skipped]);

@@ -162,6 +162,12 @@ export const WorkerEnv = CommonEnv.extend({
     ENV_LIMITS.agentJobConcurrencyMax,
     ENV_LIMITS.agentJobConcurrencyDefault,
   ),
+  /** Wall-clock age after which a queued moment skips AI writing and keeps its template. */
+  AGENT_MAX_AGE_SECONDS: boundedInt(
+    ENV_LIMITS.agentMaxAgeMinSeconds,
+    ENV_LIMITS.agentMaxAgeMaxSeconds,
+    ENV_LIMITS.agentMaxAgeDefaultSeconds,
+  ),
   /** First retry delay; BullMQ doubles it on each further attempt. */
   AGENT_RETRY_BACKOFF_MS: boundedInt(
     ENV_LIMITS.agentRetryBackoffMinMs,
