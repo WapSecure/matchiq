@@ -1,5 +1,5 @@
 /** Markers closer than this share of the timeline would overlap, so they stack. */
-const OVERLAP_SHARE = 0.04;
+const OVERLAP_SHARE = 0.05;
 const MAX_LANES = 6;
 
 /** A new lane while there is room, else the one whose last marker is oldest. */
