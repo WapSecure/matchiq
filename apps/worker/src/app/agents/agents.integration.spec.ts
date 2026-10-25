@@ -66,7 +66,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('publishes agent narratives in three personas and four locales', async () => {
-    const [first] = await t.reader.insights(key);
+    const [first] = await coreInsights();
     if (!first) throw new Error('no insight');
     expect(await t.pipeline.process(job(first.insightId), attempt(0))).toBe(
       'written',
@@ -94,7 +94,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('persists the agent handoff steps under the run correlation id, per tenant', async () => {
-    const [first] = await t.reader.insights(key);
+    const [first] = await coreInsights();
     if (!first) throw new Error('no insight');
     const request = agents.requests.find(
       (r) => r.packet.insight.insightId === first.insightId,
@@ -115,7 +115,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('does not publish twice when a job is delivered again', async () => {
-    const [first] = await t.reader.insights(key);
+    const [first] = await coreInsights();
     if (!first) throw new Error('no insight');
     expect(await t.pipeline.process(job(first.insightId), attempt(0))).toBe(
       'skipped',

@@ -95,7 +95,9 @@ describe('demo fault plans through the worker (integration, ADR-0020)', () => {
 
   const attempt = { attemptsMade: 0, maxAttempts: 3 };
   const runAll = async (key: FixtureKey, count: number) => {
-    const insights = (await t.reader.insights(key)).slice(0, count);
+    const insights = (await t.reader.insights(key))
+      .filter((i) => i.kind !== 'PLAYER_MILESTONE')
+      .slice(0, count);
     for (const i of insights) {
       await t.pipeline.process(
         { ...key, insightId: i.insightId, revision: 1 },

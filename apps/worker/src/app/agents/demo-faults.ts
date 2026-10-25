@@ -5,12 +5,13 @@ import {
   type Insight,
   type PipelineResult,
 } from '@matchiq/contracts';
-import { DEMO_FAULTS } from '../constants';
+import { DEMO_FAULTS, TEMPLATE_ONLY_KINDS } from '../constants';
 
 /**
  * The demo fault for one insight of a session (ADR-0020), or undefined.
- * Insights are counted in detection order among the plan's kinds, so a
- * replay of the same template faults the same insights every time.
+ * Insights are counted in detection order among the plan's kinds, skipping
+ * the template-only kinds that never reach the agents, so a replay of the
+ * same template faults the same insights every time.
  */
 export const faultFor = (
   plan: FaultPlan | undefined,
@@ -20,7 +21,9 @@ export const faultFor = (
   if (plan === undefined) return undefined;
   const kinds = plan.insightKinds;
   const eligible = insights.filter(
-    (i) => kinds === undefined || kinds.includes(i.kind),
+    (i) =>
+      !TEMPLATE_ONLY_KINDS.includes(i.kind) &&
+      (kinds === undefined || kinds.includes(i.kind)),
   );
   const ordinal = eligible.findIndex((i) => i.insightId === insightId) + 1;
   return faultApplies(plan, ordinal) ? plan.scenario : undefined;
