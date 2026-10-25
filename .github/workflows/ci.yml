@@ -250,12 +250,12 @@ jobs:
             context: apps/agents
     env:
       IMAGE: matchiq-${{ matrix.app }}:ci
-      DOCKER_BUILD_CACHE_DIR: ${{ runner.temp }}/docker-cache
+      DOCKER_BUILD_CACHE_DIR: /tmp/matchiq-docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/docker-cache/${{ matrix.app }}
+          path: /tmp/matchiq-docker-cache/${{ matrix.app }}
           key: docker-container-${{ matrix.app }}-${{ runner.os }}-${{ github.sha }}
           restore-keys: docker-container-${{ matrix.app }}-${{ runner.os }}-
       - name: Configure Buildx
@@ -291,12 +291,12 @@ jobs:
     env:
       APP_VERSION: ${{ github.sha }}
       COMPOSE_PROJECT_NAME: matchiq-ci-${{ github.run_id }}-${{ github.run_attempt }}
-      DOCKER_BUILD_CACHE_DIR: ${{ runner.temp }}/docker-cache
+      DOCKER_BUILD_CACHE_DIR: /tmp/matchiq-docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/docker-cache
+          path: /tmp/matchiq-docker-cache
           key: docker-compose-${{ runner.os }}-${{ github.sha }}
           restore-keys: docker-compose-${{ runner.os }}-
       - name: Configure Buildx
