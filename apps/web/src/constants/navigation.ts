@@ -26,10 +26,10 @@ export const STUDIO_TABS: readonly {
 
 export const STUDIO_TABS_LABEL = 'Match views';
 
-/** `compact: false` items are hidden below the `sm` breakpoint. */
+/** `compact: false` items are hidden below `md`; `fromLg` ones below `lg`. */
 export const NAV_ITEMS = [
   { label: 'Matches', href: ROUTES.fixtures, compact: true },
-  { label: 'Tour', href: ROUTES.guide, compact: true },
+  { label: 'Tour', href: ROUTES.guide, compact: false, fromLg: true },
   { label: 'How it works', href: '/#pipeline', compact: false },
   { label: 'Why trust it', href: '/#principles', compact: false },
 ] as const;
