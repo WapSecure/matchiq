@@ -22,7 +22,7 @@ uv run python scripts/export_recording.py --session fx_comeback_42_s7 \
   --out src/matchiq_agents/providers/recordings/fx_comeback_42.json
 ```
 
-The script reads a local Postgres through `docker exec matchiq-postgres-1 psql` with SELECT statements only and is deterministic: the same session gives the same file. It validates the result against the loader's schema before writing.
+The script reads a local Postgres through `docker exec matchiq-postgres-1 psql` with SELECT statements only and is deterministic: the same session gives the same file. It validates the result against the loader's schema before writing. Run `pnpm exec prettier --write` on the file afterwards so the format check passes; that changes layout only.
 
 Cited values were not stored by that session. The script rebuilds them from the draft text and the moment's engine metrics (each digit matched to one metric that equals it). The live checks then judge them.
 
