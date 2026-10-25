@@ -3,10 +3,11 @@ import { EvidenceIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
 import { CONFIDENCE_LABELS } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
+import { HowWritten } from '@/features/how-written/how-written';
 import { NarrativeListen } from '@/features/listen/narrative-listen';
 import type { InsightMark } from '../editorial/insight-marks';
 import { SuppressInsightButton } from '../editorial/suppress-insight-button';
-import type { NarrativeView } from '../store';
+import { type NarrativeView, useMatchStore } from '../store';
 
 type MomentFooterProps = {
   insight: Insight;
@@ -23,6 +24,7 @@ export function MomentFooter({
   headline,
   onOpenEvidence,
 }: MomentFooterProps) {
+  const fixtureId = useMatchStore((s) => s.fixtureId);
   return (
     <footer className="flex flex-wrap items-center gap-2">
       <span className="mr-auto text-micro text-ink-subtle">
@@ -47,6 +49,11 @@ export function MomentFooter({
       >
         {STUDIO_COPY.insights.evidence}
       </Button>
+      <HowWritten
+        fixtureId={fixtureId}
+        insightId={insight.insightId}
+        moment={headline}
+      />
     </footer>
   );
 }
