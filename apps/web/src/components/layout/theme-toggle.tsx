@@ -8,11 +8,8 @@ import {
   MoonIcon,
   SunIcon,
 } from '@/components/icons';
-import {
-  THEME_COPY,
-  THEME_PREFERENCES,
-  type ThemePreference,
-} from '@/constants/theme';
+import { THEME_PREFERENCES, type ThemePreference } from '@/constants/theme';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/cn';
 import { setPreference, useThemePreference } from '@/lib/theme/theme-store';
@@ -30,9 +27,15 @@ const nextOf = (p: ThemePreference): ThemePreference =>
 
 /** Three-way choice; each icon names itself in a tooltip as well as to assistive tech. */
 function ThemeSegments({ value }: { value: ThemePreference }) {
+  const messages = useInterfaceMessages();
+  const labels = {
+    light: messages.theme.light,
+    dark: messages.theme.dark,
+    system: messages.theme.system,
+  };
   return (
     <ToggleButtonGroup
-      aria-label={THEME_COPY.legend}
+      aria-label={messages.theme.legend}
       selectionMode="single"
       disallowEmptySelection
       selectedKeys={[value]}
@@ -47,13 +50,13 @@ function ThemeSegments({ value }: { value: ThemePreference }) {
         return (
           <Tooltip
             key={option}
-            content={THEME_COPY.options[option]}
+            content={labels[option]}
             ariaChild
             placement="bottom"
           >
             <ToggleButton
               id={option}
-              aria-label={THEME_COPY.options[option]}
+              aria-label={labels[option]}
               className={cn(
                 'press flex size-7 cursor-pointer items-center justify-center rounded-sm text-ink-subtle outline-none',
                 'data-hovered:text-ink data-focus-visible:outline-2 data-focus-visible:outline-accent',
@@ -71,16 +74,19 @@ function ThemeSegments({ value }: { value: ThemePreference }) {
 
 /** One button for tight headers; each press moves to the next preference. */
 function ThemeCycle({ value }: { value: ThemePreference }) {
+  const messages = useInterfaceMessages();
+  const labels = {
+    light: messages.theme.light,
+    dark: messages.theme.dark,
+    system: messages.theme.system,
+  };
   const Icon = ICONS[value];
   const next = nextOf(value);
   return (
     <button
       type="button"
       onClick={() => setPreference(next)}
-      aria-label={THEME_COPY.cycle(
-        THEME_COPY.options[value],
-        THEME_COPY.options[next],
-      )}
+      aria-label={messages.theme.cycle(labels[value], labels[next])}
       className="press flex size-8 items-center justify-center rounded-md border border-line bg-surface-sunken text-ink-muted hover:text-ink"
     >
       <Icon size={16} />

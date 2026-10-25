@@ -29,6 +29,7 @@ export function SelectedValue<K extends string>({
         </span>
       ) : null}
       <span
+        lang={option.lang}
         className={cn(
           'min-w-0 truncate font-medium',
           described && 'max-w-[70%] shrink-0',
