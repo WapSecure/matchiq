@@ -50,13 +50,14 @@ test('clean run through the real stack, in the browser', async ({ page }) => {
   );
   await expect(stats.getByRole('row', { name: /Pass quality/ })).toBeVisible();
 
+  const views = page.getByRole('navigation', { name: 'Match views' });
   await evidence.click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: 'Close evidence' }).click();
   await expect(dialog).toBeHidden();
 
-  await page.getByRole('link', { name: 'Recap' }).click();
+  await views.getByRole('link', { name: 'Recap', exact: true }).click();
   await expect(page).toHaveURL(/\/recap$/);
   await expect(page.getByText('Match story').first()).toBeVisible({
     timeout: STEP_TIMEOUT_MS,
@@ -67,7 +68,7 @@ test('clean run through the real stack, in the browser', async ({ page }) => {
   ).toBeVisible();
   await expectNoBlockingA11yViolations(page);
 
-  await page.getByRole('link', { name: 'Fact-checks' }).click();
+  await views.getByRole('link', { name: 'Fact-checks', exact: true }).click();
   await expect(page).toHaveURL(/\/observatory$/);
   await expect(page.getByText('Caught by the fact check')).toBeVisible({
     timeout: STEP_TIMEOUT_MS,
