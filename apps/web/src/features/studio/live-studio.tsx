@@ -32,9 +32,9 @@ function StudioScreen({
     <SessionFrame
       fixtureId={fixtureId}
       view="live"
+      tabsAction={<TourLauncher />}
       status={
         <>
-          <TourLauncher />
           <EditorialChip />
           <LiveConnection />
         </>

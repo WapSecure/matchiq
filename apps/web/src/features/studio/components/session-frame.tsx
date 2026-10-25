@@ -17,6 +17,7 @@ type SessionFrameProps = {
   fixtureId: string;
   view: StudioView;
   status?: ReactNode;
+  tabsAction?: ReactNode;
   banner?: ReactNode;
   children: (fixture: Fixture) => ReactNode;
 };
@@ -40,6 +41,7 @@ export function SessionFrame({
   fixtureId,
   view,
   status,
+  tabsAction,
   banner,
   children,
 }: SessionFrameProps) {
@@ -57,6 +59,7 @@ export function SessionFrame({
         matchCode={label.code}
         replay={label.replay}
         status={status}
+        tabsAction={tabsAction}
       />
       {banner}
       {fixture.data ? children(fixture.data) : null}
