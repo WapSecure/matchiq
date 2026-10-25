@@ -4,11 +4,18 @@ set -euo pipefail
 if (($#)); then
   paths=("$@")
 else
-  paths=(
-    infra/azure
-    infra/vps
-    .github/workflows/deploy-azure.yml
-  )
+  paths=()
+  while IFS= read -r path; do
+    paths+=("$path")
+  done < <(find infra -type f ! -path 'infra/keycloak/*' -print)
+  while IFS= read -r path; do
+    paths+=("$path")
+  done < <(find .github/workflows -type f \( -name 'deploy*.yml' -o -name 'deploy*.yaml' \) -print)
+fi
+
+if ((${#paths[@]} == 0)); then
+  echo 'No hosted deployment configuration found' >&2
+  exit 2
 fi
 
 patterns=(
@@ -20,7 +27,7 @@ patterns=(
 
 failed=0
 for pattern in "${patterns[@]}"; do
-  if matches=$(grep -RFn -- "$pattern" "${paths[@]}"); then
+  if matches=$(grep -IFn -- "$pattern" "${paths[@]}"); then
     printf 'Hosted configuration references local authentication material:\n%s\n' "$matches" >&2
     failed=1
   fi
