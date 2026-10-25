@@ -1192,6 +1192,12 @@ Local validation covers script syntax, formatting and rendered Compose configura
 
 The fresh-runner attempts exposed that the worker package classified runtime `@opentelemetry/api` and `pg` imports as development dependencies, so the production image built but exited at startup. The pinned packages are now worker runtime dependencies, and failure diagnostics include exited containers.
 
+## MQ-087: Local identity boundary and Docker build caches (25 October 2026)
+
+The product owner accepted ADR-0025 Option A, closing REM-06 with a documented exception for the synthetic local Keycloak accounts. README and identity documentation identify the shared password as local development material. A CI guard now rejects the local realm export path, password or localhost issuers in Azure deployment files, the VPS overlay and the Azure deployment workflow. Authentication behaviour and the local realm are unchanged.
+
+Container image jobs now restore and export a separate Buildx cache for each application. The Compose replay job has its own cache scope and builds the four application images before starting the stack. Both paths use the existing pinned GitHub cache action, preserve the final loaded images for SBOM and vulnerability scanning, and fall back to a clean build when no prior cache exists.
+
 ## MQ-084: Tests for the controls the audit found untested (24 October 2026)
 
 Tests only; no application behaviour changed.
