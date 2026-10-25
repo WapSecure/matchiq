@@ -38,6 +38,8 @@ DEMO_FAULTS_ENABLED=true
 NEXT_PUBLIC_DEMO_MODE=true      # shows the lobby "Demo scenario" select and the sign-in demo accounts
 ```
 
+**Optional route for judges without a model.** Set `AI_ENABLED=true` and `MODEL_PROVIDER=recorded` instead of the Ollama lines. The Late comeback scenario then shows agent-written cards after about 1.5 seconds, and the Fact-checks page says "Recorded model run". Say so on camera: it is a replay of earlier real output, not a live model. Do not use it in the submission cut if a live local run is available.
+
 `NEXT_PUBLIC_DEMO_MODE` is read when the web app is built or started, so restart `pnpm nx dev web` after changing it.
 
 ### 2. Commands
