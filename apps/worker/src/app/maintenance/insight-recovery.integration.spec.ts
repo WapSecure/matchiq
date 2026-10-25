@@ -12,6 +12,7 @@ import {
   startTestWorker,
   type TestWorker,
 } from '../../test/test-worker';
+import { FALLBACK_REASONS } from '../constants';
 import { RECOVERY_REASONS } from './maintenance.constants';
 
 jest.setTimeout(120_000);
@@ -106,7 +107,9 @@ describe('boot recovery of PENDING insights (integration)', () => {
     const restarted = await reboot({ AI_ENABLED: 'true' });
     try {
       expect(await pendingIds()).toEqual([]);
-      const traces = await restarted.reader.traces(key);
+      const traces = (await restarted.reader.traces(key)).filter((tr) =>
+        pending.includes(tr.insightId),
+      );
       expect(traces.map((tr) => tr.insightId).sort()).toEqual(pending);
       expect(
         traces.every(
@@ -115,7 +118,9 @@ describe('boot recovery of PENDING insights (integration)', () => {
             tr.fallbackReason === RECOVERY_REASONS.expired,
         ),
       ).toBe(true);
-      const narratives = await restarted.reader.narratives(key, {});
+      const narratives = (await restarted.reader.narratives(key, {})).filter(
+        (n) => pending.includes(n.insightId),
+      );
       expect(narratives).toHaveLength(pending.length * 12);
       const recap = await restarted.reader.recap(key);
       expect(recap?.keyMoments.every((m) => m.narratives.length === 12)).toBe(
@@ -170,7 +175,9 @@ describe('boot recovery of PENDING insights (integration)', () => {
         expect(traces.length).toBeGreaterThan(0);
         expect(
           traces.every(
-            (tr) => tr.fallbackReason === RECOVERY_REASONS.aiDisabled,
+            (tr) =>
+              tr.fallbackReason === RECOVERY_REASONS.aiDisabled ||
+              tr.fallbackReason === FALLBACK_REASONS.templateOnly,
           ),
         ).toBe(true);
       } finally {

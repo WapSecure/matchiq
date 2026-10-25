@@ -19,6 +19,7 @@ import {
   OVERLAY_END_REASONS,
   OVERLAY_TIMING,
   RETRACTION_REASONS,
+  TEMPLATE_ONLY_KINDS,
 } from '../constants';
 import { toOverlayCue } from './artifacts';
 import { gateOverlay } from './gate/publish-gate';
@@ -129,13 +130,14 @@ export class MatchPipeline {
     batch: PipelineBatch,
   ): void {
     const { fixture, aiEnabled } = this.options;
+    const viaAgents = aiEnabled && !TEMPLATE_ONLY_KINDS.includes(insight.kind);
     batch.drafts.push(this.draft('insight.detected', insight));
     batch.insights.push({
       insight,
       revision: INSIGHT_REVISION,
       period: event.period,
       detectedSequence: event.sequence,
-      publication: aiEnabled ? 'PENDING' : 'TEMPLATE',
+      publication: viaAgents ? 'PENDING' : 'TEMPLATE',
     });
     const proposal = gateOverlay(
       templateOverlay(insight, fixture),
@@ -146,12 +148,14 @@ export class MatchPipeline {
       this.applyOverlays(this.scheduler.offer(cue, this.clock), event, batch);
     }
     // With AI enabled the narratives come from the agents job enqueued after commit.
-    if (aiEnabled) return;
+    if (viaAgents) return;
     const publication = templatePublication({
       insight,
       fixture,
       createdAt: this.options.now(),
-      reason: FALLBACK_REASONS.aiDisabled,
+      reason: aiEnabled
+        ? FALLBACK_REASONS.templateOnly
+        : FALLBACK_REASONS.aiDisabled,
     });
     this.publish(insight, publication, batch);
   }
