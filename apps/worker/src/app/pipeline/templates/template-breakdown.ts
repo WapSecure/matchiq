@@ -144,7 +144,7 @@ const trendSentence = (w: Words): Sentence[] => {
 
 const previousSentence = (w: Words): Sentence[] => {
   const ref = CONTEXT_REFS.previousMinute;
-  if (!has(w, ref)) return [];
+  if (w.kind === 'PLAYER_MILESTONE' || !has(w, ref)) return [];
   const phrase = w.kind === 'GOAL' ? w.copy.previousGoal : w.copy.previousSpell;
   return [{ text: phrase(w.team, fmt(w, ref)), cited: cite(w.context, ref) }];
 };

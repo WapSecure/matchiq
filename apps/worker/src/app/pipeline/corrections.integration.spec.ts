@@ -8,6 +8,8 @@ import {
   type TestWorker,
 } from '../../test/test-worker';
 
+import { overlayIdFor } from './artifacts';
+
 jest.setTimeout(120_000);
 
 const TEMPLATE = 'fx_disallowed-goal_42';
@@ -24,7 +26,16 @@ describe('a correction retracts its moment downstream (integration)', () => {
     t = await startTestWorker();
     key = await replayToEnd(t, TEMPLATE);
     const stream = await readStream(t, key);
-    const retract = stream.find((m) => m.type === 'insight.retract');
+    const goalIds = new Set(
+      stream.flatMap((m) =>
+        m.type === 'insight.detected' && m.payload.kind === 'GOAL'
+          ? [m.payload.insightId]
+          : [],
+      ),
+    );
+    const retract = stream.find(
+      (m) => m.type === 'insight.retract' && goalIds.has(m.payload.insightId),
+    );
     if (retract?.type !== 'insight.retract') throw new Error('no retraction');
     insightId = retract.payload.insightId;
   });
@@ -33,9 +44,12 @@ describe('a correction retracts its moment downstream (integration)', () => {
 
   it('announces the retraction and pulls the live cue over the stream', async () => {
     const stream = await readStream(t, key);
-    expect(countOf(stream, 'insight.retract')).toBe(1);
+    expect(countOf(stream, 'insight.retract')).toBe(2);
     const pulled = stream.filter(
-      (m) => m.type === 'overlay.retract' && m.payload.cause === 'CORRECTION',
+      (m) =>
+        m.type === 'overlay.retract' &&
+        m.payload.cause === 'CORRECTION' &&
+        m.payload.overlayId === overlayIdFor(insightId),
     );
     expect(pulled).toHaveLength(1);
     const detected = stream.find(

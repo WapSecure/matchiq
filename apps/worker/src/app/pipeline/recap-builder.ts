@@ -100,7 +100,10 @@ export const buildRecap = (input: RecapInput): RecapDocument => ({
   keyMoments: [...input.insights]
     .sort(
       (a, b) =>
-        a.period - b.period || a.insight.matchClockMs - b.insight.matchClockMs,
+        a.period - b.period ||
+        a.insight.matchClockMs - b.insight.matchClockMs ||
+        a.insight.priority.localeCompare(b.insight.priority) ||
+        a.insight.insightId.localeCompare(b.insight.insightId),
     )
     .map((entry) => momentOf(entry, input.narratives)),
   ...(input.fixture && { story: storiesOf(input, input.fixture) }),
