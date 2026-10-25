@@ -6,6 +6,7 @@ const KNOWN_REASONS = [
   'AI_ENABLED=false: deterministic templates only',
   'agents circuit breaker open',
   'SKIPPED_STALE: queued too long, template kept',
+  'TEMPLATE_ONLY: milestone moments use standard wording',
   'agents service timed out',
   'agents service unreachable',
   'agents service returned an invalid PipelineResult',

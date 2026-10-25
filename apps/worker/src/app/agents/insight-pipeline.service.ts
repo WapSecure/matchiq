@@ -8,7 +8,7 @@ import type {
 } from '@matchiq/contracts';
 import type { FixtureKey, InsightPipelineJob } from '@matchiq/db';
 import { APP_ENV } from '@matchiq/server-kit';
-import { FALLBACK_REASONS } from '../constants';
+import { FALLBACK_REASONS, TEMPLATE_ONLY_KINDS } from '../constants';
 import type { AgentPipelineDeps } from '../infrastructure/bundles';
 import { AGENT_PIPELINE_DEPS } from '../infrastructure/tokens';
 import { recentNarratives } from '../pipeline/gate/recent-narratives';
@@ -40,13 +40,14 @@ export type JobOutcome = WriteOutcome | 'skipped';
 
 type SkipOutcome = Extract<
   PipelineCallOutcome,
-  'ai-disabled' | 'circuit-open' | 'stale'
+  'ai-disabled' | 'circuit-open' | 'stale' | 'template-only'
 >;
 
 const SKIP_REASONS: Readonly<Record<SkipOutcome, string>> = {
   'ai-disabled': FALLBACK_REASONS.aiDisabled,
   'circuit-open': FALLBACK_REASONS.circuitOpen,
   stale: FALLBACK_REASONS.skippedStale,
+  'template-only': FALLBACK_REASONS.templateOnly,
 };
 
 interface Decided {
@@ -108,8 +109,12 @@ export class InsightPipelineService {
     return ageMs > this.env.AGENT_MAX_AGE_SECONDS * 1_000;
   }
 
-  private skipReason(attempt: JobAttempt): SkipOutcome | null {
+  private skipReason(
+    attempt: JobAttempt,
+    insight: Insight,
+  ): SkipOutcome | null {
     if (!this.env.AI_ENABLED) return 'ai-disabled';
+    if (TEMPLATE_ONLY_KINDS.includes(insight.kind)) return 'template-only';
     if (this.isStale(attempt)) return 'stale';
     return this.breaker.tryAcquire() ? null : 'circuit-open';
   }
@@ -133,7 +138,7 @@ export class InsightPipelineService {
         retries: attempt.attemptsMade,
       }),
     });
-    const skipped = this.skipReason(attempt);
+    const skipped = this.skipReason(attempt, insight);
     if (skipped !== null) {
       this.metrics.pipelineCall(skipped, 0);
       return fallback(SKIP_REASONS[skipped]);
