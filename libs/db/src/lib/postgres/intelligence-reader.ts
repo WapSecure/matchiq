@@ -1,6 +1,7 @@
 import type {
   AgentStepTrace,
   CursorPageQuery,
+  EvidenceEnvelope,
   Insight,
   MatchSnapshot,
   Narrative,
@@ -65,6 +66,21 @@ export class PostgresIntelligenceReader implements IntelligenceReader {
 
   tracePage(key: FixtureKey, query: CursorPageQuery) {
     return this.pages.traces(key, query);
+  }
+
+  async insightEvidence(
+    orgId: string,
+    insightId: string,
+  ): Promise<EvidenceEnvelope | null> {
+    const [row] = await withTenant(this.db, orgId, (tx) =>
+      tx
+        .select({ payload: insights.payload })
+        .from(insights)
+        .where(
+          and(eq(insights.orgId, orgId), eq(insights.insightId, insightId)),
+        ),
+    );
+    return row?.payload.evidence ?? null;
   }
 
   stepTrace(

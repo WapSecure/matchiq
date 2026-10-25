@@ -19,6 +19,14 @@ export interface StoredEventRef {
   readonly payloadHash: string;
 }
 
+/** The highest-sequence stored event, which a streamed batch must continue from. */
+export interface StoredEventTail {
+  readonly sequence: number;
+  readonly type: MatchEvent['type'];
+  readonly period: number;
+  readonly matchClockMs: number;
+}
+
 export interface HashedEvent {
   readonly event: MatchEvent;
   readonly payloadHash: string;
@@ -84,6 +92,8 @@ export interface LedgerTransaction {
     eventIds: readonly string[],
     sequences: readonly number[],
   ): Promise<StoredEventRef[]>;
+  /** Null while the fixture has no events. */
+  findEventTail(key: FixtureKey): Promise<StoredEventTail | null>;
   insertEvents(
     key: FixtureKey,
     ingestionId: string,

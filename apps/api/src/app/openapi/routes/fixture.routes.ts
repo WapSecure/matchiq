@@ -88,7 +88,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
     tag: TAGS.fixtures,
     summary: 'Append a batch of events to the ledger',
     description:
-      'Duplicates (same eventId and body) are counted and ignored; a changed body is a 409.',
+      'Duplicates (same eventId and body) are counted and ignored; a changed body is a 409. A clock that runs backwards within a period, or an impossible period change, is a 422 listing the offending event ids. Sequence gaps are accepted and reported in `warnings`; the snapshot stays provisional until they fill.',
     auth: 'events:ingest',
     params: FixturePath,
     body: IngestBatchRequest,
@@ -104,6 +104,7 @@ export const FIXTURE_ROUTES: readonly ApiRoute[] = [
       'fixtureNotFound',
       'fixtureMismatch',
       'eventConflict',
+      'eventOrder',
       'invalidHeader',
       'idempotencyMismatch',
     ],

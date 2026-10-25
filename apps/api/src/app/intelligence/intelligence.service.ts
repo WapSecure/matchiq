@@ -3,6 +3,7 @@ import type {
   AgentStepTrace,
   CursorPage,
   CursorPageQuery,
+  EvidenceEnvelope,
   Insight,
   MatchSnapshot,
   Narrative,
@@ -18,7 +19,8 @@ import type {
 import { readPage } from '../http/cursor-page';
 import { problem } from '../http/problems';
 import { FIXTURE_READER, INTELLIGENCE_READER } from '../infrastructure/tokens';
-import type { NarrativeQuery } from './intelligence.schemas';
+import type { NarrativeQuery, RecapQuery } from './intelligence.schemas';
+import { filterRecap } from './recap-filter';
 
 /** Read models the worker's pipeline maintains, scoped to the caller's organisation (ADR-0018). */
 @Injectable()
@@ -61,11 +63,20 @@ export class IntelligenceService {
     return readPage(() => this.reader.overlayPage(known, query));
   }
 
-  async recap(key: FixtureKey): Promise<RecapDocument> {
+  async recap(key: FixtureKey, query: RecapQuery = {}): Promise<RecapDocument> {
     const recap = await this.reader.recap(await this.known(key));
     if (recap === null)
       throw problem('recapNotReady', { detail: key.fixtureId });
-    return recap;
+    return filterRecap(recap, query);
+  }
+
+  /** Another organisation's insight answers the same 404 as a missing one (ADR-0018). */
+  async evidence(orgId: string, insightId: string): Promise<EvidenceEnvelope> {
+    const evidence = await this.reader.insightEvidence(orgId, insightId);
+    if (evidence === null) {
+      throw problem('insightNotFound', { detail: insightId });
+    }
+    return evidence;
   }
 
   /** Agent Observatory: per-insight runs and gate decisions; holds no prompts or secrets. */

@@ -1223,3 +1223,11 @@ The activity log Reason column and unknown action keys now pass through `describ
 ## MQ-086 follow-up: milestone insights in the worker pipeline (25 October 2026)
 
 The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs that pin fixture moment sets were corrected. The recap sorts same-clock moments by priority then insight id, so replay output stays identical across databases. A milestone has no earlier occurrence, so its Analyst breakdown omits the previous-spell sentence, which had repeated the minute and failed the gate. A voided goal also retracts the first-goal milestone built on it, which is intended. The agents integration spec picks its insights from the non-milestone moments. Milestone cues keep the existing P2 overlay priority; overlay behaviour is unchanged.
+
+## MQ-085: API alignment and ingest validation (24 October 2026)
+
+- **Evidence endpoint**: `GET /insights/{insightId}/evidence` returns the stored evidence envelope (metrics, event ids, method version, coverage, counter-evidence). Permission `insights:read`; another organisation's insight is the same 404 as a missing one.
+- **Recap**: `GET /fixtures/{id}/recap` takes optional `persona` and `lang`, filtering key-moment narratives and the story. Without them the stored recap is returned unchanged (`recap-filter.spec.ts`).
+- **Ingest**: new events are checked against the stored ledger tail by pure checks in `libs/synthetic-data` (`checkBatchOrder`, `findSequenceGaps`). Clock regressions and impossible period transitions answer `422 event-order` with the offending event ids; gaps are accepted and returned in `warnings` (new optional field on the ingest response). `LedgerTransaction.findEventTail` and `IntelligenceReader.insightEvidence` are the new db ports.
+- **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
+- Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.

@@ -6,6 +6,7 @@ import type {
   CreatedSession,
   CursorPage,
   CursorPageQuery,
+  EvidenceEnvelope,
   FaultPlan,
   Fixture,
   FixtureTemplateSummary,
@@ -235,6 +236,11 @@ export interface IntelligenceReader {
   narratives(key: FixtureKey, filter: NarrativeFilter): Promise<Narrative[]>;
   overlays(key: FixtureKey): Promise<OverlayCue[]>;
   recap(key: FixtureKey): Promise<RecapDocument | null>;
+  /** The stored evidence of one insight within the organisation; null if absent. */
+  insightEvidence(
+    orgId: string,
+    insightId: string,
+  ): Promise<EvidenceEnvelope | null>;
   traces(key: FixtureKey): Promise<InsightTrace[]>;
   /** Every handoff of one pipeline run, by correlation id, within the organisation. */
   stepTrace(

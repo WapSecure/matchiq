@@ -149,6 +149,15 @@ describe('Intelligence read API (integration)', () => {
     );
     expect(casualFr.items).toHaveLength(1);
     expect((await get('narratives?persona=FAN')).status).toBe(422);
+    expect((await get('recap?persona=FAN')).status).toBe(422);
+    expect((await get('recap?lang=de-DE')).status).toBe(422);
+    const evidenceUrl = `${t.baseUrl}/insights/${insight.insightId}/evidence`;
+    expect(await jsonOf(await fetch(evidenceUrl))).toEqual(insight.evidence);
+    const missing = await fetch(`${t.baseUrl}/insights/in_unknown/evidence`);
+    expect(missing.status).toBe(404);
+    expect((await jsonOf(missing)).type).toBe(
+      'urn:matchiq:problem:insight-not-found',
+    );
     expect(await jsonOf(await get('overlays'))).toEqual({
       items: [],
       nextCursor: null,

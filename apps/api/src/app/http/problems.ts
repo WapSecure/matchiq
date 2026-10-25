@@ -9,6 +9,7 @@ export const PROBLEM_STATUS: Readonly<Record<ProblemKind, HttpStatus>> = {
   fixtureExists: HttpStatus.CONFLICT,
   fixtureMismatch: HttpStatus.UNPROCESSABLE_ENTITY,
   eventConflict: HttpStatus.CONFLICT,
+  eventOrder: HttpStatus.UNPROCESSABLE_ENTITY,
   idempotencyMismatch: HttpStatus.UNPROCESSABLE_ENTITY,
   invalidHeader: HttpStatus.BAD_REQUEST,
   streamUnavailable: HttpStatus.SERVICE_UNAVAILABLE,

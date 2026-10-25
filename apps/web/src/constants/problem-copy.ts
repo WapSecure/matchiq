@@ -43,6 +43,7 @@ export const PROBLEM_COPY: Record<string, ErrorCopy | ErrorKind> = {
     action: 'lobby',
   },
   'event-conflict': 'conflict',
+  'event-order': 'conflict',
   'idempotency-key-reused': {
     title: 'That request clashed with an earlier one',
     message: 'Close this and try again.',

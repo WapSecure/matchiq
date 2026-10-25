@@ -24,6 +24,11 @@ export {
   type ValidationReport,
 } from './lib/validation/issues.js';
 export {
+  type LedgerTail,
+  checkBatchOrder,
+  findSequenceGaps,
+} from './lib/validation/batch-order.js';
+export {
   type ValidatedStream,
   analyseFixtureEvents,
   validateFixtureEvents,

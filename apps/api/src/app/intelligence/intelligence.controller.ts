@@ -11,7 +11,11 @@ import type { FixtureKey, InsightTrace, RecapDocument } from '@matchiq/db';
 import { ZodValidationPipe } from '@matchiq/server-kit';
 import { ROUTES } from '../constants';
 import { FixtureScope } from '../http/fixture-scope';
-import { MatchListQuery, NarrativeQuery } from './intelligence.schemas';
+import {
+  MatchListQuery,
+  NarrativeQuery,
+  RecapQuery,
+} from './intelligence.schemas';
 import { IntelligenceService } from './intelligence.service';
 
 @Controller(ROUTES.fixtures)
@@ -54,8 +58,11 @@ export class IntelligenceController {
 
   @Get(ROUTES.recap)
   @RequirePermission('insights:read')
-  recap(@FixtureScope() key: FixtureKey): Promise<RecapDocument> {
-    return this.intelligence.recap(key);
+  recap(
+    @FixtureScope() key: FixtureKey,
+    @Query(new ZodValidationPipe(RecapQuery)) query: RecapQuery,
+  ): Promise<RecapDocument> {
+    return this.intelligence.recap(key, query);
   }
 
   @Get(ROUTES.agentRuns)
