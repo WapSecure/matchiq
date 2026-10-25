@@ -4,6 +4,8 @@ import type { Side } from '@/components/match/team-swatch';
 export type RosterTeam = { side: Side; name: string; shortName: string };
 
 export type Roster = {
+  /** Both team names by side; empty until the fixture loads. */
+  sideNames: Partial<Record<Side, string>>;
   team: (teamId: string | null | undefined) => RosterTeam | null;
   player: (playerId: string | null | undefined) => string | null;
 };
@@ -12,9 +14,11 @@ export type Roster = {
 export const buildRoster = (fixture: Fixture | undefined): Roster => {
   const teams = new Map<string, RosterTeam>();
   const players = new Map<string, string>();
+  const sideNames: Partial<Record<Side, string>> = {};
   if (fixture) {
     for (const side of ['home', 'away'] as const) {
       const team = fixture[side];
+      sideNames[side] = team.name;
       teams.set(team.teamId, {
         side,
         name: team.name,
@@ -26,6 +30,7 @@ export const buildRoster = (fixture: Fixture | undefined): Roster => {
     }
   }
   return {
+    sideNames,
     team: (id) => (id ? (teams.get(id) ?? null) : null),
     player: (id) => (id ? (players.get(id) ?? null) : null),
   };

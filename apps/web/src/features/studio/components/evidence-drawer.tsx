@@ -42,9 +42,6 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
     view?.narrative.headline ??
     (insight ? INSIGHT_KIND_LABELS[insight.kind] : EVIDENCE_COPY.title);
 
-  const subject = roster.team(insight?.teamId);
-  const subjectNames = subject ? { [subject.side]: subject.name } : undefined;
-
   return (
     <Drawer
       open={insight !== null}
@@ -74,7 +71,7 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
               <ComparedWith
                 insight={insight}
                 persona={persona}
-                names={subjectNames}
+                names={roster.sideNames}
                 loading={
                   insight.context === undefined && insight.status === 'DETECTED'
                 }
