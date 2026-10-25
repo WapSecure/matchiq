@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ApiEnv, loadEnv } from '@matchiq/config';
 import type { Fixture, MatchEvent, ProblemDetails } from '@matchiq/contracts';
+import type { DatabaseHandle } from '@matchiq/db';
 import {
   createTestDatabase,
   testRedisUrl,
@@ -18,6 +19,7 @@ import pg from 'pg';
 import type { AddressInfo } from 'node:net';
 import { AppModule } from '../app/app.module';
 import { configureApiApp } from '../app/configure-api-app';
+import { DATABASE } from '../app/infrastructure/tokens';
 
 /** The dev/CI operator-key fallback (ADR-0018): a developer + producer in `org_demo`. */
 export const OPERATOR_KEY = 'operator-test-key-'.padEnd(48, 'x');
@@ -75,7 +77,7 @@ export const startTestApp = async (
   configureApiApp(app, env);
   await app.listen(0, '127.0.0.1');
   const { port } = app.getHttpServer().address() as AddressInfo;
-  const sql = new pg.Pool({ connectionString: database.url, max: 2 });
+  const sql = app.get<DatabaseHandle>(DATABASE).pool;
   return {
     app,
     env,
@@ -87,7 +89,6 @@ export const startTestApp = async (
     }),
     close: async () => {
       await app.close();
-      await sql.end();
       await issuer.close();
       await database.drop();
     },

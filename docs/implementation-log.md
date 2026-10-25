@@ -1287,3 +1287,12 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 
 - New `apps/web-e2e/src/fullstack-smoke.spec.ts`: the real web UI against the Compose app profile (no mocks). Lobby, replay at 30×, wait for full time, scoreboard, key moment and Evidence drawer, Match stats rows, Recap, Fact-checks, signed-out Activity log, plus axe on lobby, studio and recap. Skips itself without `BASE_URL`.
 - New advisory CI job "Browser smoke on the Compose stack" (`continue-on-error`, not in the gate). It becomes required only after several clean dev runs. Closes audit REM-13 once it has passed in CI.
+
+## MQ-102: How this was written on key-moment cards (25 October 2026)
+
+- Each Live studio key-moment card and each recap key moment has a collapsed **How this was written** disclosure (`apps/web/src/features/how-written`). Open, it shows the chain for that moment: Analyst, Writer, Fact checker, Publish gate (Translator and Graphics writer on one "Also" line when recorded), each with its outcome (Passed, Used a template, Sent back, Stopped) and time taken, then who wrote the final wording and "Caught N problems" with the findings the Fact-checks page shows.
+- Reuses the Fact-checks data and helpers: the shared match runs query (`agent-runs`, same cache key as the Fact-checks page), `useAgentSteps`, `plainFallbackReasons`, `describeRejection` and the step label constants. Nothing is requested until the first open; steps are cached per moment, and the match runs list is one shared request, so concurrency stays bounded by what a viewer opens.
+- Final line: "Written by a model and fact-checked", "Standard wording: <plain reason>", or a test stand-in line for the mock provider. The "Recorded model run" line is wired in `WRITER_LINES.recorded` and appears once the `recorded` provider exists (MQ-100).
+- States: loading skeleton, "No agent steps were recorded for this moment.", plain error with retry, pending note. Template-only moments show only the plain reason. Viewers without `agents:traces:read` (the anonymous demo principal has it) do not see the disclosure.
+- UI: React Aria `Disclosure` gained an `onExpandedChange` prop; the recap rail moved to `recap-rail.tsx` to keep `recap-moment.tsx` under the line cap.
+- Tests: `how-written.spec.tsx` (collapsed and lazy, chain with outcomes and durations, caught findings, template-only, no steps, error and retry, no permission, no technical words).

@@ -68,6 +68,7 @@ export function RecapMoments({
                 team={roster.team(moment.teamId)}
                 persona={persona}
                 locale={locale}
+                fixtureId={fixture.fixtureId}
               />
             ))}
           </ol>
