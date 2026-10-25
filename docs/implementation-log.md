@@ -1213,3 +1213,7 @@ The engine gains two snapshot metrics, `shotConversionPct` and `passQualityPct`,
 ## MQ-083: Plain wording in the activity log and landing hero (24 October 2026)
 
 The activity log Reason column and unknown action keys now pass through `describeReason` and `describeAction`, so stored codes such as APPROVAL_WINDOW_LAPSED show as producer wording and the raw value stays in the Technical details disclosure. The same mapping covers the recent-graphics list and the ruled-out note. The landing hero no longer claims the moments are spotted "in seconds".
+
+## MQ-086 follow-up: milestone insights in the worker pipeline (25 October 2026)
+
+The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs that pin fixture moment sets were corrected. The recap sorts same-clock moments by priority then insight id, so replay output stays identical across databases. A milestone has no earlier occurrence, so its Analyst breakdown omits the previous-spell sentence, which had repeated the minute and failed the gate. A voided goal also retracts the first-goal milestone built on it, which is intended. The agents integration spec picks its insights from the non-milestone moments. Milestone cues keep the existing P2 overlay priority; overlay behaviour is unchanged.

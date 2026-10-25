@@ -43,14 +43,21 @@ describe('corrections downstream of the engine', () => {
     const insightId = goal?.insight.insightId ?? '';
 
     const at = batches[correction.sequence];
-    expect(at?.retractions).toEqual([
-      {
-        insightId,
-        cause: 'CORRECTION',
-        causeEventId: correction.eventId,
-        reason: correction.reason,
-      },
-    ]);
+    expect(at?.retractions).toContainEqual({
+      insightId,
+      cause: 'CORRECTION',
+      causeEventId: correction.eventId,
+      reason: correction.reason,
+    });
+    const milestones = batches
+      .flatMap((b) => b.insights)
+      .filter(
+        (r) =>
+          r.insight.kind === 'PLAYER_MILESTONE' &&
+          r.insight.evidence.eventIds.includes(correction.correctedEventId),
+      );
+    expect(milestones.map((r) => r.insight.reasonCode)).toEqual(['FIRST_GOAL']);
+    expect(at?.retractions).toHaveLength(1 + milestones.length);
     expect(at?.overlayEnds).toContainEqual(
       expect.objectContaining({
         overlayId: overlayIdFor(insightId),
@@ -64,7 +71,9 @@ describe('corrections downstream of the engine', () => {
         cause: 'CORRECTION',
       }),
     );
-    expect(ofType(batches, 'insight.retract')).toHaveLength(1);
+    expect(ofType(batches, 'insight.retract')).toHaveLength(
+      1 + milestones.length,
+    );
   });
 
   it('ends with exactly the moments the corrected ledger supports', async () => {

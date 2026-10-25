@@ -23,6 +23,8 @@ describe('agents pipeline with AI enabled (integration)', () => {
   let t: TestWorker;
   let fixture: Fixture;
   let key: FixtureKey;
+  const coreInsights = async () =>
+    (await t.reader.insights(key)).filter((i) => i.kind !== 'PLAYER_MILESTONE');
   const attempt = (attemptsMade: number) => ({ attemptsMade, maxAttempts: 3 });
 
   beforeAll(async () => {
@@ -125,7 +127,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('races two deliveries of one job into a single publication', async () => {
-    const insight = (await t.reader.insights(key))[1];
+    const insight = (await coreInsights())[1];
     if (!insight) throw new Error('no insight');
     const outcomes = await Promise.all([
       t.pipeline.process(job(insight.insightId), attempt(0)),
@@ -142,7 +144,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('rejects a draft that cites an unsupported number and serves the template for that variant', async () => {
-    const insight = (await t.reader.insights(key))[2];
+    const insight = (await coreInsights())[2];
     if (!insight) throw new Error('no insight');
     agents.behave((r) => {
       const result = fakePipelineResult(r, fixture);
@@ -174,7 +176,7 @@ describe('agents pipeline with AI enabled (integration)', () => {
   });
 
   it('retries a timeout while attempts remain, then falls back to templates', async () => {
-    const insight = (await t.reader.insights(key))[3];
+    const insight = (await coreInsights())[3];
     if (!insight) throw new Error('no insight');
     agents.behave((r) => ({
       status: 200,
