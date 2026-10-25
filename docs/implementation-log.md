@@ -1258,3 +1258,9 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - **Pressure trend**: three bars for the latest 5-minute spells with an accessible name and a table view (`spell-trend.tsx`).
 - States: loading, "Not enough match time yet to compare", and hidden for non-Analyst personas. Numbers come only from `insight.context`; nothing is shown when a figure is not in the payload.
 - Tests: `compared-with.spec.tsx`. No backend change. ADR-0029 updated.
+
+## MQ-093: milestones use standard wording (25 October 2026)
+
+- `PLAYER_MILESTONE` insights skip the agents and publish their template (`TEMPLATE_ONLY_KINDS` in the worker, metric outcome `template-only`). The Fact-checks page explains it in plain words.
+- Why: on the dev laptop milestones were about half of all moments and kept the writer from the goals and swings (4 of 41 AI-written). ADR-0011 addendum 7.
+- Tests: `insight-pipeline.stale.spec.ts` (milestone case), `fallback-reasons.spec.ts`.

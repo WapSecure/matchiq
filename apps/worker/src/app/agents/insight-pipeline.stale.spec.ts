@@ -17,13 +17,15 @@ const NOW = Date.UTC(2026, 9, 25, 12, 0, 0);
 const KEY = { orgId: 'org_1', fixtureId: 'fx_1' };
 const JOB = { ...KEY, insightId: 'in_1', revision: 1 };
 
-const build = () => {
+const build = (kind = 'PRESSURE_SWING') => {
   const run = jest.fn();
   const publish = jest.fn().mockResolvedValue('written');
   const pipelineCall = jest.fn();
   const deps = {
     clock: { now: () => new Date(NOW) },
-    reader: { pendingInsight: () => Promise.resolve({ insightId: 'in_1' }) },
+    reader: {
+      pendingInsight: () => Promise.resolve({ insightId: 'in_1', kind }),
+    },
     fixtures: { get: () => Promise.resolve({ fixtureId: 'fx_1' }) },
     client: { run },
   } as unknown as AgentPipelineDeps;
@@ -71,5 +73,21 @@ describe('InsightPipelineService staleness', () => {
       enqueuedAtMs: NOW - 60_000,
     });
     expect(pipelineCall).not.toHaveBeenCalledWith('stale', 0);
+  });
+
+  it('keeps the template for milestone moments without calling the agents', async () => {
+    const { service, run, publish, pipelineCall } = build('PLAYER_MILESTONE');
+    await service.process(JOB, { attemptsMade: 0, maxAttempts: 1 });
+    expect(run).not.toHaveBeenCalled();
+    expect(pipelineCall).toHaveBeenCalledWith('template-only', 0);
+    expect(publish).toHaveBeenCalledWith(
+      KEY,
+      expect.objectContaining({
+        claim: 'TEMPLATE',
+        publication: expect.objectContaining({
+          reason: FALLBACK_REASONS.templateOnly,
+        }),
+      }),
+    );
   });
 });

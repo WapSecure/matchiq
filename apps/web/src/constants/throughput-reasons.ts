@@ -16,6 +16,11 @@ export const THROUGHPUT_REASON_COPY: readonly {
     group: 'OTHER',
   },
   {
+    pattern: /TEMPLATE_ONLY/,
+    text: 'Milestones use standard wording so goals and swings can be written first.',
+    group: 'OTHER',
+  },
+  {
     pattern: /recovered after a worker restart/i,
     text: 'Writing was interrupted by a restart, so standard wording went out.',
     group: 'AI_TROUBLE',

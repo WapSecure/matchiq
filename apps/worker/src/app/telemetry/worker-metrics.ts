@@ -18,7 +18,8 @@ export type PipelineCallOutcome =
   | 'invalid-response'
   | 'circuit-open'
   | 'ai-disabled'
-  | 'stale';
+  | 'stale'
+  | 'template-only';
 
 const { names, help, buckets } = WORKER_METRICS;
 

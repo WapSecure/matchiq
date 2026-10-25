@@ -132,7 +132,9 @@ describe('boot recovery of PENDING insights (integration)', () => {
 
   it('rebuilds the recap for a late agent publication after the completed session left memory', async () => {
     const session = await replayToEnd(t, TEMPLATE);
-    const [first] = await t.reader.insights(session);
+    const [first] = (await t.reader.insights(session)).filter(
+      (i) => i.kind !== 'PLAYER_MILESTONE',
+    );
     if (!first) throw new Error('no insight');
     t.sessions.release(session.fixtureId);
     expect(t.sessions.isLoaded(session.fixtureId)).toBe(false);

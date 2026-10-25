@@ -143,3 +143,11 @@ Spec §28 and §46 ask for a record of every transition between agents, not only
 - **Compact prompt mode.** `AGENT_PROMPT_MODE=compact` swaps the Analyst (2.2.1) and Writer (3.1.1) for variants that drop the trend spells after the first and the per-moment-type examples. The payload drops `context.trend.spell2` and `spell3`. The grounding rules, output fields and checks are the same text and code. The default stays `standard`; the compact hashes are recorded in `prompt_registry.json`. The Fact Checker prompt is already short, so only its payload shrinks.
 
 **Consequences.** Under load the writer spends its time on the moments that matter most, and stale ones no longer wait behind it. Compact mode has only been verified against the mock model and the oracle; whether it raises the live AI share is unmeasured (docs/ai/EVALUATION.md, "Throughput at demo speeds").
+
+## Addendum 7 (2026-10-25, MQ-093): milestone moments publish standard wording
+
+**Context.** Measured on the owner's laptop (3B model, 5x): about half of a match's 41 key moments are P2 player milestones. They queue behind a writer that serves one call at a time, so only 4 of 41 moments were AI-written and 29 were still waiting at full time.
+
+**Decision.** Insights of kind `PLAYER_MILESTONE` skip the agents and publish their template with reason `TEMPLATE_ONLY: milestone moments use standard wording` (metric outcome `template-only`). The list is the `TEMPLATE_ONLY_KINDS` constant in the worker. Milestones still pass the deterministic gate, so their numbers are unchanged.
+
+**Consequences.** The writer is free for goals, swings and bursts. Milestone wording is plainer. Removing the kind from the constant restores AI writing once the machine can keep up.

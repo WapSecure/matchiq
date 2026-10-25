@@ -127,10 +127,14 @@ export const DEMO_FAULTS = {
     `Simulated failure (demo): the ${persona} ${locale} draft was altered to cite fault.injected = 99 before the publish gate`,
 } as const;
 
+/** Insight kinds that always publish their template so the writer serves goals and swings first. */
+export const TEMPLATE_ONLY_KINDS: readonly string[] = ['PLAYER_MILESTONE'];
+
 export const FALLBACK_REASONS = {
   aiDisabled: 'AI_ENABLED=false: deterministic templates only',
   circuitOpen: 'agents circuit breaker open',
   skippedStale: 'SKIPPED_STALE: queued too long, template kept',
+  templateOnly: 'TEMPLATE_ONLY: milestone moments use standard wording',
   timeout: 'agents service timed out',
   unreachable: 'agents service unreachable',
   invalidResponse: 'agents service returned an invalid PipelineResult',
