@@ -1,6 +1,6 @@
 # ADR-0025: Local development credentials are published for the local realm only
 
-- Status: Proposed, owner to confirm (2026-10-24). Spec §36, §40. Recorded by MQ-082 (audit REM-06).
+- Status: Accepted (2026-10-25). Spec §36, §40. Proposed by MQ-082 on 2026-10-24 and accepted by the product owner in MQ-087 (audit REM-06).
 
 ## Context
 
@@ -12,6 +12,7 @@ Spec §36 says demo credentials are recorded only in secure configuration and ne
 - The sign-in page labels the accounts "Development only" (`apps/web/src/constants/auth.ts`), and the README says the same.
 - `infra/keycloak/matchiq-realm.json` is mounted only by the local `docker-compose.yml`. It is not used by the VPS overlay, the Azure templates or any other hosted environment.
 - Any hosted deployment must create its own realm or tenant, with generated secrets held in a secret manager, and must not import this realm file.
+- CI rejects hosted deployment configuration that references the local realm export, its shared password or its localhost issuer.
 - The README keeps the credentials, because removing them would break the judge quick-start. This is a conscious, documented exception to §36, not a claim that §36 is met.
 
 ## Consequences

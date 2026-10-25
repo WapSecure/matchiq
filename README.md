@@ -74,7 +74,7 @@ Templates air at once. Agent narratives replace them as they pass the checks, ro
 
 ### Sign-in (development accounts only)
 
-With Option B, open <http://localhost:4200/sign-in>. The local Keycloak realm has eight synthetic accounts. They all use the password `matchiq-dev-only`, which exists only in the committed local realm export and must never be used elsewhere. The sign-in page labels these accounts "Development only". The realm file is not used by any hosted environment, and a hosted deployment must use a secret manager ([ADR-0025](docs/adr/0025-local-development-credentials.md)).
+With Option B, open <http://localhost:4200/sign-in>. The local Keycloak realm has eight synthetic accounts. They all use the password `matchiq-dev-only`, which exists only in the committed local realm export and must never be used elsewhere. The sign-in page labels these accounts "Development only". The realm file is not used by any hosted environment, and a hosted deployment must use a secret manager. This is an accepted local development deviation from specification §36 ([ADR-0025](docs/adr/0025-local-development-credentials.md)).
 
 | Account              | Organisation (synthetic) | Role         | Try                                               |
 | -------------------- | ------------------------ | ------------ | ------------------------------------------------- |

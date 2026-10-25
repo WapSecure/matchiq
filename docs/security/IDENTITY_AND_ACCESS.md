@@ -143,7 +143,7 @@ To pick up the theme on an existing local stack, recreate the Keycloak container
 
 ### Demo accounts (development only)
 
-Every account uses the password **`matchiq-dev-only`**. These credentials exist only in the local realm export and must never be used anywhere else.
+Every account uses the password **`matchiq-dev-only`**. These credentials exist only in the local realm export and must never be used anywhere else. [ADR-0025](../adr/0025-local-development-credentials.md) records the accepted local development deviation and the hosted environment safeguards.
 
 | Username             | Organisation                                  | Role              |
 | -------------------- | --------------------------------------------- | ----------------- |

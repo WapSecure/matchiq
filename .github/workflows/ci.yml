@@ -135,7 +135,6 @@ jobs:
           pnpm nx run-many -t export-json-schema openapi codegen --skip-nx-cache
           git diff --exit-code
           test -z "$(git status --porcelain)" || { git status --porcelain; exit 1; }
-
   e2e-shard:
     name: End-to-end shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
@@ -238,24 +237,35 @@ jobs:
       matrix:
         include:
           - app: api
-            args: -f apps/api/Dockerfile .
+            dockerfile: apps/api/Dockerfile
+            context: .
           - app: worker
-            args: -f apps/worker/Dockerfile .
+            dockerfile: apps/worker/Dockerfile
+            context: .
           - app: web
-            args: -f apps/web/Dockerfile .
+            dockerfile: apps/web/Dockerfile
+            context: .
           - app: agents
-            args: apps/agents
+            dockerfile: apps/agents/Dockerfile
+            context: apps/agents
     env:
       IMAGE: matchiq-${{ matrix.app }}:ci
+      DOCKER_BUILD_CACHE_DIR: ${{ runner.temp }}/docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/docker-cache/${{ matrix.app }}
+          key: docker-container-${{ matrix.app }}-${{ runner.os }}-${{ github.sha }}
+          restore-keys: docker-container-${{ matrix.app }}-${{ runner.os }}-
+      - name: Configure Buildx
+        run: docker buildx create --driver docker-container --use
       - name: Build image
         env:
-          ARGS: ${{ matrix.args }}
-        run: |
-          # shellcheck disable=SC2086
-          DOCKER_BUILDKIT=1 docker build -t "$IMAGE" $ARGS
-          docker image ls "$IMAGE" --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+          APP: ${{ matrix.app }}
+          DOCKERFILE: ${{ matrix.dockerfile }}
+          CONTEXT: ${{ matrix.context }}
+        run: .github/scripts/build-image-with-cache.sh "$APP" "$IMAGE" "$DOCKERFILE" "$CONTEXT"
       - name: Install Trivy
         run: .github/scripts/install-trivy.sh
       - name: CycloneDX SBOM
@@ -281,12 +291,28 @@ jobs:
     env:
       APP_VERSION: ${{ github.sha }}
       COMPOSE_PROJECT_NAME: matchiq-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      DOCKER_BUILD_CACHE_DIR: ${{ runner.temp }}/docker-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/docker-cache
+          key: docker-compose-${{ runner.os }}-${{ github.sha }}
+          restore-keys: docker-compose-${{ runner.os }}-
+      - name: Configure Buildx
+        run: docker buildx create --driver docker-container --use
       - name: Validate Compose configuration
         run: docker compose --profile app config --quiet
+      - name: Build application images
+        run: |
+          .github/scripts/build-image-with-cache.sh api matchiq-api:local apps/api/Dockerfile .
+          .github/scripts/build-image-with-cache.sh worker matchiq-worker:local apps/worker/Dockerfile .
+          .github/scripts/build-image-with-cache.sh agents matchiq-agents:local apps/agents/Dockerfile apps/agents
+          .github/scripts/build-image-with-cache.sh web matchiq-web:local apps/web/Dockerfile . \
+            --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1 \
+            --build-arg NEXT_PUBLIC_DEMO_MODE=true
       - name: Start fresh application stack
-        run: docker compose --profile app up -d --build --wait --wait-timeout 360
+        run: docker compose --profile app up -d --no-build --wait --wait-timeout 360
       - name: Verify services, seed and replay
         run: bash scripts/compose-smoke.sh
       - name: Sanitized diagnostics
@@ -402,6 +428,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Hosted authentication boundary
+        run: .github/scripts/check-hosted-auth-boundary.sh
       - name: Build and lint
         env:
           POSTGRES_ADMIN_PASSWORD: x
