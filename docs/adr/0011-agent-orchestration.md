@@ -151,3 +151,5 @@ Spec §28 and §46 ask for a record of every transition between agents, not only
 **Decision.** Insights of kind `PLAYER_MILESTONE` skip the agents and publish their template with reason `TEMPLATE_ONLY: milestone moments use standard wording` (metric outcome `template-only`). The list is the `TEMPLATE_ONLY_KINDS` constant in the worker. Milestones still pass the deterministic gate, so their numbers are unchanged.
 
 **Consequences.** The writer is free for goals, swings and bursts. Milestone wording is plainer. Removing the kind from the constant restores AI writing once the machine can keep up.
+
+**Follow-up (MQ-094).** Milestones no longer enter the agents queue. The match pipeline publishes their standard wording at detection (reason `TEMPLATE_ONLY`), so they are never shown as "being written". The agents-job check stays as a guard for jobs queued before this change.

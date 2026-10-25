@@ -59,7 +59,13 @@ describe('agents pipeline with AI enabled (integration)', () => {
   it('replays without waiting for the model: insights stay pending, overlays still publish', async () => {
     const insights = await t.reader.insights(key);
     expect(insights.length).toBeGreaterThan(0);
-    expect(await t.reader.narratives(key, {})).toEqual([]);
+    const milestones = new Set(
+      insights
+        .filter((i) => i.kind === 'PLAYER_MILESTONE')
+        .map((i) => i.insightId),
+    );
+    const narratives = await t.reader.narratives(key, {});
+    expect(narratives.every((n) => milestones.has(n.insightId))).toBe(true);
     const stream = await readStream(t, key);
     expect(countOf(stream, 'overlay.publish')).toBeGreaterThan(0);
     expect(fixture.fixtureId).toBe(key.fixtureId);

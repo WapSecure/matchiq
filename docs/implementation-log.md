@@ -1264,3 +1264,8 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - `PLAYER_MILESTONE` insights skip the agents and publish their template (`TEMPLATE_ONLY_KINDS` in the worker, metric outcome `template-only`). The Fact-checks page explains it in plain words.
 - Why: on the dev laptop milestones were about half of all moments and kept the writer from the goals and swings (4 of 41 AI-written). ADR-0011 addendum 7.
 - Tests: `insight-pipeline.stale.spec.ts` (milestone case), `fallback-reasons.spec.ts`.
+
+## MQ-094: milestone wording at detection (25 October 2026)
+
+- The match pipeline publishes `PLAYER_MILESTONE` standard wording when the moment is detected (publication `TEMPLATE`, reason `TEMPLATE_ONLY`) instead of queueing an agents job, so milestones are never left "being written" behind a slow writer. The job-level check from MQ-093 stays as a guard.
+- Tests: `template-only.spec.ts` (new); worker integration specs now exclude milestones where they expect agent-written or pending moments.
