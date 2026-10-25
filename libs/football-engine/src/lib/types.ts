@@ -1,4 +1,8 @@
-import type { MatchEvent, MatchPhase } from '@matchiq/contracts';
+import type {
+  MatchEvent,
+  MatchPhase,
+  PitchDimensions,
+} from '@matchiq/contracts';
 
 export type Side = 'home' | 'away';
 export const SIDES: readonly Side[] = ['home', 'away'];
@@ -7,6 +11,12 @@ export interface FixtureContext {
   readonly fixtureId: string;
   readonly teamIds: Readonly<Record<Side, string>>;
   readonly teamNames: Readonly<Record<Side, string>>;
+  readonly pitch: PitchDimensions;
+}
+
+export interface PassGeometry {
+  readonly distanceM: number;
+  readonly difficulty: number;
 }
 
 export interface TeamTally {
@@ -26,6 +36,16 @@ export interface TeamTally {
   readonly ownGoalsFor: number;
   /** Completed passes that advanced the ball at least PROGRESSIVE_PASS_MIN_GAIN. */
   readonly progressivePasses: number;
+  /** Completed passes: summed metres, summed synthetic difficulty and the count. */
+  readonly passDistanceSumM: number;
+  readonly passDifficultySum: number;
+  readonly geometryPasses: number;
+  /** Shots carrying speedKph: sum, max and count. */
+  readonly shotSpeedSumKph: number;
+  readonly shotSpeedMaxKph: number;
+  readonly speedShots: number;
+  /** Sum of the geometric xG baseline over shots. */
+  readonly xgSum: number;
 }
 
 /** Event kinds kept on a per-team timeline for windowed metrics and moments. */
@@ -86,6 +106,8 @@ export interface DerivedState {
   readonly completedAttempts: ReadonlySet<string>;
   /** PASS_ATTEMPTED eventIds whose target gains PROGRESSIVE_PASS_MIN_GAIN or more. */
   readonly progressiveAttempts: ReadonlySet<string>;
+  /** PASS_ATTEMPTED eventId -> metres and synthetic difficulty, applied on completion. */
+  readonly passGeometry: ReadonlyMap<string, PassGeometry>;
   /** Per-player counts keyed by `PLAYER_COUNT_KEYS` kind and player id. */
   readonly playerCounts: ReadonlyMap<string, number>;
 }

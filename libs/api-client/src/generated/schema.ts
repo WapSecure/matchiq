@@ -903,6 +903,11 @@ export interface components {
             passCompletionPct: components["schemas"]["MetricValue"];
             shotConversionPct?: components["schemas"]["MetricValue"];
             passQualityPct?: components["schemas"]["MetricValue"];
+            passDistanceAvgM?: components["schemas"]["MetricValue"];
+            passDifficultyAvg?: components["schemas"]["MetricValue"];
+            shotSpeedAvgKph?: components["schemas"]["MetricValue"];
+            shotSpeedMaxKph?: components["schemas"]["MetricValue"];
+            xgBaseline?: components["schemas"]["MetricValue"];
             possessionPct: components["schemas"]["MetricValue"];
             /** @enum {string} */
             possessionBasis: "TIME_WEIGHTED" | "EVENT_SHARE_PROXY";
@@ -923,7 +928,7 @@ export interface components {
             status: "available";
             value: number;
             /** @enum {string} */
-            unit: "count" | "percent" | "index" | "metres" | "kph" | "mps";
+            unit: "count" | "percent" | "index" | "metres" | "xg" | "kph" | "mps";
             numerator?: number;
             denominator?: number;
         };

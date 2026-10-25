@@ -53,6 +53,7 @@ const UNIT_SUFFIX: Record<MetricUnit, string> = {
   percent: '%',
   index: '',
   metres: ' m',
+  xg: '',
   kph: ' km/h',
   mps: ' m/s',
 };
@@ -61,7 +62,8 @@ const UNIT_DECIMALS: Record<MetricUnit, number> = {
   count: 0,
   percent: 0,
   index: 1,
-  metres: 0,
+  metres: 1,
+  xg: 2,
   kph: 1,
   mps: 1,
 };

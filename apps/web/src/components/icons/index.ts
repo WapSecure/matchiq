@@ -65,3 +65,5 @@ export { UploadIcon } from './upload-icon';
 export { OverlayArrowIcon } from './overlay-arrow-icon';
 export { MinusIcon } from './minus-icon';
 export { PlusIcon } from './plus-icon';
+export { SpeakerIcon } from './speaker-icon';
+export { StopIcon } from './stop-icon';

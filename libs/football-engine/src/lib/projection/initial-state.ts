@@ -23,6 +23,13 @@ export const EMPTY_TALLY: TeamTally = {
   redCards: 0,
   ownGoalsFor: 0,
   progressivePasses: 0,
+  passDistanceSumM: 0,
+  passDifficultySum: 0,
+  geometryPasses: 0,
+  shotSpeedSumKph: 0,
+  shotSpeedMaxKph: 0,
+  speedShots: 0,
+  xgSum: 0,
 };
 
 export const EMPTY_TIMELINE: TeamTimeline = {
@@ -50,6 +57,7 @@ export const INITIAL_DERIVED: DerivedState = {
   passAttempts: new Map(),
   completedAttempts: new Set(),
   progressiveAttempts: new Set(),
+  passGeometry: new Map(),
   playerCounts: new Map(),
 };
 
@@ -57,6 +65,7 @@ export const toFixtureContext = (fixture: Fixture): FixtureContext => ({
   fixtureId: fixture.fixtureId,
   teamIds: { home: fixture.home.teamId, away: fixture.away.teamId },
   teamNames: { home: fixture.home.name, away: fixture.away.name },
+  pitch: fixture.pitch,
 });
 
 export const createInitialState = (fixture: Fixture): ProjectionState => ({

@@ -1,5 +1,5 @@
 /** Bump on any change that can alter a snapshot value or `stateHash`. */
-export const ALGORITHM_VERSION = '1.1.0';
+export const ALGORITHM_VERSION = '1.2.0';
 /** Bump on any change to key-moment rules, thresholds or evidence wording. */
 export const MOMENT_METHOD_VERSION = '1.1.0';
 
@@ -26,6 +26,31 @@ export const ROUNDING = {
 } as const;
 
 export const PERCENT = 100;
+
+/** Pitch events use 0-100 coordinates; the fixture pitch size converts them to metres. */
+export const PITCH_SCALE = 100;
+
+/** Synthetic pass difficulty (0-100). Weights sum to 100; not calibrated to real play. */
+export const PASS_DIFFICULTY = {
+  weights: { distance: 40, angle: 20, pressure: 20, progression: 20 },
+  maxDistanceM: 40,
+  maxProgressM: 30,
+} as const;
+
+/** Uncalibrated geometric xG baseline constants (ADR-0040). Illustrative, not fitted. */
+export const XG_BASELINE = {
+  goalWidthM: 7.32,
+  intercept: -0.2,
+  distanceCoef: -0.12,
+  angleCoef: 1,
+} as const;
+
+export const MEASURE_DECIMALS = {
+  metres: 1,
+  difficulty: 1,
+  kph: 1,
+  xg: 2,
+} as const;
 
 /** A completed pass is progressive when its target is this many pitch units nearer goal (0-100 scale). */
 export const PROGRESSIVE_PASS_MIN_GAIN = 10;
