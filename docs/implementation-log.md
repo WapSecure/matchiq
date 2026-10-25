@@ -1232,6 +1232,20 @@ The P2 `PLAYER_MILESTONE` insights now flow through the worker, so the specs tha
 - **Idempotency-Key**: behaviour unchanged. README and OpenAPI now list the 12 routes that read it and say it is optional (ADR-0039; ADR-0034 and ADR-0037 amended).
 - Tests: `batch-order.spec.ts`, `ingest.service.spec.ts`, `recap-filter.spec.ts`; integration cases for event-order, gap warnings, evidence and recap query validation run in CI.
 
+## MQ-090: Stricter accessibility gate and audit status (25 October 2026)
+
+The axe helper now fails on moderate, serious and critical violations of the WCAG 2.x A and AA rules (`BLOCKING_IMPACT_THRESHOLD`). Reading the source found no pattern that triggers the moderate WCAG rules (document language is set, the viewport does not lock zoom, no media, single labels). A second pass runs the best-practice rules (landmarks, heading order, region) and logs each finding as an `axe-advisory` annotation rather than failing, until a CI run confirms them. No rule is disabled. The README claim matches this, `docs/design/ACCESSIBILITY_CHECKLIST.md` lists the manual VoiceOver, keyboard, reduced-motion and zoom checks (all not yet performed), and `docs/audits/STATUS_UPDATE_2026-10-25.md` records the audit findings' current status. Traceability rows REQ-028 and REQ-033 updated. Browser specs were not run locally; CI runs them.
+
+## MQ-091: Accepted metric scope and CI cache reporting (25 October 2026)
+
+The product owner accepted ADR-0029, closing the remaining REM-09 decision. The ADR now separates the shot-conversion, pass-quality and player-milestone work delivered by ADR-0038 from the remaining hackathon deferrals: pass distance and difficulty, tracking-dependent speed and distance metrics, additional audience dimensions, and the full analyst baseline/window controls. The submission judging map now reflects the delivered pass heuristic and milestone pipeline.
+
+The hosted-authentication guard discovers every file under `infra/` except the explicitly local `infra/keycloak/` tree and every deployment workflow named `deploy*.yml` or `deploy*.yaml`. A future hosted target is covered without editing the guard's path list. The existing prohibited local realm path, shared password and local issuers remain unchanged.
+
+Docker jobs now use the pinned cache action's restore and save entry points. Each container and Compose job records an exact hit, prefix restore or miss, the requested and restored keys, and the resulting cache size in the job summary. Cache saving still happens only after the job succeeds, and a miss still performs a clean build.
+
+Local validation: shell syntax passed; current hosted configuration passed; explicit and newly discovered hosted fixtures containing local authentication material were rejected; an `infra/keycloak` fixture remained excluded; cache reports were verified for exact hit, prefix restore and miss; workflow and documentation formatting and diff whitespace checks passed. Docker builds and the complete suite remain for CI under the repository testing policy.
+
 ## MQ-089: Analyst baseline, sample sizes and comparison windows (25 October 2026)
 
 - **Compared with** block in the Analyst evidence drawer: the moment's key count over the last 5 minutes, last 10 minutes or whole match against the match average, for both teams (5 minutes: the moment's team only), with the plays behind each figure, the moment's `sampleSize` and the envelope `limitations` when present. Plain wording; no raw index values. Fan and Broadcast never see it.
