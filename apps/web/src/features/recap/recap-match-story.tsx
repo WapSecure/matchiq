@@ -4,6 +4,7 @@ import { FileIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { RECAP_COPY, STORY_KIND_LABELS } from '@/constants/recap';
 import { SITE } from '@/constants/site';
+import { ListenButton } from '@/features/listen/listen-button';
 import { useStudioUi } from '@/features/studio/store';
 import type { RecapDocument } from '@/lib/api/session-schemas';
 import { withUniqueKeys } from '@/lib/unique-keys';
@@ -25,6 +26,13 @@ export function RecapMatchStory({ recap }: { recap: RecapDocument }) {
       Icon={FileIcon}
     >
       <div className="flex max-w-3xl flex-col gap-4">
+        <div>
+          <ListenButton
+            locale={picked.language}
+            text={picked.story.paragraphs.map((p) => p.text).join(' ')}
+            headline={copy.title}
+          />
+        </div>
         {picked.notice ? (
           <p lang={SITE.locale} className="text-xs text-warning">
             {picked.notice}

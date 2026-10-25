@@ -1,22 +1,17 @@
 import type { Insight, Persona } from '@matchiq/contracts';
 import { memo } from 'react';
-import { EvidenceIcon } from '@/components/icons';
 import { RuledOutNote } from '@/components/match/ruled-out-note';
 import { TeamSwatch } from '@/components/match/team-swatch';
-import { Badge, Button } from '@/components/ui';
-import {
-  CONFIDENCE_LABELS,
-  INSIGHT_KIND_LABELS,
-  PRIORITY_LABELS,
-} from '@/constants/match';
+import { Badge } from '@/components/ui';
+import { INSIGHT_KIND_LABELS, PRIORITY_LABELS } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { cn } from '@/lib/cn';
 import { describeMetric } from '@/lib/metric-definition';
 import { formatFraction, formatMinute } from '@/lib/format';
 import type { InsightMark } from '../editorial/insight-marks';
-import { SuppressInsightButton } from '../editorial/suppress-insight-button';
 import type { RosterTeam } from '../lib/roster';
 import type { NarrativeView } from '../store';
+import { MomentFooter } from './moment-footer';
 import { NarrativePanel } from './narrative-panel';
 
 export type KeyMomentCardProps = {
@@ -115,27 +110,13 @@ export const KeyMomentCard = memo(function KeyMomentCard({
         />
       )}
       {persona === 'ANALYST' ? <AnalystFacts insight={insight} /> : null}
-      <footer className="flex items-center gap-2">
-        <span className="mr-auto text-micro text-ink-subtle">
-          {CONFIDENCE_LABELS[insight.evidence.confidenceLabel]}
-        </span>
-        {mark.suppressed || mark.published || mark.retracted ? null : (
-          <SuppressInsightButton
-            insightId={insight.insightId}
-            headline={headline}
-          />
-        )}
-        <Button
-          size="xs"
-          variant="secondary"
-          leadingIcon={<EvidenceIcon size={14} />}
-          aria-label={STUDIO_COPY.insights.openEvidence(headline)}
-          aria-haspopup="dialog"
-          onClick={() => onOpenEvidence(insight.insightId)}
-        >
-          {STUDIO_COPY.insights.evidence}
-        </Button>
-      </footer>
+      <MomentFooter
+        insight={insight}
+        view={view}
+        mark={mark}
+        headline={headline}
+        onOpenEvidence={onOpenEvidence}
+      />
     </article>
   );
 });

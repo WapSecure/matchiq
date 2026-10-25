@@ -1269,3 +1269,10 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 
 - The match pipeline publishes `PLAYER_MILESTONE` standard wording when the moment is detected (publication `TEMPLATE`, reason `TEMPLATE_ONLY`) instead of queueing an agents job, so milestones are never left "being written" behind a slow writer. The job-level check from MQ-093 stays as a guard.
 - Tests: `template-only.spec.ts` (new); worker integration specs now exclude milestones where they expect agent-written or pending moments.
+
+## MQ-098: Listen to a narrative (25 October 2026)
+
+- A **Listen** button reads a published narrative aloud with the viewer's own device voice (Web Speech API) on each Live studio key-moment card and on the recap Match story. No model, TTS service, audio files or network use; the visible text is the transcript ([ADR-0041](adr/0041-audio-narration-via-the-device-voice.md)). Voice quality depends on the device.
+- Voice matches the narrative language; Pidgin only with an `en-NG` voice, else a plain "not available" note. Start by the viewer only, one reading at a time, Stop on the same button, stops on navigation, audience or language change and a hidden tab. Start and stop are announced once, throttled.
+- Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
+- Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.

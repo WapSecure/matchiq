@@ -116,6 +116,7 @@ Does not exist yet:
 - **Feature gaps against the challenge brief (rules §4.1 ii).** There is no pass distance or pass difficulty rating, no ball or shot speed metric (the generator records `SHOT.speedKph`, but the engine does not publish it), no player-speed tagging, and no video auto-eventing. Player Focus counts from match events only: without tracking data it shows no speed or distance ([ADR-0023](../adr/0023-player-focus-scope.md)).
 - **Single worker replica.** Replay sessions are owned by one worker ([ADR-0013](../adr/0013-replay-sessions-and-intelligence-pipeline.md)).
 - **Simulated faults are instant.** Their latency is not representative ([ADR-0020](../adr/0020-demo-fault-scenarios.md)).
+- **Listen uses the viewer's device voice.** Quality and available languages depend on the device and browser. Nigerian Pidgin has no voice, so audio is offered only if the device has a Nigerian English voice ([ADR-0041](../adr/0041-audio-narration-via-the-device-voice.md)).
 - **Pidgin glossary** is pending native-speaker review ([`PIDGIN_GLOSSARY.md`](../localization/PIDGIN_GLOSSARY.md)).
 
 ## Roadmap
