@@ -30,6 +30,8 @@ export type PitchMark = {
   /** Shots only; `true` fills the mark. */
   onTarget: boolean | null;
   outcome: ShotOutcome | null;
+  /** Shots only, and only when the data recorded a speed. */
+  speedKph: number | null;
   /** By the player the viewer follows. */
   followed?: boolean;
 };
@@ -85,6 +87,7 @@ const toMark = (
     ...toScreen(event.location, team.side),
     onTarget: shot ? ON_TARGET_OUTCOMES.has(shot.outcome) : null,
     outcome: shot ? shot.outcome : null,
+    speedKph: shot?.speedKph ?? null,
     followed: followedPlayerId !== null && event.playerId === followedPlayerId,
   };
 };
