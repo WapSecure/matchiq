@@ -10,6 +10,7 @@ import { PwaPrompts } from '@/components/pwa/pwa-prompts';
 import { PWA_METADATA, PWA_THEME_COLOR } from '@/constants/pwa';
 import { NONCE_HEADER } from '@/constants/security';
 import { SITE } from '@/constants/site';
+import { InterfaceLanguageSync } from '@/features/interface-language/interface-language-sync';
 import { THEME_INIT_SCRIPT } from '@/lib/theme/theme-script';
 import './global.css';
 
@@ -47,6 +48,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
+        <InterfaceLanguageSync />
         <SessionLoader />
         <SessionExpiredNotice />
         {children}
