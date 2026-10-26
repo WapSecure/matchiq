@@ -1315,6 +1315,24 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - UI: React Aria `Disclosure` gained an `onExpandedChange` prop; the recap rail moved to `recap-rail.tsx` to keep `recap-moment.tsx` under the line cap.
 - Tests: `how-written.spec.tsx` (collapsed and lazy, chain with outcomes and durations, caught findings, template-only, no steps, error and retry, no permission, no technical words).
 
+## MQ-106: Numbers checked receipt (26 October 2026)
+
+- Live studio key-moment cards, the on-air graphic and the Evidence drawer show that the figures in the published wording match the match data. Analyst: "All N figures match the match data" as a link that opens the Evidence drawer. Fan: one reassurance line. Broadcast: a quiet "Checked" tick. Each carries the count for screen readers.
+- The Evidence drawer gains a "Figures checked" list: each figure in the wording and the plain stat name it matches (same names as the Stats used table).
+- Truth rules: published narratives carry no `citedValues` (they are dropped after the publish gate), so the web re-checks the published text itself with the gate's own rules (digits plus spelled-out numbers, same rounding) against the moment's computed metrics and engine context metrics, the set the gate accepts. A receipt shows only when there is at least one figure and every figure matches a stat. No figures, an unreadable language (en-GB and Pidgin only), or any unmatched figure shows nothing, never "0 of 0". Retracted, ruled-out and suppressed moments show nothing. No claim is made about the gate for standard wording beyond the figures matching.
+- Code: `apps/web/src/features/numbers-checked` (`check-figures`, `numbers-checked`, `cue-numbers-checked`, `figures-checked-list`), `constants/numbers-checked.ts`; one-line wiring in `moment-footer.tsx`, `on-air-meta.tsx` and `evidence-drawer.tsx`.
+- Deferred: the recap moment. The recap document carries only metric names, not values, so figures cannot be matched there without a contract change (persisting cited values on the narrative).
+- Tests: `numbers-checked.spec.tsx` (matching, no figures, unmatched figure, unreadable language, persona variants, accessible name, retracted, no technical words, drawer list).
+
+## MQ-108: producer shortcuts and calmer confirmation (26 October 2026)
+
+- The "Waiting for your OK" queue has single-key shortcuts that work only when a waiting graphic or one of its buttons has focus: A or Enter send to air, D don't air, J/K or the arrow keys move between graphics, ? lists the keys. Ignored with Ctrl, Alt or Meta held, in text fields, on the adjust radios and in dialogs. WCAG 2.1.4: a "Keyboard shortcuts" switch (React Aria Switch, on by default, remembered per device with guarded localStorage) turns them off, and a "Shortcuts" popover lists them.
+- Visible key caps on the buttons (hidden on touch screens); the shortcut is in the accessible description, not the name, so names are unchanged.
+- After Send to air or Don't air the card stays in place for 8 seconds as "Sent to air at 12:41" or "Kept off air at 12:41", announced once politely through `useThrottledAnnouncement`. The toast is no longer used for a changed decision (no-ops still use it). No API, permission or payload change; the server audit is untouched. No animation, so reduced motion is respected.
+- Countdown: at 10 seconds or less the badge turns critical, swaps its clock for an alert icon and the card border changes, with the text "Send within 8 s". A graphic that runs out of time shows "Time ran out, so it stayed off air" with a plain explanation, instead of vanishing.
+- Code: `features/studio/approval` (`shortcut-keys`, `use-shortcut-setting`, `use-queue-keys`, `use-settled-reviews`, `settled-card`, `review-actions`, `shortcuts-help`, `key-hint`), `constants/approval-shortcuts.ts`, `keyboard-icon`.
+- Tests: `approval-shortcuts.spec.tsx` (keys act only on a focused graphic, modifiers, text fields and radios ignored, switch off and remembered, navigation, help list, confirmation and announcement, urgent text and icon, lapse message); `approval-queue.spec.tsx` updated for the in-place confirmation.
+
 ## MQ-103: studio tour panel placement (26 October 2026)
 
 - The tour panel was clipped above the screen: it sat inside the sticky header, whose backdrop blur makes `position: fixed` relative to the header. It now renders in the page body and is placed by a pure `placePanel` function (below the button, else above, else pinned, always 8 px inside the viewport, re-placed on resize and scroll). Steps, outline and focus handling are unchanged.

@@ -25,7 +25,6 @@ export const APPROVAL_COPY = {
   approveLabel: (headline: string) => `Send to air: ${headline}`,
   rejectLabel: (headline: string) => `Don't air: ${headline}`,
   sendWithin: (seconds: number) => `Send within ${seconds} s`,
-  windowClosed: 'Time is up. This graphic will not air.',
   urgentSeconds: 10,
   updated: 'Updated wording',
   previewLabel: (headline: string) => `Preview: ${headline}`,
