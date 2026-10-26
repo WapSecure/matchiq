@@ -143,7 +143,7 @@ describe('FiguresCheckedList', () => {
 
   it('renders nothing when no claim can be made', () => {
     const { container } = render(
-      <FiguresCheckedList insight={FOUR} narrative={null} />,
+      <FiguresCheckedList insight={FOUR} narrative={undefined} />,
     );
     expect(container).toBeEmptyDOMElement();
   });
