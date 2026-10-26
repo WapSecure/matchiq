@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { PITCH_COPY, type PitchTeamFilter } from '@/constants/pitch';
-import {
-  DEPTH_COPY,
-  PITCH_VIEWS,
-  type PitchView,
-} from '@/constants/pitch-depth';
+import type { PitchView } from '@/constants/pitch-depth';
 import { PassMap } from './pass-map';
 import type { PitchMark } from './pitch-events';
 import { PitchEventsView } from './pitch-events-view';
@@ -24,14 +20,10 @@ type PitchMapProps = {
   awayShort: string;
   /** Analyst audience: shows the xG baseline (synthetic, not calibrated). */
   analyst?: boolean;
+  view?: PitchView;
 };
 
-const VIEW_OPTIONS = PITCH_VIEWS.map((value) => ({
-  value,
-  label: DEPTH_COPY.views[value],
-}));
-
-/** Events, shots and passes on one pitch, each with a table alternative. */
+/** Events, shots or passes on one pitch (the view switch lives in the panel header), each with a table alternative. */
 export function PitchMap({
   marks,
   passes = [],
@@ -40,20 +32,11 @@ export function PitchMap({
   homeShort,
   awayShort,
   analyst = false,
+  view = 'events',
 }: PitchMapProps) {
-  const [view, setView] = useState<PitchView>('events');
   const [team, setTeam] = useState<PitchTeamFilter>('all');
-  const viewControl = (
-    <SegmentedControl<PitchView>
-      legend={DEPTH_COPY.viewLegend}
-      options={VIEW_OPTIONS}
-      value={view}
-      onChange={setView}
-    />
-  );
   return (
     <div className="@container flex flex-col gap-3">
-      {view === 'events' ? null : viewControl}
       {view === 'events' ? (
         <PitchEventsView
           marks={marks}
@@ -63,7 +46,6 @@ export function PitchMap({
           width={width}
           homeShort={homeShort}
           awayShort={awayShort}
-          viewControl={viewControl}
         />
       ) : (
         <>

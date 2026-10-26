@@ -1,14 +1,16 @@
 'use client';
 
 import type { Fixture } from '@matchiq/contracts';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { buildPitchMarks } from '@/components/charts/pitch-events';
 import { buildPassArrows } from '@/components/charts/pitch-passes';
 import { PitchMap } from '@/components/charts/pitch-map';
+import { PitchViewSwitch } from '@/components/charts/pitch-view-switch';
 import { EmptyState } from '@/components/feedback';
 import { PitchIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { PITCH_COPY } from '@/constants/pitch';
+import type { PitchView } from '@/constants/pitch-depth';
 import { useFocusedPlayer } from '@/features/player-focus/use-focused-player';
 import type { Roster } from '../lib/roster';
 import { useMatchStore, useStudioUi } from '../store';
@@ -28,6 +30,7 @@ export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
     () => buildPitchMarks(timeline, roster, voided, playerId),
     [timeline, roster, voided, playerId],
   );
+  const [view, setView] = useState<PitchView>('events');
   const { pitch } = fixture;
   const analyst = useStudioUi((s) => s.persona) === 'ANALYST';
   const passes = useMemo(
@@ -46,6 +49,11 @@ export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
           : PITCH_COPY.description
       }
       Icon={PitchIcon}
+      actions={
+        marks.length + passes.length > 0 ? (
+          <PitchViewSwitch value={view} onChange={setView} />
+        ) : null
+      }
       className={className}
     >
       {marks.length === 0 && passes.length === 0 ? (
@@ -54,6 +62,7 @@ export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
         <PitchMap
           marks={marks}
           passes={passes}
+          view={view}
           analyst={analyst}
           length={pitch.lengthM}
           width={pitch.widthM}

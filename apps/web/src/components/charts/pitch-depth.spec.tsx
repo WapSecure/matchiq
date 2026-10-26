@@ -1,11 +1,14 @@
 import type { MatchEvent } from '@matchiq/contracts';
+import { type ComponentProps, useState } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { buildRoster } from '@/features/studio/lib/roster';
 import { AWAY, fixture, shot } from '@/test/factories';
 import { buildPitchMarks } from './pitch-events';
 import { buildPassArrows, difficultyBand, selectPasses } from './pitch-passes';
+import type { PitchView } from '@/constants/pitch-depth';
 import { PitchMap } from './pitch-map';
+import { PitchViewSwitch } from './pitch-view-switch';
 import { selectShots, shotRadius, shotSpeedLabel } from './pitch-shots';
 
 const fx = fixture();
@@ -120,10 +123,22 @@ describe('pass map mapping', () => {
   });
 });
 
+type HarnessProps = Omit<ComponentProps<typeof PitchMap>, 'view'>;
+
+function Harness(props: HarnessProps) {
+  const [view, setView] = useState<PitchView>('events');
+  return (
+    <>
+      <PitchViewSwitch value={view} onChange={setView} />
+      <PitchMap {...props} view={view} />
+    </>
+  );
+}
+
 describe('PitchMap views', () => {
   const renderMap = (analyst = false) =>
     render(
-      <PitchMap
+      <Harness
         marks={buildPitchMarks(SHOTS, roster)}
         passes={buildPassArrows(PASSES, roster, PITCH)}
         length={105}
@@ -183,7 +198,7 @@ describe('PitchMap views', () => {
   it('says so when a team has no shots or passes', async () => {
     const user = userEvent.setup();
     render(
-      <PitchMap
+      <Harness
         marks={buildPitchMarks([must(SHOTS[0])], roster)}
         length={105}
         width={68}
