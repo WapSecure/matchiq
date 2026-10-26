@@ -1323,6 +1323,7 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Code: `apps/web/src/features/numbers-checked` (`check-figures`, `numbers-checked`, `cue-numbers-checked`, `figures-checked-list`), `constants/numbers-checked.ts`; one-line wiring in `moment-footer.tsx`, `on-air-meta.tsx` and `evidence-drawer.tsx`.
 - Deferred: the recap moment. The recap document carries only metric names, not values, so figures cannot be matched there without a contract change (persisting cited values on the narrative).
 - Tests: `numbers-checked.spec.tsx` (matching, no figures, unmatched figure, unreadable language, persona variants, accessible name, retracted, no technical words, drawer list).
+
 ## MQ-108: producer shortcuts and calmer confirmation (26 October 2026)
 
 - The "Waiting for your OK" queue has single-key shortcuts that work only when a waiting graphic or one of its buttons has focus: A or Enter send to air, D don't air, J/K or the arrow keys move between graphics, ? lists the keys. Ignored with Ctrl, Alt or Meta held, in text fields, on the adjust radios and in dialogs. WCAG 2.1.4: a "Keyboard shortcuts" switch (React Aria Switch, on by default, remembered per device with guarded localStorage) turns them off, and a "Shortcuts" popover lists them.
