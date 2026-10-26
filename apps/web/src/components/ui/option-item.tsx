@@ -9,6 +9,8 @@ import { LIST_ITEM, SECTION_DIVIDER, SECTION_HEADER } from './control-styles';
 export type ChoiceOption<K extends string = string> = {
   id: K;
   label: string;
+  short?: string;
+  lang?: string;
   description?: string;
   icon?: ReactNode;
   /** Disables the option and tells the user why, in the option itself. */
@@ -42,6 +44,7 @@ function OptionItem<K extends string>({
     <ListBoxItem
       id={option.id}
       textValue={option.label}
+      lang={option.lang}
       isDisabled={Boolean(option.disabledReason)}
       className={cn(LIST_ITEM, card && 'py-2.5')}
     >

@@ -8,14 +8,9 @@ import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { MatchCodeChip } from '@/components/match/match-code-chip';
 import { Badge, HintBadge } from '@/components/ui';
 import { MATCH_CODE_COPY } from '@/constants/match-code';
-import {
-  ROUTES,
-  STUDIO_TABS,
-  STUDIO_TABS_LABEL,
-  type StudioView,
-} from '@/constants/navigation';
-import { SYNTHETIC_DISCLOSURE } from '@/constants/site';
-import { STUDIO_COPY, WATERMARK } from '@/constants/studio';
+import { ROUTES, STUDIO_TABS, type StudioView } from '@/constants/navigation';
+import { InterfaceLanguageSelect } from '@/features/interface-language/interface-language-select';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { cn } from '@/lib/cn';
 
 type StudioHeaderProps = {
@@ -38,9 +33,10 @@ function StudioTabs({
   fixtureId: string;
   view: StudioView;
 }) {
+  const messages = useInterfaceMessages();
   return (
     <nav
-      aria-label={STUDIO_TABS_LABEL}
+      aria-label={messages.studio.views}
       className="-mb-px flex gap-1 overflow-x-auto"
     >
       {STUDIO_TABS.map((tab) => {
@@ -58,7 +54,7 @@ function StudioTabs({
                 : 'text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-line-strong',
             )}
           >
-            {tab.label}
+            {messages.studio.tabs[tab.view]}
           </Link>
         );
       })}
@@ -76,6 +72,7 @@ export function StudioHeader({
   status,
   tabsAction,
 }: StudioHeaderProps) {
+  const messages = useInterfaceMessages();
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-md backdrop-saturate-150">
       <div className="mx-auto flex min-h-14 max-w-[1920px] flex-wrap items-center gap-1 px-4 py-2 sm:h-14 sm:flex-nowrap sm:gap-3 sm:py-0 lg:px-6">
@@ -85,7 +82,7 @@ export function StudioHeader({
         >
           <ChevronLeftIcon size={16} />
           <span className="sr-only sm:not-sr-only">
-            {STUDIO_COPY.backToLobby}
+            {messages.studio.backToMatches}
           </span>
         </Link>
         <span
@@ -97,7 +94,7 @@ export function StudioHeader({
         </span>
         <div className="order-last w-full min-w-0 pt-2 sm:order-none sm:w-auto sm:flex-1 sm:pt-0">
           <h1 className="break-words text-sm font-semibold tracking-tight text-ink sm:truncate">
-            {title ?? STUDIO_COPY.title}
+            {title ?? messages.studio.title}
           </h1>
           {competition ? (
             <p className="hidden truncate text-micro text-ink-subtle sm:block">
@@ -125,13 +122,14 @@ export function StudioHeader({
           <HintBadge
             tone="synthetic"
             dot
-            hint={SYNTHETIC_DISCLOSURE.text}
+            hint={messages.synthetic.text}
             data-watermark=""
           >
-            {WATERMARK}
+            {messages.synthetic.watermark}
           </HintBadge>
           {status}
         </div>
+        <InterfaceLanguageSelect compact />
         <ThemeToggle />
         <UserMenu />
       </div>

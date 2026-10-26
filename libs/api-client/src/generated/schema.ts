@@ -1491,7 +1491,7 @@ export interface components {
             /** @enum {string} */
             agent: "MATCH_ANALYST" | "NARRATIVE_WRITER" | "FACT_CHECKER" | "BROADCAST_PRODUCER" | "LOCALIZATION";
             /** @enum {string} */
-            provider: "foundry" | "ollama" | "mock" | "template";
+            provider: "foundry" | "ollama" | "recorded" | "mock" | "template";
             modelDeployment?: string;
             promptVersion: string;
             /** Format: date-time */
@@ -1522,7 +1522,7 @@ export interface components {
                 promptHash?: string;
             };
             /** @enum {string} */
-            provider: "foundry" | "ollama" | "mock" | "template";
+            provider: "foundry" | "ollama" | "recorded" | "mock" | "template";
             modelDeployment?: string;
             /** @enum {string} */
             fromStatus: "DETECTED" | "ANALYZED" | "DRAFTED" | "VERIFIED" | "SCHEDULED" | "PUBLISHED" | "REJECTED" | "EXPIRED" | "FALLBACK";

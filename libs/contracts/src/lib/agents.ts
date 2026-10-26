@@ -27,7 +27,14 @@ export const AgentName = z.enum([
   'LOCALIZATION',
 ]);
 
-export const ModelProvider = z.enum(['foundry', 'ollama', 'mock', 'template']);
+/** `recorded` replays model output captured in an earlier run (ADR-0042); no model runs. */
+export const ModelProvider = z.enum([
+  'foundry',
+  'ollama',
+  'recorded',
+  'mock',
+  'template',
+]);
 
 /** Names an agent is allowed to mention; anything else is rejected. */
 export const EntityAllowlist = z.strictObject({

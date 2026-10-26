@@ -10,17 +10,17 @@ from pydantic import ValidationError
 from matchiq_agents.api.auth import ServiceAuth
 from matchiq_agents.constants import PIPELINE_RUNS_PATH
 from matchiq_agents.contracts.types import PipelineRequest, PipelineResult
-from matchiq_agents.faults.orchestrator import FaultAwareOrchestrator
+from matchiq_agents.pipeline.orchestrator import PipelineService
 
 router = APIRouter(tags=["pipeline"])
 
 
-def get_orchestrator(request: Request) -> FaultAwareOrchestrator:
-    orchestrator: FaultAwareOrchestrator = request.app.state.orchestrator
+def get_orchestrator(request: Request) -> PipelineService:
+    orchestrator: PipelineService = request.app.state.orchestrator
     return orchestrator
 
 
-OrchestratorDep = Annotated[FaultAwareOrchestrator, Depends(get_orchestrator)]
+OrchestratorDep = Annotated[PipelineService, Depends(get_orchestrator)]
 
 
 async def parse_request(request: Request) -> PipelineRequest:
