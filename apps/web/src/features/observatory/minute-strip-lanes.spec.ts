@@ -13,7 +13,9 @@ describe('assignLanes', () => {
     expect(assignLanes([23, 23.5, 40], 90)).toEqual([0, 1, 0]);
   });
 
-  it('caps the stack at three lanes', () => {
-    expect(Math.max(...assignLanes([10, 10, 10, 10, 10], 90))).toBe(2);
+  it('caps the stack at six lanes', () => {
+    expect(Math.max(...assignLanes([10, 10, 10, 10, 10, 10, 10, 10], 90))).toBe(
+      5,
+    );
   });
 });

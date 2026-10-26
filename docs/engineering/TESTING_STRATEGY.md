@@ -30,6 +30,18 @@ To run a single test:
 | Accessibility                       | axe with no serious or critical WCAG 2.2 AA violations, keyboard skip link, reduced motion                                                                                                                                                                                                                                                                 | M0 onwards    |
 | Failure                             | Model outage, duplicate or late events, worker restart without duplicate publication                                                                                                                                                                                                                                                                       | M2–M4         |
 
+## Browser smoke on the Compose stack
+
+`apps/web-e2e/src/fullstack-smoke.spec.ts` drives the real web UI against the real stack with no mocks and no route interception. The CI job "Browser smoke on the Compose stack" boots `docker compose --profile app up` from fresh volumes, then the spec starts the "Late comeback" replay at the fastest speed (30×), waits for "Full time", and checks the scoreboard, a key moment with its Evidence drawer, the Match stats rows "Shot conversion" and "Pass quality", the Recap match story and final stats, the Fact-checks summary, and the signed-out "You don't have access to this" message on the Activity log. Axe runs on the lobby, studio and recap pages. It proves a clean run through a browser, which the HTTP-only "Compose stack and replay smoke" does not.
+
+Run it locally against a stack that is already up (the spec skips itself without `BASE_URL`, so the mocked e2e suite is unaffected):
+
+```bash
+cd apps/web-e2e && BASE_URL=http://localhost:4200 pnpm exec playwright test fullstack-smoke --project=desktop-dark --retries=0
+```
+
+The job is `continue-on-error`: a failure shows red but does not block merges, and it is not in the required checks or the final gate. It becomes a required check only after it has passed cleanly on several consecutive dev runs.
+
 ## Rules
 
 - A feature is not complete while any required test fails. Tests are never skipped to make CI pass.

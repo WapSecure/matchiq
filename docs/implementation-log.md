@@ -1283,6 +1283,11 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
 - Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.
 
+## MQ-099: browser smoke on the Compose stack (25 October 2026)
+
+- New `apps/web-e2e/src/fullstack-smoke.spec.ts`: the real web UI against the Compose app profile (no mocks). Lobby, replay at 30×, wait for full time, scoreboard, key moment and Evidence drawer, Match stats rows, Recap, Fact-checks, signed-out Activity log, plus axe on lobby, studio and recap. Skips itself without `BASE_URL`.
+- New advisory CI job "Browser smoke on the Compose stack" (`continue-on-error`, not in the gate). It becomes required only after several clean dev runs. Closes audit REM-13 once it has passed in CI.
+
 ## MQ-101: judge guide and studio tour (25 October 2026)
 
 - Public `/guide` page, "A three-minute tour": eight numbered steps (what to do, what it shows) with links to `/fixtures` and `/sign-in`; studio, recap, fact-check and activity-log steps name what to click because session ids differ per machine. Linked from the site header ("Tour") and the matches page. The demo password is not repeated; the sign-in page remains the only place it shows.
