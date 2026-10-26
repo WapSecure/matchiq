@@ -17,6 +17,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-editable
 
 FROM ${PYTHON_IMAGE} AS runtime
+# The pinned base lags Debian's security fixes; take the fixed libssl3 (CVE-2026-84782).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade libssl3 \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --no-create-home app
 ENV PATH=/app/.venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 AGENTS_PORT=8000
 COPY --from=build --chown=app:app /app/.venv /app/.venv
