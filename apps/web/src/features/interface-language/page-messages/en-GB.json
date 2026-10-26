@@ -1,0 +1,245 @@
+{
+  "landing": {
+    "hero": {
+      "eyebrow": "Football intelligence for live broadcast",
+      "title": "One trusted match feed. Every audience, every language.",
+      "description": "MatchIQ spots the moments that matter as the match plays. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.",
+      "primaryAction": "Choose a match",
+      "secondaryAction": "See how it works",
+      "guideAction": "Take the three-minute tour",
+      "disclosure": "The demo uses fictional, simulated matches. No real clubs, players or league marks.",
+      "facts": [
+        "numbers made up by AI",
+        "audiences and languages, same facts",
+        "to take any graphic off air"
+      ]
+    },
+    "pipeline": {
+      "eyebrow": "How it works",
+      "title": "Five steps from the pitch to the screen",
+      "description": "Every fact is worked out once from the match data. Nothing changes them afterwards, and a fact check confirms each number before it airs.",
+      "stages": {
+        "ingest": {
+          "title": "Collect",
+          "description": "Every pass, shot and tackle is recorded once, in order, with its source."
+        },
+        "interpret": {
+          "title": "Understand",
+          "description": "Live score, possession, momentum and other stats, worked out the same way every time."
+        },
+        "explain": {
+          "title": "Explain",
+          "description": "AI analyst, writer and fact checker turn key moments into words, each tied to the plays behind it."
+        },
+        "render": {
+          "title": "Show",
+          "description": "On-air graphics timed to the match, kept inside safe areas, and removable in one click."
+        },
+        "personalize": {
+          "title": "Personalise",
+          "description": "Versions for fans, analysts and broadcast, in English, French, Spanish and Nigerian Pidgin, from the same facts."
+        }
+      }
+    },
+    "principles": {
+      "eyebrow": "Why you can trust it",
+      "title": "Built to be trusted on air",
+      "items": {
+        "evidence": {
+          "title": "Every number is checked",
+          "description": "Each number on screen links back to the plays and the stat behind it. If a number cannot be checked, it does not go on air."
+        },
+        "repeatable": {
+          "title": "Same match, same numbers",
+          "description": "Stats come from fixed, tested rules. Replay a match and you get exactly the same figures every time."
+        },
+        "resilience": {
+          "title": "Keeps going if the writer fails",
+          "description": "Scores and stats never depend on the writing. If it is slow or wrong, standard wording goes on air, and a producer can pull any graphic at any time."
+        }
+      }
+    }
+  },
+  "guide": {
+    "eyebrow": "For judges",
+    "title": "A three-minute tour",
+    "description": "Eight short steps that show the best of MatchIQ. Every match here is simulated, and nothing needs setting up first.",
+    "stepsLabel": "Tour steps",
+    "doLabel": "Do this",
+    "showsLabel": "What it shows",
+    "wording": "Commentary is written by a model when one is available or replayed from a recording. Otherwise standard wording is used, and either way a fact check confirms every number first.",
+    "closingTitle": "Ready to try it?",
+    "closingAction": "Choose a match",
+    "steps": {
+      "start": {
+        "title": "Start a replay",
+        "doThis": "Open the matches, pick Late comeback and start the replay at a fast speed.",
+        "shows": "A whole match plays out in a few minutes, the same way every time.",
+        "link": "Open the matches"
+      },
+      "watch": {
+        "title": "Watch it build",
+        "doThis": "Stay in the Live studio and watch the key moments, the match stats and the on-air preview.",
+        "shows": "Each key moment is spotted in the match data, written up, fact-checked and timed for broadcast."
+      },
+      "evidence": {
+        "title": "Open the evidence",
+        "doThis": "Press Evidence on a key moment. Switch the audience to Analyst to see the Compared with block.",
+        "shows": "The plays and stats behind the moment, and how it compares with the rest of the match."
+      },
+      "audience": {
+        "title": "Change audience and language",
+        "doThis": "Switch the audience, then choose a commentary language, including Naijá (Pidgin).",
+        "shows": "The wording changes for each audience and language while the facts and figures stay identical."
+      },
+      "listen": {
+        "title": "Listen to a moment",
+        "doThis": "Press Listen on a key moment.",
+        "shows": "The moment is read aloud with the voice on your own device. Nothing is sent anywhere to make the audio."
+      },
+      "factchecks": {
+        "title": "See the fact checks",
+        "doThis": "Back in the matches, open your replay and choose Fact-checks at the top.",
+        "shows": "Who wrote each moment, and which problems the fact check caught before anything went on air.",
+        "link": "Open the matches"
+      },
+      "producer": {
+        "title": "Try the producer view",
+        "doThis": "Sign in as the demo producer, switch publishing to Manual and press Send to air on a waiting graphic. Then open the Activity log.",
+        "shows": "A producer approves each graphic before it airs, and every action is recorded in a log that cannot be edited.",
+        "link": "Go to sign in"
+      },
+      "recap": {
+        "title": "Get the recap",
+        "doThis": "At full time, open the recap from the matches and choose Download match report.",
+        "shows": "The result, the key moments and the final stats in one readable report you can keep.",
+        "link": "Open the matches"
+      }
+    }
+  },
+  "offline": {
+    "eyebrow": "Offline",
+    "title": "You're offline",
+    "description": "Live match updates need an internet connection. Reconnect, then try again. We don't show saved copies, so what you see is always current.",
+    "retry": "Try again"
+  },
+  "auth": {
+    "title": "Sign in to MatchIQ",
+    "lead": "Use your organisation account. What you can do depends on your role.",
+    "unavailable": "Sign-in isn't set up here. You can still use the public demo without signing in.",
+    "continue": "Continue to sign in",
+    "publicDemo": "Browse the demo without signing in",
+    "demoTitle": "Demo accounts",
+    "demoBadge": "Development only",
+    "roles": {
+      "platform-operator": "Platform operator",
+      "tenant-owner": "Organisation owner",
+      "producer": "Producer",
+      "analyst": "Analyst",
+      "developer": "Developer",
+      "viewer": "Viewer",
+      "anonymous": "Public demo"
+    },
+    "errors": {
+      "callback": "Sign-in didn't finish. Please try again.",
+      "unavailable": "We can't reach the sign-in service right now. Try again in a moment.",
+      "expired": "You've been signed out for security. Sign in again to carry on where you left off."
+    }
+  },
+  "lobby": {
+    "eyebrow": "Matches",
+    "title": "Choose a match to replay",
+    "description": "Pick a match and a speed. Key moments, stats and on-air graphics build as it plays.",
+    "guide": "A three-minute tour",
+    "howItWorks": {
+      "label": "How replays work",
+      "text": "Each match plays out the same way every time, so you can rehearse and compare. Anyone with the link to a replay sees the same moment you do."
+    },
+    "listLabel": "Matches",
+    "pagesLabel": "Match pages",
+    "events": "Match events",
+    "versus": "vs",
+    "home": "Home",
+    "away": "Away",
+    "expect": "What to expect",
+    "featured": "Recommended replay",
+    "start": "Start replay",
+    "starting": "Starting…",
+    "speedLabel": "Replay speed",
+    "speeds": {
+      "1": {
+        "label": "Real time",
+        "description": "A full match takes about 90 minutes."
+      },
+      "5": {
+        "label": "Brisk",
+        "description": "About 18 minutes. Good for a guided walkthrough."
+      },
+      "20": {
+        "label": "Fast",
+        "description": "About 5 minutes. Key moments arrive close together."
+      },
+      "30": {
+        "label": "Highlights",
+        "description": "About 3 minutes. Best for a quick demo."
+      }
+    },
+    "startFailed": "We couldn't start the replay.",
+    "rateLimited": "You've started a lot of replays in a short time. Wait a minute, or join one of the recent replays below.",
+    "loading": "Loading matches",
+    "empty": {
+      "title": "No matches to replay yet",
+      "description": "Matches appear here as soon as they are ready. Check back in a moment."
+    },
+    "error": "We couldn't load the matches",
+    "regions": {
+      "matches": "The list of matches",
+      "replays": "Recent replays"
+    },
+    "nouns": {
+      "matches": {
+        "one": "match",
+        "other": "matches"
+      },
+      "replays": {
+        "one": "replay",
+        "other": "replays"
+      }
+    },
+    "scenarioLabels": {
+      "comeback": "Late comeback",
+      "disallowed-goal": "Disallowed goal",
+      "high-press": "High press",
+      "low-event": "Quiet match",
+      "possession-dominance": "Possession dominance",
+      "red-card-swing": "Red card turning point"
+    },
+    "scenarioPreviews": {
+      "comeback": "The visitors build a lead before the break. Watch for a late turnaround.",
+      "disallowed-goal": "A goal is chalked off after it goes in. Watch it come off the screen.",
+      "high-press": "Both sides press hard. Expect tackles, turnovers and quick breaks.",
+      "low-event": "A cagey, slow match with few shots. Useful for quiet spells on air.",
+      "possession-dominance": "One side keeps the ball and the territory. Watch the pressure build.",
+      "red-card-swing": "A sending-off changes the game. Watch the momentum shift."
+    },
+    "sessions": {
+      "title": "Recent replays",
+      "description": "Join a replay in progress or look back at a finished one",
+      "listLabel": "Recent replays",
+      "pagesLabel": "Recent replay pages",
+      "empty": "No replays yet. Start one above.",
+      "error": "We couldn't load recent replays",
+      "loading": "Loading recent replays",
+      "open": "Open",
+      "notStarted": "Not started",
+      "live": "Live now",
+      "finished": "Finished",
+      "state": {
+        "IDLE": "Ready",
+        "PLAYING": "Live",
+        "PAUSED": "Paused",
+        "COMPLETED": "Full time"
+      }
+    }
+  }
+}

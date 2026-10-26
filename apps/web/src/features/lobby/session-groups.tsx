@@ -1,24 +1,26 @@
 'use client';
 
 import { useId } from 'react';
-import { LOBBY_COPY } from '@/constants/lobby';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import type { ReplaySessionView } from '@/lib/api/session-schemas';
 import { SessionRow } from './session-row';
 import { useNow } from './use-now';
 
-const copy = LOBBY_COPY.sessions;
-
 type Group = { title: string; sessions: ReplaySessionView[] };
 
 /** Replays still running lead, so joining one in progress is the first choice. */
-const groupByLive = (sessions: readonly ReplaySessionView[]): Group[] =>
+const groupByLive = (
+  sessions: readonly ReplaySessionView[],
+  live: string,
+  finished: string,
+): Group[] =>
   [
     {
-      title: copy.live,
+      title: live,
       sessions: sessions.filter((s) => s.status.state !== 'COMPLETED'),
     },
     {
-      title: copy.finished,
+      title: finished,
       sessions: sessions.filter((s) => s.status.state === 'COMPLETED'),
     },
   ].filter((group) => group.sessions.length > 0);
@@ -63,7 +65,8 @@ export function SessionGroups({
   codeFor: (templateId: string) => string | undefined;
 }) {
   const now = useNow();
-  return groupByLive(sessions).map((group) => (
+  const copy = usePageMessages().lobby.sessions;
+  return groupByLive(sessions, copy.live, copy.finished).map((group) => (
     <SessionGroup key={group.title} group={group} codeFor={codeFor} now={now} />
   ));
 }

@@ -1,7 +1,10 @@
+'use client';
+
 import { MatchCodeChip } from '@/components/match/match-code-chip';
 import { TechnicalDetails } from '@/components/ui';
-import { LOBBY_COPY } from '@/constants/lobby';
 import { MATCH_CODE_COPY } from '@/constants/match-code';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
 import { templateCode } from '@/lib/use-match-label';
 
@@ -28,14 +31,16 @@ export function TemplateFacts({
 }: {
   template: FixtureTemplateSummary;
 }) {
+  const locale = useInterfaceLanguage((state) => state.locale);
+  const copy = usePageMessages().lobby;
   return (
     <div className="flex flex-col gap-2">
       <MatchCodeChip code={templateCode(template)} />
       <TechnicalDetails>
         <dl className="grid gap-2 font-mono">
           <Fact
-            term={LOBBY_COPY.events}
-            value={template.eventCount.toLocaleString('en-GB')}
+            term={copy.events}
+            value={template.eventCount.toLocaleString(locale)}
           />
           <Fact
             term={MATCH_CODE_COPY.technical.seed}

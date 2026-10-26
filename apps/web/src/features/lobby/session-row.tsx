@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReplayState } from '@matchiq/contracts';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@/components/icons';
@@ -8,16 +10,14 @@ import {
   BUTTON_SIZES,
   BUTTON_VARIANTS,
 } from '@/components/ui';
-import { LOBBY_COPY } from '@/constants/lobby';
-import { MATCH_CODE_COPY } from '@/constants/match-code';
 import { ROUTES } from '@/constants/navigation';
 import { REPLAY_COPY } from '@/constants/replay';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import type { ReplaySessionView } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { formatRelative } from '@/lib/format-time';
 
-const copy = LOBBY_COPY.sessions;
 const NOT_STARTED = -1;
 
 const STATE_TONE: Record<ReplayState, BadgeTone> = {
@@ -34,6 +34,7 @@ type SessionRowProps = {
 };
 
 export function SessionRow({ session, code, now }: SessionRowProps) {
+  const copy = usePageMessages().lobby.sessions;
   const { status } = session;
   const minute =
     status.appliedSequence === NOT_STARTED
@@ -44,7 +45,7 @@ export function SessionRow({ session, code, now }: SessionRowProps) {
       <div className="min-w-0 sm:flex-1">
         <p className="truncate text-sm font-medium text-ink">{session.title}</p>
         <p className="tabular truncate font-mono text-micro text-ink-subtle">
-          {MATCH_CODE_COPY.replay(session.sessionNumber)}
+          {copy.replay(session.sessionNumber)}
           {code ? ` · ${code}` : ''}
         </p>
       </div>

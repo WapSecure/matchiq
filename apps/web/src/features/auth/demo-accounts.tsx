@@ -1,13 +1,14 @@
+'use client';
+
 import { UserIcon } from '@/components/icons';
 import { Badge } from '@/components/ui';
 import {
-  AUTH_COPY,
   AUTH_QUERY,
   AUTH_ROUTES,
   DEMO_ACCOUNTS,
   DEMO_PASSWORD,
-  ROLE_LABELS,
 } from '@/constants/auth';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 
 const signInHref = (username: string, returnTo: string) =>
   `${AUTH_ROUTES.signIn}?${new URLSearchParams({
@@ -20,6 +21,7 @@ const signInHref = (username: string, returnTo: string) =>
  * with `login_hint`; the password is shown, never submitted for the user.
  */
 export function DemoAccounts({ returnTo }: { returnTo: string }) {
+  const copy = usePageMessages().auth;
   return (
     <section
       aria-labelledby="demo-accounts-title"
@@ -27,12 +29,12 @@ export function DemoAccounts({ returnTo }: { returnTo: string }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         <h2 id="demo-accounts-title" className="text-sm font-semibold text-ink">
-          {AUTH_COPY.demoTitle}
+          {copy.demoTitle}
         </h2>
-        <Badge tone="synthetic">{AUTH_COPY.demoBadge}</Badge>
+        <Badge tone="synthetic">{copy.demoBadge}</Badge>
       </div>
       <p className="mt-2 text-sm text-ink-muted">
-        {AUTH_COPY.demoLead(DEMO_PASSWORD)}
+        {copy.demoLead(DEMO_PASSWORD)}
       </p>
       <ul className="mt-4 grid gap-2">
         {DEMO_ACCOUNTS.map((account) => (
@@ -44,10 +46,7 @@ export function DemoAccounts({ returnTo }: { returnTo: string }) {
               <UserIcon size={16} className="shrink-0 text-ink-muted" />
               <span className="min-w-0">
                 <span className="block text-[13px] font-medium text-ink">
-                  {AUTH_COPY.demoAccount(
-                    ROLE_LABELS[account.role],
-                    account.org,
-                  )}
+                  {copy.demoAccount(copy.roles[account.role], account.org)}
                 </span>
                 <span className="block truncate font-mono text-micro text-ink-subtle">
                   {account.username}

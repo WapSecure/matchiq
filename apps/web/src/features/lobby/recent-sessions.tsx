@@ -10,15 +10,14 @@ import {
   useCursorPage,
 } from '@/components/ui/pagination';
 import { PROBLEM_SLUGS } from '@/constants/api';
-import { LOBBY_COPY } from '@/constants/lobby';
-import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
+import { PAGE_SIZES } from '@/constants/pagination';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { isApiError } from '@/lib/api/api-error';
 import { useSessionsPage, useTemplates } from '@/lib/api/hooks';
 import { cn } from '@/lib/cn';
 import { templateCode } from '@/lib/use-match-label';
 import { SessionGroups } from './session-groups';
 
-const copy = LOBBY_COPY.sessions;
 const LIST = 'recent-replays';
 const PAGE_SIZE = PAGE_SIZES.replays;
 
@@ -35,6 +34,8 @@ const useTemplateCodes = () => {
 };
 
 function SessionsBody() {
+  const lobby = usePageMessages().lobby;
+  const copy = lobby.sessions;
   const paging = useCursorPage(LIST);
   const sessions = useSessionsPage({
     limit: PAGE_SIZE,
@@ -104,7 +105,7 @@ function SessionsBody() {
         onNext={() => {
           if (nextCursor !== null) paging.goNext(nextCursor, items.length);
         }}
-        noun={PAGINATION_NOUNS.replays}
+        noun={lobby.nouns.replays}
         label={copy.pagesLabel}
         isLoading={loading}
       />
@@ -113,6 +114,7 @@ function SessionsBody() {
 }
 
 export function RecentSessions() {
+  const copy = usePageMessages().lobby.sessions;
   return (
     <Panel
       id="recent-sessions"
