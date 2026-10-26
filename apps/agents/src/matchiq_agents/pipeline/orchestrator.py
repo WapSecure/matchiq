@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from dataclasses import dataclass, replace
+from typing import Protocol
 
 from matchiq_agents.clock import MS_PER_SECOND, Clock, Deadline
 from matchiq_agents.constants import DEFAULT_RUN_BUDGET
@@ -19,7 +20,6 @@ from matchiq_agents.guard.safety import ContentSafetyScreen
 from matchiq_agents.models.port import ModelPort
 from matchiq_agents.models.pricing import EMPTY_PRICES, PriceTable
 from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy, StageTimer
-from matchiq_agents.pipeline import reasons
 from matchiq_agents.pipeline import step_reasons as outcomes
 from matchiq_agents.pipeline.budget import BudgetLimits, RunBudget
 from matchiq_agents.pipeline.recorder import RunScope
@@ -35,6 +35,12 @@ from matchiq_agents.roster.modes import PromptMode
 from matchiq_agents.templates.fallback import TemplateFallback
 
 logger = logging.getLogger(__name__)
+
+
+class PipelineService(Protocol):
+    """What the HTTP layer needs: one request in, one result out."""
+
+    async def run(self, request: PipelineRequest) -> PipelineResult: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,6 +101,17 @@ class PipelineOrchestrator:
             prompt_mode=self._config.prompt_mode,
         )
 
+    def context_for(self, request: PipelineRequest) -> AgentContext:
+        return self._agents(request)
+
+    async def template_only(self, request: PipelineRequest, outcome: StepOutcome) -> PipelineResult:
+        """Templates only and no model call: the answer for a moment without a recording."""
+        agents = self._agents(request)
+        problems = integrity_problems(request)
+        if problems:
+            return rejected_result(agents.view, problems)
+        return await emergency_result(agents, outcome)
+
     async def run(self, request: PipelineRequest) -> PipelineResult:
         agents = self._agents(request)
         problems = integrity_problems(request)
@@ -112,12 +129,14 @@ class PipelineOrchestrator:
         return await emergency_result(agents)
 
 
-async def emergency_result(agents: AgentContext) -> PipelineResult:
+async def emergency_result(
+    agents: AgentContext, outcome: StepOutcome = outcomes.EMERGENCY
+) -> PipelineResult:
     """Template-only result used when the workflow itself fails or overruns its deadline."""
     recorder = agents.recorder
 
     async def work(_: PipelineState) -> tuple[PipelineState, StepOutcome]:
-        return await _emergency_state(agents), outcomes.EMERGENCY
+        return await _emergency_state(agents, outcome.reason), outcome
 
     # Runs of the failed workflow are not carried over, so the step counts only its own usage.
     before = replace(recorder.last, runs=()) if recorder.last else PipelineState()
@@ -125,7 +144,7 @@ async def emergency_result(agents: AgentContext) -> PipelineResult:
     return build_result(agents.view, final, recorder.steps)
 
 
-async def _emergency_state(agents: AgentContext) -> PipelineState:
+async def _emergency_state(agents: AgentContext, reason: str) -> PipelineState:
     fallback = agents.fallback
     canonical = fallback.drafts(agents.canonical_personas, CANONICAL_LOCALE)
     issues = deterministic_issues(agents, None, canonical)
@@ -135,7 +154,7 @@ async def _emergency_state(agents: AgentContext) -> PipelineState:
         route=Route.FINALISE,
         analysis=fallback.analysis(),
         verification=verification,
-        fallback_reasons=(reasons.ORCHESTRATION_ERROR,),
+        fallback_reasons=(reason,),
     )
     if verification.verdict is not Verdict.PASS:
         return state.advance(PipelineStatus.REJECTED, Route.FINALISE)

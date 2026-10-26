@@ -23,13 +23,18 @@ from matchiq_agents.models.mock import MockModel
 from matchiq_agents.models.port import ModelPort
 from matchiq_agents.models.pricing import PriceTable
 from matchiq_agents.models.resilience import CircuitBreaker, RetryPolicy, StageTimer
-from matchiq_agents.pipeline.orchestrator import PipelineConfig, PipelineOrchestrator
+from matchiq_agents.pipeline.orchestrator import (
+    PipelineConfig,
+    PipelineOrchestrator,
+    PipelineService,
+)
 from matchiq_agents.providers.foundry import FoundryNotConfiguredError, build_chat_client
 from matchiq_agents.providers.ollama import (
     OLLAMA_RUN_OPTIONS,
     OllamaNotConfiguredError,
     build_ollama_client,
 )
+from matchiq_agents.providers.recorded import RecordedService, load_recordings
 from matchiq_agents.settings import ModelProvider, Settings
 
 
@@ -47,6 +52,9 @@ def build_model(settings: Settings) -> ModelPort:
                 deployment,
                 run_options=OLLAMA_RUN_OPTIONS,
             )
+        case ModelProvider.RECORDED:
+            # Replay never calls a model; `RecordedService` answers without this port.
+            return MockModel()
         case ModelProvider.FOUNDRY:
             if settings.foundry_model is None:
                 raise FoundryNotConfiguredError("FOUNDRY_MODEL must be configured")
@@ -138,8 +146,14 @@ def fault_breaker(
 
 def build_service(
     settings: Settings, clock: Clock, model: ModelPort | None = None
-) -> FaultAwareOrchestrator:
+) -> PipelineService:
     """The orchestrator plus demo fault routing (ADR-0020); a faulted run never shares state."""
+    if settings.model_provider is ModelProvider.RECORDED:
+        return RecordedService(
+            build_orchestrator(settings, clock),
+            load_recordings(settings),
+            settings.recorded_latency_ms,
+        )
     config = pipeline_config(settings)
     return FaultAwareOrchestrator(
         build_orchestrator(settings, clock, model),

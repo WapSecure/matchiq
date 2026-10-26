@@ -30,6 +30,7 @@ OVERLAY_TEMPLATE: Final = StepOutcome(
 )
 OVERLAY_FALLBACK: Final = StepOutcome(D.FALLBACK, "OVERLAY_FALLBACK", reasons.PRODUCER_FALLBACK)
 EMERGENCY: Final = StepOutcome(D.FALLBACK, "ORCHESTRATION_ERROR", reasons.ORCHESTRATION_ERROR)
+NO_RECORDING: Final = StepOutcome(D.FALLBACK, "TEMPLATE_USED", reasons.NO_RECORDING)
 
 
 def _codes(issues: Sequence[Issue]) -> str:

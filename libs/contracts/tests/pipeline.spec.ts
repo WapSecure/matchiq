@@ -55,6 +55,7 @@ describe('model provider', () => {
     expect(PipelineResult.shape.runs.element.shape.provider.options).toEqual([
       'foundry',
       'ollama',
+      'recorded',
       'mock',
       'template',
     ]);
@@ -62,6 +63,12 @@ describe('model provider', () => {
       PipelineResult.safeParse({
         ...sample('PipelineResult'),
         runs: [{ ...run, provider: 'ollama' }],
+      }).success,
+    ).toBe(true);
+    expect(
+      PipelineResult.safeParse({
+        ...sample('PipelineResult'),
+        runs: [{ ...run, provider: 'recorded' }],
       }).success,
     ).toBe(true);
   });

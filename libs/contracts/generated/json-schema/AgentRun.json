@@ -26,6 +26,7 @@
       "enum": [
         "foundry",
         "ollama",
+        "recorded",
         "mock",
         "template"
       ]

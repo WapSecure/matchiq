@@ -9,6 +9,7 @@ import { MAIN_CONTENT_ID } from '@/constants/site';
 import { useAgentRuns } from '@/lib/api/hooks';
 import { FallbackNote } from './fallback-note';
 import { MomentList } from './moment-list';
+import { RecordedNote } from './recorded-note';
 import { TraceSummary } from './trace-summary';
 import { useRecapMoments } from './use-recap-moments';
 
@@ -48,6 +49,7 @@ function Traces({ fixtureId }: { fixtureId: string }) {
   return (
     <>
       <TraceSummary traces={traces} />
+      <RecordedNote traces={traces} />
       <FallbackNote traces={traces} />
       {traces.length === 0 ? (
         <EmptyState Icon={AgentsIcon} title={copy.empty} />
