@@ -1298,3 +1298,8 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - States: loading skeleton, "No agent steps were recorded for this moment.", plain error with retry, pending note. Template-only moments show only the plain reason. Viewers without `agents:traces:read` (the anonymous demo principal has it) do not see the disclosure.
 - UI: React Aria `Disclosure` gained an `onExpandedChange` prop; the recap rail moved to `recap-rail.tsx` to keep `recap-moment.tsx` under the line cap.
 - Tests: `how-written.spec.tsx` (collapsed and lazy, chain with outcomes and durations, caught findings, template-only, no steps, error and retry, no permission, no technical words).
+
+## MQ-103: studio tour panel placement (26 October 2026)
+
+- The tour panel was clipped above the screen: it sat inside the sticky header, whose backdrop blur makes `position: fixed` relative to the header. It now renders in the page body and is placed by a pure `placePanel` function (below the button, else above, else pinned, always 8 px inside the viewport, re-placed on resize and scroll). Steps, outline and focus handling are unchanged.
+- Tests: `place-panel.spec.ts` (room above, no room above, right edge, tiny viewport).
