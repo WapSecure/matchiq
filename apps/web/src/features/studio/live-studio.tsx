@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { TourLauncher } from '@/features/guide/tour/tour-launcher';
 import type { SseTransport } from '@/lib/stream';
 import {
   ConnectionBanner,
@@ -31,6 +32,7 @@ function StudioScreen({
     <SessionFrame
       fixtureId={fixtureId}
       view="live"
+      tabsAction={<TourLauncher />}
       status={
         <>
           <EditorialChip />
