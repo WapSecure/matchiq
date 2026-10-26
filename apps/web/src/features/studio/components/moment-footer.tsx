@@ -5,9 +5,10 @@ import { CONFIDENCE_LABELS } from '@/constants/match';
 import { STUDIO_COPY } from '@/constants/studio';
 import { HowWritten } from '@/features/how-written/how-written';
 import { NarrativeListen } from '@/features/listen/narrative-listen';
+import { MomentNumbersChecked } from '@/features/numbers-checked/numbers-checked';
 import type { InsightMark } from '../editorial/insight-marks';
 import { SuppressInsightButton } from '../editorial/suppress-insight-button';
-import { type NarrativeView, useMatchStore } from '../store';
+import { type NarrativeView, useMatchStore, useStudioUi } from '../store';
 
 type MomentFooterProps = {
   insight: Insight;
@@ -25,11 +26,21 @@ export function MomentFooter({
   onOpenEvidence,
 }: MomentFooterProps) {
   const fixtureId = useMatchStore((s) => s.fixtureId);
+  const persona = useStudioUi((s) => s.persona);
   return (
     <footer className="flex flex-wrap items-center gap-2">
       <span className="mr-auto text-micro text-ink-subtle">
         {CONFIDENCE_LABELS[insight.evidence.confidenceLabel]}
       </span>
+      <MomentNumbersChecked
+        insight={insight}
+        narrative={view?.narrative ?? null}
+        withheld={mark.retracted || mark.suppressed}
+        persona={persona}
+        headline={headline}
+        onOpen={() => onOpenEvidence(insight.insightId)}
+        className="order-last w-full"
+      />
       {mark.suppressed || mark.published || mark.retracted ? null : (
         <SuppressInsightButton
           insightId={insight.insightId}

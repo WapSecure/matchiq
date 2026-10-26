@@ -4,6 +4,7 @@ import { Drawer } from '@/components/ui/drawer';
 import { COMPARISON_COPY } from '@/constants/comparison';
 import { EVIDENCE_COPY } from '@/constants/evidence';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
+import { FiguresCheckedList } from '@/features/numbers-checked/figures-checked-list';
 import { useEvidenceEvents } from '../hooks/use-evidence-events';
 import type { Roster } from '../lib/roster';
 import {
@@ -65,6 +66,7 @@ export function EvidenceDrawer({ roster }: { roster: Roster }) {
                 {insight.evidence.rationale}
               </p>
             ) : null}
+            <FiguresCheckedList insight={insight} narrative={view?.narrative} />
           </EvidenceSection>
           {persona === 'ANALYST' ? (
             <EvidenceSection title={COMPARISON_COPY.title}>
