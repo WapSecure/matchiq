@@ -9,6 +9,7 @@ import { LIST_ITEM, SECTION_DIVIDER, SECTION_HEADER } from './control-styles';
 export type ChoiceOption<K extends string = string> = {
   id: K;
   label: string;
+  short?: string;
   lang?: string;
   description?: string;
   icon?: ReactNode;

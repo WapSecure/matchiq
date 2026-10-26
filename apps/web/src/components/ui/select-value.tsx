@@ -30,13 +30,19 @@ export function SelectedValue<K extends string>({
       ) : null}
       <span
         lang={option.lang}
+        aria-hidden={option.short ? true : undefined}
         className={cn(
           'min-w-0 truncate font-medium',
           described && 'max-w-[70%] shrink-0',
         )}
       >
-        {option.label}
+        {option.short ?? option.label}
       </span>
+      {option.short ? (
+        <span lang={option.lang} className="sr-only">
+          {`${option.short} ${option.label}`}
+        </span>
+      ) : null}
       {described ? (
         <span className="hidden min-w-0 flex-1 truncate text-ink-subtle sm:inline">
           {option.description}

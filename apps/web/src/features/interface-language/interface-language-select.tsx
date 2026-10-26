@@ -23,7 +23,7 @@ export function InterfaceLanguageSelect({
       options={INTERFACE_LOCALE_OPTIONS}
       value={locale}
       onChange={setLocale}
-      className={compact ? 'w-[7.25rem] shrink-0' : 'w-full'}
+      className={compact ? 'w-[4.5rem] shrink-0' : 'w-full'}
     />
   );
 }

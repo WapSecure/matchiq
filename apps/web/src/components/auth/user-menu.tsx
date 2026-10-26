@@ -67,9 +67,9 @@ export function UserMenu() {
         size="sm"
         aria-label={messages.account.signIn}
         leadingIcon={<UserIcon size={15} />}
-        className="px-2 md:px-3"
+        className="px-2 lg:px-3"
       >
-        <span className="hidden md:inline">{messages.account.signIn}</span>
+        <span className="hidden lg:inline">{messages.account.signIn}</span>
       </ButtonLink>
     );
   }
@@ -80,7 +80,7 @@ export function UserMenu() {
         aria-label={`${messages.account.menu}: ${view.user.name}, ${roleText(rolesOf(view))}`}
         leadingIcon={<UserIcon size={16} />}
       >
-        <span className="hidden max-w-32 truncate md:inline">
+        <span className="hidden max-w-32 truncate lg:inline">
           {view.user.name}
         </span>
       </ActionButton>

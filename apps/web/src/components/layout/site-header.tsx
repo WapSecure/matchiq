@@ -30,7 +30,7 @@ export function SiteHeader() {
   ];
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas/80 backdrop-blur-md backdrop-saturate-150">
-      <Container className="flex h-14 items-center justify-between gap-4">
+      <Container className="flex h-14 items-center justify-between gap-2 sm:gap-4">
         <a
           href="/"
           aria-label={messages.navigation.home}
@@ -51,14 +51,14 @@ export function SiteHeader() {
             {navItems.map((item) => (
               <span
                 key={item.href}
-                className={item.compact ? 'contents' : 'hidden md:contents'}
+                className={item.compact ? 'contents' : 'hidden lg:contents'}
               >
                 <ButtonLink href={item.href} variant="ghost" size="sm">
                   {item.label}
                 </ButtonLink>
               </span>
             ))}
-            <span className="hidden sm:contents">
+            <span className="hidden lg:contents">
               <ButtonLink
                 href={SITE.repositoryUrl}
                 variant="ghost"

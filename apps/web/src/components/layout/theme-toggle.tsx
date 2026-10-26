@@ -98,10 +98,10 @@ export function ThemeToggle({ className }: { className?: string }) {
   const value = useThemePreference();
   return (
     <div className={cn('shrink-0', className)} data-testid="theme-toggle">
-      <div className="hidden sm:block">
+      <div className="hidden lg:block">
         <ThemeSegments value={value} />
       </div>
-      <div className="sm:hidden">
+      <div className="lg:hidden">
         <ThemeCycle value={value} />
       </div>
     </div>

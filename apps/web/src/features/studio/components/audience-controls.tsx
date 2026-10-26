@@ -56,7 +56,7 @@ export function AudienceBar({
         'flex flex-wrap items-end gap-x-4 gap-y-2 px-4 py-2.5',
         // Scroll margin keeps a focused option clear of the sticky page header.
         variant === 'toolbar'
-          ? 'border-b border-line bg-surface/95 backdrop-blur-sm [&_input]:scroll-mt-40'
+          ? 'border-b border-line bg-surface/95 backdrop-blur-sm [&_input]:scroll-mt-56'
           : 'rounded-lg border border-line bg-surface shadow-panel',
         className,
       )}
