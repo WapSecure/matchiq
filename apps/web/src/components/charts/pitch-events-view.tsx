@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { EVENT_DETAIL } from '@/constants/events';
 import {
   PITCH_COPY,
@@ -21,6 +21,8 @@ type EventsViewProps = {
   width: number;
   homeShort: string;
   awayShort: string;
+  /** Rendered above the filters so the plot keeps its height beside them. */
+  viewControl: ReactNode;
 };
 
 const readout = (m: PitchMark): string =>
@@ -55,6 +57,7 @@ export function PitchEventsView({
   width,
   homeShort,
   awayShort,
+  viewControl,
 }: EventsViewProps) {
   const [kinds, setKinds] = useState<ReadonlySet<PitchKind>>(
     () => new Set(PITCH_KINDS),
@@ -82,7 +85,8 @@ export function PitchEventsView({
   return (
     <div className="@container flex flex-col gap-3">
       <div className="grid gap-4 @3xl:grid-cols-[minmax(0,1fr)_12.5rem]">
-        <div className="@3xl:order-2">
+        <div className="flex flex-col gap-3 @3xl:order-2 @3xl:gap-5">
+          {viewControl}
           <PitchFilters
             team={team}
             onTeam={onTeam}

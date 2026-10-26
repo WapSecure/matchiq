@@ -43,14 +43,17 @@ export function PitchMap({
 }: PitchMapProps) {
   const [view, setView] = useState<PitchView>('events');
   const [team, setTeam] = useState<PitchTeamFilter>('all');
+  const viewControl = (
+    <SegmentedControl<PitchView>
+      legend={DEPTH_COPY.viewLegend}
+      options={VIEW_OPTIONS}
+      value={view}
+      onChange={setView}
+    />
+  );
   return (
     <div className="@container flex flex-col gap-3">
-      <SegmentedControl<PitchView>
-        legend={DEPTH_COPY.viewLegend}
-        options={VIEW_OPTIONS}
-        value={view}
-        onChange={setView}
-      />
+      {view === 'events' ? null : viewControl}
       {view === 'events' ? (
         <PitchEventsView
           marks={marks}
@@ -60,6 +63,7 @@ export function PitchMap({
           width={width}
           homeShort={homeShort}
           awayShort={awayShort}
+          viewControl={viewControl}
         />
       ) : (
         <>
