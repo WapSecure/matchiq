@@ -9,8 +9,9 @@ import {
   totalPagesOf,
   useNumberedPage,
 } from '@/components/ui/pagination';
-import { FEATURED_SCENARIO, LOBBY_COPY } from '@/constants/lobby';
-import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
+import { FEATURED_SCENARIO } from '@/constants/lobby';
+import { PAGE_SIZES } from '@/constants/pagination';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useTemplates } from '@/lib/api/hooks';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
 import { TemplateCard } from './template-card';
@@ -19,8 +20,9 @@ const SKELETON_CARDS = 2;
 const GRID = 'grid gap-5 md:grid-cols-2';
 
 function LobbySkeleton() {
+  const copy = usePageMessages().lobby;
   return (
-    <div role="status" aria-label={LOBBY_COPY.loading} className={GRID}>
+    <div role="status" aria-label={copy.loading} className={GRID}>
       {Array.from({ length: SKELETON_CARDS }, (_, i) => (
         <Skeleton key={i} className="h-[26rem] rounded-xl" />
       ))}
@@ -46,6 +48,7 @@ function TemplatePages({
 }: {
   templates: readonly FixtureTemplateSummary[];
 }) {
+  const copy = usePageMessages().lobby;
   const paging = useNumberedPage(PAGE_SIZES.lobbyDefault);
   const { pageSize } = paging;
   const page = clampPage(paging.page, totalPagesOf(templates.length, pageSize));
@@ -55,7 +58,7 @@ function TemplatePages({
   );
   return (
     <div className="flex flex-col gap-5">
-      <ul aria-label={LOBBY_COPY.listLabel} className={GRID}>
+      <ul aria-label={copy.listLabel} className={GRID}>
         {visible.map((template) => (
           <li key={template.templateId} className="flex min-w-0">
             <TemplateCard
@@ -72,20 +75,21 @@ function TemplatePages({
         onPageChange={paging.setPage}
         pageSizeOptions={PAGE_SIZES.lobby}
         onPageSizeChange={paging.setPageSize}
-        noun={PAGINATION_NOUNS.matches}
-        label={LOBBY_COPY.pagesLabel}
+        noun={copy.nouns.matches}
+        label={copy.pagesLabel}
       />
     </div>
   );
 }
 
 export function TemplateLobby() {
+  const copy = usePageMessages().lobby;
   const templates = useTemplates();
   if (templates.isPending) return <LobbySkeleton />;
   if (templates.isError) {
     return (
       <ErrorState
-        title={LOBBY_COPY.error.title}
+        title={copy.error}
         error={templates.error}
         onRetry={() => void templates.refetch()}
       />
@@ -95,8 +99,8 @@ export function TemplateLobby() {
     return (
       <EmptyState
         Icon={TimelineIcon}
-        title={LOBBY_COPY.empty.title}
-        description={LOBBY_COPY.empty.description}
+        title={copy.empty.title}
+        description={copy.empty.description}
       />
     );
   }

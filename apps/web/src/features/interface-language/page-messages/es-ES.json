@@ -1,0 +1,244 @@
+{
+  "landing": {
+    "hero": {
+      "eyebrow": "Inteligencia futbolística para emisiones en directo",
+      "title": "Una fuente fiable del partido. Para cada público y cada idioma.",
+      "description": "MatchIQ detecta los momentos importantes mientras se juega el partido. Las estadísticas proceden directamente de los datos, la IA explica por qué importa cada momento, una verificación confirma cada cifra y los productores reciben gráficos fiables que pueden retirar en cualquier momento.",
+      "primaryAction": "Elegir un partido",
+      "secondaryAction": "Ver cómo funciona",
+      "disclosure": "La demostración utiliza partidos ficticios y simulados. No aparecen clubes, jugadores ni marcas de ligas reales.",
+      "facts": [
+        "cifras inventadas por la IA",
+        "públicos e idiomas, mismos hechos",
+        "para retirar cualquier gráfico del aire"
+      ]
+    },
+    "pipeline": {
+      "eyebrow": "Cómo funciona",
+      "title": "Cinco pasos del campo a la pantalla",
+      "description": "Cada hecho se calcula una sola vez a partir de los datos del partido. Nada lo modifica después y una verificación confirma cada cifra antes de emitirla.",
+      "stages": {
+        "ingest": {
+          "title": "Recopilar",
+          "description": "Cada pase, disparo y entrada se registra una vez, en orden y con su fuente."
+        },
+        "interpret": {
+          "title": "Comprender",
+          "description": "Marcador, posesión, impulso y otras estadísticas se calculan siempre del mismo modo."
+        },
+        "explain": {
+          "title": "Explicar",
+          "description": "El analista, redactor y verificador de IA convierten los momentos clave en textos vinculados con las jugadas que los respaldan."
+        },
+        "render": {
+          "title": "Mostrar",
+          "description": "Gráficos sincronizados con el partido, dentro de las zonas seguras y retirables con un clic."
+        },
+        "personalize": {
+          "title": "Personalizar",
+          "description": "Versiones para aficionados, analistas y emisiones en inglés, francés, español y pidgin nigeriano, basadas en los mismos hechos."
+        }
+      }
+    },
+    "principles": {
+      "eyebrow": "Por qué puedes confiar",
+      "title": "Diseñado para inspirar confianza en antena",
+      "items": {
+        "evidence": {
+          "title": "Cada cifra se verifica",
+          "description": "Cada cifra en pantalla enlaza con las jugadas y la estadística que la respaldan. Si no puede verificarse, no se emite."
+        },
+        "repeatable": {
+          "title": "Mismo partido, mismas cifras",
+          "description": "Las estadísticas siguen reglas fijas y probadas. Al repetir un partido se obtienen exactamente los mismos resultados."
+        },
+        "resilience": {
+          "title": "Continúa si falla la redacción",
+          "description": "Los marcadores y estadísticas nunca dependen del texto. Si tarda o es incorrecto, se emite una redacción estándar y el productor puede retirar cualquier gráfico."
+        }
+      }
+    }
+  },
+  "guide": {
+    "eyebrow": "Para el jurado",
+    "title": "Un recorrido de tres minutos",
+    "description": "Ocho pasos breves que muestran lo mejor de MatchIQ. Todos los partidos son simulados y no hay que configurar nada.",
+    "stepsLabel": "Pasos del recorrido",
+    "doLabel": "Haz esto",
+    "showsLabel": "Qué demuestra",
+    "wording": "Los comentarios los redacta un modelo cuando está disponible o se reproducen desde una grabación. En caso contrario se usa una redacción estándar. En ambos casos, cada cifra se verifica primero.",
+    "closingTitle": "¿Listo para probarlo?",
+    "closingAction": "Elegir un partido",
+    "steps": {
+      "start": {
+        "title": "Iniciar una repetición",
+        "doThis": "Abre los partidos, elige Remontada tardía e inicia la repetición a velocidad rápida.",
+        "shows": "Un partido completo se reproduce en pocos minutos, siempre del mismo modo.",
+        "link": "Abrir los partidos"
+      },
+      "watch": {
+        "title": "Observa cómo se construye",
+        "doThis": "Quédate en el Estudio en directo y observa los momentos clave, las estadísticas y la vista previa de emisión.",
+        "shows": "Cada momento clave se detecta en los datos, se redacta, se verifica y se sincroniza para su emisión."
+      },
+      "evidence": {
+        "title": "Abrir las pruebas",
+        "doThis": "Pulsa Pruebas en un momento clave. Cambia el público a Analista para ver el bloque Comparado con.",
+        "shows": "Las jugadas y estadísticas que respaldan el momento y su comparación con el resto del partido."
+      },
+      "audience": {
+        "title": "Cambiar público e idioma",
+        "doThis": "Cambia el público y elige un idioma para los comentarios, incluido naijá (pidgin).",
+        "shows": "La redacción cambia según el público y el idioma, mientras los hechos y las cifras permanecen iguales."
+      },
+      "listen": {
+        "title": "Escuchar un momento",
+        "doThis": "Pulsa Escuchar en un momento clave.",
+        "shows": "El momento se lee con la voz de tu dispositivo. No se envía nada fuera para generar el audio."
+      },
+      "factchecks": {
+        "title": "Ver las verificaciones",
+        "doThis": "Vuelve a los partidos, abre la repetición y elige Verificaciones en la parte superior.",
+        "shows": "Quién redactó cada momento y qué problemas detectó la verificación antes de emitirlo.",
+        "link": "Abrir los partidos"
+      },
+      "producer": {
+        "title": "Probar la vista de producción",
+        "doThis": "Inicia sesión como productor de demostración, cambia la publicación a Manual, envía a antena un gráfico pendiente y abre el Registro de actividad.",
+        "shows": "Un productor aprueba cada gráfico antes de emitirlo y cada acción queda en un registro que no puede editarse.",
+        "link": "Ir al inicio de sesión"
+      },
+      "recap": {
+        "title": "Obtener el resumen",
+        "doThis": "Al terminar el partido, abre el resumen desde los partidos y elige Descargar informe del partido.",
+        "shows": "El resultado, los momentos clave y las estadísticas finales en un informe legible que puedes conservar.",
+        "link": "Abrir los partidos"
+      }
+    }
+  },
+  "offline": {
+    "eyebrow": "Sin conexión",
+    "title": "No tienes conexión",
+    "description": "Las actualizaciones en directo necesitan conexión a Internet. Vuelve a conectarte e inténtalo de nuevo. No mostramos copias guardadas para que la información esté siempre actualizada.",
+    "retry": "Intentarlo de nuevo"
+  },
+  "auth": {
+    "title": "Iniciar sesión en MatchIQ",
+    "lead": "Usa la cuenta de tu organización. Lo que puedes hacer depende de tu rol.",
+    "unavailable": "El inicio de sesión no está configurado aquí. Puedes usar la demostración pública sin iniciar sesión.",
+    "continue": "Continuar al inicio de sesión",
+    "publicDemo": "Explorar la demostración sin iniciar sesión",
+    "demoTitle": "Cuentas de demostración",
+    "demoBadge": "Solo para desarrollo",
+    "roles": {
+      "platform-operator": "Operador de plataforma",
+      "tenant-owner": "Propietario de la organización",
+      "producer": "Productor",
+      "analyst": "Analista",
+      "developer": "Desarrollador",
+      "viewer": "Espectador",
+      "anonymous": "Demostración pública"
+    },
+    "errors": {
+      "callback": "No se completó el inicio de sesión. Inténtalo de nuevo.",
+      "unavailable": "No podemos acceder al servicio de inicio de sesión. Inténtalo de nuevo en un momento.",
+      "expired": "Tu sesión se ha cerrado por seguridad. Vuelve a iniciarla para continuar donde la dejaste."
+    }
+  },
+  "lobby": {
+    "eyebrow": "Partidos",
+    "title": "Elige un partido para repetir",
+    "description": "Elige un partido y una velocidad. Los momentos clave, las estadísticas y los gráficos de emisión aparecen durante la reproducción.",
+    "guide": "Un recorrido de tres minutos",
+    "howItWorks": {
+      "label": "Cómo funcionan las repeticiones",
+      "text": "Cada partido se desarrolla siempre de la misma forma para poder ensayar y comparar. Cualquiera que tenga el enlace ve el mismo momento que tú."
+    },
+    "listLabel": "Partidos",
+    "pagesLabel": "Páginas de partidos",
+    "events": "Eventos del partido",
+    "versus": "vs.",
+    "home": "Local",
+    "away": "Visitante",
+    "expect": "Qué esperar",
+    "featured": "Repetición recomendada",
+    "start": "Iniciar repetición",
+    "starting": "Iniciando…",
+    "speedLabel": "Velocidad de repetición",
+    "speeds": {
+      "1": {
+        "label": "Tiempo real",
+        "description": "Un partido completo dura unos 90 minutos."
+      },
+      "5": {
+        "label": "Ágil",
+        "description": "Unos 18 minutos. Adecuado para un recorrido guiado."
+      },
+      "20": {
+        "label": "Rápida",
+        "description": "Unos 5 minutos. Los momentos clave llegan seguidos."
+      },
+      "30": {
+        "label": "Momentos destacados",
+        "description": "Unos 3 minutos. Ideal para una demostración rápida."
+      }
+    },
+    "startFailed": "No se pudo iniciar la repetición.",
+    "rateLimited": "Has iniciado muchas repeticiones en poco tiempo. Espera un minuto o únete a una repetición reciente.",
+    "loading": "Cargando partidos",
+    "empty": {
+      "title": "Aún no hay partidos para repetir",
+      "description": "Los partidos aparecen aquí en cuanto están listos. Vuelve a comprobarlo en un momento."
+    },
+    "error": "No se pudieron cargar los partidos",
+    "regions": {
+      "matches": "La lista de partidos",
+      "replays": "Repeticiones recientes"
+    },
+    "nouns": {
+      "matches": {
+        "one": "partido",
+        "other": "partidos"
+      },
+      "replays": {
+        "one": "repetición",
+        "other": "repeticiones"
+      }
+    },
+    "scenarioLabels": {
+      "comeback": "Remontada tardía",
+      "disallowed-goal": "Gol anulado",
+      "high-press": "Presión alta",
+      "low-event": "Partido cerrado",
+      "possession-dominance": "Dominio de la posesión",
+      "red-card-swing": "Giro tras una tarjeta roja"
+    },
+    "scenarioPreviews": {
+      "comeback": "Los visitantes se adelantan antes del descanso. Observa la remontada final.",
+      "disallowed-goal": "Se anula un gol después de subir al marcador. Observa cómo desaparece de la pantalla.",
+      "high-press": "Ambos equipos presionan con intensidad. Habrá entradas, pérdidas y transiciones rápidas.",
+      "low-event": "Un partido lento y cerrado con pocos disparos. Útil para probar fases tranquilas en antena.",
+      "possession-dominance": "Un equipo controla el balón y el terreno. Observa cómo aumenta la presión.",
+      "red-card-swing": "Una expulsión cambia el partido. Observa el cambio de impulso."
+    },
+    "sessions": {
+      "title": "Repeticiones recientes",
+      "description": "Únete a una repetición en curso o revisa una que ya terminó",
+      "listLabel": "Repeticiones recientes",
+      "pagesLabel": "Páginas de repeticiones recientes",
+      "empty": "Aún no hay repeticiones. Inicia una arriba.",
+      "error": "No se pudieron cargar las repeticiones recientes",
+      "loading": "Cargando repeticiones recientes",
+      "open": "Abrir",
+      "notStarted": "Sin iniciar",
+      "live": "En directo",
+      "finished": "Finalizadas",
+      "state": {
+        "IDLE": "Lista",
+        "PLAYING": "En directo",
+        "PAUSED": "En pausa",
+        "COMPLETED": "Finalizado"
+      }
+    }
+  }
+}

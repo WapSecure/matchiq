@@ -7,7 +7,7 @@ import { PlayIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
 import { HTTP_STATUS } from '@/constants/api';
 import { demoFaultPlan } from '@/constants/demo-faults';
-import { LOBBY_COPY } from '@/constants/lobby';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useStudioUi } from '@/features/studio/store';
 import { isApiError } from '@/lib/api/api-error';
 import { PUBLIC_ENV } from '@/lib/env';
@@ -18,14 +18,15 @@ import { useStartSession } from './use-start-session';
 type SessionStartProps = { templateId: string; title: string };
 
 function StartProblem({ id, error }: { id: string; error: unknown }) {
+  const copy = usePageMessages().lobby;
   return (
     <div id={id}>
       <InlineProblem
         error={error}
-        lead={LOBBY_COPY.startFailed}
+        lead={copy.startFailed}
         message={
           isApiError(error) && error.status === HTTP_STATUS.tooManyRequests
-            ? LOBBY_COPY.rateLimited
+            ? copy.rateLimited
             : undefined
         }
       />
@@ -38,6 +39,7 @@ function StartProblem({ id, error }: { id: string; error: unknown }) {
  * is wide enough, stacked otherwise. Starting creates a session and opens its studio.
  */
 export function SessionStart({ templateId, title }: SessionStartProps) {
+  const copy = usePageMessages().lobby;
   const errorId = useId();
   const [speed, setSpeed] = useState<ReplaySpeed>(
     () => useStudioUi.getState().speed,
@@ -61,13 +63,13 @@ export function SessionStart({ templateId, title }: SessionStartProps) {
             )
           }
           disabled={session.pending}
-          aria-label={LOBBY_COPY.startLabel(title)}
+          aria-label={copy.startLabel(title)}
           aria-describedby={session.error ? errorId : undefined}
           size="md"
           leadingIcon={<PlayIcon size={14} />}
           className="w-full shrink-0 @lg:ml-auto @lg:w-auto"
         >
-          {session.pending ? LOBBY_COPY.starting : LOBBY_COPY.start}
+          {session.pending ? copy.starting : copy.start}
         </Button>
       </div>
       {session.error ? (

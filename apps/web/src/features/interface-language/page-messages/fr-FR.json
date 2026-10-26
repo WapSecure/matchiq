@@ -1,0 +1,244 @@
+{
+  "landing": {
+    "hero": {
+      "eyebrow": "Intelligence football pour la diffusion en direct",
+      "title": "Un flux de match fiable. Pour chaque public, dans chaque langue.",
+      "description": "MatchIQ repère les moments importants pendant le match. Les statistiques viennent directement des données du match, l'IA explique leur importance, une vérification confirme chaque nombre et les producteurs obtiennent des graphiques fiables qu'ils peuvent retirer à tout moment.",
+      "primaryAction": "Choisir un match",
+      "secondaryAction": "Voir le fonctionnement",
+      "disclosure": "La démo utilise des matchs fictifs et simulés. Aucun club, joueur ou emblème de ligue réel.",
+      "facts": [
+        "nombre inventé par l'IA",
+        "publics et langues, mêmes faits",
+        "pour retirer un graphique de l'antenne"
+      ]
+    },
+    "pipeline": {
+      "eyebrow": "Fonctionnement",
+      "title": "Cinq étapes du terrain à l'écran",
+      "description": "Chaque fait est calculé une seule fois à partir des données du match. Rien ne le modifie ensuite et une vérification confirme chaque nombre avant sa diffusion.",
+      "stages": {
+        "ingest": {
+          "title": "Collecter",
+          "description": "Chaque passe, tir et tacle est enregistré une fois, dans l’ordre, avec sa source."
+        },
+        "interpret": {
+          "title": "Comprendre",
+          "description": "Score, possession, dynamique et autres statistiques sont calculés toujours de la même manière."
+        },
+        "explain": {
+          "title": "Expliquer",
+          "description": "L'analyste, le rédacteur et le vérificateur IA transforment les moments clés en textes reliés aux actions qui les justifient."
+        },
+        "render": {
+          "title": "Afficher",
+          "description": "Des graphiques synchronisés avec le match, placés dans les zones sûres et retirables en un clic."
+        },
+        "personalize": {
+          "title": "Personnaliser",
+          "description": "Des versions pour supporters, analystes et diffuseurs, en anglais, français, espagnol et pidgin nigérian, fondées sur les mêmes faits."
+        }
+      }
+    },
+    "principles": {
+      "eyebrow": "Pourquoi lui faire confiance",
+      "title": "Conçu pour inspirer confiance à l'antenne",
+      "items": {
+        "evidence": {
+          "title": "Chaque nombre est vérifié",
+          "description": "Chaque nombre affiché renvoie aux actions et à la statistique qui le justifient. Un nombre invérifiable n'est pas diffusé."
+        },
+        "repeatable": {
+          "title": "Même match, mêmes nombres",
+          "description": "Les statistiques suivent des règles fixes et testées. Une nouvelle lecture du match produit exactement les mêmes résultats."
+        },
+        "resilience": {
+          "title": "Continue si la rédaction échoue",
+          "description": "Les scores et statistiques ne dépendent jamais du texte. S'il est lent ou incorrect, un texte standard est diffusé et le producteur peut retirer tout graphique à tout moment."
+        }
+      }
+    }
+  },
+  "guide": {
+    "eyebrow": "Pour les jurés",
+    "title": "Une visite de trois minutes",
+    "description": "Huit étapes courtes pour découvrir le meilleur de MatchIQ. Tous les matchs sont simulés et aucune configuration préalable n’est nécessaire.",
+    "stepsLabel": "Étapes de la visite",
+    "doLabel": "À faire",
+    "showsLabel": "Ce que cela montre",
+    "wording": "Les commentaires sont rédigés par un modèle lorsqu'il est disponible ou rejoués depuis un enregistrement. Sinon, un texte standard est utilisé. Dans tous les cas, chaque nombre est vérifié au préalable.",
+    "closingTitle": "Prêt à essayer ?",
+    "closingAction": "Choisir un match",
+    "steps": {
+      "start": {
+        "title": "Lancer une rediffusion",
+        "doThis": "Ouvrez les matchs, choisissez Remontée tardive et lancez la rediffusion à vitesse rapide.",
+        "shows": "Un match entier se déroule en quelques minutes, toujours de la même manière.",
+        "link": "Ouvrir les matchs"
+      },
+      "watch": {
+        "title": "Suivre sa construction",
+        "doThis": "Restez dans le Studio en direct et observez les moments clés, les statistiques et l'aperçu antenne.",
+        "shows": "Chaque moment clé est repéré dans les données, rédigé, vérifié et synchronisé pour la diffusion."
+      },
+      "evidence": {
+        "title": "Ouvrir les preuves",
+        "doThis": "Appuyez sur Preuves dans un moment clé. Passez au public Analyste pour voir le bloc Comparé à.",
+        "shows": "Les actions et statistiques qui justifient le moment, ainsi que sa comparaison avec le reste du match."
+      },
+      "audience": {
+        "title": "Changer de public et de langue",
+        "doThis": "Changez de public, puis choisissez une langue de commentaires, dont le naijá (pidgin).",
+        "shows": "La formulation change selon le public et la langue, tandis que les faits et les nombres restent identiques."
+      },
+      "listen": {
+        "title": "Écouter un moment",
+        "doThis": "Appuyez sur Écouter dans un moment clé.",
+        "shows": "Le moment est lu par la voix de votre appareil. Aucun contenu n'est envoyé ailleurs pour produire l'audio."
+      },
+      "factchecks": {
+        "title": "Voir les vérifications",
+        "doThis": "Revenez aux matchs, ouvrez votre rediffusion et choisissez Vérifications en haut.",
+        "shows": "Qui a rédigé chaque moment et quels problèmes ont été détectés avant toute diffusion.",
+        "link": "Ouvrir les matchs"
+      },
+      "producer": {
+        "title": "Essayer la vue producteur",
+        "doThis": "Connectez-vous comme producteur de démo, passez la publication en mode Manuel, envoyez un graphique en attente à l'antenne, puis ouvrez le Journal d'activité.",
+        "shows": "Un producteur approuve chaque graphique avant sa diffusion et chaque action est inscrite dans un journal non modifiable.",
+        "link": "Aller à la connexion"
+      },
+      "recap": {
+        "title": "Obtenir le récapitulatif",
+        "doThis": "À la fin du match, ouvrez le récapitulatif depuis les matchs et choisissez Télécharger le rapport du match.",
+        "shows": "Le résultat, les moments clés et les statistiques finales dans un rapport lisible à conserver.",
+        "link": "Ouvrir les matchs"
+      }
+    }
+  },
+  "offline": {
+    "eyebrow": "Hors connexion",
+    "title": "Vous êtes hors connexion",
+    "description": "Les mises à jour en direct nécessitent une connexion Internet. Reconnectez-vous, puis réessayez. Nous n'affichons pas de copies enregistrées afin que les informations restent toujours actuelles.",
+    "retry": "Réessayer"
+  },
+  "auth": {
+    "title": "Se connecter à MatchIQ",
+    "lead": "Utilisez le compte de votre organisation. Vos possibilités dépendent de votre rôle.",
+    "unavailable": "La connexion n'est pas configurée ici. Vous pouvez tout de même utiliser la démo publique sans vous connecter.",
+    "continue": "Continuer vers la connexion",
+    "publicDemo": "Parcourir la démo sans se connecter",
+    "demoTitle": "Comptes de démonstration",
+    "demoBadge": "Développement uniquement",
+    "roles": {
+      "platform-operator": "Opérateur de plateforme",
+      "tenant-owner": "Propriétaire de l'organisation",
+      "producer": "Producteur",
+      "analyst": "Analyste",
+      "developer": "Développeur",
+      "viewer": "Spectateur",
+      "anonymous": "Démo publique"
+    },
+    "errors": {
+      "callback": "La connexion n'a pas abouti. Veuillez réessayer.",
+      "unavailable": "Le service de connexion est momentanément inaccessible. Réessayez dans un instant.",
+      "expired": "Vous avez été déconnecté pour des raisons de sécurité. Reconnectez-vous pour reprendre là où vous vous étiez arrêté."
+    }
+  },
+  "lobby": {
+    "eyebrow": "Matchs",
+    "title": "Choisissez un match à rejouer",
+    "description": "Choisissez un match et une vitesse. Les moments clés, les statistiques et les graphiques antenne apparaissent pendant la lecture.",
+    "guide": "Une visite de trois minutes",
+    "howItWorks": {
+      "label": "Fonctionnement des rediffusions",
+      "text": "Chaque match se déroule toujours de la même manière afin de pouvoir répéter et comparer. Toute personne disposant du lien voit le même moment que vous."
+    },
+    "listLabel": "Matchs",
+    "pagesLabel": "Pages de matchs",
+    "events": "Événements du match",
+    "versus": "c.",
+    "home": "Domicile",
+    "away": "Extérieur",
+    "expect": "À quoi s’attendre",
+    "featured": "Rediffusion recommandée",
+    "start": "Lancer la rediffusion",
+    "starting": "Démarrage…",
+    "speedLabel": "Vitesse de rediffusion",
+    "speeds": {
+      "1": {
+        "label": "Temps réel",
+        "description": "Un match complet dure environ 90 minutes."
+      },
+      "5": {
+        "label": "Soutenu",
+        "description": "Environ 18 minutes. Idéal pour une visite guidée."
+      },
+      "20": {
+        "label": "Rapide",
+        "description": "Environ 5 minutes. Les moments clés se suivent de près."
+      },
+      "30": {
+        "label": "Temps forts",
+        "description": "Environ 3 minutes. Idéal pour une démo rapide."
+      }
+    },
+    "startFailed": "Impossible de lancer la rediffusion.",
+    "rateLimited": "Vous avez lancé de nombreuses rediffusions en peu de temps. Attendez une minute ou rejoignez une rediffusion récente ci-dessous.",
+    "loading": "Chargement des matchs",
+    "empty": {
+      "title": "Aucun match à rejouer",
+      "description": "Les matchs apparaissent ici dès qu'ils sont prêts. Revenez dans un instant."
+    },
+    "error": "Impossible de charger les matchs",
+    "regions": {
+      "matches": "La liste des matchs",
+      "replays": "Rediffusions récentes"
+    },
+    "nouns": {
+      "matches": {
+        "one": "match",
+        "other": "matchs"
+      },
+      "replays": {
+        "one": "rediffusion",
+        "other": "rediffusions"
+      }
+    },
+    "scenarioLabels": {
+      "comeback": "Remontée tardive",
+      "disallowed-goal": "But refusé",
+      "high-press": "Pressing haut",
+      "low-event": "Match fermé",
+      "possession-dominance": "Domination de la possession",
+      "red-card-swing": "Tournant après carton rouge"
+    },
+    "scenarioPreviews": {
+      "comeback": "Les visiteurs prennent l'avantage avant la pause. Attendez-vous à un retournement tardif.",
+      "disallowed-goal": "Un but est annulé après avoir été affiché. Observez son retrait de l'écran.",
+      "high-press": "Les deux équipes pressent fort. Attendez-vous à des tacles, des pertes de balle et des transitions rapides.",
+      "low-event": "Un match fermé et lent, avec peu de tirs. Utile pour tester les temps faibles à l'antenne.",
+      "possession-dominance": "Une équipe garde le ballon et occupe le terrain. Observez la pression s'accentuer.",
+      "red-card-swing": "Une expulsion change le match. Observez l'évolution de la dynamique."
+    },
+    "sessions": {
+      "title": "Rediffusions récentes",
+      "description": "Rejoignez une rediffusion en cours ou consultez-en une terminée",
+      "listLabel": "Rediffusions récentes",
+      "pagesLabel": "Pages des rediffusions récentes",
+      "empty": "Aucune rediffusion. Lancez-en une ci-dessus.",
+      "error": "Impossible de charger les rediffusions récentes",
+      "loading": "Chargement des rediffusions récentes",
+      "open": "Ouvrir",
+      "notStarted": "Non démarrée",
+      "live": "En direct",
+      "finished": "Terminées",
+      "state": {
+        "IDLE": "Prête",
+        "PLAYING": "En direct",
+        "PAUSED": "En pause",
+        "COMPLETED": "Terminé"
+      }
+    }
+  }
+}

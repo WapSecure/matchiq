@@ -1,6 +1,8 @@
+'use client';
+
 import { RequirePermission } from '@/components/auth/require-permission';
 import { Badge } from '@/components/ui';
-import { FEATURED_LABEL, LOBBY_COPY } from '@/constants/lobby';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import type { FixtureTemplateSummary } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { MatchHero } from './match-hero';
@@ -17,8 +19,11 @@ export function TemplateCard({
   template,
   featured = false,
 }: TemplateCardProps) {
+  const copy = usePageMessages().lobby;
   const titleId = `${template.templateId}-title`;
-  const preview = scenarioPreview(template.scenario);
+  const preview =
+    copy.scenarioPreviews[template.scenario] ??
+    scenarioPreview(template.scenario);
   return (
     <article
       aria-labelledby={titleId}
@@ -31,8 +36,11 @@ export function TemplateCard({
     >
       <header className="flex min-w-0 items-center justify-between gap-3 border-b border-line px-5 py-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Badge tone="accent">{scenarioLabel(template.scenario)}</Badge>
-          {featured ? <Badge tone="neutral">{FEATURED_LABEL}</Badge> : null}
+          <Badge tone="accent">
+            {copy.scenarioLabels[template.scenario] ??
+              scenarioLabel(template.scenario)}
+          </Badge>
+          {featured ? <Badge tone="neutral">{copy.featured}</Badge> : null}
         </div>
         <p className="eyebrow hidden min-w-0 truncate text-ink-subtle sm:block">
           {competitionName(template.competitionLabel)}
@@ -42,7 +50,7 @@ export function TemplateCard({
         <MatchHero template={template} titleId={titleId} />
         {preview ? (
           <p className="rounded-lg border border-line bg-surface-raised/60 px-3 py-2.5 text-sm leading-relaxed text-ink-muted">
-            <span className="font-medium text-ink">{LOBBY_COPY.expect}: </span>
+            <span className="font-medium text-ink">{copy.expect}: </span>
             {preview}
           </p>
         ) : null}
