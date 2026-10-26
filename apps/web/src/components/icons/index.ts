@@ -15,6 +15,7 @@ export { PlayIcon } from './play-icon';
 export { PauseIcon } from './pause-icon';
 export { RestartIcon } from './restart-icon';
 export { CloseIcon } from './close-icon';
+export { CompassIcon } from './compass-icon';
 export { ChevronLeftIcon } from './chevron-left-icon';
 export { AlertIcon } from './alert-icon';
 export { BroadcastIcon } from './broadcast-icon';

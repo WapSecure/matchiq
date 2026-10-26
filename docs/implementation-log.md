@@ -1288,6 +1288,13 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - New `apps/web-e2e/src/fullstack-smoke.spec.ts`: the real web UI against the Compose app profile (no mocks). Lobby, replay at 30×, wait for full time, scoreboard, key moment and Evidence drawer, Match stats rows, Recap, Fact-checks, signed-out Activity log, plus axe on lobby, studio and recap. Skips itself without `BASE_URL`.
 - New advisory CI job "Browser smoke on the Compose stack" (`continue-on-error`, not in the gate). It becomes required only after several clean dev runs. Closes audit REM-13 once it has passed in CI.
 
+## MQ-101: judge guide and studio tour (25 October 2026)
+
+- Public `/guide` page, "A three-minute tour": eight numbered steps (what to do, what it shows) with links to `/fixtures` and `/sign-in`; studio, recap, fact-check and activity-log steps name what to click because session ids differ per machine. Linked from the site header ("Tour") and the matches page. The demo password is not repeated; the sign-in page remains the only place it shows.
+- Opt-in "Take the tour" at the end of the Live studio tab row: a non-modal panel (focus moves in, Escape or Close returns it) that outlines five regions (score and preview, key moments, audience and language, Evidence, Match stats), skips any not on screen, never auto-starts and never blocks the replay. Dismissal is kept per device in guarded `localStorage`; after that the button is icon-only.
+- Code: `apps/web/src/features/guide` (`guide-page`, `tour/`), `constants/guide.ts`, `compass-icon`, a `data-tour="audience"` anchor and a `[data-tour-active]` outline rule.
+- Tests: `guide-page.spec.tsx`, `tour-launcher.spec.tsx`. No e2e change: no page list for axe exists beyond per-page specs.
+
 ## MQ-102: How this was written on key-moment cards (25 October 2026)
 
 - Each Live studio key-moment card and each recap key moment has a collapsed **How this was written** disclosure (`apps/web/src/features/how-written`). Open, it shows the chain for that moment: Analyst, Writer, Fact checker, Publish gate (Translator and Graphics writer on one "Also" line when recorded), each with its outcome (Passed, Used a template, Sent back, Stopped) and time taken, then who wrote the final wording and "Caught N problems" with the findings the Fact-checks page shows.
