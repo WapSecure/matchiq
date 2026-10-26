@@ -1283,6 +1283,13 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
 - Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.
 
+## MQ-101: judge guide and studio tour (25 October 2026)
+
+- Public `/guide` page, "A three-minute tour": eight numbered steps (what to do, what it shows) with links to `/fixtures` and `/sign-in`; studio, recap, fact-check and activity-log steps name what to click because session ids differ per machine. Linked from the site header ("Tour") and the matches page. The demo password is not repeated; the sign-in page remains the only place it shows.
+- Opt-in "Take the tour" at the end of the Live studio tab row: a non-modal panel (focus moves in, Escape or Close returns it) that outlines five regions (score and preview, key moments, audience and language, Evidence, Match stats), skips any not on screen, never auto-starts and never blocks the replay. Dismissal is kept per device in guarded `localStorage`; after that the button is icon-only.
+- Code: `apps/web/src/features/guide` (`guide-page`, `tour/`), `constants/guide.ts`, `compass-icon`, a `data-tour="audience"` anchor and a `[data-tour-active]` outline rule.
+- Tests: `guide-page.spec.tsx`, `tour-launcher.spec.tsx`. No e2e change: no page list for axe exists beyond per-page specs.
+
 ## MQ-102: How this was written on key-moment cards (25 October 2026)
 
 - Each Live studio key-moment card and each recap key moment has a collapsed **How this was written** disclosure (`apps/web/src/features/how-written`). Open, it shows the chain for that moment: Analyst, Writer, Fact checker, Publish gate (Translator and Graphics writer on one "Also" line when recorded), each with its outcome (Passed, Used a template, Sent back, Stopped) and time taken, then who wrote the final wording and "Caught N problems" with the findings the Fact-checks page shows.

@@ -29,7 +29,13 @@ export function SiteHeader() {
             {NAV_ITEMS.map((item) => (
               <span
                 key={item.href}
-                className={item.compact ? 'contents' : 'hidden md:contents'}
+                className={
+                  item.compact
+                    ? 'contents'
+                    : 'fromLg' in item
+                      ? 'hidden lg:contents'
+                      : 'hidden md:contents'
+                }
               >
                 <ButtonLink href={item.href} variant="ghost" size="sm">
                   {item.label}

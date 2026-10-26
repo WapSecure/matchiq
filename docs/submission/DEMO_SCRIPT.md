@@ -14,6 +14,10 @@ The video must also:
 - contain no third-party trademarks or copyrighted music (rules §4.4);
 - be in English, or come with an English translation (rules §4.9).
 
+## Judge path
+
+Judges with only a few minutes can open `/guide` ("A three-minute tour", linked from the site header and the matches page) for eight numbered steps with links to the real places. Inside the Live studio, **Take the tour** opens an optional panel that points at the score and on-air preview, key moments, audience and language, Evidence and Match stats. It never starts by itself.
+
 ## Setup (do this before recording)
 
 ### 1. Environment

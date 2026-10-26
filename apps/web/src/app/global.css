@@ -156,6 +156,13 @@
   }
 }
 
+/* The studio tour outlines the region it is describing. */
+[data-tour-active] {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-lg, 0.5rem);
+}
+
 /* Lower third: the bar wipes in, then the copy settles. */
 @keyframes cue-wipe {
   from {
