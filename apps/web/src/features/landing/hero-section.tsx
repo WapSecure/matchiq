@@ -1,6 +1,7 @@
 import { ArrowRightIcon, ShieldIcon } from '@/components/icons';
 import { Badge, ButtonLink, Container } from '@/components/ui';
 import { HERO } from '@/constants/landing';
+import { GUIDE_CTA } from '@/constants/landing-gallery';
 import { HeroPreview } from './hero-preview';
 
 function HeroFacts() {
@@ -50,6 +51,9 @@ export function HeroSection() {
             </ButtonLink>
             <ButtonLink href={HERO.howItWorks.href} variant="secondary">
               {HERO.howItWorks.label}
+            </ButtonLink>
+            <ButtonLink href={GUIDE_CTA.href} variant="ghost">
+              {GUIDE_CTA.label}
             </ButtonLink>
           </div>
           <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-ink-subtle">

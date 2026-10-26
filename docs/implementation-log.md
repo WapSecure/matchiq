@@ -1337,3 +1337,10 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 
 - The tour panel was clipped above the screen: it sat inside the sticky header, whose backdrop blur makes `position: fixed` relative to the header. It now renders in the page body and is placed by a pure `placePanel` function (below the button, else above, else pinned, always 8 px inside the viewport, re-placed on resize and scroll). Steps, outline and focus handling are unchanged.
 - Tests: `place-panel.spec.ts` (room above, no room above, right edge, tiny viewport).
+
+## MQ-110: landing gallery and capabilities (26 October 2026)
+
+- The landing page gains a "See it working" gallery of four real screenshots (live studio at full time, evidence drawer with the Compared with block, a fact-checks page for a session recorded earlier, the recap), each with a caption saying what it proves, and a "What you can do" row of six icon cards. A "Take the three-minute tour" link sits beside the hero buttons. Hero, how-it-works, trust sections and the Simulated match note are unchanged.
+- Screenshots are 1280 px wide WebP under 55 KB each in `apps/web/public/landing/`, rendered with `next/image` (explicit size, lazy, `unoptimized` because they are already compressed), framed with a border that reads in light and dark.
+- Code: `features/landing/gallery-section`, `capabilities-section`, `constants/landing-gallery.ts`. No new icons were needed.
+- Tests: `gallery.spec.tsx` (four images with alt and captions, recorded-earlier caption, headings, no technical words, capabilities, tour link).
