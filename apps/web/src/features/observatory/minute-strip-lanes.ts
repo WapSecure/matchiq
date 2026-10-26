@@ -1,6 +1,12 @@
 /** Markers closer than this share of the timeline would overlap, so they stack. */
-const OVERLAP_SHARE = 0.025;
-const MAX_LANES = 3;
+const OVERLAP_SHARE = 0.05;
+const MAX_LANES = 6;
+
+/** A new lane while there is room, else the one whose last marker is oldest. */
+const freeLane = (lastInLane: readonly number[]): number =>
+  lastInLane.length < MAX_LANES
+    ? lastInLane.length
+    : lastInLane.indexOf(Math.min(...lastInLane));
 
 /**
  * Lane per marker (0 = on the line). A marker takes the first lane whose last
@@ -18,7 +24,7 @@ export function assignLanes(
   const lanes = new Array<number>(positions.length).fill(0);
   for (const { at, index } of order) {
     let lane = lastInLane.findIndex((end) => at - end >= gap);
-    if (lane === -1) lane = Math.min(lastInLane.length, MAX_LANES - 1);
+    if (lane === -1) lane = freeLane(lastInLane);
     lastInLane[lane] = at;
     lanes[index] = lane;
   }
