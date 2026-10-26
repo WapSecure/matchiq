@@ -139,7 +139,7 @@ Does not exist yet:
 
 ## Category
 
-Best Multi-Agent System. Five agents (Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer) collaborate in an Agent Framework graph workflow with revise, reject and fallback branches, and a deterministic gate decides what airs. Every key moment card has a collapsed "How this was written" disclosure showing the chain (analyst, writer, fact checker, publish gate) with each outcome and what the fact check caught.
+Best Multi-Agent System. Five agents (Match Analyst, Narrative Writer, Fact Checker, Localization, Broadcast Producer) collaborate in an Agent Framework graph workflow with revise, reject and fallback branches, and a deterministic gate decides what airs. Every key moment card has a collapsed "How this was written" disclosure showing the chain (analyst, writer, fact checker, publish gate) with each outcome and what the fact check caught. Each key moment and on-air graphic also carries a "Numbers checked" receipt, with a "Figures checked" list in the Evidence drawer that pairs every figure in the wording with the match-data stat it matched.
 
 ## Deck and licence
 
