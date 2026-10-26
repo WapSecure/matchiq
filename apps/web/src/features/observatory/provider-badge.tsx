@@ -16,6 +16,7 @@ export function ProviderBadge({
   const { label, hint } = PROVIDER_LABELS[provider];
   const tone =
     provider === 'foundry' || provider === 'ollama' ? 'accent' : 'neutral';
+  // `recorded` stays neutral: it replays earlier model wording and is not a live model.
   if (inline)
     return (
       <Badge tone={tone} data-provider={provider}>

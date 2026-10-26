@@ -13,6 +13,7 @@ REPLACED_PERSONAS: Final = "fact checker replaced {personas} with templates ({co
 PRODUCER_FALLBACK: Final = "producer: overlay failed checks"
 TEMPLATE_FAILED: Final = "template output failed checks; suppressed"
 ORCHESTRATION_ERROR: Final = "orchestration error; template output"
+NO_RECORDING: Final = "no recording for this moment"
 INTEGRITY_PREFIX: Final = "suppressed: "
 SEPARATOR: Final = "; "
 REASON_MAX: Final = 200

@@ -2,7 +2,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response, status
 
-from matchiq_agents.constants import FOUNDRY_CHECK, HEALTH_PREFIX, OLLAMA_CHECK, SERVICE_NAME
+from matchiq_agents.constants import (
+    FOUNDRY_CHECK,
+    HEALTH_PREFIX,
+    OLLAMA_CHECK,
+    RECORDED_CHECK,
+    SERVICE_NAME,
+)
 from matchiq_agents.contracts.generated.HealthStatus import Checks, HealthStatus, Status
 from matchiq_agents.providers.ollama import probe_ollama
 from matchiq_agents.settings import ModelProvider, Settings
@@ -10,6 +16,7 @@ from matchiq_agents.settings import ModelProvider, Settings
 router = APIRouter(prefix=HEALTH_PREFIX, tags=["health"])
 
 MOCK_PROVIDER_DETAIL = "mock provider; deterministic templates only"
+RECORDED_DETAIL = "recorded model run: earlier real output replayed, no live model"
 OLLAMA_READY = "local Ollama model {model} (not Foundry)"
 OLLAMA_UNREACHABLE = "Ollama endpoint unreachable; template fallback only"
 OLLAMA_MODEL_MISSING = "Ollama reachable but model {model} is not pulled"
@@ -56,6 +63,8 @@ async def ready(settings: SettingsDep, response: Response) -> HealthStatus:
     """Reports whether a real model is wired. Mock mode is ready but flagged as degraded."""
     if settings.model_provider is ModelProvider.OLLAMA:
         name, check = OLLAMA_CHECK, await _ollama_check(settings)
+    elif settings.model_provider is ModelProvider.RECORDED:
+        name, check = RECORDED_CHECK, Checks(status=Status.degraded, detail=RECORDED_DETAIL)
     else:
         name, check = FOUNDRY_CHECK, _static_check(settings)
     if check.status is Status.unavailable:

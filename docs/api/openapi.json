@@ -14547,6 +14547,7 @@
             "enum": [
               "foundry",
               "ollama",
+              "recorded",
               "mock",
               "template"
             ]
@@ -14689,6 +14690,7 @@
             "enum": [
               "foundry",
               "ollama",
+              "recorded",
               "mock",
               "template"
             ]
