@@ -33,7 +33,7 @@ MatchIQ follows the challenge's five-stage pipeline (official rules §4.1):
 | **Render**      | Timed overlay cues (create, update, retract) with priority, dwell time and collision handling, shown in a 16:9 broadcast preview. Templates air at once, and verified agent copy replaces them.                                                                                                          | `apps/worker`, `apps/web`, [ADR-0013](../adr/0013-replay-sessions-and-intelligence-pipeline.md)                                               |
 | **Personalize** | Casual, Analyst and Broadcast personas in English, French, Spanish and Nigerian Pidgin. The numbers are the same in all 12 variants, and the content changes by audience.                                                                                                                                | [ADR-0014](../adr/0014-nigerian-pidgin-locale.md)                                                                                             |
 
-Around the pipeline: a match recap at full time, an Agent Observatory that shows every agent run, and producer editorial controls with an audit trail.
+Around the pipeline: a match recap at full time, an Agent Observatory that shows every agent run, and producer editorial controls with an audit trail, and a keyboard-friendly approval queue (shortcuts that can be switched off, a clear countdown and a plain confirmation).
 
 ## How it works
 
