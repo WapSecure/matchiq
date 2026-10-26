@@ -49,7 +49,7 @@ export function InsightFeed({
       description={STUDIO_COPY.insights.description}
       Icon={SparkIcon}
       className={className}
-      bodyClassName="p-0"
+      bodyClassName="p-0!"
       scrollable
     >
       <AudienceBar variant="toolbar" className="sticky top-0 z-10" />
