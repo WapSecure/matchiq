@@ -212,7 +212,7 @@ cd apps/agents && uv run python scripts/run_eval.py --provider mock   # agent ev
 
 ## Judge path
 
-Short on time? Follow the [three-minute tour](apps/web/src/constants/guide.ts) at `/guide` in the running app. It walks through the replay, evidence, audiences and languages, Listen, fact-checks, the producer view and the recap. The Live studio also has an optional **Take the tour** button.
+Short on time? Follow the [three-minute tour](apps/web/src/constants/guide.ts) at `/guide` in the running app. It walks through the replay, evidence, audiences and languages, Listen, fact-checks, the producer view and the recap. The Live studio also has an optional **Take the tour** button. The landing page also has a "See it working" gallery of real screenshots from a simulated match.
 
 The studio's pitch map has **Events, Shots and Passes** views: shots sized by outcome with speed in km/h, and the hardest-rated completed passes per team with distance and a synthetic difficulty score (Analysts also see the uncalibrated xG baseline).
 
