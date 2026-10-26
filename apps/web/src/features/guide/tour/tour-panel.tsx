@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CloseIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
 import { TOUR_ACTIVE_ATTRIBUTE, TOUR_COPY } from '@/constants/guide';
+import { PANEL_MARGIN, placePanel } from './place-panel';
 import { findTarget, type ResolvedStep } from './resolve-steps';
 
 type TourPanelProps = {
@@ -23,11 +25,59 @@ function useActiveTarget(selector: string | undefined) {
   }, [selector]);
 }
 
+const WIDTH = 384;
+const ANCHOR = '[data-tour-trigger]';
+
+/**
+ * Portalled to the body: the sticky header's backdrop blur would otherwise
+ * become the containing block of `position: fixed` and clip the panel.
+ */
+function usePlacement(
+  ref: React.RefObject<HTMLDivElement | null>,
+  key: number,
+) {
+  const [style, setStyle] = useState<React.CSSProperties>({
+    visibility: 'hidden',
+  });
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = ref.current;
+      if (!el) return;
+      const viewport = { width: window.innerWidth, height: window.innerHeight };
+      const width = Math.min(WIDTH, viewport.width - 2 * PANEL_MARGIN);
+      el.style.width = `${width}px`;
+      const anchor =
+        document.querySelector(ANCHOR)?.getBoundingClientRect() ??
+        ({ top: 0, bottom: 0, left: 0, right: viewport.width } as const);
+      const { top, left } = placePanel(
+        anchor,
+        { width, height: el.offsetHeight },
+        viewport,
+      );
+      setStyle({
+        top,
+        left,
+        width,
+        maxHeight: viewport.height - 2 * PANEL_MARGIN,
+      });
+    };
+    place();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [ref, key]);
+  return style;
+}
+
 /** Non-modal: the replay and the rest of the page stay usable. */
 export function TourPanel({ steps, index, onIndex, onClose }: TourPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
   const current = steps[index];
   const last = index === steps.length - 1;
+  const style = usePlacement(ref, index);
   useActiveTarget(current?.selector);
   useEffect(() => ref.current?.focus(), []);
   useEffect(() => {
@@ -38,13 +88,14 @@ export function TourPanel({ steps, index, onIndex, onClose }: TourPanelProps) {
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div
       ref={ref}
+      style={style}
       role="dialog"
       aria-label={TOUR_COPY.panelLabel}
       tabIndex={-1}
-      className="fixed inset-x-4 bottom-4 z-50 rounded-lg border border-line-strong bg-surface p-4 shadow-float outline-none sm:left-auto sm:right-4 sm:w-96"
+      className="fixed z-50 overflow-y-auto rounded-lg border border-line-strong bg-surface p-4 shadow-float outline-none"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -85,6 +136,7 @@ export function TourPanel({ steps, index, onIndex, onClose }: TourPanelProps) {
           </Button>
         </div>
       ) : null}
-    </div>
+    </div>,
+    document.body,
   );
 }

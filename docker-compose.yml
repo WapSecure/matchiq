@@ -190,7 +190,9 @@ services:
       redis: { condition: service_healthy }
       agents: { condition: service_healthy }
 
-  # Runs the mock provider. Foundry needs Azure credentials, so run it natively (`pnpm nx serve agents`).
+  # Runs the mock provider, or `recorded` (a replay of earlier model output) with
+  # COMPOSE_MODEL_PROVIDER=recorded. Foundry needs Azure credentials, so run it natively
+  # (`pnpm nx serve agents`).
   agents:
     profiles: [app]
     build:
@@ -202,7 +204,8 @@ services:
       APP_VERSION: ${APP_VERSION:-0.0.0-dev}
       AGENTS_PORT: '8000'
       AGENTS_SERVICE_TOKEN: ${AGENTS_SERVICE_TOKEN:-local_only_agents_service_token_change_me}
-      MODEL_PROVIDER: mock
+      MODEL_PROVIDER: ${COMPOSE_MODEL_PROVIDER:-mock}
+      RECORDED_LATENCY_MS: ${RECORDED_LATENCY_MS:-1500}
       OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-30m}
       OLLAMA_WARMUP: ${OLLAMA_WARMUP:-true}
       AGENT_PROMPT_MODE: ${AGENT_PROMPT_MODE:-standard}

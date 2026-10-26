@@ -64,6 +64,9 @@ export const PUBLICATION_LABELS = {
   PENDING: 'Pending',
 } as const;
 
+export const RECORDED_EXPLANATION =
+  "Wording written by a model in an earlier run and replayed through today's checks";
+
 /** Honest provider names: standard wording or a test stand-in is never presented as AI. */
 export const PROVIDER_LABELS: Record<
   ModelProvider,
@@ -85,7 +88,17 @@ export const PROVIDER_LABELS: Record<
     label: 'AI (Microsoft Foundry)',
     hint: 'An AI model deployed on Microsoft Foundry',
   },
+  recorded: {
+    label: 'Recorded model run',
+    hint: RECORDED_EXPLANATION,
+  },
 };
+
+/** Shown beside the provider name and once on the page: a replay is never a live model. */
+export const RECORDED_NOTE_COPY = {
+  title: 'Recorded model run',
+  body: RECORDED_EXPLANATION,
+} as const;
 
 export const AGENT_LABELS: Record<AgentName, string> = {
   MATCH_ANALYST: 'Analyst',

@@ -1283,6 +1283,17 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
 - Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.
 
+## MQ-100: recorded model run for machines without a model (25 October 2026)
+
+- `MODEL_PROVIDER=recorded` replays real `qwen2.5:7b-instruct` output (session `fx_comeback_42_s7`, 23 October 2026, 19 moments) through the unchanged pipeline, so the Observatory, agent-written cards and the gate work with no model installed. ADR-0042.
+- Moments are matched by template id, kind, period, match clock, side and reason code, not insight id. A hit pauses `RECORDED_LATENCY_MS` (default 1500, 0 allowed) so the template airs first; a miss returns the template result with the reason "no recording for this moment". Recorded run and step latencies are shown as recorded.
+- Only the model calls are replaced: the Fact Checker, template fallback, per-item translation checks, overlay checks, step recorder and the worker's publish gate run on recorded text as on live text. `recorded` is refused in prod, and the service fails to start on a missing or invalid recording.
+- Contract: `ModelProvider` gains `recorded` (generated Python, JSON Schema, OpenAPI and API client regenerated). Web: "Recorded model run" label and a one-line note on the Fact-checks page, never "AI (local model)".
+- Gaps in the source session, recorded in the ADR: no cited values (rebuilt from text and engine metrics at export), no agent steps (produced live on replay), no analyst claims.
+- Measured on a fresh Late comeback session (41 moments, 22 are player milestones the worker never sends to the agents): all 19 agent-bound moments match; 9 publish the model wording for every audience, 1 partly and 9 fall back to templates because today's editorial rules reject the old goal and momentum drafts.
+- Docs: README "No model? Use a recorded run", `.env.example`, `docker-compose.yml` (`COMPOSE_MODEL_PROVIDER`), LOCAL_STACK, SUBMISSION, DEMO_SCRIPT, recordings README (provenance).
+- Tests: `apps/agents/tests/test_recorded_provider.py` (hit, miss, pause and zero, provider and deployment labels, gate rejection of changed numbers, fail-fast on invalid recordings, readiness, prod refusal, committed file checks), `recorded-note.spec.tsx`, contract provider enum spec.
+
 ## MQ-099: browser smoke on the Compose stack (25 October 2026)
 
 - New `apps/web-e2e/src/fullstack-smoke.spec.ts`: the real web UI against the Compose app profile (no mocks). Lobby, replay at 30×, wait for full time, scoreboard, key moment and Evidence drawer, Match stats rows, Recap, Fact-checks, signed-out Activity log, plus axe on lobby, studio and recap. Skips itself without `BASE_URL`.
@@ -1312,3 +1323,8 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Countdown: at 10 seconds or less the badge turns critical, swaps its clock for an alert icon and the card border changes, with the text "Send within 8 s". A graphic that runs out of time shows "Time ran out, so it stayed off air" with a plain explanation, instead of vanishing.
 - Code: `features/studio/approval` (`shortcut-keys`, `use-shortcut-setting`, `use-queue-keys`, `use-settled-reviews`, `settled-card`, `review-actions`, `shortcuts-help`, `key-hint`), `constants/approval-shortcuts.ts`, `keyboard-icon`.
 - Tests: `approval-shortcuts.spec.tsx` (keys act only on a focused graphic, modifiers, text fields and radios ignored, switch off and remembered, navigation, help list, confirmation and announcement, urgent text and icon, lapse message); `approval-queue.spec.tsx` updated for the in-place confirmation.
+
+## MQ-103: studio tour panel placement (26 October 2026)
+
+- The tour panel was clipped above the screen: it sat inside the sticky header, whose backdrop blur makes `position: fixed` relative to the header. It now renders in the page body and is placed by a pure `placePanel` function (below the button, else above, else pinned, always 8 px inside the viewport, re-placed on resize and scroll). Steps, outline and focus handling are unchanged.
+- Tests: `place-panel.spec.ts` (room above, no room above, right edge, tiny viewport).

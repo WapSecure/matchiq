@@ -69,6 +69,7 @@ In compose, the agents container runs `MODEL_PROVIDER=mock`, which gives determi
 
 - **macOS:** use native Ollama (`brew install ollama`, then `ollama serve`). Docker on macOS cannot use the Apple GPU, so a containerised model runs on CPU only and is much slower. Native Ollama listens on `localhost:11434`. A container reaches it at `http://host.docker.internal:11434`.
 - **Linux:** run `docker compose --profile ai up -d ollama`, then `docker compose exec ollama ollama pull <model>`. This runs on CPU. Use a small model (roughly 1–4B parameters) and expect a few seconds per response.
+- **No model (recorded run):** set `COMPOSE_MODEL_PROVIDER=recorded` and `AI_ENABLED=true` in `.env`, then recreate the stack. The agents container replays real model wording captured earlier for the Late comeback scenario, through the live fact check and publish gate, after `RECORDED_LATENCY_MS` (default 1500). It starts only if its recordings load, and the Fact-checks page labels the runs "Recorded model run". It is not a live model ([ADR-0042](../adr/0042-recorded-model-provider.md)). Natively, use `MODEL_PROVIDER=recorded`.
 - **Foundry:** run the agents service natively (`pnpm nx serve agents`) after `az login`, with `MODEL_PROVIDER=foundry`, `FOUNDRY_PROJECT_ENDPOINT` and `FOUNDRY_MODEL`. The container has no Azure CLI credentials. This path is unverified until a Foundry project exists (ADR-0003).
 
 ## Data, fixtures and replay

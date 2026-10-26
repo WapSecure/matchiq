@@ -128,7 +128,7 @@ def _accept(
     return _Batch(accepted, absent)
 
 
-def _fallback_item(ctx: AgentContext, source: NarrativeDraft, locale: Locale) -> NarrativeDraft:
+def fallback_item(ctx: AgentContext, source: NarrativeDraft, locale: Locale) -> NarrativeDraft:
     """The persona's template in `locale` when it states the same numbers and names as the source
     (spec §27); otherwise the en-GB source text, flagged `localeFallback`."""
     target = ctx.fallback.draft(source.persona, locale)
@@ -204,7 +204,7 @@ async def localise_all(
         for source in sources:
             draft = translated.get((source.persona, locale))
             if draft is None:
-                draft = _fallback_item(ctx, source, locale)
+                draft = fallback_item(ctx, source, locale)
                 used_template = True
             localised.append(draft)
     if used_template:

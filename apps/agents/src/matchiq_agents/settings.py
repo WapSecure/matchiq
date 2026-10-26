@@ -1,4 +1,5 @@
 from enum import StrEnum
+from pathlib import Path
 from typing import Self
 
 from pydantic import Field, HttpUrl, SecretStr, model_validator
@@ -13,6 +14,7 @@ from matchiq_agents.constants import (
     DEFAULT_OLLAMA_KEEP_ALIVE,
     DEFAULT_OLLAMA_MODEL,
     DEFAULT_PORT,
+    DEFAULT_RECORDED_LATENCY_MS,
     DEFAULT_RUN_BUDGET,
     LOCAL_CIRCUIT_TIMEOUT_THRESHOLD,
     OLLAMA_KEEP_ALIVE_PATTERN,
@@ -28,6 +30,7 @@ class ModelProvider(StrEnum):
     MOCK = "mock"
     OLLAMA = "ollama"
     FOUNDRY = "foundry"
+    RECORDED = "recorded"
 
 
 class AppEnvironment(StrEnum):
@@ -36,6 +39,9 @@ class AppEnvironment(StrEnum):
     DEV = "dev"
     STAGE = "stage"
     PROD = "prod"
+
+
+_NOT_FOR_PROD = frozenset({ModelProvider.MOCK, ModelProvider.RECORDED})
 
 
 class Settings(BaseSettings):
@@ -58,6 +64,9 @@ class Settings(BaseSettings):
         default=DEFAULT_OLLAMA_KEEP_ALIVE, pattern=OLLAMA_KEEP_ALIVE_PATTERN
     )
     ollama_warmup: bool = True
+    # `recorded` replays earlier model output (ADR-0042). Dir unset: the packaged recordings.
+    recorded_latency_ms: int = Field(default=DEFAULT_RECORDED_LATENCY_MS, ge=0)
+    recorded_dir: Path | None = None
     agent_prompt_mode: PromptMode = PromptMode.STANDARD
     agent_max_retries: int = Field(default=MAX_AGENT_RETRIES, ge=0, le=MAX_AGENT_RETRIES)
     agent_circuit_failure_threshold: int = Field(default=DEFAULT_CIRCUIT_FAILURE_THRESHOLD, ge=1)
@@ -94,7 +103,7 @@ class Settings(BaseSettings):
     def critique_enabled(self) -> bool:
         if self.agent_critique_enabled is not None:
             return self.agent_critique_enabled
-        return not self.is_local
+        return not (self.is_local or self.model_provider is ModelProvider.RECORDED)
 
     @property
     def circuit_timeout_threshold(self) -> int | None:
@@ -118,8 +127,8 @@ class Settings(BaseSettings):
         ):
             msg = "OLLAMA_ENDPOINT and OLLAMA_MODEL are required when MODEL_PROVIDER=ollama"
             raise ValueError(msg)
-        if self.model_provider is ModelProvider.MOCK and self.app_env is AppEnvironment.PROD:
-            msg = "MODEL_PROVIDER=mock is not permitted in prod"
+        if self.model_provider in _NOT_FOR_PROD and self.app_env is AppEnvironment.PROD:
+            msg = f"MODEL_PROVIDER={self.model_provider.value} is not permitted in prod"
             raise ValueError(msg)
         if self.demo_faults_enabled and self.app_env is AppEnvironment.PROD:
             msg = "DEMO_FAULTS_ENABLED is not permitted in prod"
