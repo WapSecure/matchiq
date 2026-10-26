@@ -2,6 +2,7 @@ import type { Locale } from '@matchiq/contracts';
 import { Badge, HintBadge } from '@/components/ui';
 import { CUE_HOLD_MS, OVERLAY_COPY } from '@/constants/overlay';
 import { OVERLAY_KIND_LABELS } from '@/constants/match';
+import { CueNumbersChecked } from '@/features/numbers-checked/cue-numbers-checked';
 import type { OnAir } from '../lib/cue-dwell';
 import { useStudioUi } from '../store';
 
@@ -25,6 +26,7 @@ export function OnAirMeta({ onAir, locale }: { onAir: OnAir; locale: Locale }) {
       <HintBadge hint={OVERLAY_COPY.sourceHint}>
         {OVERLAY_COPY.source[source]}
       </HintBadge>
+      <CueNumbersChecked cue={cue} />
       {cue.locale !== locale ? (
         <Badge>{OVERLAY_COPY.localeFallback}</Badge>
       ) : null}
