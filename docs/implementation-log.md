@@ -1282,3 +1282,19 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Voice matches the narrative language; Pidgin only with an `en-NG` voice, else a plain "not available" note. Start by the viewer only, one reading at a time, Stop on the same button, stops on navigation, audience or language change and a hidden tab. Start and stop are announced once, throttled.
 - Code: `apps/web/src/features/listen` (`use-speech`, `listen-button`, `narrative-listen`, `voices`, `transcript`), `constants/listen.ts`, speaker and stop icons, `moment-footer.tsx` split out of the key-moment card.
 - Tests: `use-speech.spec.tsx` (voice per locale, Pidgin without a voice, toggling, stop on language change, no `speechSynthesis`, accessible name and description). No new Playwright test; the existing axe scans cover the pages.
+
+## MQ-101: judge guide and studio tour (25 October 2026)
+
+- Public `/guide` page, "A three-minute tour": eight numbered steps (what to do, what it shows) with links to `/fixtures` and `/sign-in`; studio, recap, fact-check and activity-log steps name what to click because session ids differ per machine. Linked from the site header ("Tour") and the matches page. The demo password is not repeated; the sign-in page remains the only place it shows.
+- Opt-in "Take the tour" at the end of the Live studio tab row: a non-modal panel (focus moves in, Escape or Close returns it) that outlines five regions (score and preview, key moments, audience and language, Evidence, Match stats), skips any not on screen, never auto-starts and never blocks the replay. Dismissal is kept per device in guarded `localStorage`; after that the button is icon-only.
+- Code: `apps/web/src/features/guide` (`guide-page`, `tour/`), `constants/guide.ts`, `compass-icon`, a `data-tour="audience"` anchor and a `[data-tour-active]` outline rule.
+- Tests: `guide-page.spec.tsx`, `tour-launcher.spec.tsx`. No e2e change: no page list for axe exists beyond per-page specs.
+
+## MQ-102: How this was written on key-moment cards (25 October 2026)
+
+- Each Live studio key-moment card and each recap key moment has a collapsed **How this was written** disclosure (`apps/web/src/features/how-written`). Open, it shows the chain for that moment: Analyst, Writer, Fact checker, Publish gate (Translator and Graphics writer on one "Also" line when recorded), each with its outcome (Passed, Used a template, Sent back, Stopped) and time taken, then who wrote the final wording and "Caught N problems" with the findings the Fact-checks page shows.
+- Reuses the Fact-checks data and helpers: the shared match runs query (`agent-runs`, same cache key as the Fact-checks page), `useAgentSteps`, `plainFallbackReasons`, `describeRejection` and the step label constants. Nothing is requested until the first open; steps are cached per moment, and the match runs list is one shared request, so concurrency stays bounded by what a viewer opens.
+- Final line: "Written by a model and fact-checked", "Standard wording: <plain reason>", or a test stand-in line for the mock provider. The "Recorded model run" line is wired in `WRITER_LINES.recorded` and appears once the `recorded` provider exists (MQ-100).
+- States: loading skeleton, "No agent steps were recorded for this moment.", plain error with retry, pending note. Template-only moments show only the plain reason. Viewers without `agents:traces:read` (the anonymous demo principal has it) do not see the disclosure.
+- UI: React Aria `Disclosure` gained an `onExpandedChange` prop; the recap rail moved to `recap-rail.tsx` to keep `recap-moment.tsx` under the line cap.
+- Tests: `how-written.spec.tsx` (collapsed and lazy, chain with outcomes and durations, caught findings, template-only, no steps, error and retry, no permission, no technical words).

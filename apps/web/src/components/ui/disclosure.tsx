@@ -20,6 +20,7 @@ type DisclosureProps = {
   meta?: ReactNode;
   defaultExpanded?: boolean;
   isDisabled?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
   variant?: DisclosureVariant;
   id?: string;
   className?: string;
@@ -39,6 +40,7 @@ export function Disclosure({
   meta,
   defaultExpanded,
   isDisabled,
+  onExpandedChange,
   variant = 'inline',
   id,
   className,
@@ -71,6 +73,7 @@ export function Disclosure({
       id={id}
       defaultExpanded={defaultExpanded}
       isDisabled={isDisabled}
+      onExpandedChange={onExpandedChange}
       className={cn(
         'group/disclosure',
         variant === 'card' &&

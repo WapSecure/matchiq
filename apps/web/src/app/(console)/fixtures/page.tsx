@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { RegionBoundary } from '@/components/feedback';
 import { SiteFooter, SiteHeader, SyntheticNotice } from '@/components/layout';
 import { REGION_NAMES } from '@/constants/errors';
-import { Container, InfoTip } from '@/components/ui';
+import { ButtonLink, Container, InfoTip } from '@/components/ui';
+import { GUIDE_COPY } from '@/constants/guide';
+import { ROUTES } from '@/constants/navigation';
 import { LOBBY_COPY } from '@/constants/lobby';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import { RecentSessions } from '@/features/lobby/recent-sessions';
@@ -32,6 +34,14 @@ export default function FixturesPage() {
                 className="-mt-0.5 sm:mt-0"
               />
             </div>
+            <ButtonLink
+              href={ROUTES.guide}
+              variant="ghost"
+              size="sm"
+              className="-ml-2.5 mt-3"
+            >
+              {GUIDE_COPY.title}
+            </ButtonLink>
           </header>
           <div className="mt-8">
             <RegionBoundary region={REGION_NAMES.matches}>

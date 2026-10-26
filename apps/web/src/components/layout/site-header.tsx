@@ -18,6 +18,11 @@ export function SiteHeader() {
       compact: true,
     },
     {
+      label: messages.navigation.tour,
+      href: ROUTES.guide,
+      compact: false,
+    },
+    {
       label: messages.navigation.howItWorks,
       href: '/#pipeline',
       compact: false,

@@ -5,6 +5,7 @@ export type InterfaceMessages = {
     home: string;
     repository: string;
     matches: string;
+    tour: string;
     howItWorks: string;
     whyTrustIt: string;
     back: string;

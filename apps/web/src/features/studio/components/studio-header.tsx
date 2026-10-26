@@ -22,6 +22,8 @@ type StudioHeaderProps = {
   replay?: number | null;
   /** Live connection indicator; only the live view has a stream. */
   status?: ReactNode;
+  /** Sits at the end of the tab row, e.g. the optional studio tour. */
+  tabsAction?: ReactNode;
 };
 
 function StudioTabs({
@@ -68,6 +70,7 @@ export function StudioHeader({
   matchCode = null,
   replay = null,
   status,
+  tabsAction,
 }: StudioHeaderProps) {
   const messages = useInterfaceMessages();
   return (
@@ -130,8 +133,11 @@ export function StudioHeader({
         <ThemeToggle />
         <UserMenu />
       </div>
-      <div className="mx-auto max-w-[1920px] px-2 lg:px-4">
-        <StudioTabs fixtureId={fixtureId} view={view} />
+      <div className="mx-auto flex max-w-[1920px] items-center gap-2 px-2 lg:px-4">
+        <div className="min-w-0 flex-1">
+          <StudioTabs fixtureId={fixtureId} view={view} />
+        </div>
+        {tabsAction}
       </div>
     </header>
   );
