@@ -1354,3 +1354,10 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 | R-31-03 same template, same scoreboard | `apps/worker/src/app/pipeline/replay-determinism.spec.ts` (two pipeline runs per golden match, equal score and snapshot hash)                                                        |
 | R-08-14 composite foreign keys         | `libs/db/tests/composite-fk.integration.spec.ts`                                                                                                                                     |
 | R-38-05 ledger immutability            | Skipped: `libs/db/tests/ledger-immutability.integration.spec.ts` already asserts UPDATE and DELETE are refused.                                                                      |
+
+## MQ-110: landing gallery and capabilities (26 October 2026)
+
+- The landing page gains a "See it working" gallery of four real screenshots (live studio at full time, evidence drawer with the Compared with block, a fact-checks page for a session recorded earlier, the recap), each with a caption saying what it proves, and a "What you can do" row of six icon cards. A "Take the three-minute tour" link sits beside the hero buttons. Hero, how-it-works, trust sections and the Simulated match note are unchanged.
+- Screenshots are 1280 px wide WebP under 55 KB each in `apps/web/public/landing/`, rendered with `next/image` (explicit size, lazy, `unoptimized` because they are already compressed), framed with a border that reads in light and dark.
+- Code: `features/landing/gallery-section`, `capabilities-section`, `constants/landing-gallery.ts`. No new icons were needed.
+- Tests: `gallery.spec.tsx` (four images with alt and captions, recorded-earlier caption, headings, no technical words, capabilities, tour link).
