@@ -20,7 +20,10 @@ const queuePrefix = (fixtureId: string) =>
  * One review decision. Retrying the same decision reuses its
  * `Idempotency-Key`, so a lost response never sends a cue to air twice.
  */
-export const useReviewDecision = (insightId: string | null) => {
+export const useReviewDecision = (
+  insightId: string | null,
+  onDecided?: (outcome: 'APPROVED' | 'REJECTED') => void,
+) => {
   const fixtureId = useMatchStore((s) => s.fixtureId);
   const show = useEditorialNotice((s) => s.show);
   const queryClient = useQueryClient();
@@ -33,11 +36,15 @@ export const useReviewDecision = (insightId: string | null) => {
       return reviewInsight(insightId ?? '', command, key);
     },
     onSuccess: (result) => {
-      const done =
-        result.state === 'APPROVED'
+      const approved = result.state === 'APPROVED';
+      if (result.changed && onDecided) {
+        onDecided(approved ? 'APPROVED' : 'REJECTED');
+      } else {
+        const done = approved
           ? APPROVAL_COPY.done.APPROVED
           : APPROVAL_COPY.done.REJECTED;
-      show(result.changed ? done : APPROVAL_COPY.noop, result.changed);
+        show(result.changed ? done : APPROVAL_COPY.noop, result.changed);
+      }
       void queryClient.invalidateQueries({ queryKey: queuePrefix(fixtureId) });
     },
   });

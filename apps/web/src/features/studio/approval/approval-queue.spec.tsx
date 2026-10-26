@@ -119,7 +119,9 @@ describe('approval queue', () => {
     expect(
       (call?.[1]?.headers as Record<string, string>)['Idempotency-Key'],
     ).toMatch(/^[0-9a-f-]{36}$/);
-    expect(await screen.findByText('Sent to air.')).toBeVisible();
+    expect(await screen.findByTestId('settled-review')).toHaveTextContent(
+      /^Sent to air at \d{2}:\d{2}/,
+    );
   });
 
   it("drops a graphic with Don't air and explains a missed moment plainly", async () => {
