@@ -131,7 +131,7 @@ describe('commentary language boundaries', () => {
       screen.getByRole('radiogroup', { name: 'Audience' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Interface labels, facts and figures stay the same/),
+      screen.getByText(/Interface language changes controls and navigation/),
     ).toBeInTheDocument();
   });
 });

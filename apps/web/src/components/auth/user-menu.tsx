@@ -8,7 +8,8 @@ import {
   PopoverPanel,
   PopoverTrigger,
 } from '@/components/ui';
-import { AUTH_COPY, AUTH_ROUTES, ROLE_LABELS } from '@/constants/auth';
+import { AUTH_ROUTES, ROLE_LABELS } from '@/constants/auth';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { rolesOf, useSession } from '@/lib/auth/session-store';
 import type { SessionViewUser } from '@/lib/auth/session-view';
 
@@ -27,15 +28,18 @@ function Detail({ label, value }: { label: string; value: string }) {
 }
 
 function AccountDetails({ user }: { user: SessionViewUser }) {
+  const messages = useInterfaceMessages();
   return (
     <>
       <dl className="space-y-3">
-        <Detail label={AUTH_COPY.signedInAs} value={user.name} />
+        <Detail label={messages.account.signedInAs} value={user.name} />
         <Detail
-          label={AUTH_COPY.organisation}
-          value={user.orgName?.trim() || AUTH_COPY.organisationUnavailable}
+          label={messages.account.organisation}
+          value={
+            user.orgName?.trim() || messages.account.organisationUnavailable
+          }
         />
-        <Detail label={AUTH_COPY.role} value={roleText(user.roles)} />
+        <Detail label={messages.account.role} value={roleText(user.roles)} />
       </dl>
       <form method="post" action={AUTH_ROUTES.signOut} className="mt-4">
         <Button
@@ -43,7 +47,7 @@ function AccountDetails({ user }: { user: SessionViewUser }) {
           className="w-full"
           leadingIcon={<SignOutIcon size={15} />}
         >
-          {AUTH_COPY.signOut}
+          {messages.account.signOut}
         </Button>
       </form>
     </>
@@ -52,6 +56,7 @@ function AccountDetails({ user }: { user: SessionViewUser }) {
 
 /** Name, organisation and role of the signed-in user, or a sign-in link. */
 export function UserMenu() {
+  const messages = useInterfaceMessages();
   const view = useSession((s) => s.view);
   if (view?.status !== 'authenticated') {
     if (!view?.ssoEnabled) return null;
@@ -60,11 +65,11 @@ export function UserMenu() {
         href={AUTH_ROUTES.signInPage}
         variant="secondary"
         size="sm"
-        aria-label={AUTH_COPY.signIn}
+        aria-label={messages.account.signIn}
         leadingIcon={<UserIcon size={15} />}
-        className="px-2 md:px-3"
+        className="px-2 lg:px-3"
       >
-        <span className="hidden md:inline">{AUTH_COPY.signIn}</span>
+        <span className="hidden lg:inline">{messages.account.signIn}</span>
       </ButtonLink>
     );
   }
@@ -72,15 +77,15 @@ export function UserMenu() {
     <PopoverTrigger>
       <ActionButton
         variant="ghost"
-        aria-label={`${AUTH_COPY.userMenu}: ${view.user.name}, ${roleText(rolesOf(view))}`}
+        aria-label={`${messages.account.menu}: ${view.user.name}, ${roleText(rolesOf(view))}`}
         leadingIcon={<UserIcon size={16} />}
       >
-        <span className="hidden max-w-32 truncate md:inline">
+        <span className="hidden max-w-32 truncate lg:inline">
           {view.user.name}
         </span>
       </ActionButton>
       <PopoverPanel
-        aria-label={AUTH_COPY.userMenu}
+        aria-label={messages.account.menu}
         placement="bottom end"
         className="w-64"
       >

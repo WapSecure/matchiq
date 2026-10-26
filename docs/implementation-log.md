@@ -1323,6 +1323,14 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 - Code: `apps/web/src/features/numbers-checked` (`check-figures`, `numbers-checked`, `cue-numbers-checked`, `figures-checked-list`), `constants/numbers-checked.ts`; one-line wiring in `moment-footer.tsx`, `on-air-meta.tsx` and `evidence-drawer.tsx`.
 - Deferred: the recap moment. The recap document carries only metric names, not values, so figures cannot be matched there without a contract change (persisting cited values on the narrative).
 - Tests: `numbers-checked.spec.tsx` (matching, no figures, unmatched figure, unreadable language, persona variants, accessible name, retracted, no technical words, drawer list).
+## MQ-108: producer shortcuts and calmer confirmation (26 October 2026)
+
+- The "Waiting for your OK" queue has single-key shortcuts that work only when a waiting graphic or one of its buttons has focus: A or Enter send to air, D don't air, J/K or the arrow keys move between graphics, ? lists the keys. Ignored with Ctrl, Alt or Meta held, in text fields, on the adjust radios and in dialogs. WCAG 2.1.4: a "Keyboard shortcuts" switch (React Aria Switch, on by default, remembered per device with guarded localStorage) turns them off, and a "Shortcuts" popover lists them.
+- Visible key caps on the buttons (hidden on touch screens); the shortcut is in the accessible description, not the name, so names are unchanged.
+- After Send to air or Don't air the card stays in place for 8 seconds as "Sent to air at 12:41" or "Kept off air at 12:41", announced once politely through `useThrottledAnnouncement`. The toast is no longer used for a changed decision (no-ops still use it). No API, permission or payload change; the server audit is untouched. No animation, so reduced motion is respected.
+- Countdown: at 10 seconds or less the badge turns critical, swaps its clock for an alert icon and the card border changes, with the text "Send within 8 s". A graphic that runs out of time shows "Time ran out, so it stayed off air" with a plain explanation, instead of vanishing.
+- Code: `features/studio/approval` (`shortcut-keys`, `use-shortcut-setting`, `use-queue-keys`, `use-settled-reviews`, `settled-card`, `review-actions`, `shortcuts-help`, `key-hint`), `constants/approval-shortcuts.ts`, `keyboard-icon`.
+- Tests: `approval-shortcuts.spec.tsx` (keys act only on a focused graphic, modifiers, text fields and radios ignored, switch off and remembered, navigation, help list, confirmation and announcement, urgent text and icon, lapse message); `approval-queue.spec.tsx` updated for the in-place confirmation.
 
 ## MQ-103: studio tour panel placement (26 October 2026)
 
