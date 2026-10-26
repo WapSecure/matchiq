@@ -34,6 +34,7 @@ export type PageMessages = {
       description: string;
       primaryAction: string;
       secondaryAction: string;
+      guideAction: string;
       disclosure: string;
       facts: readonly string[];
     };

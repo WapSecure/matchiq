@@ -3,6 +3,7 @@
 import { ArrowRightIcon, ShieldIcon } from '@/components/icons';
 import { Badge, ButtonLink, Container } from '@/components/ui';
 import { HERO } from '@/constants/landing';
+import { GUIDE_CTA } from '@/constants/landing-gallery';
 import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { HeroPreview } from './hero-preview';
 
@@ -54,6 +55,9 @@ export function HeroSection() {
             </ButtonLink>
             <ButtonLink href={HERO.howItWorks.href} variant="secondary">
               {copy.secondaryAction}
+            </ButtonLink>
+            <ButtonLink href={GUIDE_CTA.href} variant="ghost">
+              {copy.guideAction}
             </ButtonLink>
           </div>
           <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-ink-subtle">

@@ -6,6 +6,7 @@
       "description": "MatchIQ detecta los momentos importantes mientras se juega el partido. Las estadísticas proceden directamente de los datos, la IA explica por qué importa cada momento, una verificación confirma cada cifra y los productores reciben gráficos fiables que pueden retirar en cualquier momento.",
       "primaryAction": "Elegir un partido",
       "secondaryAction": "Ver cómo funciona",
+      "guideAction": "Hacer el recorrido de tres minutos",
       "disclosure": "La demostración utiliza partidos ficticios y simulados. No aparecen clubes, jugadores ni marcas de ligas reales.",
       "facts": [
         "cifras inventadas por la IA",

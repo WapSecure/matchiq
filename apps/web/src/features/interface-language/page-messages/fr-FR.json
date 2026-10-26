@@ -6,6 +6,7 @@
       "description": "MatchIQ repère les moments importants pendant le match. Les statistiques viennent directement des données du match, l'IA explique leur importance, une vérification confirme chaque nombre et les producteurs obtiennent des graphiques fiables qu'ils peuvent retirer à tout moment.",
       "primaryAction": "Choisir un match",
       "secondaryAction": "Voir le fonctionnement",
+      "guideAction": "Faire la visite de trois minutes",
       "disclosure": "La démo utilise des matchs fictifs et simulés. Aucun club, joueur ou emblème de ligue réel.",
       "facts": [
         "nombre inventé par l'IA",
