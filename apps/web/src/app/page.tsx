@@ -5,6 +5,8 @@ import {
   SyntheticNotice,
 } from '@/components/layout';
 import {
+  CapabilitiesSection,
+  GallerySection,
   HeroSection,
   PipelineSection,
   PrinciplesSection,
@@ -19,7 +21,9 @@ export default function LandingPage() {
       <SiteHeader />
       <main id={MAIN_CONTENT_ID}>
         <HeroSection />
+        <GallerySection />
         <PipelineSection />
+        <CapabilitiesSection />
         <PrinciplesSection />
       </main>
       <SiteFooter />
