@@ -1337,3 +1337,20 @@ Local validation: shell syntax passed; current hosted configuration passed; expl
 
 - The tour panel was clipped above the screen: it sat inside the sticky header, whose backdrop blur makes `position: fixed` relative to the header. It now renders in the page body and is placed by a pure `placePanel` function (below the button, else above, else pinned, always 8 px inside the viewport, re-placed on resize and scroll). Steps, outline and focus handling are unchanged.
 - Tests: `place-panel.spec.ts` (room above, no room above, right edge, tiny viewport).
+
+## MQ-109: test hardening for built-but-unproven requirements (26 October 2026)
+
+No product behaviour changed. Each row from the requirements tracker now has a CI-run test.
+
+| Row                                    | Test                                                                                                                                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R-06-64 visible focus indicator        | `apps/web/src/components/ui/focus-indicator.spec.tsx` (button, link, checkbox, switch, radio, segmented control; the app has no tab primitive)                                       |
+| R-47-02 under three clicks to a match  | `apps/web-e2e/src/landing-to-match.spec.ts` (`/` to Choose a match to Start replay)                                                                                                  |
+| R-47-46 no browser-native controls     | `apps/web/src/lib/guards/native-controls.spec.ts` with a documented allowlist in `native-controls.constants.ts` (seek range, modal and drawer dialogs, hidden pitch-filter checkbox) |
+| R-09-22 evidence drawer                | `apps/web/src/features/studio/components/evidence-drawer.spec.tsx`                                                                                                                   |
+| R-12-02 no league marks                | `apps/web/src/lib/guards/league-marks.spec.ts` (disclaimer text allowed)                                                                                                             |
+| R-26-12 safe-area insets               | `apps/web/src/components/overlay/overlay-safe-area.spec.tsx` (extends the top/bottom check in `match-components.spec.tsx` to all four insets and the default)                        |
+| R-47-38 colour-independent status      | `apps/web/src/features/how-written/status-indicators.spec.tsx`                                                                                                                       |
+| R-31-03 same template, same scoreboard | `apps/worker/src/app/pipeline/replay-determinism.spec.ts` (two pipeline runs per golden match, equal score and snapshot hash)                                                        |
+| R-08-14 composite foreign keys         | `libs/db/tests/composite-fk.integration.spec.ts`                                                                                                                                     |
+| R-38-05 ledger immutability            | Skipped: `libs/db/tests/ledger-immutability.integration.spec.ts` already asserts UPDATE and DELETE are refused.                                                                      |
