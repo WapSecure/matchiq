@@ -83,7 +83,7 @@ export function MinuteStrip({
   return (
     <div
       className={cn(
-        'select-none [--lane-step:0.75rem] sm:[--lane-step:1.5rem]',
+        'select-none [--lane-step:0.75rem] sm:[--lane-step:1.75rem]',
         className,
       )}
       style={{
