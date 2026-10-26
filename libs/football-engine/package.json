@@ -14,6 +14,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./geometry": {
+      "@matchiq/source": "./src/geometry.ts",
+      "types": "./dist/geometry.d.ts",
+      "import": "./dist/geometry.js",
+      "default": "./dist/geometry.js"
+    },
     "./player": {
       "@matchiq/source": "./src/player.ts",
       "types": "./dist/player.d.ts",

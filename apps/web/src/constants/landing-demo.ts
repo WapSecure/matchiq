@@ -79,5 +79,6 @@ export const DEMO_MARKS: PitchMark[] = POINTS.map(
     ...toScreen({ x, y }, side),
     onTarget: kind === 'SHOT' ? (onTarget ?? true) : null,
     outcome: null,
+    speedKph: null,
   }),
 );
