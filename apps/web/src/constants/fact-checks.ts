@@ -83,6 +83,10 @@ export const FACT_CHECKS_COPY = {
       RETRACTED: 'Taken off air by a producer',
       HELD: 'Held by a producer',
       SUPPRESSED: 'Dropped by a producer',
+      AWAITING_APPROVAL: "Waiting for a producer's OK",
+      APPROVED: 'Sent to air by a producer',
+      REJECTED: 'Kept off air by a producer',
+      APPROVAL_EXPIRED: 'Not sent in time',
     },
     checkValue: {
       passed: 'Passed ✓',
