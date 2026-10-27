@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import type { Fixture, PipelineRequest } from '@matchiq/contracts';
 import {
   fakePipelineResult,
@@ -62,6 +63,30 @@ describe('HttpAgentsClient', () => {
       kind: 'invalid-response',
       retriable: false,
     });
+  });
+
+  it('logs the first contract issues (paths and codes only) when a result is invalid', async () => {
+    const warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation();
+    const valid = fakePipelineResult(request, fixture);
+    server.behave(() => ({
+      status: 200,
+      body: {
+        ...valid,
+        narratives: [{ ...valid.narratives[0], breakdown: null }],
+      },
+    }));
+    await expect(client().run(request)).rejects.toMatchObject({
+      kind: 'invalid-response',
+    });
+    const [message] = warn.mock.calls[0] ?? [];
+    expect(message).toContain(request.packet.correlationId);
+    expect(message).toContain('narratives.0.breakdown invalid_type');
+    expect(message).not.toContain(valid.narratives[0]?.body);
+    warn.mockRestore();
+    server.behave((r) => ({
+      status: 200,
+      body: fakePipelineResult(r, fixture),
+    }));
   });
 
   it('times out slow responses as a retriable failure', async () => {

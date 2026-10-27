@@ -12,6 +12,7 @@ DEFAULT_PORT: Final = 8000
 DEFAULT_APP_VERSION: Final = "0.0.0-dev"
 FOUNDRY_CHECK: Final = "foundry"
 PIPELINE_RUNS_PATH: Final = f"{API_PREFIX}/pipeline/runs"
+REQUIRED_NULLABLE_FIELDS: Final = ("analysis", "verification", "overlay")
 DEFAULT_CIRCUIT_FAILURE_THRESHOLD: Final = 5
 DEFAULT_CIRCUIT_RESET_MS: Final = 30_000
 RETRY_BACKOFF_BASE_MS: Final = 100

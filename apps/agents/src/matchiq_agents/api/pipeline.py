@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from matchiq_agents.api.auth import ServiceAuth
-from matchiq_agents.constants import PIPELINE_RUNS_PATH
+from matchiq_agents.constants import PIPELINE_RUNS_PATH, REQUIRED_NULLABLE_FIELDS
 from matchiq_agents.contracts.types import PipelineRequest, PipelineResult
 from matchiq_agents.pipeline.orchestrator import PipelineService
 
@@ -32,8 +32,15 @@ async def parse_request(request: Request) -> PipelineRequest:
 
 
 def to_wire(result: PipelineResult) -> dict[str, Any]:
-    """Unset optional fields are omitted; required nullable fields stay as explicit nulls."""
-    return result.model_dump(mode="json", exclude_unset=True)
+    """Optional fields that hold no value are omitted; required nullable fields stay as nulls.
+
+    Dropping by value, not by "was it assigned", matters: a draft rebuilt from another draft's
+    dump carries an explicit `breakdown: null`, which the worker's contract rejects.
+    """
+    wire = result.model_dump(mode="json", exclude_none=True)
+    for field in REQUIRED_NULLABLE_FIELDS:
+        wire.setdefault(field, None)
+    return wire
 
 
 @router.post(PIPELINE_RUNS_PATH, response_model=None)
