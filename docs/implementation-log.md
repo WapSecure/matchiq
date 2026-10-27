@@ -1392,4 +1392,11 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 - Demo faults on the recorded provider were silently ignored (it bypassed the fault router). `WRITER_REVISE` now corrupts one recorded draft with the `fault.injected` citation, the live Fact Checker returns REVISE, and the revision is the recorded draft itself, with every run labelled as a simulated failure. `MODEL_TIMEOUT` routes to the isolated faulted pipeline (nothing to replay, templates air, runs say `mock` and TIMED_OUT). `GATE_REJECT` is worker-side and already worked. All three need `DEMO_FAULTS_ENABLED`.
 - Tests: `tests/test_wire.py`, `tests/test_recorded_committed.py` (19 real engine packets in `tests/fixtures/comeback_requests.json`), `agents-client.spec.ts`.
 
+## QA and submission docs (27 October 2026)
+
+- Full-product pass in the browser (desktop and 390 px; producer, viewer, signed-out): 9 defects found and fixed by PR, each with a spec where practical: Fact-checks and "How this was written" failing after Manual approval (#120), header chip (#122), milestone wording (#123), pitch-map edge clipping (#124), "1 play" (#125), keyboard access to table regions (#126), Recap headline (#127), recorded provider contract (#128), plus the Evidence drawer labels (#119).
+- Docs aligned with what was verified: the recorded run at 5× (10 of 19 non-milestone moments), the three lobby demo failures, goals staying on standard wording, and Foundry, Entra and Azure still unexercised for lack of an Azure subscription.
+
+## MQ-122: quiet console for missing agent traces (27 October 2026)
+
 - MQ-122: the web proxy answers 204 instead of 404 for a missing agent trace (`/bff/agents/traces/{id}`), so the browser console no longer logs a red error for moments with no recorded handoffs. The API contract is unchanged; 500s, auth failures and other 404s still surface.
