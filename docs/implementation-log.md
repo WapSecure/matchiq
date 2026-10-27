@@ -1408,3 +1408,11 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 ## MQ-122: quiet console for missing agent traces (27 October 2026)
 
 - MQ-122: the web proxy answers 204 instead of 404 for a missing agent trace (`/bff/agents/traces/{id}`), so the browser console no longer logs a red error for moments with no recorded handoffs. The API contract is unchanged; 500s, auth failures and other 404s still surface.
+
+## MQ-125 to MQ-128: trace fetch, safety-net menu, queue wait, contract tests (28 October 2026)
+
+- MQ-125: the web skips the agent trace request for moments whose runs are all standard wording (`provider` template, fallback reason starting `TEMPLATE_ONLY`), so those cards no longer wait on a request that can only return nothing. Code: `use-agent-steps.ts` (`hasNoStoredHandoffs`).
+- MQ-128: "Show the safety net" in the Live studio header starts a new replay at 5× with the chosen demo failure (wrong number fixed, timed out, wrong number blocked) and opens it. It shows only in demo mode for a producer with replay control, and the failures stay labelled as simulated. Code: `features/studio/components/safety-net-menu.tsx`, `constants/safety-net.ts`.
+- MQ-126: the time an agent request waits in the worker queue is measured and shown ("Waited N s in the queue", from 2 s) in the trace, with a metric. `queueWaitMs` is optional on the read contract; OpenAPI and the client were regenerated. Code: `worker/src/app/agents/queue-wait.ts`, `queue-consumers.ts`, `libs/contracts/src/lib/reads.ts`.
+- MQ-127: contract tests send the worker's real requests to the agents models and back, and compare the Zod and Pydantic shapes, so a null-versus-absent drift fails in CI instead of at demo time. Tests: `test_contract_roundtrip.py`, `test_contract_parity.py`, `worker_requests.json`, `pipeline-request.contract.spec.ts`.
+- Not run: no live model, Foundry, Azure or Entra involved; all of this is local and recorded-run behaviour.
