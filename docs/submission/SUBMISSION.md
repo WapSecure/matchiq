@@ -37,6 +37,8 @@ Around the pipeline: a match recap at full time, an Agent Observatory that shows
 
 ## How it works
 
+A one-page engineering view, with the failure-mode table and the delivery guarantees, is in the [architecture overview](../architecture/OVERVIEW.md).
+
 1. **Replay session.** A judge starts a fixture from the lobby. The API creates a session and the worker feeds the template's events into that session's ledger at the chosen speed (1×, 5×, 20× or 30×).
 2. **Deterministic projection.** Each event updates the match state through pure functions. Replays are reproducible: the same events give the same state hashes and the same overlay decisions ([ADR-0008](../adr/0008-replay-determinism-scope.md)).
 3. **Key moment and evidence.** When a rule fires, the insight carries its computed metrics, source event ids, a rationale and counter-evidence.
