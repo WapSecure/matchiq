@@ -64,7 +64,7 @@ Use the right-hand column on screen. The left-hand column stays in code, contrac
 | agent narrative, AGENT source | **Written by AI** | Always disclosed |
 | template, fallback, TEMPLATE source | **Standard wording** | Pre-written sentences filled with match data. Never "template". |
 | publish gate, gate | **fact check** | "Fact-checked ✓" |
-| gate rejection | **caught by the fact check** | |
+| gate rejection (facts or numbers) | **caught by the fact check** | Repetition and tone rejections are "held back for wording", never "caught" |
 | fact checker agent | fact checker | |
 | narrative writer agent | writer | |
 | match analyst agent | analyst | |
