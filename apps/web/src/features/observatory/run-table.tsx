@@ -1,9 +1,12 @@
+'use client';
+
 import type { AgentRun } from '@matchiq/contracts';
 import {
   AGENT_LABELS,
   OBSERVATORY_COPY,
   OUTCOME_LABELS,
 } from '@/constants/observatory';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
 import { cn } from '@/lib/cn';
 import { withUniqueKeys } from '@/lib/unique-keys';
 import { ProviderBadge } from './provider-badge';
@@ -41,6 +44,7 @@ export function RunTable({
   runs: readonly AgentRun[];
   caption: string;
 }) {
+  const locale = useInterfaceLanguage((state) => state.locale);
   if (runs.length === 0)
     return <p className="text-xs text-ink-subtle">{copy.noRuns}</p>;
   const ordered = withUniqueKeys(
@@ -85,7 +89,7 @@ export function RunTable({
                 v{run.promptVersion}
               </td>
               <td className={cn(CELL, 'tabular text-right font-mono text-ink')}>
-                {copy.latency(run.latencyMs)}
+                {run.latencyMs.toLocaleString(locale)} ms
               </td>
               <td className={cn(CELL, 'tabular text-right font-mono text-ink')}>
                 {run.retries}

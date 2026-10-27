@@ -5,8 +5,9 @@ import { EmptyState } from '@/components/feedback';
 import { SparkIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { LoadMore } from '@/components/ui/pagination';
-import { PAGE_SIZES, PAGINATION_NOUNS } from '@/constants/pagination';
+import { PAGE_SIZES } from '@/constants/pagination';
 import { STUDIO_COPY } from '@/constants/studio';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import {
   biasesFavourite,
   favouriteFirst,
@@ -26,6 +27,7 @@ export function InsightFeed({
   roster: Roster;
   className?: string;
 }) {
+  const state = usePageMessages().states.studio;
   const all = useMatchStore((s) => s.insights);
   const narratives = useMatchStore((s) => s.narratives);
   const persona = useStudioUi((s) => s.persona);
@@ -54,7 +56,7 @@ export function InsightFeed({
     >
       <AudienceBar variant="toolbar" className="sticky top-0 z-10" />
       {insights.length === 0 ? (
-        <EmptyState compact title={STUDIO_COPY.insights.empty} />
+        <EmptyState compact title={state.insightsEmpty} />
       ) : (
         <div>
           {insights.slice(0, limit).map((insight) => (
@@ -85,7 +87,7 @@ export function InsightFeed({
               total={insights.length}
               hasMore={limit < insights.length}
               onLoadMore={() => setLimit((n) => n + PAGE_SIZES.feed)}
-              noun={PAGINATION_NOUNS.moments}
+              noun={state.momentNoun}
               label={STUDIO_COPY.insights.moreLabel}
             />
           ) : null}

@@ -241,5 +241,59 @@
         "COMPLETED": "Full time"
       }
     }
+  },
+  "states": {
+    "audit": {
+      "loading": "Loading the activity log",
+      "error": "We couldn't load the activity log",
+      "empty": {
+        "title": "No activity yet",
+        "description": "Actions taken during this match appear here."
+      },
+      "emptyFiltered": {
+        "title": "No activity matches these filters",
+        "description": "Try a wider time range, or choose Any action or Anyone."
+      },
+      "moreLabel": "More activity",
+      "end": "End of the activity log.",
+      "noun": { "one": "entry", "other": "entries" }
+    },
+    "observatory": {
+      "loading": "Loading the fact-checks",
+      "error": "We couldn't load the fact-checks",
+      "empty": "No key moments yet. They appear here as the replay runs.",
+      "filterEmpty": "No key moments match this filter.",
+      "showAll": "Show all key moments",
+      "momentNoun": { "one": "key moment", "other": "key moments" }
+    },
+    "recap": { "momentsEmpty": "No key moments were recorded." },
+    "playerFocus": {
+      "loading": "Loading the match so far",
+      "loadFailed": "We couldn't load this player's match",
+      "pickTitle": "Pick a player to follow",
+      "pickBody": "See their passes, shots and big moments, and spot them on the pitch map.",
+      "quietTitle": "{player} hasn’t been involved yet",
+      "quietBody": "Their actions appear here as soon as they happen."
+    },
+    "studio": {
+      "timelineEmpty": "No events yet. Start the replay to begin.",
+      "timelineEmptyKey": "No major events yet.",
+      "insightsEmpty": "No key moments yet. They appear here as the match unfolds.",
+      "pitchEmpty": "No shots, recoveries or final-third entries yet.",
+      "momentumEmpty": "Momentum appears after the match gets going.",
+      "metricsAwaiting": "Stats appear once play begins.",
+      "approvalEmpty": {
+        "AUTO": {
+          "title": "Graphics go on air automatically",
+          "description": "Nothing needs your approval right now."
+        },
+        "MANUAL": {
+          "title": "Nothing waiting",
+          "description": "New graphics appear here when they need your approval."
+        }
+      },
+      "eventNoun": { "one": "event", "other": "events" },
+      "momentNoun": { "one": "key moment", "other": "key moments" }
+    }
   }
 }

@@ -7,8 +7,9 @@ import { AuditIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui';
 import { LoadMore } from '@/components/ui/pagination';
 import { AUDIT_COPY } from '@/constants/audit';
-import { PAGINATION_NOUNS } from '@/constants/pagination';
 import { MAIN_CONTENT_ID } from '@/constants/site';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { AuditFilterBar } from './audit-filter-bar';
 import {
   type AuditFilterForm,
@@ -28,6 +29,8 @@ function AuditResults({
   form: AuditFilterForm;
   fixtureId: string;
 }) {
+  const state = usePageMessages().states.audit;
+  const locale = useInterfaceLanguage((value) => value.locale);
   const filters = useMemo(
     () => toAuditQuery(form, fixtureId),
     [form, fixtureId],
@@ -42,7 +45,7 @@ function AuditResults({
     return (
       <div
         role="status"
-        aria-label={copy.loading}
+        aria-label={state.loading}
         className="flex flex-col gap-2"
       >
         <Skeleton className="h-10" />
@@ -53,7 +56,7 @@ function AuditResults({
   if (audit.isError && events.length === 0) {
     return (
       <ErrorState
-        title={copy.error}
+        title={state.error}
         error={audit.error}
         onRetry={() => void audit.refetch()}
       />
@@ -65,26 +68,33 @@ function AuditResults({
     return (
       <EmptyState
         Icon={AuditIcon}
-        title={filtered ? copy.emptyFiltered : copy.empty}
-        description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
+        title={filtered ? state.emptyFiltered.title : state.empty.title}
+        description={
+          filtered ? state.emptyFiltered.description : state.empty.description
+        }
       />
     );
   }
   return (
     <div className="flex flex-col gap-3">
-      <AuditTable events={events} hasMore={audit.hasNextPage} nowMs={nowMs} />
+      <AuditTable
+        events={events}
+        hasMore={audit.hasNextPage}
+        nowMs={nowMs}
+        locale={locale}
+      />
       <LoadMore
         shown={events.length}
         hasMore={audit.hasNextPage}
         isLoading={audit.isFetchingNextPage}
         onLoadMore={() => void audit.fetchNextPage()}
-        noun={PAGINATION_NOUNS.activity}
-        label={copy.moreLabel}
-        endMessage={copy.end}
+        noun={state.noun}
+        label={state.moreLabel}
+        endMessage={state.end}
       />
       {audit.isFetchNextPageError ? (
         <ErrorState
-          title={copy.error}
+          title={state.error}
           error={audit.error}
           onRetry={() => void audit.fetchNextPage()}
         />

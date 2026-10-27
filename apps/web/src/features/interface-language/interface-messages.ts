@@ -1,4 +1,4 @@
-import type { ErrorKind } from '@/constants/errors';
+import type { ErrorKind, RegionNameKey } from '@/constants/errors';
 import type { CountNoun } from '@/constants/pagination';
 
 export type InterfaceMessages = {
@@ -74,6 +74,7 @@ export type InterfaceMessages = {
       title: (region: string) => string;
       message: string;
       retry: string;
+      regions: Record<RegionNameKey, string>;
     };
     page: {
       metaTitle: string;

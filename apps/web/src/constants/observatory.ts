@@ -52,7 +52,6 @@ export const OBSERVATORY_COPY = {
       retries: 'Retries',
       outcome: 'Result',
     },
-    latency: (ms: number) => `${ms.toLocaleString('en-GB')} ms`,
     faultNotes: 'Demo failure notes',
   },
   notApplicable: '—',

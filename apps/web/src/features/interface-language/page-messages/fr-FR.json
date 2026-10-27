@@ -241,5 +241,59 @@
         "COMPLETED": "Terminé"
       }
     }
+  },
+  "states": {
+    "audit": {
+      "loading": "Chargement du journal d'activité",
+      "error": "Impossible de charger le journal d'activité",
+      "empty": {
+        "title": "Aucune activité pour le moment",
+        "description": "Les actions effectuées pendant ce match apparaissent ici."
+      },
+      "emptyFiltered": {
+        "title": "Aucune activité ne correspond à ces filtres",
+        "description": "Élargissez la période ou choisissez Toutes les actions ou Tout le monde."
+      },
+      "moreLabel": "Plus d'activité",
+      "end": "Vous avez atteint la première activité.",
+      "noun": { "one": "entrée", "other": "entrées" }
+    },
+    "observatory": {
+      "loading": "Chargement des vérifications",
+      "error": "Impossible de charger les vérifications",
+      "empty": "Aucun moment clé pour le moment. Ils apparaissent ici pendant la rediffusion.",
+      "filterEmpty": "Aucun moment clé ne correspond à ce filtre.",
+      "showAll": "Afficher tous les moments clés",
+      "momentNoun": { "one": "moment clé", "other": "moments clés" }
+    },
+    "recap": { "momentsEmpty": "Aucun moment clé n'a été enregistré." },
+    "playerFocus": {
+      "loading": "Chargement du match jusqu'ici",
+      "loadFailed": "Impossible de charger le match de ce joueur",
+      "pickTitle": "Choisissez un joueur à suivre",
+      "pickBody": "Suivez ses passes, ses tirs et ses moments importants, et repérez-le sur le terrain.",
+      "quietTitle": "{player} n'est pas encore intervenu",
+      "quietBody": "Ses actions apparaissent ici dès qu'elles se produisent."
+    },
+    "studio": {
+      "timelineEmpty": "Aucun événement pour le moment. Lancez la rediffusion pour commencer.",
+      "timelineEmptyKey": "Aucun événement majeur pour le moment.",
+      "insightsEmpty": "Aucun moment clé pour le moment. Ils apparaissent ici au fil du match.",
+      "pitchEmpty": "Aucun tir, aucune récupération ni entrée dans le dernier tiers pour le moment.",
+      "momentumEmpty": "La dynamique apparaît une fois le match lancé.",
+      "metricsAwaiting": "Les statistiques apparaissent au démarrage de la rediffusion.",
+      "approvalEmpty": {
+        "AUTO": {
+          "title": "Les graphiques passent automatiquement à l'antenne",
+          "description": "Aucune validation n'est nécessaire pour le moment."
+        },
+        "MANUAL": {
+          "title": "Aucun élément en attente",
+          "description": "Les nouveaux graphiques apparaissent ici lorsqu'ils nécessitent votre validation."
+        }
+      },
+      "eventNoun": { "one": "événement", "other": "événements" },
+      "momentNoun": { "one": "moment clé", "other": "moments clés" }
+    }
   }
 }

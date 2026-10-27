@@ -9,7 +9,7 @@ import { useMemo } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback';
 import { UserIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui';
-import { PLAYER_FOCUS_COPY as C } from '@/constants/player-focus';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { usePreferences } from '@/features/preferences/preferences-store';
 import { FollowedPlayers } from './followed-players';
 import { NoTrackingBadge } from './no-tracking-badge';
@@ -46,6 +46,7 @@ function FocusContent({
   moments,
   onOpenMoment,
 }: FocusContentProps) {
+  const state = usePageMessages().states.playerFocus;
   const involvement = useMemo(
     () => playerInvolvement(ledger.events, player.playerId),
     [ledger.events, player.playerId],
@@ -56,7 +57,11 @@ function FocusContent({
   );
   if (ledger.status === 'loading')
     return (
-      <div role="status" aria-label={C.loading} className="flex flex-col gap-2">
+      <div
+        role="status"
+        aria-label={state.loading}
+        className="flex flex-col gap-2"
+      >
         <Skeleton className="h-28" />
         <Skeleton className="h-20" />
       </div>
@@ -64,7 +69,7 @@ function FocusContent({
   if (ledger.status === 'error')
     return (
       <ErrorState
-        title={C.loadFailed}
+        title={state.loadFailed}
         error={ledger.error}
         onRetry={ledger.retry}
       />
@@ -74,8 +79,8 @@ function FocusContent({
       <EmptyState
         compact
         Icon={UserIcon}
-        title={C.quietTitle(player.displayName)}
-        description={C.quietBody}
+        title={state.quietTitle.replace('{player}', player.displayName)}
+        description={state.quietBody}
       />
     );
   return (
@@ -95,6 +100,7 @@ export function PlayerFocusBody({
   moments,
   onOpenMoment,
 }: Omit<FocusContentProps, 'player'> & { fixture: Fixture }) {
+  const state = usePageMessages().states.playerFocus;
   const follow = usePreferences((s) => s.followPlayer);
   const { playerId, player, squad, followedHere } = useFocusedPlayer(fixture);
   return (
@@ -117,8 +123,8 @@ export function PlayerFocusBody({
         <EmptyState
           compact
           Icon={UserIcon}
-          title={C.pickTitle}
-          description={C.pickBody}
+          title={state.pickTitle}
+          description={state.pickBody}
         />
       )}
     </div>

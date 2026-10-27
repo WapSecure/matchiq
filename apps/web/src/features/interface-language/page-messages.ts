@@ -130,6 +130,45 @@ export type PageMessages = {
       state: Record<ReplayState, string>;
     };
   };
+  states: {
+    audit: {
+      loading: string;
+      error: string;
+      empty: TitledDescription;
+      emptyFiltered: TitledDescription;
+      moreLabel: string;
+      end: string;
+      noun: { one: string; other: string };
+    };
+    observatory: {
+      loading: string;
+      error: string;
+      empty: string;
+      filterEmpty: string;
+      showAll: string;
+      momentNoun: { one: string; other: string };
+    };
+    recap: { momentsEmpty: string };
+    playerFocus: {
+      loading: string;
+      loadFailed: string;
+      pickTitle: string;
+      pickBody: string;
+      quietTitle: string;
+      quietBody: string;
+    };
+    studio: {
+      timelineEmpty: string;
+      timelineEmptyKey: string;
+      insightsEmpty: string;
+      pitchEmpty: string;
+      momentumEmpty: string;
+      metricsAwaiting: string;
+      approvalEmpty: Record<'AUTO' | 'MANUAL', TitledDescription>;
+      eventNoun: { one: string; other: string };
+      momentNoun: { one: string; other: string };
+    };
+  };
 };
 
 type StaticAuth = Omit<PageMessages['auth'], 'demoLead' | 'demoAccount'>;

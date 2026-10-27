@@ -1,9 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
 import { run } from '@/test/session-factories';
 import { RunTable } from './run-table';
 
 describe('RunTable', () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    useInterfaceLanguage.setState({ locale: 'en-GB' });
+  });
 
   it('renders every step of a run, including a retried agent', () => {
     const errors = vi
@@ -38,5 +42,11 @@ describe('RunTable', () => {
       args.some((a) => String(a).includes('same key')),
     );
     expect(keyWarnings).toEqual([]);
+  });
+
+  it('formats latency in the interface locale', () => {
+    useInterfaceLanguage.setState({ locale: 'es-ES' });
+    render(<RunTable runs={[run({ latencyMs: 12_345 })]} caption="Runs" />);
+    expect(screen.getByRole('table')).toHaveTextContent('12.345 ms');
   });
 });

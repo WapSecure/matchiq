@@ -4,8 +4,6 @@ import type { Fixture } from '@matchiq/contracts';
 import { useMemo } from 'react';
 import { RequirePermission } from '@/components/auth/require-permission';
 import { RegionBoundary } from '@/components/feedback';
-import { REGION_NAMES as R } from '@/constants/errors';
-import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import { MAIN_CONTENT_ID } from '@/constants/site';
 import { PlayerFocusPanel } from '@/features/player-focus/player-focus-panel';
 import { EvidenceDrawer } from './components/evidence-drawer';
@@ -49,18 +47,18 @@ export function StudioGrid({ fixture }: { fixture: Fixture }) {
         id={MAIN_CONTENT_ID}
         className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-4 lg:px-6"
       >
-        <RegionBoundary region={R.controls}>
+        <RegionBoundary region="controls">
           <ProducerControlBar />
         </RegionBoundary>
         <div className={GRID}>
           <div className={COLUMN}>
             <div className={SLOT.scoreboard}>
-              <RegionBoundary region={R.scoreboard}>
+              <RegionBoundary region="scoreboard">
                 <ScoreboardStrip fixture={fixture} />
               </RegionBoundary>
             </div>
             <div className={SLOT.preview}>
-              <RegionBoundary region={R.preview}>
+              <RegionBoundary region="preview">
                 <OverlayPanel
                   homeShort={fixture.home.shortName}
                   awayShort={fixture.away.shortName}
@@ -78,25 +76,25 @@ export function StudioGrid({ fixture }: { fixture: Fixture }) {
               </RegionBoundary>
             </div>
             <div className={SLOT.pitch}>
-              <RegionBoundary region={R.pitch}>
+              <RegionBoundary region="pitch">
                 <PitchPanel fixture={fixture} roster={roster} />
               </RegionBoundary>
             </div>
           </div>
           <div className={`${COLUMN} 2xl:contents`}>
             <div className={SLOT.feed}>
-              <RegionBoundary region={R.moments}>
+              <RegionBoundary region="moments">
                 <InsightFeed roster={roster} className={FEED} />
               </RegionBoundary>
             </div>
             <div className={COLUMN}>
               <div className={SLOT.events}>
-                <RegionBoundary region={R.events}>
+                <RegionBoundary region="events">
                   <TimelinePanel roster={roster} className="max-h-[30rem]" />
                 </RegionBoundary>
               </div>
               <div className={SLOT.stats}>
-                <RegionBoundary region={R.stats}>
+                <RegionBoundary region="stats">
                   <LiveMetrics
                     homeName={fixture.home.name}
                     awayName={fixture.away.name}
@@ -104,7 +102,7 @@ export function StudioGrid({ fixture }: { fixture: Fixture }) {
                 </RegionBoundary>
               </div>
               <div className={SLOT.focus}>
-                <RegionBoundary region={PLAYER_FOCUS_COPY.region}>
+                <RegionBoundary region="playerFocus">
                   <PlayerFocusPanel fixture={fixture} />
                 </RegionBoundary>
               </div>
@@ -112,7 +110,7 @@ export function StudioGrid({ fixture }: { fixture: Fixture }) {
           </div>
         </div>
       </main>
-      <RegionBoundary region={R.evidence}>
+      <RegionBoundary region="evidence">
         <EvidenceDrawer roster={roster} />
       </RegionBoundary>
       <LiveAnnouncer />

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { LoadMore } from '@/components/ui/pagination';
-import { PAGINATION_NOUNS } from '@/constants/pagination';
 import { EmptyState } from '@/components/feedback';
 import { Button } from '@/components/ui';
 import {
@@ -12,6 +11,7 @@ import {
 } from '@/constants/fact-checks';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { cumulativeMs } from '@/lib/format';
 import { faultOf } from './fault-chain';
@@ -47,6 +47,7 @@ export function MomentList({
   traces: readonly InsightTrace[];
   moments: Map<string, RecapMomentInfo>;
 }) {
+  const state = usePageMessages().states.observatory;
   const [filter, setFilter] = useState<MomentFilter>('ALL');
   const shown = filterTraces(traces, filter);
   const win = useMomentWindow(shown, filter);
@@ -62,14 +63,14 @@ export function MomentList({
       {shown.length === 0 ? (
         <EmptyState
           compact
-          title={copy.filters.empty}
+          title={state.filterEmpty}
           action={
             <Button
               size="sm"
               variant="secondary"
               onClick={() => setFilter('ALL')}
             >
-              {copy.filters.showAll}
+              {state.showAll}
             </Button>
           }
         />
@@ -95,7 +96,7 @@ export function MomentList({
           total={shown.length}
           hasMore={win.hasMore}
           onLoadMore={win.loadMore}
-          noun={PAGINATION_NOUNS.moments}
+          noun={state.momentNoun}
           label={copy.moreLabel}
         />
       ) : null}

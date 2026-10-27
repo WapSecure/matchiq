@@ -11,6 +11,7 @@ import { PitchIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { PITCH_COPY } from '@/constants/pitch';
 import type { PitchView } from '@/constants/pitch-depth';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useFocusedPlayer } from '@/features/player-focus/use-focused-player';
 import type { Roster } from '../lib/roster';
 import { useMatchStore, useStudioUi } from '../store';
@@ -23,6 +24,7 @@ type PitchPanelProps = {
 
 /** Plots the session's own events from the match store (spec §31.2). */
 export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
+  const state = usePageMessages().states.studio;
   const timeline = useMatchStore((s) => s.timeline);
   const voided = useMatchStore((s) => s.voided);
   const { playerId } = useFocusedPlayer(fixture);
@@ -57,7 +59,7 @@ export function PitchPanel({ fixture, roster, className }: PitchPanelProps) {
       className={className}
     >
       {marks.length === 0 && passes.length === 0 ? (
-        <EmptyState compact Icon={PitchIcon} title={PITCH_COPY.empty} />
+        <EmptyState compact Icon={PitchIcon} title={state.pitchEmpty} />
       ) : (
         <PitchMap
           marks={marks}

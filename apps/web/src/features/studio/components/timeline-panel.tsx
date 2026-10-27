@@ -15,6 +15,7 @@ import {
 import { CORRECTION_COPY } from '@/constants/corrections';
 import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
 import { STUDIO_COPY } from '@/constants/studio';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useFollowedRows } from '@/features/player-focus/use-followed-rows';
 import { useTickerRows } from '../hooks/use-ticker-rows';
 import { useTimelineEvents } from '../hooks/use-timeline-events';
@@ -26,18 +27,15 @@ const copy = STUDIO_COPY.timeline;
 const periodLabel = (period: number): string =>
   PERIOD_LABELS[period] ?? copy.period(period);
 
+type TimelinePanelProps = { roster: Roster; className?: string };
+
 /**
  * Newest first. The window grows from the top, so a live insert pushes the
  * oldest row out of view rather than moving what the reader is looking at;
  * the scroll body's native scroll anchoring holds the position when scrolled.
  */
-export function TimelinePanel({
-  roster,
-  className,
-}: {
-  roster: Roster;
-  className?: string;
-}) {
+export function TimelinePanel({ roster, className }: TimelinePanelProps) {
+  const state = usePageMessages().states.studio;
   const fixtureId = useMatchStore((s) => s.fixtureId);
   const voided = useMatchStore((s) => s.voided);
   const [all, setAll] = useState(false);
@@ -78,7 +76,9 @@ export function TimelinePanel({
       {rows.length === 0 && !older.hasOlder ? (
         <EmptyState
           compact
-          title={older.events.length === 0 ? copy.empty : copy.emptyKey}
+          title={
+            older.events.length ? state.timelineEmptyKey : state.timelineEmpty
+          }
         />
       ) : (
         <>
@@ -102,7 +102,7 @@ export function TimelinePanel({
             hasMore={limit < rows.length || older.hasOlder}
             isLoading={older.loading}
             onLoadMore={more}
-            noun={copy.noun}
+            noun={state.eventNoun}
             label={copy.moreLabel}
           />
         </>

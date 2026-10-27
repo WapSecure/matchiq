@@ -3,6 +3,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertIcon, RefreshIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
+import type { RegionNameKey } from '@/constants/errors';
 import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import type { InterfaceMessages } from '@/features/interface-language/interface-messages';
 import { cn } from '@/lib/cn';
@@ -38,6 +39,10 @@ class RegionBoundaryCore extends Component<
 
   override render(): ReactNode {
     if (!this.state.failed) return this.props.children;
+    const { copy, region } = this.props;
+    const regionName = Object.hasOwn(copy.regions, region)
+      ? copy.regions[region as RegionNameKey]
+      : region;
     return (
       <section
         role="alert"
@@ -50,14 +55,12 @@ class RegionBoundaryCore extends Component<
         <AlertIcon size={18} className="shrink-0 text-warning" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-ink">
-            {this.props.copy.title(this.props.region)}
+            {copy.title(regionName)}
           </p>
-          <p className="mt-0.5 text-xs text-ink-muted">
-            {this.props.copy.message}
-          </p>
+          <p className="mt-0.5 text-xs text-ink-muted">{copy.message}</p>
         </div>
         <Button onClick={this.reset} leadingIcon={<RefreshIcon size={14} />}>
-          {this.props.copy.retry}
+          {copy.retry}
         </Button>
       </section>
     );
