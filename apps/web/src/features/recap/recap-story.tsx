@@ -1,7 +1,7 @@
 'use client';
 
 import type { Fixture } from '@matchiq/contracts';
-import { RECAP_COPY } from '@/constants/recap';
+import { RECAP_COPY, RECAP_LEDE_PERSONA } from '@/constants/recap';
 import { SITE } from '@/constants/site';
 import { useStudioUi } from '@/features/studio/store';
 import type { RecapDocument } from '@/lib/api/session-schemas';
@@ -14,7 +14,8 @@ const copy = RECAP_COPY;
 
 /**
  * The latest of the most important moments, which usually decided the match,
- * in the chosen audience and language.
+ * in plain words and the chosen language. The audience only takes over when no
+ * plain version exists, so the headline never reads like analyst notes.
  */
 const useLede = (recap: RecapDocument) => {
   const persona = useStudioUi((s) => s.persona);
@@ -22,7 +23,11 @@ const useLede = (recap: RecapDocument) => {
   const top = orderedMoments(recap.keyMoments)
     .reverse()
     .sort((a, b) => a.priority.localeCompare(b.priority))[0];
-  return top ? pickNarrative(top.narratives, persona, locale) : null;
+  if (!top) return null;
+  return (
+    pickNarrative(top.narratives, RECAP_LEDE_PERSONA, locale) ??
+    pickNarrative(top.narratives, persona, locale)
+  );
 };
 
 /** Result in words, the story in one line, and three quick facts. */
