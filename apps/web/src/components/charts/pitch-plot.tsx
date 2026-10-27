@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { PITCH_COORD_MAX, PITCH_MARK } from '@/constants/pitch';
+import { PITCH_COORD_MAX, PITCH_MARK, pitchViewBox } from '@/constants/pitch';
 import { cn } from '@/lib/cn';
 import type { PitchMark } from './pitch-events';
 import { PitchGlyph } from './pitch-glyph';
@@ -42,7 +42,7 @@ export function PitchPlot({
   const sy = width / PITCH_COORD_MAX;
   return (
     <svg
-      viewBox={`0 0 ${length} ${width}`}
+      viewBox={pitchViewBox(length, width)}
       role="img"
       aria-labelledby={`${titleId} ${descId}`}
       className={cn('block h-auto w-full rounded-md', className)}
@@ -50,7 +50,7 @@ export function PitchPlot({
     >
       <title id={titleId}>{title}</title>
       <desc id={descId}>{description}</desc>
-      <PitchMarkings length={length} width={width} />
+      <PitchMarkings length={length} width={width} surround />
       <g>
         {paintOrder(marks).map((m) => (
           <g

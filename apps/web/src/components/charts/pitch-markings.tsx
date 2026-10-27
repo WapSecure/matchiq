@@ -1,10 +1,12 @@
-import { PITCH_MARKINGS_M as M } from '@/constants/pitch';
+import { PITCH_MARKINGS_M as M, PITCH_VIEW_PAD_M } from '@/constants/pitch';
 
 type PitchMarkingsProps = {
   /** Pitch length and width in metres; the parent viewBox uses the same units. */
   length: number;
   width: number;
   striped?: boolean;
+  /** Paint grass beyond the touchlines, for canvases that pad their viewBox. */
+  surround?: boolean;
 };
 
 const arcHalfChord = Math.sqrt(
@@ -16,6 +18,7 @@ export function PitchMarkings({
   length,
   width,
   striped = true,
+  surround = false,
 }: PitchMarkingsProps) {
   const cy = width / 2;
   const box = (depth: number, span: number, end: 'left' | 'right') => (
@@ -34,6 +37,15 @@ export function PitchMarkings({
   const stripe = length / M.stripes;
   return (
     <g aria-hidden>
+      {surround ? (
+        <rect
+          x={-PITCH_VIEW_PAD_M}
+          y={-PITCH_VIEW_PAD_M}
+          width={length + 2 * PITCH_VIEW_PAD_M}
+          height={width + 2 * PITCH_VIEW_PAD_M}
+          className="fill-pitch"
+        />
+      ) : null}
       <rect width={length} height={width} className="fill-pitch" />
       {striped
         ? Array.from({ length: M.stripes / 2 }, (_, i) => (

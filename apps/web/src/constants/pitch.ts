@@ -22,6 +22,12 @@ export const PITCH_COORD_MAX = 100;
 /** Mark radius in metres; ~8 px across on a 390 px phone. */
 export const PITCH_MARK = { radius: 1.5, goalRadius: 1.9, ring: 0.5 } as const;
 
+/** Grass margin in metres so marks and arrowheads on the touchline are not clipped. */
+export const PITCH_VIEW_PAD_M = 4;
+
+export const pitchViewBox = (lengthM: number, widthM: number): string =>
+  `${-PITCH_VIEW_PAD_M} ${-PITCH_VIEW_PAD_M} ${lengthM + 2 * PITCH_VIEW_PAD_M} ${widthM + 2 * PITCH_VIEW_PAD_M}`;
+
 export const PITCH_KINDS = [
   'GOAL',
   'SHOT',
