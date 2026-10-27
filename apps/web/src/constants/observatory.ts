@@ -28,6 +28,7 @@ export const OBSERVATORY_COPY = {
     'Prompts, keys and passwords are never shown here; only what happened.',
   story: {
     caughtTitle: 'What the fact check caught',
+    heldBackTitle: 'Held back for repeating itself, not for facts',
   },
   technical: {
     status: 'Status',

@@ -8,6 +8,7 @@ import {
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { faultOf } from './fault-chain';
 import { fallbackGroup } from './plain-trace';
+import { splitRejections } from './rejection-split';
 
 const MATCHES: Record<MomentFilter, (t: InsightTrace) => boolean> = {
   ALL: () => true,
@@ -58,7 +59,14 @@ export const summarise = (traces: readonly InsightTrace[]) => {
     agentPct:
       traces.length === 0 ? 0 : Math.round((agent / traces.length) * PERCENT),
     simulated: traces.filter(MATCHES.SIMULATED).length,
-    rejected: traces.reduce((n, t) => n + (t.gate?.rejected.length ?? 0), 0),
+    rejected: traces.reduce(
+      (n, t) => n + splitRejections(t.gate?.rejected ?? []).caught.length,
+      0,
+    ),
+    heldBack: traces.reduce(
+      (n, t) => n + splitRejections(t.gate?.rejected ?? []).heldBack.length,
+      0,
+    ),
     providers,
   };
 };

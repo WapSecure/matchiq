@@ -10,6 +10,7 @@ import { formatClock, formatMinute } from '@/lib/format';
 import { AgentStepTimeline } from './agent-step-timeline';
 import { FaultChain } from './fault-chain';
 import { describeRejection, plainFallbackReasons } from './plain-trace';
+import { splitRejections } from './rejection-split';
 import { traceFacts, type Variants } from './trace-facts';
 import { TraceFactsRow } from './trace-facts-row';
 import { TraceTechnical } from './trace-technical';
@@ -70,7 +71,9 @@ export function TraceCard({ trace, period, variants }: TraceCardProps) {
     trace.publication === 'TEMPLATE'
       ? plainFallbackReasons(trace.fallbackReason)
       : [];
-  const caught = (trace.gate?.rejected ?? []).map(describeRejection);
+  const split = splitRejections(trace.gate?.rejected ?? []);
+  const caught = split.caught.map(describeRejection);
+  const heldBack = split.heldBack.map(describeRejection);
   return (
     <article
       id={momentAnchor(trace.insightId)}
@@ -122,6 +125,7 @@ export function TraceCard({ trace, period, variants }: TraceCardProps) {
             </ul>
           </section>
         ) : null}
+        <Notes title={OBSERVATORY_COPY.story.heldBackTitle} items={heldBack} />
         <TraceTechnical
           trace={trace}
           caption={`${OBSERVATORY_COPY.technical.runs}: ${kind} ${minute}`}

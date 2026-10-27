@@ -37,6 +37,22 @@ function Caught({ items }: { items: string[] }) {
   );
 }
 
+function HeldBack({ items }: { items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section aria-label={copy.heldBackLabel} className="flex flex-col gap-0.5">
+      <p className="text-xs font-medium text-ink">
+        {copy.heldBack(items.length)}
+      </p>
+      <ul className="flex list-disc flex-col gap-0.5 pl-8 text-xs text-ink-muted">
+        {items.map((item, i) => (
+          <li key={`${i}-${item}`}>{item}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** The chain for one moment: each stage with its outcome, then who wrote the wording. */
 export function ChainView({
   chain,
@@ -69,6 +85,7 @@ export function ChainView({
         </p>
       ) : null}
       <Caught items={chain.caught} />
+      <HeldBack items={chain.heldBack} />
       {chain.finalLine ? (
         <p className="text-xs font-medium text-ink">{chain.finalLine}</p>
       ) : null}

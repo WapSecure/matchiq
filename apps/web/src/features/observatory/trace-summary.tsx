@@ -104,7 +104,11 @@ export function TraceSummary({ traces }: { traces: readonly InsightTrace[] }) {
       <ShareOfAi s={s} />
       <Tile
         label={copy.tiles.caught}
-        hint={copy.tiles.caughtHint}
+        hint={
+          s.heldBack > 0
+            ? `${copy.tiles.caughtHint}. ${copy.tiles.heldBack(s.heldBack)}`
+            : copy.tiles.caughtHint
+        }
         value={s.rejected}
       />
       <Tile
