@@ -11,10 +11,11 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from matchiq_agents.constants import RECORDINGS_SUBDIR
+from matchiq_agents.contracts.generated.PipelineRequest import FaultScenario
 from matchiq_agents.contracts.types import PipelineRequest, PipelineResult
 from matchiq_agents.domain.facts import integrity_problems
 from matchiq_agents.pipeline import step_reasons as outcomes
-from matchiq_agents.pipeline.orchestrator import PipelineOrchestrator
+from matchiq_agents.pipeline.orchestrator import PipelineOrchestrator, PipelineService
 from matchiq_agents.pipeline.result import rejected_result
 from matchiq_agents.providers.recording import RecordingIndex, key_for, load_index
 from matchiq_agents.providers.replay import Replay
@@ -50,13 +51,19 @@ class RecordedService:
         index: RecordingIndex,
         latency_ms: int,
         sleep: Sleep = asyncio.sleep,
+        timeouts: PipelineService | None = None,
     ) -> None:
         self._pipeline = pipeline
         self._index = index
         self._latency_ms = latency_ms
         self._sleep = sleep
+        self._timeouts = timeouts
 
     async def run(self, request: PipelineRequest) -> PipelineResult:
+        fault = request.fault if self._timeouts is not None else None
+        if fault is FaultScenario.MODEL_TIMEOUT and self._timeouts is not None:
+            # Every call times out, so nothing is replayed: the isolated faulted pipeline runs.
+            return await self._timeouts.run(request)
         ctx = self._pipeline.context_for(request)
         problems = integrity_problems(request)
         if problems:
@@ -67,4 +74,4 @@ class RecordedService:
         pause_ms = min(self._latency_ms, ctx.view.deadline_ms * MAX_PAUSE_SHARE)
         if pause_ms > 0:
             await self._sleep(pause_ms / MS_PER_SECOND)
-        return await Replay(ctx, moment).run()
+        return await Replay(ctx, moment, fault).run()

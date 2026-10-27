@@ -1,0 +1,5526 @@
+[
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_734beaeb11149053f3214126",
+      "correlationId": "a6f73577-ca87-8ec6-bd5a-4d02e48c5241",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_01c82bd343929ab61124ea1c",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "PRESSURE_SWING",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 1122769,
+        "teamId": "tm_marshstead",
+        "reasonCode": "PRESSURE_SWING_THRESHOLD",
+        "evidence": {
+          "insightId": "in_01c82bd343929ab61124ea1c",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 522769,
+          "windowEndMs": 1122769,
+          "eventIds": [
+            "ev_000213",
+            "ev_000226",
+            "ev_000229",
+            "ev_000235",
+            "ev_000243",
+            "ev_000252",
+            "ev_000277",
+            "ev_000281"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 0,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 0,
+            "momentum.home.rolling5m": -1.36,
+            "shots.away.rolling5m": 2,
+            "shotsOnTarget.away.rolling5m": 2,
+            "pressures.away.rolling5m": 8,
+            "recoveries.away.rolling5m": 1,
+            "highRecoveries.away.rolling5m": 1,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": 0.09,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 8,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -0.96,
+            "shots.away.previous5m": 1,
+            "shotsOnTarget.away.previous5m": 1,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 2,
+            "highRecoveries.away.previous5m": 1,
+            "finalThirdEntries.away.previous5m": 3,
+            "momentum.away.previous5m": -0.35
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Marshstead Albion applied 8 pressures in the latest five minutes, up from 2 in the five before; this suggests a rise in pressing intensity.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:18:42.769Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEVEL",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 0,
+            "context.score.margin": 0,
+            "context.minute": 19,
+            "context.compare.recent.home": 8,
+            "context.compare.average.home": 7.5,
+            "context.compare.recent.away": 10,
+            "context.compare.average.away": 6.9,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 2,
+            "context.trend.spell3": 8
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_e8edc0404ead3ab090e7423e",
+      "correlationId": "97942d41-4771-8207-b6d5-8461d91f23c4",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_93557437aa7789ebf8174640",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "SHOT_BURST",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 1325773,
+        "teamId": "tm_marshstead",
+        "reasonCode": "SHOT_BURST_THRESHOLD",
+        "evidence": {
+          "insightId": "in_93557437aa7789ebf8174640",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1025773,
+          "windowEndMs": 1325773,
+          "eventIds": ["ev_000272", "ev_000325", "ev_000331"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 2,
+            "recoveries.home.rolling5m": 2,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 0,
+            "momentum.home.rolling5m": -1.26,
+            "shots.away.rolling5m": 3,
+            "shotsOnTarget.away.rolling5m": 2,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 2,
+            "highRecoveries.away.rolling5m": 2,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": 0.49,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 3,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -1.21,
+            "shots.away.previous5m": 1,
+            "shotsOnTarget.away.previous5m": 1,
+            "pressures.away.previous5m": 6,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 1,
+            "finalThirdEntries.away.previous5m": 1,
+            "momentum.away.previous5m": -0.35
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Marshstead Albion took 3 shots within five minutes of play; this suggests a spell of sustained attacking pressure.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:22:05.773Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEVEL",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 0,
+            "context.score.margin": 0,
+            "context.minute": 23,
+            "context.compare.recent.home": 0,
+            "context.compare.average.home": 0,
+            "context.compare.recent.away": 4,
+            "context.compare.average.away": 2.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 3
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_4ab1d01c64b2e6cc15f87572",
+      "correlationId": "366849c8-6771-83fb-9dbc-e6ec43aebc4c",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_2d9b8d6823944fa079da6be9",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "GOAL",
+        "priority": "P0",
+        "period": 1,
+        "matchClockMs": 1327168,
+        "teamId": "tm_marshstead",
+        "playerId": "pl_marshstead_34",
+        "reasonCode": "GOAL_SCORED",
+        "evidence": {
+          "insightId": "in_2d9b8d6823944fa079da6be9",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1027168,
+          "windowEndMs": 1327168,
+          "eventIds": ["ev_000332", "ev_000331"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 2,
+            "recoveries.home.rolling5m": 2,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 0,
+            "momentum.home.rolling5m": -1.26,
+            "shots.away.rolling5m": 3,
+            "shotsOnTarget.away.rolling5m": 2,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 2,
+            "highRecoveries.away.rolling5m": 2,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": 0.49,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 3,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -1.21,
+            "shots.away.previous5m": 1,
+            "shotsOnTarget.away.previous5m": 1,
+            "pressures.away.previous5m": 6,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 1,
+            "finalThirdEntries.away.previous5m": 1,
+            "momentum.away.previous5m": -0.35,
+            "goals.home": 0,
+            "goals.away": 1
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Marshstead Albion scored; the score is now 0-1.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:22:07.168Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEADING",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": { "regainEventId": "ev_000327" },
+          "eventIds": ["ev_000327"],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 1,
+            "context.score.margin": 1,
+            "context.minute": 23,
+            "context.compare.recent.home": 0,
+            "context.compare.average.home": 0,
+            "context.compare.recent.away": 4,
+            "context.compare.average.away": 2.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 3,
+            "context.linked.regainSeconds": 12
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_9d359b815baee6e400e10bfb",
+      "correlationId": "4e0fe850-48e3-80c5-bf8d-abe9a1139e94",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_f95b735d526455068a0b137d",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "HIGH_REGAINS",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 1643480,
+        "teamId": "tm_penbrook",
+        "reasonCode": "HIGH_REGAINS_THRESHOLD",
+        "evidence": {
+          "insightId": "in_f95b735d526455068a0b137d",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1343480,
+          "windowEndMs": 1643480,
+          "eventIds": ["ev_000351", "ev_000375", "ev_000398"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 3,
+            "recoveries.home.rolling5m": 3,
+            "highRecoveries.home.rolling5m": 3,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": -0.61,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 1,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.31,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -1.26,
+            "shots.away.previous5m": 3,
+            "shotsOnTarget.away.previous5m": 2,
+            "pressures.away.previous5m": 3,
+            "recoveries.away.previous5m": 2,
+            "highRecoveries.away.previous5m": 2,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": 0.44
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town made 3 recoveries high up the pitch within five minutes; this suggests an effective high press.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:27:23.480Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "highRecoveries" },
+          "trend": { "metric": "highRecoveries", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 1,
+            "context.score.margin": 1,
+            "context.minute": 28,
+            "context.compare.recent.home": 3,
+            "context.compare.average.home": 1.1,
+            "context.compare.recent.away": 2,
+            "context.compare.average.away": 1.1,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 0,
+            "context.trend.spell2": 0,
+            "context.trend.spell3": 3
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_570399e67a9d23c6d09d54b9",
+      "correlationId": "db8801fc-b83e-81fa-8ea7-acb8db5edabf",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_0600e11f3643a9bbc89c4c39",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "MOMENTUM_SHIFT",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 1679715,
+        "teamId": "tm_penbrook",
+        "reasonCode": "MOMENTUM_SHIFT_THRESHOLD",
+        "evidence": {
+          "insightId": "in_0600e11f3643a9bbc89c4c39",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1079715,
+          "windowEndMs": 1679715,
+          "eventIds": [
+            "ev_000414",
+            "ev_000354",
+            "ev_000358",
+            "ev_000372",
+            "ev_000380",
+            "ev_000351",
+            "ev_000375",
+            "ev_000398",
+            "ev_000409"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 3,
+            "recoveries.home.rolling5m": 4,
+            "highRecoveries.home.rolling5m": 4,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": 0,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 2,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.26,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -1.26,
+            "shots.away.previous5m": 3,
+            "shotsOnTarget.away.previous5m": 2,
+            "pressures.away.previous5m": 3,
+            "recoveries.away.previous5m": 2,
+            "highRecoveries.away.previous5m": 2,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": 0.44
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "The momentum index favours Penbrook Town at 0 against -1.26, from -1.26 against 0.44 in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:27:59.715Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 1,
+            "context.score.margin": 1,
+            "context.minute": 28,
+            "context.compare.recent.home": 5,
+            "context.compare.average.home": 6.8,
+            "context.compare.recent.away": 5,
+            "context.compare.average.away": 5.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 2,
+            "context.trend.spell3": 3
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_8eb594aff72d97144ab6b411",
+      "correlationId": "d94c4b16-daad-8a5f-b93f-5bd9af15ee3e",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_92c30ca5d763643e6f223c2d",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "SHOT_BURST",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 1832469,
+        "teamId": "tm_penbrook",
+        "reasonCode": "SHOT_BURST_THRESHOLD",
+        "evidence": {
+          "insightId": "in_92c30ca5d763643e6f223c2d",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1532469,
+          "windowEndMs": 1832469,
+          "eventIds": ["ev_000414", "ev_000431", "ev_000455"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 3,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 4,
+            "recoveries.home.rolling5m": 4,
+            "highRecoveries.home.rolling5m": 4,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": 0.92,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.16,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 3,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 1,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": -0.94,
+            "shots.away.previous5m": 2,
+            "shotsOnTarget.away.previous5m": 1,
+            "pressures.away.previous5m": 1,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 1,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -0.26
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town took 3 shots within five minutes of play; this suggests a spell of sustained attacking pressure.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:30:32.469Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "FIRST_HALF",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 1,
+            "context.score.margin": 1,
+            "context.minute": 31,
+            "context.compare.recent.home": 3,
+            "context.compare.average.home": 1,
+            "context.compare.recent.away": 2,
+            "context.compare.average.away": 2,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 0,
+            "context.trend.spell2": 0,
+            "context.trend.spell3": 3
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_e7330e5d97b2a829e3b2a969",
+      "correlationId": "048a5e67-1dd2-8ac0-ab60-cc2e68070b70",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_4befb6cdfb5666ca0d3c6bc0",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "PRESSURE_SWING",
+        "priority": "P1",
+        "period": 1,
+        "matchClockMs": 2187254,
+        "teamId": "tm_penbrook",
+        "reasonCode": "PRESSURE_SWING_THRESHOLD",
+        "evidence": {
+          "insightId": "in_4befb6cdfb5666ca0d3c6bc0",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1587254,
+          "windowEndMs": 2187254,
+          "eventIds": [
+            "ev_000483",
+            "ev_000492",
+            "ev_000508",
+            "ev_000542",
+            "ev_000546",
+            "ev_000549",
+            "ev_000555",
+            "ev_000559"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 8,
+            "recoveries.home.rolling5m": 0,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 2,
+            "momentum.home.rolling5m": -0.32,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 2,
+            "recoveries.away.rolling5m": 1,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 1,
+            "momentum.away.rolling5m": -1.16,
+            "shots.home.previous5m": 4,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 5,
+            "highRecoveries.home.previous5m": 5,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": 1.03,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 4,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.16
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town applied 8 pressures in the latest five minutes, up from 2 in the five before; this suggests a rise in pressing intensity.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T15:36:27.254Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "BEFORE_HALF_TIME",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 1,
+            "context.score.margin": 1,
+            "context.minute": 37,
+            "context.compare.recent.home": 10,
+            "context.compare.average.home": 8,
+            "context.compare.recent.away": 6,
+            "context.compare.average.away": 5.8,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 4,
+            "context.trend.spell2": 2,
+            "context.trend.spell3": 8
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_9937e820dcf9f68de7677dfe",
+      "correlationId": "0b8b97a2-636b-83b0-aac8-7f859b05d17e",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_08362c4b6292a55c38cb032c",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "GOAL",
+        "priority": "P0",
+        "period": 1,
+        "matchClockMs": 2461213,
+        "teamId": "tm_marshstead",
+        "playerId": "pl_marshstead_27",
+        "reasonCode": "GOAL_SCORED",
+        "evidence": {
+          "insightId": "in_08362c4b6292a55c38cb032c",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 2161213,
+          "windowEndMs": 2461213,
+          "eventIds": ["ev_000627", "ev_000626"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 6,
+            "recoveries.home.rolling5m": 0,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 2,
+            "momentum.home.rolling5m": -0.42,
+            "shots.away.rolling5m": 1,
+            "shotsOnTarget.away.rolling5m": 1,
+            "pressures.away.rolling5m": 0,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 1,
+            "momentum.away.rolling5m": -0.82,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 6,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 2,
+            "momentum.home.previous5m": -0.42,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 1,
+            "momentum.away.previous5m": -1.16,
+            "goals.home": 0,
+            "goals.away": 2
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Marshstead Albion scored; the score is now 0-2.",
+          "counterEvidence": [
+            {
+              "description": "Penbrook Town also took 1 shots in the same window.",
+              "eventIds": ["ev_000576"]
+            }
+          ],
+          "generatedAt": "2026-10-24T15:41:01.213Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEADING",
+          "phase": "BEFORE_HALF_TIME",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": { "previousInsightId": "in_2d9b8d6823944fa079da6be9" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 2,
+            "context.score.margin": 2,
+            "context.minute": 42,
+            "context.compare.recent.home": 2,
+            "context.compare.average.home": 1.5,
+            "context.compare.recent.away": 1,
+            "context.compare.average.away": 1.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 0,
+            "context.trend.spell2": 0,
+            "context.trend.spell3": 1,
+            "context.linked.previousMinute": 23
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_8b6f1401e53d3142adb044c0",
+      "correlationId": "13aab41c-c5f9-889d-b200-b5a907bb2485",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_e04eaeaf6ff28d90ca34f5d3",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "MOMENTUM_SHIFT",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 600024,
+        "teamId": "tm_marshstead",
+        "reasonCode": "MOMENTUM_SHIFT_THRESHOLD",
+        "evidence": {
+          "insightId": "in_e04eaeaf6ff28d90ca34f5d3",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 24,
+          "windowEndMs": 600024,
+          "eventIds": [
+            "ev_000843",
+            "ev_000860",
+            "ev_000821",
+            "ev_000828",
+            "ev_000832",
+            "ev_000835",
+            "ev_000838",
+            "ev_000852",
+            "ev_000869",
+            "ev_000888"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 2,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": -1.16,
+            "shots.away.rolling5m": 2,
+            "shotsOnTarget.away.rolling5m": 2,
+            "pressures.away.rolling5m": 7,
+            "recoveries.away.rolling5m": 2,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 1,
+            "momentum.away.rolling5m": -0.03,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 7,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 2,
+            "momentum.home.previous5m": -0.37,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 1,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 2,
+            "momentum.away.previous5m": -1.11
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "The momentum index favours Marshstead Albion at -0.03 against -1.16, from -1.11 against -0.37 in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:13:50.097Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEADING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 2,
+            "context.score.margin": 2,
+            "context.minute": 56,
+            "context.compare.recent.home": 9,
+            "context.compare.average.home": 8.5,
+            "context.compare.recent.away": 8,
+            "context.compare.average.away": 5.6,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 2,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 7
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_f95c3752e57935a9aa86c547",
+      "correlationId": "b0ccb1c7-a572-8827-950e-2d7d5bfb9665",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_78340cae4f2e10306046af0e",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "PRESSURE_SWING",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 766567,
+        "teamId": "tm_penbrook",
+        "reasonCode": "PRESSURE_SWING_THRESHOLD",
+        "evidence": {
+          "insightId": "in_78340cae4f2e10306046af0e",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 166567,
+          "windowEndMs": 766567,
+          "eventIds": [
+            "ev_000857",
+            "ev_000875",
+            "ev_000899",
+            "ev_000908",
+            "ev_000931",
+            "ev_000939",
+            "ev_000942",
+            "ev_000945"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 8,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 1,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": -0.69,
+            "shots.away.rolling5m": 1,
+            "shotsOnTarget.away.rolling5m": 1,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 1,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -0.72,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 3,
+            "recoveries.home.previous5m": 1,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": -0.67,
+            "shots.away.previous5m": 1,
+            "shotsOnTarget.away.previous5m": 1,
+            "pressures.away.previous5m": 5,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 1,
+            "momentum.away.previous5m": -0.57
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town applied 8 pressures in the latest five minutes, up from 3 in the five before; this suggests a rise in pressing intensity.",
+          "counterEvidence": [
+            {
+              "description": "Marshstead Albion also took 1 shots in the same window.",
+              "eventIds": ["ev_000860"]
+            }
+          ],
+          "generatedAt": "2026-10-24T16:16:36.640Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_4befb6cdfb5666ca0d3c6bc0" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 2,
+            "context.score.margin": 2,
+            "context.minute": 58,
+            "context.compare.recent.home": 11,
+            "context.compare.average.home": 9.2,
+            "context.compare.recent.away": 9,
+            "context.compare.average.away": 5.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 9,
+            "context.trend.spell2": 3,
+            "context.trend.spell3": 8,
+            "context.linked.previousMinute": 37
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_4a54bf55a4d3bd85f95a4fd9",
+      "correlationId": "1a46f0a0-5ea7-8609-9f6f-0d0e381a1538",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_804f15da3c18220549c25883",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "MOMENTUM_SHIFT",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 993095,
+        "teamId": "tm_penbrook",
+        "reasonCode": "MOMENTUM_SHIFT_THRESHOLD",
+        "evidence": {
+          "insightId": "in_804f15da3c18220549c25883",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 393095,
+          "windowEndMs": 993095,
+          "eventIds": [
+            "ev_001004",
+            "ev_000986",
+            "ev_000992",
+            "ev_000931",
+            "ev_000939",
+            "ev_000942",
+            "ev_000945",
+            "ev_000921",
+            "ev_001006"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 4,
+            "recoveries.home.rolling5m": 4,
+            "highRecoveries.home.rolling5m": 2,
+            "finalThirdEntries.home.rolling5m": 2,
+            "momentum.home.rolling5m": -0.19,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 3,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.21,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 4,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": -1.06,
+            "shots.away.previous5m": 2,
+            "shotsOnTarget.away.previous5m": 2,
+            "pressures.away.previous5m": 5,
+            "recoveries.away.previous5m": 1,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -0.23
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "The momentum index favours Penbrook Town at -0.19 against -1.21, from -1.06 against -0.23 in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:20:23.168Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "STEADY" },
+          "linked": { "previousInsightId": "in_0600e11f3643a9bbc89c4c39" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 0,
+            "context.score.away": 2,
+            "context.score.margin": 2,
+            "context.minute": 62,
+            "context.compare.recent.home": 8,
+            "context.compare.average.home": 8.6,
+            "context.compare.recent.away": 8,
+            "context.compare.average.away": 5.7,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 4,
+            "context.trend.spell2": 4,
+            "context.trend.spell3": 4,
+            "context.linked.previousMinute": 28
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_67d02bf5146668542b7e23fd",
+      "correlationId": "74655813-f46b-8424-8f30-37b4dfd59cfc",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_31f95676ec23a5c4956744e7",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "GOAL",
+        "priority": "P0",
+        "period": 2,
+        "matchClockMs": 1187997,
+        "teamId": "tm_penbrook",
+        "playerId": "pl_penbrook_12",
+        "reasonCode": "GOAL_SCORED",
+        "evidence": {
+          "insightId": "in_31f95676ec23a5c4956744e7",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 887997,
+          "windowEndMs": 1187997,
+          "eventIds": ["ev_001056", "ev_001055"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 2,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 2,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 1,
+            "finalThirdEntries.home.rolling5m": 3,
+            "momentum.home.rolling5m": 0.09,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 2,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.26,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 6,
+            "recoveries.home.previous5m": 3,
+            "highRecoveries.home.previous5m": 1,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": -0.79,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.26,
+            "goals.home": 1,
+            "goals.away": 2
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town scored; the score is now 1-2.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:23:38.070Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": {},
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 1,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 65,
+            "context.compare.recent.home": 2,
+            "context.compare.average.home": 1.5,
+            "context.compare.recent.away": 0,
+            "context.compare.average.away": 1.4,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 0,
+            "context.trend.spell2": 0,
+            "context.trend.spell3": 2
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_11b551cf7cc2d98c3f8418ba",
+      "correlationId": "39592830-f1af-8391-b17d-a624fdae3254",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_032d9bcbf9deadc51bf0093e",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "SHOT_BURST",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 1423239,
+        "teamId": "tm_penbrook",
+        "reasonCode": "SHOT_BURST_THRESHOLD",
+        "evidence": {
+          "insightId": "in_032d9bcbf9deadc51bf0093e",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1123239,
+          "windowEndMs": 1423239,
+          "eventIds": ["ev_001055", "ev_001078", "ev_001106"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 3,
+            "shotsOnTarget.home.rolling5m": 2,
+            "pressures.home.rolling5m": 1,
+            "recoveries.home.rolling5m": 2,
+            "highRecoveries.home.rolling5m": 1,
+            "finalThirdEntries.home.rolling5m": 3,
+            "momentum.home.rolling5m": 0.47,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 3,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.21,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 1,
+            "finalThirdEntries.home.previous5m": 2,
+            "momentum.home.previous5m": -0.45,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.26
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town took 3 shots within five minutes of play; this suggests a spell of sustained attacking pressure.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:27:33.312Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "RISING" },
+          "linked": { "previousInsightId": "in_92c30ca5d763643e6f223c2d" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 1,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 69,
+            "context.compare.recent.home": 4,
+            "context.compare.average.home": 1.7,
+            "context.compare.recent.away": 0,
+            "context.compare.average.away": 1.3,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 0,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 3,
+            "context.linked.previousMinute": 31
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_3dffb38df19cf68eac5e1d4a",
+      "correlationId": "7c52220a-22c7-88e0-8685-adda9e6bfaa0",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_7f88024182a102b9d9b08c4f",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "HIGH_REGAINS",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 1446287,
+        "teamId": "tm_penbrook",
+        "reasonCode": "HIGH_REGAINS_THRESHOLD",
+        "evidence": {
+          "insightId": "in_7f88024182a102b9d9b08c4f",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1146287,
+          "windowEndMs": 1446287,
+          "eventIds": ["ev_001094", "ev_001117", "ev_001122"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 4,
+            "shotsOnTarget.home.rolling5m": 2,
+            "pressures.home.rolling5m": 3,
+            "recoveries.home.rolling5m": 4,
+            "highRecoveries.home.rolling5m": 3,
+            "finalThirdEntries.home.rolling5m": 3,
+            "momentum.home.rolling5m": 0.95,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.16,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 1,
+            "finalThirdEntries.home.previous5m": 2,
+            "momentum.home.previous5m": -0.45,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.26
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town made 3 recoveries high up the pitch within five minutes; this suggests an effective high press.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:27:56.360Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "highRecoveries" },
+          "trend": { "metric": "highRecoveries", "direction": "RISING" },
+          "linked": { "previousInsightId": "in_f95b735d526455068a0b137d" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 1,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 70,
+            "context.compare.recent.home": 4,
+            "context.compare.average.home": 1.7,
+            "context.compare.recent.away": 0,
+            "context.compare.average.away": 0.4,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 3,
+            "context.linked.previousMinute": 28
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_a9236f9aa722838ad5178b2c",
+      "correlationId": "0b871f4f-b618-84a9-94f6-3c511badc242",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_7460d5a2abc66df567f01ca4",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "MOMENTUM_SHIFT",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 1595611,
+        "teamId": "tm_penbrook",
+        "reasonCode": "MOMENTUM_SHIFT_THRESHOLD",
+        "evidence": {
+          "insightId": "in_7460d5a2abc66df567f01ca4",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 995611,
+          "windowEndMs": 1595611,
+          "eventIds": [
+            "ev_001078",
+            "ev_001106",
+            "ev_001120",
+            "ev_001124",
+            "ev_001072",
+            "ev_001091",
+            "ev_001145",
+            "ev_001100",
+            "ev_001109",
+            "ev_001112",
+            "ev_001133",
+            "ev_001136",
+            "ev_001094",
+            "ev_001117",
+            "ev_001122"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 4,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 5,
+            "recoveries.home.rolling5m": 4,
+            "highRecoveries.home.rolling5m": 3,
+            "finalThirdEntries.home.rolling5m": 3,
+            "momentum.home.rolling5m": 1.05,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 5,
+            "recoveries.away.rolling5m": 1,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.11,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 0,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 1,
+            "momentum.home.previous5m": -0.72,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 0,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.36
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "The momentum index favours Penbrook Town at 1.05 against -1.11, from -0.72 against -1.36 in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:30:25.684Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_804f15da3c18220549c25883" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 1,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 72,
+            "context.compare.recent.home": 7,
+            "context.compare.average.home": 8.4,
+            "context.compare.recent.away": 5,
+            "context.compare.average.away": 5.6,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 4,
+            "context.trend.spell2": 2,
+            "context.trend.spell3": 5,
+            "context.linked.previousMinute": 62
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_6410e888ba3fa450f334761f",
+      "correlationId": "b6c9c2fa-ca40-8af3-b0d1-5249b43f67fa",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_e72dfcab209915e3856ec49c",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "PRESSURE_SWING",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 1629435,
+        "teamId": "tm_penbrook",
+        "reasonCode": "PRESSURE_SWING_THRESHOLD",
+        "evidence": {
+          "insightId": "in_e72dfcab209915e3856ec49c",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1029435,
+          "windowEndMs": 1629435,
+          "eventIds": [
+            "ev_001100",
+            "ev_001109",
+            "ev_001112",
+            "ev_001133",
+            "ev_001136",
+            "ev_001158",
+            "ev_001163",
+            "ev_001168"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 4,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 8,
+            "recoveries.home.rolling5m": 3,
+            "highRecoveries.home.rolling5m": 3,
+            "finalThirdEntries.home.rolling5m": 2,
+            "momentum.home.rolling5m": 1.1,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 3,
+            "recoveries.away.rolling5m": 2,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.21,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 2,
+            "recoveries.home.previous5m": 1,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 2,
+            "momentum.home.previous5m": -0.62,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 2,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.26
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town applied 8 pressures in the latest five minutes, up from 2 in the five before; this suggests a rise in pressing intensity.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:30:59.508Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "TRAILING",
+          "phase": "SECOND_HALF",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_78340cae4f2e10306046af0e" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 1,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 73,
+            "context.compare.recent.home": 10,
+            "context.compare.average.home": 8.7,
+            "context.compare.recent.away": 5,
+            "context.compare.average.away": 5.5,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 3,
+            "context.trend.spell2": 2,
+            "context.trend.spell3": 8,
+            "context.linked.previousMinute": 58
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_530dd95d22e37710daec09ba",
+      "correlationId": "be8300c5-e34b-8af7-9742-335c4171e466",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_3aea87e777b0509dac6e48ea",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "GOAL",
+        "priority": "P0",
+        "period": 2,
+        "matchClockMs": 1977352,
+        "teamId": "tm_penbrook",
+        "playerId": "pl_penbrook_8",
+        "reasonCode": "GOAL_SCORED",
+        "evidence": {
+          "insightId": "in_3aea87e777b0509dac6e48ea",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1677352,
+          "windowEndMs": 1977352,
+          "eventIds": ["ev_001247", "ev_001246"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 6,
+            "recoveries.home.rolling5m": 2,
+            "highRecoveries.home.rolling5m": 1,
+            "finalThirdEntries.home.rolling5m": 0,
+            "momentum.home.rolling5m": -0.45,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 1,
+            "recoveries.away.rolling5m": 0,
+            "highRecoveries.away.rolling5m": 0,
+            "finalThirdEntries.away.rolling5m": 0,
+            "momentum.away.rolling5m": -1.31,
+            "shots.home.previous5m": 3,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 9,
+            "recoveries.home.previous5m": 3,
+            "highRecoveries.home.previous5m": 3,
+            "finalThirdEntries.home.previous5m": 3,
+            "momentum.home.previous5m": 1.21,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 4,
+            "recoveries.away.previous5m": 2,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.16,
+            "goals.home": 2,
+            "goals.away": 2
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 0.83,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town scored; the score is now 2-2.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:36:47.425Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "LEVEL",
+          "phase": "FINAL_15",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_31f95676ec23a5c4956744e7" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 2,
+            "context.score.away": 2,
+            "context.score.margin": 0,
+            "context.minute": 78,
+            "context.compare.recent.home": 4,
+            "context.compare.average.home": 1.9,
+            "context.compare.recent.away": 0,
+            "context.compare.average.away": 1.2,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 2,
+            "context.trend.spell2": 3,
+            "context.trend.spell3": 1,
+            "context.linked.previousMinute": 65
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_842defbd282e91c646e5b235",
+      "correlationId": "69fdcc27-283b-8d25-b8aa-383c3f60ed4d",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_1742e5937bbf55cfb7b95152",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "MOMENTUM_SHIFT",
+        "priority": "P1",
+        "period": 2,
+        "matchClockMs": 2277929,
+        "teamId": "tm_marshstead",
+        "reasonCode": "MOMENTUM_SHIFT_THRESHOLD",
+        "evidence": {
+          "insightId": "in_1742e5937bbf55cfb7b95152",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 1677929,
+          "windowEndMs": 2277929,
+          "eventIds": [
+            "ev_001267",
+            "ev_001259",
+            "ev_001275",
+            "ev_001282",
+            "ev_001302",
+            "ev_001306",
+            "ev_001255",
+            "ev_001293"
+          ],
+          "computedMetrics": {
+            "shots.home.rolling5m": 0,
+            "shotsOnTarget.home.rolling5m": 0,
+            "pressures.home.rolling5m": 1,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 0,
+            "momentum.home.rolling5m": -1.31,
+            "shots.away.rolling5m": 1,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 4,
+            "recoveries.away.rolling5m": 2,
+            "highRecoveries.away.rolling5m": 2,
+            "finalThirdEntries.away.rolling5m": 1,
+            "momentum.away.rolling5m": -0.29,
+            "shots.home.previous5m": 1,
+            "shotsOnTarget.home.previous5m": 1,
+            "pressures.home.previous5m": 6,
+            "recoveries.home.previous5m": 2,
+            "highRecoveries.home.previous5m": 1,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -0.45,
+            "shots.away.previous5m": 0,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 1,
+            "recoveries.away.previous5m": 0,
+            "highRecoveries.away.previous5m": 0,
+            "finalThirdEntries.away.previous5m": 0,
+            "momentum.away.previous5m": -1.31
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "The momentum index favours Marshstead Albion at -0.29 against -1.31, from -1.31 against -0.45 in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:41:48.002Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "away",
+          "scoreState": "LEVEL",
+          "phase": "FINAL_15",
+          "comparison": { "metric": "pressures" },
+          "trend": { "metric": "pressures", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_e04eaeaf6ff28d90ca34f5d3" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 2,
+            "context.score.away": 2,
+            "context.score.margin": 0,
+            "context.minute": 83,
+            "context.compare.recent.home": 7,
+            "context.compare.average.home": 8.6,
+            "context.compare.recent.away": 5,
+            "context.compare.average.away": 5.5,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 4,
+            "context.trend.spell2": 1,
+            "context.trend.spell3": 4,
+            "context.linked.previousMinute": 56
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  },
+  {
+    "schemaVersion": 1,
+    "packet": {
+      "schemaVersion": 1,
+      "runId": "run_455c06bf1a71d6abfbeac1ec",
+      "correlationId": "40af0112-e990-85af-be22-c1ce61dea829",
+      "orgId": "org_demo",
+      "fixtureId": "fx_comeback_42_s29",
+      "insight": {
+        "schemaVersion": 1,
+        "insightId": "in_bf628901295f92e4ce03e053",
+        "fixtureId": "fx_comeback_42_s29",
+        "kind": "GOAL",
+        "priority": "P0",
+        "period": 2,
+        "matchClockMs": 2596134,
+        "teamId": "tm_penbrook",
+        "playerId": "pl_penbrook_34",
+        "reasonCode": "GOAL_SCORED",
+        "evidence": {
+          "insightId": "in_bf628901295f92e4ce03e053",
+          "fixtureId": "fx_comeback_42_s29",
+          "windowStartMs": 2296134,
+          "windowEndMs": 2596134,
+          "eventIds": ["ev_001391", "ev_001390"],
+          "computedMetrics": {
+            "shots.home.rolling5m": 1,
+            "shotsOnTarget.home.rolling5m": 1,
+            "pressures.home.rolling5m": 3,
+            "recoveries.home.rolling5m": 1,
+            "highRecoveries.home.rolling5m": 0,
+            "finalThirdEntries.home.rolling5m": 1,
+            "momentum.home.rolling5m": -0.67,
+            "shots.away.rolling5m": 0,
+            "shotsOnTarget.away.rolling5m": 0,
+            "pressures.away.rolling5m": 1,
+            "recoveries.away.rolling5m": 1,
+            "highRecoveries.away.rolling5m": 1,
+            "finalThirdEntries.away.rolling5m": 1,
+            "momentum.away.rolling5m": -1.04,
+            "shots.home.previous5m": 0,
+            "shotsOnTarget.home.previous5m": 0,
+            "pressures.home.previous5m": 1,
+            "recoveries.home.previous5m": 1,
+            "highRecoveries.home.previous5m": 0,
+            "finalThirdEntries.home.previous5m": 0,
+            "momentum.home.previous5m": -1.31,
+            "shots.away.previous5m": 1,
+            "shotsOnTarget.away.previous5m": 0,
+            "pressures.away.previous5m": 4,
+            "recoveries.away.previous5m": 2,
+            "highRecoveries.away.previous5m": 2,
+            "finalThirdEntries.away.previous5m": 1,
+            "momentum.away.previous5m": -0.29,
+            "goals.home": 3,
+            "goals.away": 2
+          },
+          "methodVersion": "1.1.0",
+          "dataCoverage": 1,
+          "confidenceLabel": "high",
+          "rationale": "Penbrook Town scored; the score is now 3-2.",
+          "counterEvidence": [],
+          "generatedAt": "2026-10-24T16:47:06.207Z"
+        },
+        "status": "DETECTED",
+        "context": {
+          "methodVersion": "1.0.0",
+          "side": "home",
+          "scoreState": "LEADING",
+          "phase": "FINAL_15",
+          "comparison": { "metric": "shots" },
+          "trend": { "metric": "shots", "direction": "MIXED" },
+          "linked": { "previousInsightId": "in_3aea87e777b0509dac6e48ea" },
+          "eventIds": [],
+          "metrics": {
+            "context.score.home": 3,
+            "context.score.away": 2,
+            "context.score.margin": 1,
+            "context.minute": 89,
+            "context.compare.recent.home": 1,
+            "context.compare.average.home": 1.8,
+            "context.compare.recent.away": 1,
+            "context.compare.average.away": 1.1,
+            "context.compare.windowMinutes": 10,
+            "context.trend.spell1": 1,
+            "context.trend.spell2": 0,
+            "context.trend.spell3": 1,
+            "context.linked.previousMinute": 78
+          }
+        },
+        "synthetic": true
+      },
+      "entities": {
+        "teams": [
+          { "teamId": "tm_penbrook", "name": "Penbrook Town" },
+          { "teamId": "tm_marshstead", "name": "Marshstead Albion" }
+        ],
+        "players": [
+          {
+            "playerId": "pl_penbrook_1",
+            "teamId": "tm_penbrook",
+            "displayName": "Halius Vantley"
+          },
+          {
+            "playerId": "pl_penbrook_5",
+            "teamId": "tm_penbrook",
+            "displayName": "Jasis Thornton"
+          },
+          {
+            "playerId": "pl_penbrook_12",
+            "teamId": "tm_penbrook",
+            "displayName": "Zedric Yarrowstow"
+          },
+          {
+            "playerId": "pl_penbrook_21",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Langfeld"
+          },
+          {
+            "playerId": "pl_penbrook_36",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelard Pellwick"
+          },
+          {
+            "playerId": "pl_penbrook_4",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Morholt"
+          },
+          {
+            "playerId": "pl_penbrook_3",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_20",
+            "teamId": "tm_penbrook",
+            "displayName": "Iorric Pellstow"
+          },
+          {
+            "playerId": "pl_penbrook_8",
+            "teamId": "tm_penbrook",
+            "displayName": "Wenan Ashdale"
+          },
+          {
+            "playerId": "pl_penbrook_17",
+            "teamId": "tm_penbrook",
+            "displayName": "Loren Dunley"
+          },
+          {
+            "playerId": "pl_penbrook_40",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Inglegrove"
+          },
+          {
+            "playerId": "pl_penbrook_33",
+            "teamId": "tm_penbrook",
+            "displayName": "Caelric Morridge"
+          },
+          {
+            "playerId": "pl_penbrook_13",
+            "teamId": "tm_penbrook",
+            "displayName": "Osard Belfeld"
+          },
+          {
+            "playerId": "pl_penbrook_25",
+            "teamId": "tm_penbrook",
+            "displayName": "Yoren Yarrowholt"
+          },
+          {
+            "playerId": "pl_penbrook_18",
+            "teamId": "tm_penbrook",
+            "displayName": "Norric Langholt"
+          },
+          {
+            "playerId": "pl_penbrook_34",
+            "teamId": "tm_penbrook",
+            "displayName": "Jason Netheby"
+          },
+          {
+            "playerId": "pl_penbrook_11",
+            "teamId": "tm_penbrook",
+            "displayName": "Fenen Thorndale"
+          },
+          {
+            "playerId": "pl_penbrook_15",
+            "teamId": "tm_penbrook",
+            "displayName": "Roson Ravridge"
+          },
+          {
+            "playerId": "pl_marshstead_1",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioren Pellfeld"
+          },
+          {
+            "playerId": "pl_marshstead_15",
+            "teamId": "tm_marshstead",
+            "displayName": "Garo Ashwick"
+          },
+          {
+            "playerId": "pl_marshstead_33",
+            "teamId": "tm_marshstead",
+            "displayName": "Vasard Wexley"
+          },
+          {
+            "playerId": "pl_marshstead_22",
+            "teamId": "tm_marshstead",
+            "displayName": "Yorek Oakton"
+          },
+          {
+            "playerId": "pl_marshstead_13",
+            "teamId": "tm_marshstead",
+            "displayName": "Malard Grimby"
+          },
+          {
+            "playerId": "pl_marshstead_30",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorek Belridge"
+          },
+          {
+            "playerId": "pl_marshstead_39",
+            "teamId": "tm_marshstead",
+            "displayName": "Zedon Yarrowby"
+          },
+          {
+            "playerId": "pl_marshstead_5",
+            "teamId": "tm_marshstead",
+            "displayName": "Alek Nethewick"
+          },
+          {
+            "playerId": "pl_marshstead_2",
+            "teamId": "tm_marshstead",
+            "displayName": "Alis Langdale"
+          },
+          {
+            "playerId": "pl_marshstead_27",
+            "teamId": "tm_marshstead",
+            "displayName": "Alius Pellmere"
+          },
+          {
+            "playerId": "pl_marshstead_34",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Langmere"
+          },
+          {
+            "playerId": "pl_marshstead_38",
+            "teamId": "tm_marshstead",
+            "displayName": "Ioro Yarrowgrove"
+          },
+          {
+            "playerId": "pl_marshstead_7",
+            "teamId": "tm_marshstead",
+            "displayName": "Iorric Thornton"
+          },
+          {
+            "playerId": "pl_marshstead_40",
+            "teamId": "tm_marshstead",
+            "displayName": "Fenel Ravley"
+          },
+          {
+            "playerId": "pl_marshstead_25",
+            "teamId": "tm_marshstead",
+            "displayName": "Jasis Everby"
+          },
+          {
+            "playerId": "pl_marshstead_23",
+            "teamId": "tm_marshstead",
+            "displayName": "Feno Holloton"
+          },
+          {
+            "playerId": "pl_marshstead_10",
+            "teamId": "tm_marshstead",
+            "displayName": "Elan Ingleley"
+          },
+          {
+            "playerId": "pl_marshstead_18",
+            "teamId": "tm_marshstead",
+            "displayName": "Osen Quillstow"
+          }
+        ]
+      },
+      "persona": "CASUAL",
+      "locale": "en-GB",
+      "deadlineMs": 20000,
+      "policyVersion": "1.1.0"
+    },
+    "personas": ["CASUAL", "ANALYST", "BROADCAST"],
+    "locales": ["en-GB", "fr-FR", "es-ES", "pcm-NG"]
+  }
+]

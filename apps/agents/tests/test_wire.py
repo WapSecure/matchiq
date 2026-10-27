@@ -1,7 +1,7 @@
 """The HTTP body must satisfy the worker's PipelineResult contract (MQ-119)."""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import SecretStr
 
@@ -17,19 +17,21 @@ from tests.support.models import FakeClock, ScriptedModel
 from tests.test_recorded_provider import recording_for, settings_for, write
 
 
-def nulls_below_the_top(value: Any, path: str = "") -> list[str]:
+def nulls_below_the_top(value: object, path: str = "") -> list[str]:
     if isinstance(value, dict):
+        fields = cast(dict[str, Any], value)
         return [
             found
-            for key, item in value.items()
+            for key, item in fields.items()
             for found in (
                 [f"{path}.{key}"] if item is None else nulls_below_the_top(item, f"{path}.{key}")
             )
         ]
     if isinstance(value, list):
+        items = cast(list[Any], value)
         return [
             found
-            for index, item in enumerate(value)
+            for index, item in enumerate(items)
             for found in nulls_below_the_top(item, f"{path}[{index}]")
         ]
     return []

@@ -5,12 +5,14 @@ the per-item localisation checks, the overlay checks and the step recorder are t
 a recorded draft that no longer matches this session's numbers is rejected and the template airs.
 """
 
+from collections.abc import Sequence
 from dataclasses import replace
 from datetime import timedelta
 
 from pydantic import ValidationError
 
 from matchiq_agents.constants import RECORDED_DEPLOYMENT_PREFIX
+from matchiq_agents.contracts.generated.PipelineRequest import FaultScenario
 from matchiq_agents.contracts.types import (
     AgentName,
     AgentRun,
@@ -38,6 +40,7 @@ from matchiq_agents.pipeline.result import build_result
 from matchiq_agents.pipeline.state import PipelineState, Route
 from matchiq_agents.pipeline.steps import StepOutcome, Work
 from matchiq_agents.providers.recording import RecordedMoment, RecordedNarrative, RecordedRun
+from matchiq_agents.providers.replay_faults import corrupt_first, label_faulted
 from matchiq_agents.roster.context import AgentContext
 from matchiq_agents.roster.convert import to_overlay
 from matchiq_agents.roster.localization import fallback_item, serve_original
@@ -47,9 +50,14 @@ Step = tuple[PipelineState, StepOutcome]
 
 
 class Replay:
-    def __init__(self, ctx: AgentContext, moment: RecordedMoment) -> None:
+    def __init__(
+        self, ctx: AgentContext, moment: RecordedMoment, fault: FaultScenario | None = None
+    ) -> None:
         self._ctx = ctx
         self._moment = moment
+        self._fault = fault
+        self._corruption_note: str | None = None
+        self._revision_notes: tuple[str, ...] = ()
         self._deployment = f"{RECORDED_DEPLOYMENT_PREFIX}{moment.source.model}"
         self._cursor = ctx.runner.clock.now()
 
@@ -103,10 +111,13 @@ class Replay:
         state = await self._step(
             AgentStepRole.NARRATIVE_WRITER, state, self._writer, AgentName.NARRATIVE_WRITER
         )
+        checker = FactCheckerExecutor(ctx, "recorded_checker").step
         if state.route is Route.VERIFY:
-            state = await self._step(
-                AgentStepRole.FACT_CHECKER, state, FactCheckerExecutor(ctx, "recorded_checker").step
-            )
+            state = await self._step(AgentStepRole.FACT_CHECKER, state, checker)
+        if state.route is Route.REVISE:
+            self._revision_notes = state.revision_notes
+            state = await self._step(AgentStepRole.NARRATIVE_WRITER, state, self._revision)
+            state = await self._step(AgentStepRole.FACT_CHECKER, state, checker)
         if state.route is Route.FALLBACK:
             state = await self._step(
                 AgentStepRole.TEMPLATE_FALLBACK, state, FallbackExecutor(ctx, "recorded_fb").step
@@ -123,7 +134,10 @@ class Replay:
             )
         if state.fallback_reasons and state.status is S.VERIFIED:
             state = state.advance(S.FALLBACK, Route.FINALISE)
-        return build_result(ctx.view, state, ctx.recorder.steps)
+        result = build_result(ctx.view, state, ctx.recorder.steps)
+        if self._fault is None:
+            return result
+        return label_faulted(result, self._fault, self._corruption_note, self._revision_notes)
 
     async def _analyst(self, state: PipelineState) -> Step:
         runs = self._runs(AgentName.MATCH_ANALYST)
@@ -134,20 +148,46 @@ class Replay:
         return nxt.advance(S.ANALYZED, Route.VERIFY), outcomes.GROUNDED
 
     async def _writer(self, state: PipelineState) -> Step:
-        drafts = [
-            draft
-            for persona in self._ctx.canonical_personas
-            if (draft := self._canonical(persona)) is not None
-        ]
-        nxt = replace(state, draft_attempts=MAX_DRAFT_ATTEMPTS).with_runs(
+        drafts = self._canonicals(self._ctx.canonical_personas)
+        attempts = MAX_DRAFT_ATTEMPTS
+        if self._fault is FaultScenario.WRITER_REVISE:
+            drafts, self._corruption_note = corrupt_first(drafts)
+            attempts = 1
+        nxt = replace(state, draft_attempts=attempts).with_runs(
             *self._runs(AgentName.NARRATIVE_WRITER)
         )
         if not drafts:
             failed = nxt.with_fallback(reasons.WRITER_FALLBACK)
             return failed.advance(S.FALLBACK, Route.FALLBACK), outcomes.WRITER_FALLBACK
-        # Recorded drafts cannot be rewritten, so the Fact Checker's attempt budget is spent.
+        # Recorded drafts cannot be rewritten, so the attempt budget is spent. Only the
+        # WRITER_REVISE demo fault keeps one revision, which restores the recorded draft.
         drafted = replace(nxt, canonical=tuple(drafts))
         return drafted.advance(S.DRAFTED, Route.VERIFY), outcomes.DRAFTED
+
+    def _canonicals(self, personas: Sequence[Persona]) -> list[NarrativeDraft]:
+        return [draft for persona in personas if (draft := self._canonical(persona)) is not None]
+
+    async def _revision(self, state: PipelineState) -> Step:
+        """The revision of a corrupted draft is the recorded draft; no model call is invented."""
+        by_persona = {d.persona: d for d in state.canonical}
+        by_persona |= {d.persona: d for d in self._canonicals(state.revision_personas)}
+        canonical = tuple(by_persona[p] for p in self._ctx.canonical_personas if p in by_persona)
+        run = self._ctx.runner.scope.record(self._revision_record())
+        nxt = replace(
+            state,
+            canonical=canonical,
+            draft_attempts=state.draft_attempts + 1,
+            revision_notes=(),
+            revision_personas=(),
+        ).with_runs(run)
+        return nxt.advance(S.DRAFTED, Route.VERIFY), outcomes.DRAFTED
+
+    def _revision_record(self) -> RunRecord:
+        writer = self._moment.runs_of(AgentName.NARRATIVE_WRITER)[0]
+        free = writer.model_copy(
+            update={"latency_ms": 0, "retries": 0, "tokens_in": None, "tokens_out": None}
+        )
+        return self._record(free)
 
     def _canonical(self, persona: Persona) -> NarrativeDraft | None:
         recorded = self._moment.narrative(persona, CANONICAL_LOCALE)
