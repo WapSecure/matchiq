@@ -9,6 +9,9 @@ export const AGENT_STEPS_QUERY_KEY = 'agent-traces';
 export const AGENT_STEPS_PAGE_SIZE = 6;
 /** Handoff records never change once stored. */
 export const AGENT_STEPS_STALE_MS = 5 * 60_000;
+/** Milestone moments are written from templates only, so no handoffs are stored. */
+export const TEMPLATE_ONLY_REASON_PREFIX = 'TEMPLATE_ONLY';
+export const TEMPLATE_PROVIDER = 'template';
 export const HASH_PREVIEW_LENGTH = 12;
 
 export const AGENT_STEP_COPY = {

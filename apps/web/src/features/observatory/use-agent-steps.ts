@@ -4,6 +4,8 @@ import {
   AGENT_STEPS_QUERY_KEY,
   AGENT_STEPS_STALE_MS,
   AGENT_TRACE_PATH,
+  TEMPLATE_ONLY_REASON_PREFIX,
+  TEMPLATE_PROVIDER,
 } from '@/constants/agent-steps';
 import { requestJsonOrNull } from '@/lib/api/http-client';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
@@ -21,10 +23,19 @@ const fetchAgentSteps = async (
 export const correlationIdOf = (trace: InsightTrace): string | undefined =>
   trace.runs[0]?.correlationId;
 
+/** True only when the trace proves no handoffs were stored, so the fetch would 404. */
+export const hasNoStoredHandoffs = (trace: InsightTrace): boolean =>
+  trace.runs.length > 0 &&
+  trace.runs.every((r) => r.provider === TEMPLATE_PROVIDER) &&
+  (trace.fallbackReason?.startsWith(TEMPLATE_ONLY_REASON_PREFIX) ?? false);
+
 /** `GET /agents/traces/{correlationId}`, once the moment's narratives are published. */
 export const useAgentSteps = (trace: InsightTrace) => {
   const correlationId = correlationIdOf(trace);
-  const ready = correlationId !== undefined && trace.publication !== 'PENDING';
+  const ready =
+    correlationId !== undefined &&
+    trace.publication !== 'PENDING' &&
+    !hasNoStoredHandoffs(trace);
   return {
     ready,
     query: useQuery({

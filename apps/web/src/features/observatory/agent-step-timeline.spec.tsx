@@ -120,6 +120,43 @@ describe('AgentStepTimeline', () => {
     ).toBeInTheDocument();
   });
 
+  describe('moments with no stored handoffs', () => {
+    const TEMPLATE_ONLY =
+      'TEMPLATE_ONLY: milestone moments use standard wording';
+    const milestone = trace({
+      kind: 'PLAYER_MILESTONE',
+      fallbackReason: TEMPLATE_ONLY,
+      runs: [run({ correlationId: CORRELATION })],
+    });
+
+    it('issues no request for a template-only milestone', async () => {
+      const mock = stubApi({});
+      renderWith(<AgentStepTimeline trace={milestone} moment="m" />);
+      expect(
+        await screen.findByText('No handoffs were recorded for this moment.'),
+      ).toBeInTheDocument();
+      expect(callsTo(mock, PATH)).toHaveLength(0);
+    });
+
+    it('still fetches when any run used a recorded agent', async () => {
+      const mock = stubApi({ [`GET ${PATH}`]: { status: 204, body: null } });
+      const mixed = trace({
+        fallbackReason: TEMPLATE_ONLY,
+        runs: [run(), run({ provider: 'recorded', outcome: 'SUCCEEDED' })],
+      });
+      renderWith(<AgentStepTimeline trace={mixed} moment="m" />);
+      await screen.findByText('No handoffs were recorded for this moment.');
+      expect(callsTo(mock, PATH)).toHaveLength(1);
+    });
+
+    it('still fetches for shapes it does not recognise', async () => {
+      const mock = stubApi({ [`GET ${PATH}`]: { status: 204, body: null } });
+      renderWith(<AgentStepTimeline trace={published} moment="m" />);
+      await screen.findByText('No handoffs were recorded for this moment.');
+      expect(callsTo(mock, PATH)).toHaveLength(1);
+    });
+  });
+
   it('waits for a moment that is still being written', () => {
     const mock = stubApi({});
     renderWith(
