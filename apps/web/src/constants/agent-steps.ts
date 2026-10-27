@@ -10,7 +10,6 @@ export const AGENT_STEPS_PAGE_SIZE = 6;
 /** Handoff records never change once stored. */
 export const AGENT_STEPS_STALE_MS = 5 * 60_000;
 export const HASH_PREVIEW_LENGTH = 12;
-export const NOT_FOUND_STATUS = 404;
 
 export const AGENT_STEP_COPY = {
   title: 'How the agents worked on this',

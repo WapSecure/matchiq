@@ -89,6 +89,9 @@ export const BFF = {
       'The identity provider could not be reached. Your session is kept; try again shortly.',
   },
   dotSegments: ['.', '..'],
+  /** Expected 404s answered 204 so the browser console stays quiet: GET agents/traces/{id}. */
+  quietNotFound: { prefix: ['agents', 'traces'], segments: 3 },
+  noContent: 204,
   problemType: (status: number) => `urn:matchiq:problem:bff-${status}`,
   contentType: 'content-type',
   problemMediaType: 'application/problem+json',

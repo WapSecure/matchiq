@@ -1404,3 +1404,7 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 
 - Full-product pass in the browser (desktop and 390 px; producer, viewer, signed-out): 9 defects found and fixed by PR, each with a spec where practical: Fact-checks and "How this was written" failing after Manual approval (#120), header chip (#122), milestone wording (#123), pitch-map edge clipping (#124), "1 play" (#125), keyboard access to table regions (#126), Recap headline (#127), recorded provider contract (#128), plus the Evidence drawer labels (#119).
 - Docs aligned with what was verified: the recorded run at 5× (10 of 19 non-milestone moments), the three lobby demo failures, goals staying on standard wording, and Foundry, Entra and Azure still unexercised for lack of an Azure subscription.
+
+## MQ-122: quiet console for missing agent traces (27 October 2026)
+
+- MQ-122: the web proxy answers 204 instead of 404 for a missing agent trace (`/bff/agents/traces/{id}`), so the browser console no longer logs a red error for moments with no recorded handoffs. The API contract is unchanged; 500s, auth failures and other 404s still surface.

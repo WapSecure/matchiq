@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { NextRequest } from 'next/server';
 import { BFF } from '@/constants/auth';
-import { POST } from './route';
+import { GET, POST } from './route';
 
 const WEB_ORIGIN = 'https://app.matchiq.test';
 const FOREIGN_ORIGIN = 'https://evil.example';
@@ -64,5 +64,32 @@ describe('BFF cross-origin refusal', () => {
     expect((init.headers as Headers).get(BFF.authorization)).toBe(
       `${BFF.bearer}token`,
     );
+  });
+});
+
+describe('BFF expected not-found', () => {
+  const get = (path: string[]) =>
+    GET(new NextRequest(`${WEB_ORIGIN}/bff/${path.join('/')}`), {
+      params: Promise.resolve({ path }),
+    });
+  const answer = (status: number) =>
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(status === 404 ? '{}' : 'x', { status })),
+    );
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('answers 204 for a missing agent trace', async () => {
+    answer(404);
+    const response = await get(['agents', 'traces', 'abc']);
+    expect(response.status).toBe(204);
+    expect(await response.text()).toBe('');
+  });
+
+  it('keeps every other 404 and any trace failure visible', async () => {
+    answer(404);
+    expect((await get(['fixtures', 'nope'])).status).toBe(404);
+    answer(500);
+    expect((await get(['agents', 'traces', 'abc'])).status).toBe(500);
   });
 });
