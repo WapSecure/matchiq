@@ -13,6 +13,7 @@ import {
 import { ROUTES } from '@/constants/navigation';
 import { REPLAY_COPY } from '@/constants/replay';
 import { usePageMessages } from '@/features/interface-language/use-page-messages';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
 import type { ReplaySessionView } from '@/lib/api/session-schemas';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
@@ -35,6 +36,7 @@ type SessionRowProps = {
 
 export function SessionRow({ session, code, now }: SessionRowProps) {
   const copy = usePageMessages().lobby.sessions;
+  const locale = useInterfaceLanguage((state) => state.locale);
   const { status } = session;
   const minute =
     status.appliedSequence === NOT_STARTED
@@ -65,6 +67,7 @@ export function SessionRow({ session, code, now }: SessionRowProps) {
               session.updatedAt,
               Math.max(now, Date.parse(session.updatedAt)),
               'short',
+              locale,
             )}
           </time>
         </div>

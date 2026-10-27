@@ -7,6 +7,7 @@ import { TimelineIcon } from '@/components/icons';
 import { Panel } from '@/components/ui';
 import { INSIGHT_KIND_LABELS } from '@/constants/match';
 import { RECAP_COPY } from '@/constants/recap';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { MinuteStrip } from '@/features/observatory/minute-strip';
 import { buildRoster } from '@/features/studio/lib/roster';
 import { useStudioUi } from '@/features/studio/store';
@@ -24,6 +25,7 @@ export function RecapMoments({
   recap: RecapDocument;
   fixture: Fixture;
 }) {
+  const state = usePageMessages().states.recap;
   const persona = useStudioUi((s) => s.persona);
   const locale = useStudioUi((s) => s.locale);
   const roster = useMemo(() => buildRoster(fixture), [fixture]);
@@ -54,7 +56,7 @@ export function RecapMoments({
       bodyClassName="p-0"
     >
       {ordered.length === 0 ? (
-        <EmptyState compact title={RECAP_COPY.momentsEmpty} />
+        <EmptyState compact title={state.momentsEmpty} />
       ) : (
         <>
           <div className="border-b border-line px-4 pt-3">

@@ -241,5 +241,59 @@
         "COMPLETED": "Finalizado"
       }
     }
+  },
+  "states": {
+    "audit": {
+      "loading": "Cargando el registro de actividad",
+      "error": "No se pudo cargar el registro de actividad",
+      "empty": {
+        "title": "Aún no hay actividad",
+        "description": "Las acciones realizadas durante este partido aparecen aquí."
+      },
+      "emptyFiltered": {
+        "title": "Ninguna actividad coincide con estos filtros",
+        "description": "Amplía el intervalo o elige Cualquier acción o Cualquier persona."
+      },
+      "moreLabel": "Más actividad",
+      "end": "Has llegado a la primera actividad.",
+      "noun": { "one": "entrada", "other": "entradas" }
+    },
+    "observatory": {
+      "loading": "Cargando las verificaciones",
+      "error": "No se pudieron cargar las verificaciones",
+      "empty": "Aún no hay momentos clave. Aparecen aquí durante la repetición.",
+      "filterEmpty": "Ningún momento clave coincide con este filtro.",
+      "showAll": "Mostrar todos los momentos clave",
+      "momentNoun": { "one": "momento clave", "other": "momentos clave" }
+    },
+    "recap": { "momentsEmpty": "No se registraron momentos clave." },
+    "playerFocus": {
+      "loading": "Cargando el partido hasta ahora",
+      "loadFailed": "No se pudo cargar el partido de este jugador",
+      "pickTitle": "Elige un jugador para seguir",
+      "pickBody": "Consulta sus pases, disparos y grandes momentos, y localízalo en el campo.",
+      "quietTitle": "{player} aún no ha intervenido",
+      "quietBody": "Sus acciones aparecen aquí en cuanto ocurren."
+    },
+    "studio": {
+      "timelineEmpty": "Aún no hay eventos. Inicia la repetición para comenzar.",
+      "timelineEmptyKey": "Aún no hay eventos destacados.",
+      "insightsEmpty": "Aún no hay momentos clave. Aparecen aquí a medida que avanza el partido.",
+      "pitchEmpty": "Aún no hay disparos, recuperaciones ni entradas en el último tercio.",
+      "momentumEmpty": "El impulso aparece cuando el partido se pone en marcha.",
+      "metricsAwaiting": "Las estadísticas aparecen cuando comienza la repetición.",
+      "approvalEmpty": {
+        "AUTO": {
+          "title": "Los gráficos se emiten automáticamente",
+          "description": "No hay nada que aprobar ahora mismo."
+        },
+        "MANUAL": {
+          "title": "Nada pendiente",
+          "description": "Los gráficos nuevos aparecen aquí cuando necesitan tu aprobación."
+        }
+      },
+      "eventNoun": { "one": "evento", "other": "eventos" },
+      "momentNoun": { "one": "momento clave", "other": "momentos clave" }
+    }
   }
 }

@@ -143,7 +143,10 @@ export const REGION_NAMES = {
   recap: 'The recap',
   checks: 'The fact-checks',
   activity: 'The activity log',
+  playerFocus: 'Player focus',
 } as const;
+
+export type RegionNameKey = keyof typeof REGION_NAMES;
 
 /** Never shown to users; the guard test scans copy and rendered states for these. */
 export const FORBIDDEN_COPY_PATTERNS: readonly RegExp[] = [

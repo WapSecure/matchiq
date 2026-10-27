@@ -182,6 +182,21 @@ describe('RegionBoundary', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(screen.getByText('Panel back')).toBeTruthy();
   });
+
+  it('localizes a known region name with the interface language', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    useInterfaceLanguage.setState({ locale: 'fr-FR' });
+    render(
+      <RegionBoundary region="moments">
+        <Boom />
+      </RegionBoundary>,
+    );
+    expect(
+      screen.getByText(
+        'Impossible de charger cette section : Les moments clés',
+      ),
+    ).toBeTruthy();
+  });
 });
 
 describe('PageError', () => {

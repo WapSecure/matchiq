@@ -6,6 +6,7 @@ import { AgentsIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui';
 import { OBSERVATORY_COPY } from '@/constants/observatory';
 import { MAIN_CONTENT_ID } from '@/constants/site';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useAgentRuns } from '@/lib/api/hooks';
 import { FallbackNote } from './fallback-note';
 import { MomentList } from './moment-list';
@@ -16,13 +17,14 @@ import { useRecapMoments } from './use-recap-moments';
 const copy = OBSERVATORY_COPY;
 
 function Traces({ fixtureId }: { fixtureId: string }) {
+  const state = usePageMessages().states.observatory;
   const runs = useAgentRuns(fixtureId);
   const moments = useRecapMoments(fixtureId);
   if (runs.isPending) {
     return (
       <div
         role="status"
-        aria-label={copy.loading}
+        aria-label={state.loading}
         className="flex flex-col gap-3"
       >
         <Skeleton className="h-28" />
@@ -34,7 +36,7 @@ function Traces({ fixtureId }: { fixtureId: string }) {
   if (runs.isError) {
     return (
       <ErrorState
-        title={copy.error}
+        title={state.error}
         error={runs.error}
         onRetry={() => void runs.refetch()}
       />
@@ -52,7 +54,7 @@ function Traces({ fixtureId }: { fixtureId: string }) {
       <RecordedNote traces={traces} />
       <FallbackNote traces={traces} />
       {traces.length === 0 ? (
-        <EmptyState Icon={AgentsIcon} title={copy.empty} />
+        <EmptyState Icon={AgentsIcon} title={state.empty} />
       ) : (
         <MomentList traces={traces} moments={moments} />
       )}

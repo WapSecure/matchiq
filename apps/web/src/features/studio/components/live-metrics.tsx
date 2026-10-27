@@ -7,6 +7,7 @@ import { PossessionBar } from '@/components/match/possession-bar';
 import { StatComparison } from '@/components/match/stat-comparison';
 import { Panel, Skeleton } from '@/components/ui';
 import { STUDIO_COPY } from '@/constants/studio';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { statRows } from '../lib/stat-rows';
 import { useMatchStore } from '../store';
 
@@ -31,6 +32,7 @@ export function LiveMetrics({
   awayName,
   className,
 }: LiveMetricsProps) {
+  const state = usePageMessages().states.studio;
   const snapshot = useMatchStore((s) => s.snapshot);
   const statePending = useMatchStore((s) => !s.hydrated);
   const momentum = useMatchStore((s) => s.momentum);
@@ -76,7 +78,7 @@ export function LiveMetrics({
           ) : (
             <EmptyState
               compact
-              title={m.momentumEmpty}
+              title={state.momentumEmpty}
               className="@2xl:col-span-2 @5xl:col-span-1"
             />
           )}
@@ -84,7 +86,7 @@ export function LiveMetrics({
       ) : statePending ? (
         <MetricsSkeleton />
       ) : (
-        <EmptyState compact title={m.awaiting} />
+        <EmptyState compact title={state.metricsAwaiting} />
       )}
     </Panel>
   );

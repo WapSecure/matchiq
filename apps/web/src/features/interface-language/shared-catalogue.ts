@@ -2,6 +2,7 @@ import type { CountNoun } from '@/constants/pagination';
 import { ERROR_INTERFACE_MESSAGES } from './error-catalogue';
 import type { InterfaceLocale } from './interface-locales';
 import type { InterfaceMessages } from './interface-messages';
+import { REGION_INTERFACE_MESSAGES } from './region-catalogue';
 
 type SharedMessages = Pick<
   InterfaceMessages,
@@ -55,6 +56,7 @@ const en: SharedMessages = {
       message:
         'The rest of the page still works. Try again to reload this part.',
       retry: 'Try again',
+      regions: REGION_INTERFACE_MESSAGES['en-GB'],
     },
     page: {
       metaTitle: 'Something went wrong',
@@ -123,6 +125,7 @@ const fr: SharedMessages = {
       message:
         'Le reste de la page fonctionne toujours. Réessayez de charger cette section.',
       retry: 'Réessayer',
+      regions: REGION_INTERFACE_MESSAGES['fr-FR'],
     },
     page: {
       metaTitle: 'Un problème est survenu',
@@ -191,6 +194,7 @@ const es: SharedMessages = {
       message:
         'El resto de la página sigue funcionando. Intenta cargar esta sección de nuevo.',
       retry: 'Intentar de nuevo',
+      regions: REGION_INTERFACE_MESSAGES['es-ES'],
     },
     page: {
       metaTitle: 'Se ha producido un problema',

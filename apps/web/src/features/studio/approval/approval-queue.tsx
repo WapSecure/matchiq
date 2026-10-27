@@ -8,6 +8,7 @@ import { CheckIcon } from '@/components/icons';
 import { Badge, Skeleton } from '@/components/ui';
 import { SETTLED_COPY } from '@/constants/approval-shortcuts';
 import { APPROVAL_COPY } from '@/constants/approval';
+import { usePageMessages } from '@/features/interface-language/use-page-messages';
 import { useMatchStore } from '../store';
 import { ReviewCard } from './review-card';
 import { SettledCard } from './settled-card';
@@ -37,16 +38,17 @@ type BodyProps = {
 };
 
 function Body({ items, policy, settled, onExpire, ...card }: BodyProps) {
+  const state = usePageMessages().states.studio;
   const keys = new Set(items.map(reviewKey));
   const extras = Object.values(settled).filter((s) => !keys.has(s.key));
   if (items.length === 0 && extras.length === 0) {
-    const empty = APPROVAL_COPY.empty[policy];
+    const empty = state.approvalEmpty[policy];
     return (
       <EmptyState
         compact
         Icon={CheckIcon}
         title={empty.title}
-        description={empty.body}
+        description={empty.description}
       />
     );
   }

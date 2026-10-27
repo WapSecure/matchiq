@@ -1,6 +1,5 @@
 import type { AuditEvent } from '@matchiq/contracts';
 import type { ReactNode } from 'react';
-import { TechnicalDetails } from '@/components/ui';
 import {
   ACTOR_TYPE_LABELS,
   AUDIT_ACTION_LABELS,
@@ -8,13 +7,16 @@ import {
 } from '@/constants/audit';
 import { describeAction, describeReason } from '@/lib/describe-reason';
 import { formatRelative, formatTimestamp } from '@/lib/format-time';
+import type { InterfaceLocale } from '@/features/interface-language/interface-locales';
 import { AuditDiff } from './audit-diff';
 import { AuditTargetCell } from './audit-target-cell';
+import { AuditTechnical } from './audit-technical';
 
 type AuditTableProps = {
   events: readonly AuditEvent[];
   hasMore: boolean;
   nowMs: number;
+  locale: InterfaceLocale;
 };
 
 const columns = AUDIT_COPY.columns;
@@ -53,44 +55,23 @@ function AuditActorCell({ event }: { event: AuditEvent }) {
   );
 }
 
-function AuditTechnical({ event }: { event: AuditEvent }) {
-  const t = AUDIT_COPY.technical;
-  const rows = [
-    [t.action, event.action],
-    [
-      t.reason,
-      event.reason && describeReason(event.reason) !== event.reason
-        ? event.reason
-        : null,
-    ],
-    [t.actor, event.actor.id],
-    [t.target, event.target.id],
-    [t.entry, event.id],
-    [t.request, event.requestId],
-  ].filter((row): row is [string, string] => Boolean(row[1]));
-  return (
-    <TechnicalDetails className="mt-2 text-left font-normal">
-      <dl className="grid gap-1 font-mono text-micro">
-        {rows.map(([label, value]) => (
-          <div key={label}>
-            <dt className="text-ink-subtle">{label}</dt>
-            <dd className="break-all text-ink">{value}</dd>
-          </div>
-        ))}
-      </dl>
-    </TechnicalDetails>
-  );
-}
-
-function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
+function AuditRow({
+  event,
+  nowMs,
+  locale,
+}: {
+  event: AuditEvent;
+  nowMs: number;
+  locale: InterfaceLocale;
+}) {
   return (
     <tr className="border-t border-line max-md:flex max-md:flex-col max-md:gap-2.5 max-md:px-4 max-md:py-3.5">
       <Cell label={columns.time}>
         <time dateTime={event.at} className="block whitespace-nowrap text-ink">
-          {formatRelative(event.at, nowMs)}
+          {formatRelative(event.at, nowMs, 'long', locale)}
         </time>
         <span className="tabular block whitespace-nowrap font-mono text-micro text-ink-subtle">
-          {formatTimestamp(event.at)}
+          {formatTimestamp(event.at, locale)}
         </span>
       </Cell>
       <th
@@ -121,7 +102,12 @@ function AuditRow({ event, nowMs }: { event: AuditEvent; nowMs: number }) {
 }
 
 /** A real table on wide screens; each row stacks into a card on phones. */
-export function AuditTable({ events, hasMore, nowMs }: AuditTableProps) {
+export function AuditTable({
+  events,
+  hasMore,
+  nowMs,
+  locale,
+}: AuditTableProps) {
   return (
     <div
       role="region"
@@ -148,7 +134,12 @@ export function AuditTable({ events, hasMore, nowMs }: AuditTableProps) {
         </thead>
         <tbody className="max-md:block">
           {events.map((event) => (
-            <AuditRow key={event.id} event={event} nowMs={nowMs} />
+            <AuditRow
+              key={event.id}
+              event={event}
+              nowMs={nowMs}
+              locale={locale}
+            />
           ))}
         </tbody>
       </table>
