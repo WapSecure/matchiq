@@ -3,6 +3,7 @@ import {
   InsightKind,
   Locale,
   NarrativeSource,
+  OverlayEditorialState,
   Persona,
   PipelineStatus,
 } from '@matchiq/contracts';
@@ -33,7 +34,7 @@ export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
 export const InsightEditorialTrace = z.object({
   insight: z.enum(['SUPPRESSED', 'RETRACTED']).nullable(),
   insightReason: z.string().nullable(),
-  overlay: z.enum(['RETRACTED', 'HELD', 'SUPPRESSED']).nullable(),
+  overlay: OverlayEditorialState.nullable(),
   overlayReason: z.string().nullable(),
 });
 
