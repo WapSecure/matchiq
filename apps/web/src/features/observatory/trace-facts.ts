@@ -6,6 +6,7 @@ import {
   PERSONA_OPTIONS,
 } from '@/constants/match';
 import { FACT_CHECKS_COPY } from '@/constants/fact-checks';
+import { splitRejections } from './rejection-split';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 
 const facts = FACT_CHECKS_COPY.facts;
@@ -60,7 +61,7 @@ const checkFact = (gate: InsightTrace['gate']): TraceFact => {
       value: facts.checkValue.pending,
       tone: 'muted',
     };
-  const caught = gate.rejected.length;
+  const caught = splitRejections(gate.rejected).caught.length;
   return caught === 0
     ? { label: facts.check, value: facts.checkValue.passed, tone: 'standard' }
     : {

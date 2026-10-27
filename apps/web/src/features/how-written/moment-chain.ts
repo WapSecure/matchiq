@@ -16,6 +16,7 @@ import {
   describeRejection,
   plainFallbackReasons,
 } from '@/features/observatory/plain-trace';
+import { splitRejections } from '@/features/observatory/rejection-split';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { formatSeconds } from '@/lib/format';
 
@@ -32,6 +33,8 @@ export type MomentChain = {
   links: ChainLink[];
   extras: ChainLink[];
   caught: string[];
+  /** Wording held back for style (such as repeating itself), not for a fact. */
+  heldBack: string[];
   finalLine: string | null;
   standardReason: boolean;
 };
@@ -93,10 +96,12 @@ export const buildChain = (
 ): MomentChain => {
   const main = linksFor(MAIN_ROLES, steps);
   const gate = gateLink(trace);
+  const split = splitRejections(trace.gate?.rejected ?? []);
   return {
     links: steps.length === 0 ? [] : gate ? [...main, gate] : main,
     extras: linksFor(EXTRA_ROLES, steps),
-    caught: (trace.gate?.rejected ?? []).map(describeRejection),
+    caught: split.caught.map(describeRejection),
+    heldBack: split.heldBack.map(describeRejection),
     finalLine: finalLineFor(trace),
     standardReason: trace.publication === 'TEMPLATE',
   };

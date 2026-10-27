@@ -28,7 +28,9 @@ export const FACT_CHECKS_COPY = {
   },
   tiles: {
     caught: 'Caught by the fact check',
-    caughtHint: 'Problems stopped before anything went on air',
+    caughtHint: 'Wrong facts or numbers stopped before anything went on air',
+    heldBack: (n: number) =>
+      `${n} more held back for wording that repeated itself, not for facts`,
     simulated: 'Simulated failures',
     simulatedHint: 'Failures we caused on purpose to show the safety net',
     providers: 'Who wrote them',

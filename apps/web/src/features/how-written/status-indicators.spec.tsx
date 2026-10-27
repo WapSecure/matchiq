@@ -49,6 +49,7 @@ const chain = (caught: string[]): MomentChain => ({
   ),
   extras: [],
   caught,
+  heldBack: [],
   finalLine: null,
   standardReason: false,
 });

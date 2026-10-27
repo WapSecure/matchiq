@@ -11,6 +11,9 @@ export const MOMENT_TRACE_COPY = {
   also: 'Also',
   caught: (n: number) => `Caught ${n} ${n === 1 ? 'problem' : 'problems'}`,
   caughtLabel: 'What the fact check caught',
+  heldBackLabel: 'Held back for wording, not facts',
+  heldBack: (n: number) =>
+    `Held back ${n} ${n === 1 ? 'wording' : 'wordings'} for repeating itself`,
   tookLabel: (seconds: string) => `Took ${seconds}`,
 } as const;
 
