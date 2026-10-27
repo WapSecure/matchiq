@@ -60,6 +60,9 @@ describe('ComparedWith', () => {
     ).toBeVisible();
     expect(screen.getAllByText(/about 4 so far in the match/)).toHaveLength(1);
     expect(screen.getByText(COMPARISON_COPY.momentSample(6))).toBeVisible();
+    expect(COMPARISON_COPY.momentSample(1)).toBe(
+      'The moment itself rests on 1 play.',
+    );
     expect(screen.getByText('Only 20 minutes played.')).toBeVisible();
     expect(
       screen.getByRole('img', { name: /Home: shots in the last three/ }),
