@@ -21,6 +21,12 @@ export const MODE_VIEW: Record<
   },
 };
 
+/** Shown in place of the AUTO chip while a producer approves each graphic. */
+export const MANUAL_APPROVAL_VIEW = {
+  label: 'Manual approval',
+  tone: 'warning',
+} as const satisfies { label: string; tone: ModeTone };
+
 /** Typed confirmation for the organisation-wide emergency stop. */
 export const KILL_CONFIRM_PHRASE = 'STOP';
 

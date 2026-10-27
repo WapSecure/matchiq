@@ -3,8 +3,13 @@
 import type { EditorialMode } from '@matchiq/contracts';
 import { AlertIcon, FreezeIcon } from '@/components/icons';
 import { Badge } from '@/components/ui';
-import { EDITORIAL_COPY, MODE_VIEW } from '@/constants/editorial';
+import {
+  EDITORIAL_COPY,
+  MANUAL_APPROVAL_VIEW,
+  MODE_VIEW,
+} from '@/constants/editorial';
 import { cn } from '@/lib/cn';
+import { usePublishPolicy } from '../approval/approval-queue';
 import { useMatchStore } from '../store';
 
 /** No `editorial.status` yet means nothing was ever frozen or killed. */
@@ -13,7 +18,10 @@ export const useEditorialMode = (): EditorialMode =>
 
 /** Hidden on narrow screens, where the header has no room and the banner carries the state. */
 export function EditorialChip() {
-  const view = MODE_VIEW[useEditorialMode()];
+  const mode = useEditorialMode();
+  const manual = usePublishPolicy() === 'MANUAL';
+  const view =
+    mode === 'AUTO' && manual ? MANUAL_APPROVAL_VIEW : MODE_VIEW[mode];
   return (
     <span className="hidden shrink-0 md:flex">
       <Badge tone={view.tone} dot data-testid="editorial-chip">
