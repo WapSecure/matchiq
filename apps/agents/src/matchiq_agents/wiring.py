@@ -148,16 +148,23 @@ def build_service(
     settings: Settings, clock: Clock, model: ModelPort | None = None
 ) -> PipelineService:
     """The orchestrator plus demo fault routing (ADR-0020); a faulted run never shares state."""
+    config = pipeline_config(settings)
+
+    def faults(base: PipelineOrchestrator) -> FaultAwareOrchestrator:
+        return FaultAwareOrchestrator(
+            base,
+            enabled=settings.demo_faults_enabled,
+            faulted=lambda faulty, isolated: PipelineOrchestrator(faulty, isolated, clock, config),
+            breaker=fault_breaker(settings, clock, config),
+        )
+
     if settings.model_provider is ModelProvider.RECORDED:
+        base = build_orchestrator(settings, clock)
         return RecordedService(
-            build_orchestrator(settings, clock),
+            base,
             load_recordings(settings),
             settings.recorded_latency_ms,
+            # Only handed over when demo faults are on; MODEL_TIMEOUT has nothing to replay.
+            timeouts=faults(base) if settings.demo_faults_enabled else None,
         )
-    config = pipeline_config(settings)
-    return FaultAwareOrchestrator(
-        build_orchestrator(settings, clock, model),
-        enabled=settings.demo_faults_enabled,
-        faulted=lambda faulty, isolated: PipelineOrchestrator(faulty, isolated, clock, config),
-        breaker=fault_breaker(settings, clock, config),
-    )
+    return faults(build_orchestrator(settings, clock, model))

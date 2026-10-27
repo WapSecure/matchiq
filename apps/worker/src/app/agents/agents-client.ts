@@ -4,7 +4,15 @@ import {
   injectTraceHeaders,
   withClientSpan,
 } from '@matchiq/server-kit';
-import { AGENTS_HTTP, FALLBACK_REASONS } from '../constants';
+import { Logger } from '@nestjs/common';
+import {
+  AGENTS_HTTP,
+  AGENTS_ISSUE_LOG_LIMIT,
+  FALLBACK_REASONS,
+  LOG_MESSAGES,
+} from '../constants';
+
+const logger = new Logger('AgentsClient');
 
 /** Port to the stateless agents service; it proposes, the worker's gate commits. */
 export interface AgentsClient {
@@ -71,6 +79,15 @@ export class HttpAgentsClient implements AgentsClient {
       await response.json().catch(() => null),
     );
     if (!parsed.success) {
+      logger.warn(
+        LOG_MESSAGES.invalidAgentsResult(
+          request.packet.correlationId,
+          parsed.error.issues.length,
+          parsed.error.issues
+            .slice(0, AGENTS_ISSUE_LOG_LIMIT)
+            .map((issue) => `${issue.path.join('.')} ${issue.code}`),
+        ),
+      );
       throw new AgentsCallError(
         'invalid-response',
         FALLBACK_REASONS.invalidResponse,

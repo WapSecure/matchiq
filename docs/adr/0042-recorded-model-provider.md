@@ -48,3 +48,8 @@ A replay must never read as a live model.
 - Replaying through a fake `ModelPort`: the agents' raw outputs (claims, cited values) were not stored, so the roster would have had to be fed invented inputs.
 - Matching by insight id: ids differ per session, so nothing would match.
 - Bypassing the gate for recorded text: it would hide exactly the behaviour a judge should see.
+
+## Addendum (2026-10-27): valid output and demo faults (MQ-119)
+
+- The replay's responses were refused by the worker because a rebuilt draft carried `breakdown: null`; the HTTP body now omits empty optional fields for every provider. Measured on the committed recording against the 19 real Late comeback packets: 9 moments publish with the recorded wording for every audience, 1 partly, 9 fall back (stale goal and momentum wording, correctly rejected).
+- Demo faults apply to a replay when `DEMO_FAULTS_ENABLED` is on. `WRITER_REVISE` corrupts one recorded draft with the `fault.injected` citation, the live Fact Checker returns REVISE, and the revision restores the recorded draft (no number in a recording is edited, no model call is claimed). `MODEL_TIMEOUT` runs the isolated faulted pipeline, which airs templates; its runs are labelled `mock` and TIMED_OUT because nothing was replayed.

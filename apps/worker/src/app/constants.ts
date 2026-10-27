@@ -202,7 +202,15 @@ export const LOG_MESSAGES = {
     `Post-commit step for ${fixtureId} failed: ${reason}`,
   resumed: (fixtureId: string, sequence: number) =>
     `Resumed replay session ${fixtureId} after sequence ${sequence}`,
+  invalidAgentsResult: (
+    correlationId: string,
+    total: number,
+    issues: readonly string[],
+  ) =>
+    `Agents result for ${correlationId} failed the PipelineResult contract (${total} issues): ${issues.join('; ')}`,
 } as const;
+
+export const AGENTS_ISSUE_LOG_LIMIT = 5;
 
 export const REDIS_CONNECTION_NAMES = {
   publisher: 'matchiq-worker-pub',
