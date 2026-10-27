@@ -59,7 +59,7 @@ describe('describeMetric', () => {
       formula: 'count(PRESSURE_APPLIED)',
     });
     expect(describeMetric('unknown.ref')).toEqual({
-      label: 'unknown.ref',
+      label: 'Another figure in the wording',
       plain: null,
       formula: null,
     });
