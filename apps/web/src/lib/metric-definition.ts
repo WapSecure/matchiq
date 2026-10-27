@@ -1,5 +1,7 @@
+import { FIGURE_FALLBACK_LABEL } from '@/constants/numbers-checked';
 import {
   METRIC_BASES,
+  NAMED_EXTRA_METRICS,
   METRIC_REF_SEPARATOR,
   METRIC_SIDES,
   METRIC_WINDOWS,
@@ -22,7 +24,10 @@ const describeScope = (side?: string, window?: string): string =>
 export const describeMetric = (metricRef: string): MetricDescription => {
   const [base = '', side, window] = metricRef.split(METRIC_REF_SEPARATOR);
   const known = METRIC_BASES[base];
-  if (!known) return { label: metricRef, plain: null, formula: null };
+  if (!known) {
+    const label = NAMED_EXTRA_METRICS[metricRef] ?? FIGURE_FALLBACK_LABEL;
+    return { label, plain: null, formula: null };
+  }
   const scope = describeScope(side, window);
   return {
     label: scope ? `${known.label} (${scope})` : known.label,

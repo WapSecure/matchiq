@@ -137,3 +137,8 @@ export const METRIC_WINDOWS: Record<string, string> = {
 };
 
 export const METRIC_REF_SEPARATOR = '.';
+
+/** Plain names for refs outside the registry that can still reach the screen. */
+export const NAMED_EXTRA_METRICS: Readonly<Record<string, string>> = {
+  'fault.injected': 'Planted wrong number (demo)',
+};

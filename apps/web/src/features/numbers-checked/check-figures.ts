@@ -3,7 +3,6 @@ import {
   CONTEXT_FIGURE_LABELS,
   FIGURE_DECIMAL_COMMA,
   FIGURE_NUMERAL_PATTERN,
-  FIGURE_FALLBACK_LABEL,
   FIGURE_TOLERANCE,
   FIGURE_WORD_PATTERN,
   FIGURE_WORDS,
@@ -49,8 +48,7 @@ const represents = (numeral: Numeral, value: number): boolean => {
 const statLabel = (ref: string): string => {
   const context = CONTEXT_FIGURE_LABELS[ref];
   if (context) return context;
-  const described = describeMetric(ref);
-  return described.plain === null ? FIGURE_FALLBACK_LABEL : described.label;
+  return describeMetric(ref).label;
 };
 
 /** The same stats the publish gate accepts: the moment's metrics and its context. */
