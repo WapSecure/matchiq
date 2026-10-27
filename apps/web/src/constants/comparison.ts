@@ -44,8 +44,10 @@ export const COMPARISON_COPY = {
     match: { label: 'Whole match', short: 'Match' },
   },
   loading: 'Working out the comparison…',
-  empty: 'Not enough match time yet to compare',
-  windowEmpty: 'This view is not available for this moment yet',
+  empty:
+    'There is not enough match time to compare this moment yet. Try again after the replay moves on.',
+  windowEmpty:
+    'This time range is not ready yet. Choose a longer range or return after more play.',
   fiveMinuteScope:
     'Over 5 minutes only the team behind this moment is measured.',
   above: 'Above the match average',

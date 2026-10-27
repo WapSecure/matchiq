@@ -61,6 +61,7 @@ export const DEPTH_COPY = {
         ? 'No shots for this selection yet.'
         : `${count} shot${count === 1 ? '' : 's'} plotted by where they were taken. Bigger marks scored or hit the target.`,
     empty: 'No shots for this team yet.',
+    emptyHint: 'This map updates as soon as a shot is recorded.',
     legendGoal: 'Largest: goal',
     legendOn: 'Filled: on target',
     legendOff: 'Small, hollow: off target or blocked',
@@ -82,6 +83,7 @@ export const DEPTH_COPY = {
         ? 'No completed passes for this selection yet.'
         : `${count} completed pass${count === 1 ? '' : 'es'} drawn as arrows from start to end.`,
     empty: 'No completed passes for this team yet.',
+    emptyHint: 'This map updates as soon as a completed pass is recorded.',
     rule: (n: number) =>
       `Showing the ${n} most difficult completed passes per team (synthetic difficulty, longest first on ties), not every pass.`,
     shown: (shown: number, total: number) => `${shown} of ${total} passes`,
