@@ -1,4 +1,5 @@
 import type { ShotOutcome } from '@matchiq/contracts';
+import { NOT_AVAILABLE } from './match';
 
 export const PITCH_VIEWS = ['events', 'shots', 'passes'] as const;
 export type PitchView = (typeof PITCH_VIEWS)[number];
@@ -47,7 +48,7 @@ export const DEPTH_COPY = {
   previous: 'Previous',
   next: 'Next',
   stepPosition: (index: number, total: number) => `${index} of ${total}`,
-  none: '—',
+  none: NOT_AVAILABLE,
   speed: (kph: number) => `${Number(kph.toFixed(1))} km/h`,
   distance: (m: number) => `${m.toFixed(1)} m`,
   difficulty: (value: number) => value.toFixed(0),
@@ -82,7 +83,7 @@ export const DEPTH_COPY = {
         : `${count} completed pass${count === 1 ? '' : 'es'} drawn as arrows from start to end.`,
     empty: 'No completed passes for this team yet.',
     rule: (n: number) =>
-      `Showing the ${n} hardest-rated completed passes per team (synthetic difficulty, longest first on ties), not every pass.`,
+      `Showing the ${n} most difficult completed passes per team (synthetic difficulty, longest first on ties), not every pass.`,
     shown: (shown: number, total: number) => `${shown} of ${total} passes`,
     legendTitle: 'Synthetic difficulty',
     bands: {

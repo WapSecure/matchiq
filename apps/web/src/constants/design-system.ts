@@ -43,7 +43,7 @@ export const GALLERY_COPY = {
   },
   invalidMessage: 'Choose an option to continue.',
   dateInvalid: 'Choose a date before the match ends.',
-  textLabel: 'Fixture name',
+  textLabel: 'Match name',
   textValue: 'Northbridge v Harbourside',
   textInvalid: 'Use at least three characters.',
   textareaLabel: 'Reason',
@@ -53,45 +53,48 @@ export const GALLERY_COPY = {
   primary: 'Start replay',
   secondary: 'Restart',
   ghost: 'Cancel',
-  danger: 'Kill switch',
+  danger: 'Emergency stop',
   tooltipTrigger: 'Hover or focus me',
   tooltipText:
     'Tooltips add context. They never hold the only copy of a label.',
   hintBadge: 'Provisional',
-  hintBadgeText: 'Figures may change until the replay worker confirms them.',
-  popoverTrigger: 'What is a seed?',
-  popoverTitle: 'Fixed seeds',
+  hintBadgeText: 'Figures may change until the match data is confirmed.',
+  popoverTrigger: 'Why does this replay repeat?',
+  popoverTitle: 'Repeatable replay',
   popoverBody:
-    'The generator uses a fixed seed, so every replay produces the same events in the same order.',
-  menuTrigger: 'Session actions',
+    'This sample uses the same match data each time, so every replay unfolds in the same order.',
+  menuTrigger: 'Replay actions',
   disclosureTitle: 'View as table',
   disclosureMeta: '3 rows',
   disclosureBody:
-    'Disclosures replace native details elements: a real button, an expanded state and a smooth height change.',
+    'The same information is available as an accessible table with clear open and closed states.',
   accordion: [
     'Why synthetic data?',
-    'What does the publish gate check?',
-    'Who can use the kill switch?',
+    'What does the fact check cover?',
+    'Who can use the emergency stop?',
   ],
   accordionBody: 'Short answers live here. Only one section is open at a time.',
-  toastSaved: 'Auto-publish frozen. Producers can still air cues by hand.',
-  toastNeutral: 'Already frozen. Nothing changed.',
+  toastSaved:
+    'Automatic graphics paused. Producers can still send graphics by hand.',
+  toastNeutral: 'Graphics are already paused. Nothing changed.',
   toastCritical:
     'The command could not be sent. Check your connection and try again.',
   openModal: 'Open modal',
   openDrawer: 'Open drawer',
-  modalTitle: 'Retract this cue?',
+  modalTitle: 'Take this graphic off air?',
   modalBody:
-    'The cue leaves the programme output straight away. The audit trail records who did it and why.',
+    'The graphic leaves the broadcast output straight away. The activity log records who did it and why.',
   drawerTitle: 'Evidence',
   close: 'Close',
-  confirm: 'Retract cue',
-  switchLabel: 'Auto-publish',
-  switchDescription: 'Cues that pass the gate go to air without a producer.',
+  confirm: 'Take off air',
+  switchLabel: 'Automatic graphics',
+  switchDescription:
+    'Graphics that pass the fact check go to air without a producer.',
   checkboxLabel: 'Show simulated failures',
-  checkboxDescription: 'Adds a labelled demo fault to every third insight.',
+  checkboxDescription:
+    'Adds a labelled demo failure to every third key moment.',
   checkboxInvalid: 'Confirm before you continue.',
-  uploadLabel: 'Fixture import',
+  uploadLabel: 'Match data import',
   uploadAcceptLabel: 'JSON or CSV',
   labels: {
     speed: 'Replay speed',
@@ -131,12 +134,12 @@ export const GALLERY_OPTIONS = {
         {
           id: 'producer',
           label: 'Producer',
-          description: 'Freezes publishing and retracts cues.',
+          description: 'Pauses publishing and takes graphics off air.',
         },
         {
           id: 'editor',
           label: 'Editor',
-          description: 'Suppresses insights before they air.',
+          description: 'Drops key moments before they air.',
         },
       ],
     },
@@ -146,7 +149,7 @@ export const GALLERY_OPTIONS = {
         {
           id: 'operator',
           label: 'Operator',
-          description: 'Runs the kill switch.',
+          description: 'Uses the emergency stop.',
         },
         {
           id: 'admin',
@@ -175,8 +178,8 @@ export const GALLERY_OPTIONS = {
       label: 'View recap',
       description: 'Moments, metrics and narratives.',
     },
-    { id: 'copy', label: 'Copy session link' },
-    { id: 'purge', label: 'Delete session', tone: 'danger', separated: true },
+    { id: 'copy', label: 'Copy replay link' },
+    { id: 'purge', label: 'Delete replay', tone: 'danger', separated: true },
   ],
 } as const;
 
@@ -191,7 +194,7 @@ export const GALLERY_UPLOAD_TYPES = [
 export const GALLERY_UPLOAD_SAMPLES: readonly UploadItem[] = [
   {
     id: 's1',
-    name: 'fixtures-week-9.json',
+    name: 'match-data-week-9.json',
     size: 48_211,
     progress: 64,
     status: 'uploading',

@@ -1,4 +1,5 @@
 import { Disclosure } from '@/components/ui/disclosure';
+import { NOT_AVAILABLE } from '@/constants/match';
 import { PITCH_COPY } from '@/constants/pitch';
 import { EVENT_DETAIL } from '@/constants/events';
 import { PLAYER_FOCUS_COPY } from '@/constants/player-focus';
@@ -40,7 +41,7 @@ export function PitchTable({ marks }: { marks: readonly PitchMark[] }) {
                 <td className="px-2 py-1 font-mono">{m.teamShort}</td>
                 <td className="px-2 py-1">{eventLabel(m)}</td>
                 <td className="px-2 py-1 text-ink-muted">
-                  {m.player ?? '—'}
+                  {m.player ?? NOT_AVAILABLE}
                   {m.followed ? (
                     <span className="ml-1.5 font-semibold text-accent-strong">
                       {PLAYER_FOCUS_COPY.followedMark}

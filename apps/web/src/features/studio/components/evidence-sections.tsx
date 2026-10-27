@@ -1,7 +1,7 @@
 import type { EvidenceEnvelope, Insight, MatchEvent } from '@matchiq/contracts';
 import type { ReactNode } from 'react';
 import { EVIDENCE_COPY } from '@/constants/evidence';
-import { CONFIDENCE_LABELS } from '@/constants/match';
+import { CONFIDENCE_LABELS, NOT_AVAILABLE } from '@/constants/match';
 import { formatFraction, formatMinute, formatWindow } from '@/lib/format';
 import { withUniqueKeys } from '@/lib/unique-keys';
 import { describeEvent } from '../lib/describe-event';
@@ -64,9 +64,11 @@ export function EvidenceEvents({
         const event = byId.get(id);
         const described = event ? describeEvent(event, roster) : null;
         return (
-          <li key={key} className="grid grid-cols-[3rem_1fr] gap-2 text-sm">
+          <li key={key} className="grid grid-cols-[5rem_1fr] gap-2 text-sm">
             <span className="tabular font-mono text-xs text-ink-subtle">
-              {event ? formatMinute(event.period, event.matchClockMs) : '—'}
+              {event
+                ? formatMinute(event.period, event.matchClockMs)
+                : NOT_AVAILABLE}
             </span>
             <div className="min-w-0">
               <p className="text-ink">

@@ -30,7 +30,7 @@ export const STUDIO_COPY = {
   insights: {
     moreLabel: 'More key moments',
     title: 'Key moments',
-    description: 'Spotted in the match data, written up and fact-checked',
+    description: 'Spotted in the match data, written up and checked',
     empty: 'No key moments yet. They appear here as the match unfolds.',
     evidence: 'Evidence',
     coverage: 'Data completeness',
@@ -40,7 +40,7 @@ export const STUDIO_COPY = {
     localeFallback: (language: string) =>
       `The ${language} version isn't ready yet, so you're seeing English.`,
     source: {
-      AGENT: 'Fact-checked',
+      AGENT: 'Checked against data',
       TEMPLATE: 'Standard wording',
     },
     sourceHint: {

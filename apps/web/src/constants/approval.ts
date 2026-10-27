@@ -4,7 +4,7 @@ import type { PublishPolicy } from '@matchiq/contracts';
 export const APPROVAL_COPY = {
   title: 'Waiting for your OK',
   description:
-    'In Manual, each fact-checked graphic waits here until you send it to air.',
+    'In Manual, each graphic that passes the fact check waits here until you send it to air.',
   count: (n: number) => (n === 1 ? '1 waiting' : `${n} waiting`),
   loading: 'Checking for graphics waiting for your OK',
   empty: {
@@ -98,7 +98,7 @@ export const POLICY_COPY: {
       action: 'Switch to Manual',
       title: 'Check each graphic before it airs',
       description:
-        "Fact-checked graphics wait for your OK instead of going on air. A graphic you don't send within its countdown is dropped and never airs late.",
+        "Graphics that pass the fact check wait for your OK instead of going on air. A graphic you don't send within its countdown is dropped and never airs late.",
       submit: 'Switch to Manual',
       pending: 'Switching…',
       done: 'Manual on. Graphics wait for your OK.',
@@ -108,7 +108,7 @@ export const POLICY_COPY: {
       action: 'Switch to Auto',
       title: 'Send graphics to air automatically',
       description:
-        'Fact-checked graphics go on air as soon as they are ready. Any graphic already waiting still needs your OK.',
+        'Graphics that pass the fact check go on air as soon as they are ready. Any graphic already waiting still needs your OK.',
       submit: 'Switch to Auto',
       pending: 'Switching…',
       done: 'Auto on. Graphics go on air when ready.',

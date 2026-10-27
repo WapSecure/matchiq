@@ -157,7 +157,7 @@ describe('PitchMap views', () => {
     expect(container.querySelectorAll('[data-shot]')).toHaveLength(3);
     await user.click(screen.getByRole('radio', { name: 'Passes' }));
     expect(container.querySelectorAll('[data-pass]')).toHaveLength(12);
-    expect(screen.getByText(/hardest-rated completed passes/)).toBeVisible();
+    expect(screen.getByText(/most difficult completed passes/)).toBeVisible();
   });
 
   it('lists shot speed in the table and hides xG outside the Analyst view', async () => {

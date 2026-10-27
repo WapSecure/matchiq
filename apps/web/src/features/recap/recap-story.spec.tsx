@@ -28,7 +28,7 @@ describe('recap story facts', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a dash when possession is not available', () => {
+  it('names unavailable possession instead of showing a symbol', () => {
     const base = finalWith(50, 50);
     const missing = {
       ...base,

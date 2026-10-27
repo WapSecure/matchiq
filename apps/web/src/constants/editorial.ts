@@ -77,7 +77,7 @@ export const RESUME_COPY: CommandCopy = {
   action: 'Resume graphics',
   title: 'Resume automatic graphics for this match',
   description:
-    'New fact-checked graphics go on air again. Graphics held while paused stay held.',
+    'New graphics that pass the fact check go on air again. Graphics held while paused stay held.',
   submit: 'Resume',
   pending: 'Resuming…',
   done: 'Graphics resumed.',

@@ -74,7 +74,7 @@ export const AUDIT_COPY = {
   eyebrow: 'Who did what',
   title: 'Activity log',
   description:
-    'Every producer action and automatic on-air decision, newest first. Entries can never be edited or removed.',
+    'Every producer action and automatic broadcast decision, newest first. Entries can never be edited or removed.',
   filtersLabel: 'Filter the activity log',
   fields: {
     action: 'Action',
@@ -121,7 +121,7 @@ export const AUDIT_COPY = {
   error: "We couldn't load the activity log",
   empty: 'No activity yet',
   emptyHint:
-    'Producer actions and automatic on-air decisions appear here as they happen.',
+    'Producer actions and automatic broadcast decisions appear here as they happen.',
   emptyFiltered: 'No activity matches these filters',
   emptyFilteredHint: 'Try a wider time range, or choose Any action or Anyone.',
   scrollRegion: 'Activity entries',

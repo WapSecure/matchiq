@@ -44,7 +44,7 @@ export const PWA_MANIFEST: MetadataRoute.Manifest = {
   name: SITE.name,
   short_name: SITE.name,
   description:
-    'Football intelligence for live broadcast, shown on simulated matches: match stats, fact-checked key moments and on-air graphics. Fictional teams; not affiliated with the Premier League.',
+    'Football intelligence for live broadcast on simulated matches: match stats, key moments checked against the data and broadcast graphics. Fictional teams; not affiliated with the Premier League.',
   start_url: PWA_ROUTES.start,
   scope: '/',
   display: 'standalone',

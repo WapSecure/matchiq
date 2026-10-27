@@ -34,7 +34,7 @@ describe('commentary language boundaries', () => {
     expect(languageOf(screen.getByText('Trois tirs en cinq minutes.'))).toBe(
       'fr-FR',
     );
-    expect(languageOf(screen.getByText('Fact-checked'))).toBe('en-GB');
+    expect(languageOf(screen.getByText('Checked against data'))).toBe('en-GB');
   });
 
   it('tags provider fallback text as English even when filed under French', () => {
@@ -95,7 +95,7 @@ describe('commentary language boundaries', () => {
       </ul>,
     );
     expect(languageOf(screen.getByText('Home United égalise'))).toBe('fr-FR');
-    expect(languageOf(screen.getByText('Fact-checked'))).toBe('en-GB');
+    expect(languageOf(screen.getByText('Checked against data'))).toBe('en-GB');
   });
 
   it('tags overlay text with the cue locale', () => {
