@@ -97,6 +97,8 @@ The full list and the permission matrix are in [`docs/security/IDENTITY_AND_ACCE
 
 ## Architecture
 
+For the full picture (data flow, delivery guarantees, failure modes, tenancy, scaling and the decision index) read the [architecture overview](docs/architecture/OVERVIEW.md).
+
 ```mermaid
 flowchart LR
   subgraph Client

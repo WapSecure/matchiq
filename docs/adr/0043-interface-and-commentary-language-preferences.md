@@ -1,4 +1,4 @@
-# ADR-0042: Interface and commentary languages are independent
+# ADR-0043: Interface and commentary languages are independent
 
 - Status: Accepted (2026-10-25). Supersedes the interface-localization part of ADR-0035. Spec §27 and §47.
 
