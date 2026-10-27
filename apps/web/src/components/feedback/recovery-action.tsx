@@ -3,6 +3,8 @@
 import { RefreshIcon } from '@/components/icons';
 import { Button, ButtonLink } from '@/components/ui';
 import { ERROR_UI } from '@/constants/errors';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
+import type { InterfaceMessages } from '@/features/interface-language/interface-messages';
 import { ROUTES } from '@/constants/navigation';
 import type { HumanError } from '@/lib/errors';
 import { signInHref } from '@/lib/errors/sign-in-href';
@@ -16,9 +18,11 @@ type RecoveryActionProps = {
 function RetryButton({
   onRetry,
   waitFor,
+  copy,
 }: {
   onRetry: () => void;
   waitFor: number;
+  copy: InterfaceMessages['feedback']['recovery'];
 }) {
   return (
     <Button
@@ -26,13 +30,14 @@ function RetryButton({
       disabled={waitFor > 0}
       leadingIcon={<RefreshIcon size={14} />}
     >
-      {waitFor > 0 ? ERROR_UI.retryIn(waitFor) : ERROR_UI.retry}
+      {waitFor > 0 ? copy.retryIn(waitFor) : copy.retry}
     </Button>
   );
 }
 
 /** The single recovery a humanized error offers. */
 export function RecoveryAction({ human, onRetry }: RecoveryActionProps) {
+  const copy = useInterfaceMessages().feedback.recovery;
   const waitSeconds =
     human.action === 'wait'
       ? (human.retryAfterSeconds ?? ERROR_UI.defaultWaitSeconds)
@@ -42,13 +47,13 @@ export function RecoveryAction({ human, onRetry }: RecoveryActionProps) {
     case 'signIn':
       return (
         <ButtonLink href={signInHref()} size="sm">
-          {ERROR_UI.signIn}
+          {copy.signIn}
         </ButtonLink>
       );
     case 'lobby':
       return (
         <ButtonLink href={ROUTES.fixtures} variant="secondary" size="sm">
-          {ERROR_UI.lobby}
+          {copy.lobby}
         </ButtonLink>
       );
     case 'reload':
@@ -57,18 +62,21 @@ export function RecoveryAction({ human, onRetry }: RecoveryActionProps) {
           onClick={() => window.location.reload()}
           leadingIcon={<RefreshIcon size={14} />}
         >
-          {ERROR_UI.reload}
+          {copy.reload}
         </Button>
       );
     case 'wait':
-      if (onRetry) return <RetryButton onRetry={onRetry} waitFor={left} />;
+      if (onRetry)
+        return <RetryButton onRetry={onRetry} waitFor={left} copy={copy} />;
       return left > 0 ? (
         <p role="timer" className="tabular text-xs text-ink-muted">
-          {ERROR_UI.waitFor(left)}
+          {copy.waitFor(left)}
         </p>
       ) : null;
     case 'retry':
-      return onRetry ? <RetryButton onRetry={onRetry} waitFor={0} /> : null;
+      return onRetry ? (
+        <RetryButton onRetry={onRetry} waitFor={0} copy={copy} />
+      ) : null;
     default:
       return null;
   }

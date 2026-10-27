@@ -1,5 +1,6 @@
 import type { InterfaceLocale } from './interface-locales';
 import type { InterfaceMessages } from './interface-messages';
+import { SHARED_INTERFACE_MESSAGES } from './shared-catalogue';
 
 export {
   DEFAULT_INTERFACE_LOCALE,
@@ -9,6 +10,7 @@ export {
 export type { InterfaceLocale } from './interface-locales';
 
 const en: InterfaceMessages = {
+  ...SHARED_INTERFACE_MESSAGES['en-GB'],
   language: { label: 'Interface language', saved: 'Saved on this device' },
   navigation: {
     primary: 'Primary',
@@ -76,6 +78,7 @@ const en: InterfaceMessages = {
 };
 
 const fr: InterfaceMessages = {
+  ...SHARED_INTERFACE_MESSAGES['fr-FR'],
   language: {
     label: "Langue de l'interface",
     saved: 'Enregistrée sur cet appareil',
@@ -150,6 +153,7 @@ const fr: InterfaceMessages = {
 };
 
 const es: InterfaceMessages = {
+  ...SHARED_INTERFACE_MESSAGES['es-ES'],
   language: {
     label: 'Idioma de la interfaz',
     saved: 'Guardado en este dispositivo',

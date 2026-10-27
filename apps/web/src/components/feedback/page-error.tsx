@@ -3,9 +3,9 @@
 import { AlertIcon, RefreshIcon } from '@/components/icons';
 import { SyntheticNotice } from '@/components/layout/synthetic-notice';
 import { Button, ButtonLink, Container } from '@/components/ui';
-import { PAGE_ERROR_COPY } from '@/constants/errors';
 import { ROUTES } from '@/constants/navigation';
 import { MAIN_CONTENT_ID } from '@/constants/site';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { SupportReference } from './support-reference';
 
 type PageErrorProps = {
@@ -16,7 +16,7 @@ type PageErrorProps = {
 
 /** Whole-page failure: friendly, with a retry and a way back to the matches. */
 export function PageError({ digest, onRetry }: PageErrorProps) {
-  const copy = PAGE_ERROR_COPY;
+  const copy = useInterfaceMessages().feedback.page;
   return (
     <>
       <SyntheticNotice />

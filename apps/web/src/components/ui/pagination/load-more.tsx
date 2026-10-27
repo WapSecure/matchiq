@@ -1,7 +1,8 @@
 'use client';
 
 import { SpinnerIcon } from '@/components/icons';
-import { type CountNoun, PAGINATION_COPY as C } from '@/constants/pagination';
+import type { CountNoun } from '@/constants/pagination';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { cn } from '@/lib/cn';
 import { Button } from '../button';
 import { EDGE_DISABLED, PageSummary } from './pagination-parts';
@@ -22,6 +23,7 @@ export interface LoadMoreProps {
 /** "Show more" for feeds: appends the next page below and keeps focus on the button. */
 export function LoadMore(props: LoadMoreProps) {
   const { shown, total, noun, isLoading = false } = props;
+  const copy = useInterfaceMessages().pagination;
   return (
     <nav
       aria-label={props.label}
@@ -29,8 +31,8 @@ export function LoadMore(props: LoadMoreProps) {
     >
       <PageSummary busy={isLoading}>
         {total === undefined
-          ? C.showingCount(shown, noun)
-          : C.showingOf(shown, total, noun)}
+          ? copy.showingCount(shown, noun)
+          : copy.showingOf(shown, total, noun)}
       </PageSummary>
       {props.hasMore ? (
         <Button
@@ -41,10 +43,12 @@ export function LoadMore(props: LoadMoreProps) {
           leadingIcon={isLoading ? <SpinnerIcon size={14} /> : undefined}
           className={cn('min-w-32 pointer-coarse:h-11', EDGE_DISABLED)}
         >
-          {isLoading ? C.loadingMore : C.showMore}
+          {isLoading ? copy.loadingMore : copy.showMore}
         </Button>
       ) : (
-        <p className="text-xs text-ink-subtle">{props.endMessage ?? C.end}</p>
+        <p className="text-xs text-ink-subtle">
+          {props.endMessage ?? copy.end}
+        </p>
       )}
     </nav>
   );

@@ -10,11 +10,13 @@ import {
 } from '@/lib/api/api-error';
 import { createQueryClient } from '@/lib/api/query-provider';
 import { useSession } from '@/lib/auth/session-store';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
 import { ErrorState } from './error-state';
 import { InlineProblem } from './inline-problem';
 import { PageError } from './page-error';
 import { RegionBoundary } from './region-boundary';
 import { SessionExpiredNotice } from '@/components/auth/session-expired-notice';
+import { TechnicalDetails } from '@/components/ui';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/studio/fx_1' }));
 
@@ -42,6 +44,8 @@ afterEach(() => {
   vi.useRealTimers();
   useSession.setState({ view: null });
 });
+
+beforeEach(() => useInterfaceLanguage.setState({ locale: 'en-GB' }));
 
 describe('ErrorState', () => {
   it.each([
@@ -127,6 +131,15 @@ describe('ErrorState', () => {
       screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
     ).toBe('/sign-in?returnTo=%2Fstudio%2Ffx_1%3Ftab%3D2');
   });
+
+  it('uses the interface language for shared errors and recovery', () => {
+    useInterfaceLanguage.setState({ locale: 'fr-FR' });
+    render(<ErrorState error={networkError()} onRetry={vi.fn()} />);
+    expect(
+      screen.getByText('MatchIQ est momentanément inaccessible'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Réessayer' })).toBeTruthy();
+  });
 });
 
 describe('InlineProblem', () => {
@@ -182,6 +195,36 @@ describe('PageError', () => {
       'd1g35t',
     );
     expect(screen.getByRole('note').textContent).toMatch(/fictional/);
+  });
+
+  it('localizes the page recovery and support reference', () => {
+    useInterfaceLanguage.setState({ locale: 'es-ES' });
+    render(<PageError digest="support-1" onRetry={vi.fn()} />);
+    expect(
+      screen.getByRole('heading', {
+        name: 'Esta página no se ha cargado correctamente',
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Intentar de nuevo' }),
+    ).toBeTruthy();
+    expect(screen.getByText('Copiar referencia')).toBeTruthy();
+  });
+});
+
+describe('TechnicalDetails', () => {
+  it('localizes its opt-in label and audience', () => {
+    useInterfaceLanguage.setState({ locale: 'fr-FR' });
+    render(
+      <TechnicalDetails>
+        <p>Build 42</p>
+      </TechnicalDetails>,
+    );
+    expect(
+      screen.getByRole('button', {
+        name: /Détails techniques.*pour les équipes techniques et les évaluateurs/,
+      }),
+    ).toBeTruthy();
   });
 });
 

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons';
-import { PAGINATION_COPY as C } from '@/constants/pagination';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { cn } from '@/lib/cn';
 import { Button } from '../button';
 import { Skeleton } from '../skeleton';
@@ -48,9 +48,10 @@ export function StepButton({
 }) {
   const previous = direction === 'previous';
   const Icon = previous ? ChevronLeftIcon : ChevronRightIcon;
+  const copy = useInterfaceMessages().pagination;
   return (
     <Button
-      aria-label={previous ? C.previousPage : C.nextPage}
+      aria-label={previous ? copy.previousPage : copy.nextPage}
       aria-disabled={isDisabled || undefined}
       onClick={() => {
         if (!isDisabled) onPress();
@@ -62,7 +63,7 @@ export function StepButton({
     >
       {previous ? <Icon size={14} /> : null}
       <span className="hidden sm:inline">
-        {label ?? (previous ? C.previous : C.next)}
+        {label ?? (previous ? copy.previous : copy.next)}
       </span>
       {previous ? null : <Icon size={14} />}
     </Button>

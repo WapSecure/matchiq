@@ -1,3 +1,6 @@
+import type { ErrorKind } from '@/constants/errors';
+import type { CountNoun } from '@/constants/pagination';
+
 export type InterfaceMessages = {
   language: { label: string; saved: string };
   navigation: {
@@ -51,4 +54,62 @@ export type InterfaceMessages = {
     iosHint: string;
     dismissInstall: string;
   };
+  feedback: {
+    errors: Record<ErrorKind, { title: string; message: string }>;
+    recovery: {
+      retry: string;
+      retryIn: (seconds: number) => string;
+      waitFor: (seconds: number) => string;
+      signIn: string;
+      lobby: string;
+      reload: string;
+    };
+    support: {
+      instruction: string;
+      reference: string;
+      copy: string;
+      copied: string;
+    };
+    boundary: {
+      title: (region: string) => string;
+      message: string;
+      retry: string;
+    };
+    page: {
+      metaTitle: string;
+      eyebrow: string;
+      title: string;
+      description: string;
+      retry: string;
+      lobby: string;
+    };
+    accessDenied: {
+      title: string;
+      body: (role: string) => string;
+      action: string;
+    };
+  };
+  pagination: {
+    previous: string;
+    next: string;
+    previousPage: string;
+    nextPage: string;
+    goToPage: (page: number) => string;
+    pageOf: (page: number, pages: number) => string;
+    page: (page: number) => string;
+    showing: (
+      from: number,
+      to: number,
+      total: number,
+      noun: CountNoun,
+    ) => string;
+    showingCount: (count: number, noun: CountNoun) => string;
+    showingOf: (count: number, total: number, noun: CountNoun) => string;
+    perPage: string;
+    perPageOption: (size: number) => string;
+    showMore: string;
+    loadingMore: string;
+    end: string;
+  };
+  technical: { summary: string; audience: string };
 };

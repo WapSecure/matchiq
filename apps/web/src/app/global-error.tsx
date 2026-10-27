@@ -2,8 +2,11 @@
 
 import { useEffect } from 'react';
 import { PageError } from '@/components/feedback/page-error';
-import { PAGE_ERROR_COPY } from '@/constants/errors';
 import { SITE } from '@/constants/site';
+import {
+  useInterfaceLanguage,
+  useInterfaceMessages,
+} from '@/features/interface-language/interface-language-store';
 import './global.css';
 
 const LOG_PREFIX = '[matchiq] app failed:';
@@ -18,13 +21,15 @@ type GlobalErrorProps = {
  * stylesheet (allowed by `style-src 'self'`), never inline `<style>`.
  */
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  const locale = useInterfaceLanguage((state) => state.locale);
+  const messages = useInterfaceMessages();
   useEffect(() => {
     console.error(LOG_PREFIX, error);
   }, [error]);
   return (
-    <html lang={SITE.locale}>
+    <html lang={locale}>
       <body className="min-h-dvh">
-        <title>{`${PAGE_ERROR_COPY.metaTitle} · ${SITE.name}`}</title>
+        <title>{`${messages.feedback.page.metaTitle} · ${SITE.name}`}</title>
         <PageError digest={error.digest} onRetry={reset} />
       </body>
     </html>

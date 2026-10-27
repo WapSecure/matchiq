@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import { AlertIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { humanizeError } from '@/lib/errors';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
+import { localizeError } from '@/features/interface-language/localize-error';
 import { RecoveryAction } from './recovery-action';
 import { SupportReference } from './support-reference';
 
@@ -25,7 +27,11 @@ export function InlineProblem({
   onRetry,
   className,
 }: InlineProblemProps) {
-  const human = useMemo(() => humanizeError(error), [error]);
+  const messages = useInterfaceMessages();
+  const human = useMemo(
+    () => localizeError(humanizeError(error), messages.feedback.errors),
+    [error, messages],
+  );
   const text =
     message ??
     (lead && !human.headline

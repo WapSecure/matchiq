@@ -1,5 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
-import { TECHNICAL_COPY } from '@/constants/technical';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { cn } from '@/lib/cn';
 import { Disclosure } from './disclosure';
 
@@ -16,14 +18,15 @@ type TechnicalDetailsProps = {
  */
 export function TechnicalDetails({
   children,
-  summary = TECHNICAL_COPY.summary,
+  summary,
   className,
 }: TechnicalDetailsProps) {
+  const copy = useInterfaceMessages().technical;
   return (
     <div data-testid="technical-details" className={cn('text-xs', className)}>
       <Disclosure
-        title={summary}
-        meta={TECHNICAL_COPY.audience}
+        title={summary ?? copy.summary}
+        meta={copy.audience}
         panelClassName="flex flex-col gap-3 text-xs"
       >
         {children}
