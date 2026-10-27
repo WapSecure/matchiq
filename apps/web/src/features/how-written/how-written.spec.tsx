@@ -121,6 +121,30 @@ describe('HowWritten', () => {
     expect(screen.queryByText(/Caught/)).not.toBeInTheDocument();
   });
 
+  it.each([
+    [24_000, true],
+    [1_500, false],
+    [undefined, false],
+  ])('queue wait %s shows the quiet line: %s', async (queueWaitMs, shown) => {
+    stubApi({
+      [`GET ${RUNS}`]: {
+        body: {
+          items: [agentTrace(queueWaitMs === undefined ? {} : { queueWaitMs })],
+        },
+      },
+      [`GET ${STEPS}`]: { body: stepsBody(FULL) },
+    });
+    renderIt();
+    await open();
+    await screen.findByRole('list', { name: "Steps behind Goal 18'" });
+    const line = screen.queryByText(
+      'Waited 24 s in the queue before writing started',
+    );
+    expect(line !== null).toBe(shown);
+    expect(screen.queryAllByText(/^Step time/).length > 0).toBe(shown);
+    expect(screen.queryAllByText(/^Took/).length > 0).toBe(!shown);
+  });
+
   it('lists what the fact check caught', async () => {
     const caught = agentTrace({
       gate: {

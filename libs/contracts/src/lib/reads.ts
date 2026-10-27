@@ -101,6 +101,8 @@ export const GateReport = z.strictObject({
   templateNarratives: z.int().nonnegative(),
   overlayRevision: z.int().nullable(),
   rejected: z.array(GateRejection),
+  /** Time the job waited in the queue before its first attempt began; absent on older rows. */
+  queueWaitMs: z.int().nonnegative().optional(),
 });
 
 export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
@@ -140,6 +142,8 @@ export const InsightTrace = z.strictObject({
   gate: GateReport.nullable(),
   runs: z.array(AgentRun),
   editorial: InsightEditorialTrace,
+  /** Queue wait before writing started (timing metadata, not model time); absent when unknown. */
+  queueWaitMs: z.int().nonnegative().optional(),
 });
 
 export const InsightTraceList = CursorPage(InsightTrace);

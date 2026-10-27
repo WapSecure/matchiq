@@ -8,6 +8,7 @@ import {
 import { InsightPipelineJob, QUEUES, ReplayCommandJob } from '@matchiq/db';
 import { withLogContext } from '@matchiq/server-kit';
 import { Worker, type Job } from 'bullmq';
+import { firstAttemptWaitMs } from '../agents/queue-wait';
 import { InsightPipelineService } from '../agents/insight-pipeline.service';
 import { LOG_MESSAGES } from '../constants';
 import { REDIS } from '../infrastructure/tokens';
@@ -78,13 +79,7 @@ export class QueueConsumers
     );
     const insights = new Worker(
       QUEUES.insightPipeline,
-      inJobContext((job) =>
-        this.pipeline.process(InsightPipelineJob.parse(job.data), {
-          attemptsMade: job.attemptsMade,
-          maxAttempts: job.opts.attempts ?? 1,
-          enqueuedAtMs: job.timestamp,
-        }),
-      ),
+      inJobContext((job) => this.runInsight(job)),
       { ...options, concurrency: this.config.insightConcurrency },
     );
     for (const worker of [commands, insights]) {
@@ -97,6 +92,17 @@ export class QueueConsumers
       worker.on('error', (error) => this.logger.warn(describe(error)));
     }
     this.workers = [commands, insights];
+  }
+
+  private runInsight(job: Job) {
+    const waitMs = firstAttemptWaitMs(job);
+    if (waitMs !== null) this.config.metrics.queueWaited(waitMs / 1_000);
+    return this.pipeline.process(InsightPipelineJob.parse(job.data), {
+      attemptsMade: job.attemptsMade,
+      maxAttempts: job.opts.attempts ?? 1,
+      enqueuedAtMs: job.timestamp,
+      ...(waitMs === null ? {} : { queueWaitMs: waitMs }),
+    });
   }
 
   private observe(worker: Worker): void {

@@ -75,24 +75,26 @@ One JSON object per line:
 
 Every series carries `service`. Labels are bounded enums; ids are never labels.
 
-| Series                                         | Type      | Labels                   | Source                                                                                   |
-| ---------------------------------------------- | --------- | ------------------------ | ---------------------------------------------------------------------------------------- |
-| `matchiq_http_requests_total`                  | counter   | method, route, status    | API and worker, every route (RED)                                                        |
-| `matchiq_http_request_duration_seconds`        | histogram | method, route            | API and worker; SSE routes last for the connection                                       |
-| `matchiq_sse_connections`                      | gauge     | —                        | API: open SSE streams                                                                    |
-| `matchiq_replay_sessions`                      | gauge     | state                    | Worker: loaded sessions by replay state                                                  |
-| `matchiq_pipeline_commit_duration_seconds`     | histogram | —                        | Worker: committed pipeline transactions (event-to-state proxy)                           |
-| `matchiq_outbox_backlog`                       | gauge     | —                        | Worker: unpublished outbox rows                                                          |
-| `matchiq_outbox_oldest_age_seconds`            | gauge     | —                        | Worker: relay lag                                                                        |
-| `matchiq_queue_jobs`                           | gauge     | queue, state             | Worker: BullMQ waiting (incl. prioritized) / active / delayed / failed                   |
-| `matchiq_queue_job_duration_seconds`           | histogram | queue, outcome           | Worker: job processing time, completed or failed                                         |
-| `matchiq_agent_pipeline_call_duration_seconds` | histogram | outcome                  | Worker: success, timeout, unreachable, http, invalid-response, circuit-open, ai-disabled |
-| `matchiq_agent_runs_total`                     | counter   | agent, provider, outcome | Worker: stored agent runs (SUCCEEDED, FAILED, TIMED_OUT, FALLBACK)                       |
-| `matchiq_agent_run_duration_seconds`           | histogram | agent, provider, outcome | Worker: latency reported per agent run                                                   |
-| `matchiq_insight_completions_total`            | counter   | status, source           | Worker: PUBLISHED / FALLBACK / REJECTED by AGENT or TEMPLATE                             |
-| `matchiq_gate_rejections_total`                | counter   | item, source, code       | Worker: publish-gate rejections by issue code                                            |
-| `matchiq_retention_deleted_total`              | counter   | kind                     | Worker: rows deleted by retention                                                        |
-| `process_*`, `nodejs_*`                        | various   | —                        | prom-client defaults                                                                     |
+| Series                                         | Type      | Labels                   | Source                                                                                        |
+| ---------------------------------------------- | --------- | ------------------------ | --------------------------------------------------------------------------------------------- |
+| `matchiq_http_requests_total`                  | counter   | method, route, status    | API and worker, every route (RED)                                                             |
+| `matchiq_http_request_duration_seconds`        | histogram | method, route            | API and worker; SSE routes last for the connection                                            |
+| `matchiq_sse_connections`                      | gauge     | —                        | API: open SSE streams                                                                         |
+| `matchiq_replay_sessions`                      | gauge     | state                    | Worker: loaded sessions by replay state                                                       |
+| `matchiq_pipeline_commit_duration_seconds`     | histogram | —                        | Worker: committed pipeline transactions (event-to-state proxy)                                |
+| `matchiq_outbox_backlog`                       | gauge     | —                        | Worker: unpublished outbox rows                                                               |
+| `matchiq_outbox_oldest_age_seconds`            | gauge     | —                        | Worker: relay lag                                                                             |
+| `matchiq_queue_jobs`                           | gauge     | queue, state             | Worker: BullMQ waiting (incl. prioritized) / active / delayed / failed                        |
+| `matchiq_agent_queue_wait_seconds`             | histogram | —                        | Worker: enqueue to first attempt start for insight-pipeline jobs (queue wait, not model time) |
+| `matchiq_agent_queue_depth`                    | gauge     | —                        | Worker: insight-pipeline jobs waiting for the agents service                                  |
+| `matchiq_queue_job_duration_seconds`           | histogram | queue, outcome           | Worker: job processing time, completed or failed                                              |
+| `matchiq_agent_pipeline_call_duration_seconds` | histogram | outcome                  | Worker: success, timeout, unreachable, http, invalid-response, circuit-open, ai-disabled      |
+| `matchiq_agent_runs_total`                     | counter   | agent, provider, outcome | Worker: stored agent runs (SUCCEEDED, FAILED, TIMED_OUT, FALLBACK)                            |
+| `matchiq_agent_run_duration_seconds`           | histogram | agent, provider, outcome | Worker: latency reported per agent run                                                        |
+| `matchiq_insight_completions_total`            | counter   | status, source           | Worker: PUBLISHED / FALLBACK / REJECTED by AGENT or TEMPLATE                                  |
+| `matchiq_gate_rejections_total`                | counter   | item, source, code       | Worker: publish-gate rejections by issue code                                                 |
+| `matchiq_retention_deleted_total`              | counter   | kind                     | Worker: rows deleted by retention                                                             |
+| `process_*`, `nodejs_*`                        | various   | —                        | prom-client defaults                                                                          |
 
 Counters from the pipeline are recorded only after the transaction commits. A redelivered job whose batch is skipped is not counted twice.
 

@@ -26,6 +26,7 @@ export const GateReport = z.object({
   templateNarratives: z.int().nonnegative(),
   overlayRevision: z.int().nullable(),
   rejected: z.array(GateRejection),
+  queueWaitMs: z.int().nonnegative().optional(),
 });
 
 export const InsightPublication = z.enum(['PENDING', 'AGENT', 'TEMPLATE']);
@@ -48,6 +49,8 @@ export const InsightTrace = z.object({
   gate: GateReport.nullable(),
   runs: z.array(AgentRun),
   editorial: InsightEditorialTrace.optional(),
+  /** Absent from APIs older than MQ-126. */
+  queueWaitMs: z.int().nonnegative().optional(),
 });
 
 export const TraceList = itemsOf(InsightTrace);

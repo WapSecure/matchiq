@@ -45,6 +45,7 @@ export class WorkerGauges implements OnModuleInit, OnApplicationShutdown {
     );
     this.sessionGauge();
     this.queueGauge(this.queues);
+    this.depthGauge(this.queues);
     this.outboxGauges(new PostgresOutboxStore(this.database.db));
   }
 
@@ -90,6 +91,22 @@ export class WorkerGauges implements OnModuleInit, OnApplicationShutdown {
             }
           });
         }
+      },
+    });
+  }
+
+  private depthGauge(queues: readonly Queue[]): void {
+    const insights = queues.find((q) => q.name === QUEUES.insightPipeline);
+    new Gauge({
+      name: names.queueDepth,
+      help: help.queueDepth,
+      registers: [this.registry],
+      async collect() {
+        if (insights === undefined) return;
+        await tolerant(async () => {
+          const counts = await insights.getJobCounts('waiting', 'prioritized');
+          this.set((counts.waiting ?? 0) + (counts.prioritized ?? 0));
+        });
       },
     });
   }

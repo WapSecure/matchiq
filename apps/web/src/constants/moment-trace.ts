@@ -17,6 +17,16 @@ export const MOMENT_TRACE_COPY = {
   tookLabel: (seconds: string) => `Took ${seconds}`,
 } as const;
 
+/** Waits shorter than this are ordinary and not worth a line. */
+export const QUEUE_WAIT_MIN_MS = 2_000;
+
+export const QUEUE_WAIT_COPY = {
+  line: (seconds: number) =>
+    `Waited ${seconds} s in the queue before writing started`,
+  /** Replaces "Took" so a queued step is not read as model time. */
+  stepTime: (seconds: string) => `Step time ${seconds}`,
+} as const;
+
 export const GATE_OUTCOMES = {
   passed: 'Passed',
   template: 'Used a template',

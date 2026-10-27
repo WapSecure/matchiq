@@ -36,6 +36,7 @@ export class WorkerMetrics {
   private readonly gateRejections: Counter<'item' | 'source' | 'code'>;
   private readonly transactions: Histogram<never>;
   private readonly jobs: Histogram<'queue' | 'outcome'>;
+  private readonly queueWait: Histogram<never>;
   private readonly retention: Counter<'kind'>;
 
   constructor(@Inject(METRICS_REGISTRY) registry: Registry) {
@@ -85,6 +86,12 @@ export class WorkerMetrics {
       buckets: [...buckets.agent],
       registers,
     });
+    this.queueWait = new Histogram({
+      name: names.queueWait,
+      help: help.queueWait,
+      buckets: [...buckets.agent],
+      registers,
+    });
     this.retention = new Counter({
       name: names.retention,
       help: help.retention,
@@ -129,6 +136,11 @@ export class WorkerMetrics {
 
   job(queue: string, outcome: 'completed' | 'failed', seconds: number): void {
     this.jobs.observe({ queue, outcome }, seconds);
+  }
+
+  /** Seconds between enqueue and the first attempt starting. */
+  queueWaited(seconds: number): void {
+    this.queueWait.observe(seconds);
   }
 
   retained(counts: Readonly<Record<string, number>>): void {

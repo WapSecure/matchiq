@@ -11,6 +11,7 @@ import {
 } from '@/constants/agent-steps';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { AgentStepItem } from './agent-step-item';
+import { hasQueueWait, queueWaitLine } from './queue-wait';
 import { useAgentSteps } from './use-agent-steps';
 
 const copy = AGENT_STEP_COPY;
@@ -19,14 +20,22 @@ function Note({ children }: { children: string }) {
   return <p className="text-[13px] text-ink-subtle">{children}</p>;
 }
 
-function StepList({ steps, label }: { steps: AgentStep[]; label: string }) {
+function StepList({
+  steps,
+  label,
+  waited,
+}: {
+  steps: AgentStep[];
+  label: string;
+  waited: boolean;
+}) {
   const [limit, setLimit] = useState(AGENT_STEPS_PAGE_SIZE);
   const visible = steps.slice(0, limit);
   return (
     <>
       <ol aria-label={label} className="group/steps flex flex-col">
         {visible.map((step) => (
-          <AgentStepItem key={step.stepIndex} step={step} />
+          <AgentStepItem key={step.stepIndex} step={step} waited={waited} />
         ))}
       </ol>
       {steps.length > AGENT_STEPS_PAGE_SIZE ? (
@@ -73,7 +82,13 @@ function Body({ trace, label }: { trace: InsightTrace; label: string }) {
   }
   const steps = query.data?.steps ?? [];
   if (steps.length === 0) return <Note>{copy.empty}</Note>;
-  return <StepList steps={steps} label={label} />;
+  return (
+    <StepList
+      steps={steps}
+      label={label}
+      waited={hasQueueWait(trace.queueWaitMs)}
+    />
+  );
 }
 
 /** Per-moment handoff timeline: analyst → writer → fact checker → translator → graphics. */
@@ -92,6 +107,11 @@ export function AgentStepTimeline({
           {copy.title}
         </h4>
         <p className="text-micro text-ink-subtle">{copy.description}</p>
+        {queueWaitLine(trace.queueWaitMs) ? (
+          <p className="text-micro text-ink-subtle">
+            {queueWaitLine(trace.queueWaitMs)}
+          </p>
+        ) : null}
       </header>
       <Body trace={trace} label={copy.listLabel(moment)} />
     </section>

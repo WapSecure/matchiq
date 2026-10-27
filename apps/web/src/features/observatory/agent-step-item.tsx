@@ -8,6 +8,7 @@ import {
   STEP_REASONS,
   STEP_ROLE_LABELS,
 } from '@/constants/agent-steps';
+import { QUEUE_WAIT_COPY } from '@/constants/moment-trace';
 import { cn } from '@/lib/cn';
 import { formatSeconds } from '@/lib/format';
 import { describeMetric } from '@/lib/metric-definition';
@@ -38,7 +39,13 @@ function Evidence({ step }: { step: AgentStep }) {
 }
 
 /** One handoff in plain words; ids, versions and tokens live in Technical details. */
-export function AgentStepItem({ step }: { step: AgentStep }) {
+export function AgentStepItem({
+  step,
+  waited = false,
+}: {
+  step: AgentStep;
+  waited?: boolean;
+}) {
   return (
     <li className="relative flex flex-col gap-0.5 pb-3 pl-5 last:pb-0">
       <span
@@ -60,7 +67,9 @@ export function AgentStepItem({ step }: { step: AgentStep }) {
           {STEP_DECISION_LABELS[step.decision]}
         </Badge>
         <span className="tabular ml-auto text-micro text-ink-subtle">
-          {copy.took(formatSeconds(step.latencyMs))}
+          {waited
+            ? QUEUE_WAIT_COPY.stepTime(formatSeconds(step.latencyMs))
+            : copy.took(formatSeconds(step.latencyMs))}
         </span>
       </div>
       <p className="text-[13px] text-ink-muted">{plainReason(step)}</p>
