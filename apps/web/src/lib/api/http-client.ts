@@ -9,6 +9,7 @@ import { AUTH_ROUTES } from '@/constants/auth';
 import { useSession, whenSessionKnown } from '@/lib/auth/session-store';
 import { apiUrl } from '@/lib/env';
 import {
+  ApiError,
   httpError,
   invalidResponseError,
   networkError,
@@ -83,16 +84,39 @@ export const describeIssues = (error: z.ZodError): string =>
     .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
     .join('; ');
 
+const parseJson = async <S extends z.ZodType>(
+  response: Response,
+  schema: S,
+): Promise<z.infer<S>> => {
+  const body = await readBody(response);
+  if (!response.ok) throw httpError(response.status, body, response.headers);
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) throw invalidResponseError(describeIssues(parsed.error));
+  return parsed.data;
+};
+
 /** Fetches JSON and validates it against a contract before returning it. */
 export const requestJson = async <S extends z.ZodType>(
   path: string,
   schema: S,
   options: RequestOptions = {},
 ): Promise<z.infer<S>> => {
-  const response = await send(path, options);
-  const body = await readBody(response);
-  if (!response.ok) throw httpError(response.status, body, response.headers);
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) throw invalidResponseError(describeIssues(parsed.error));
-  return parsed.data;
+  return parseJson(await send(path, options), schema);
+};
+
+/** Like `requestJson`, but a 204 or 404 answer means there is nothing to show and gives null. */
+export const requestJsonOrNull = async <S extends z.ZodType>(
+  path: string,
+  schema: S,
+  options: RequestOptions = {},
+): Promise<z.infer<S> | null> => {
+  try {
+    const response = await send(path, options);
+    if (response.status === NO_CONTENT) return null;
+    return await parseJson(response, schema);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === HTTP_STATUS.notFound)
+      return null;
+    throw error;
+  }
 };

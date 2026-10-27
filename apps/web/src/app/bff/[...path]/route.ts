@@ -30,6 +30,11 @@ const pick = (from: Headers, names: readonly string[]): Headers => {
   return out;
 };
 
+const isQuietNotFound = (request: NextRequest, path: string[]): boolean =>
+  request.method === 'GET' &&
+  path.length === BFF.quietNotFound.segments &&
+  BFF.quietNotFound.prefix.every((segment, i) => path[i] === segment);
+
 /**
  * Backend-for-frontend: forwards a signed-in user's API calls with the
  * session's bearer token, so the token never reaches browser JavaScript.
@@ -65,6 +70,10 @@ const forward = async (request: NextRequest, context: Context) => {
   } catch {
     // Still persist a refreshed session: its old refresh token is now spent.
     return settle(problem(STATUS.badGateway, TITLES.unreachable), env, live);
+  }
+  if (upstream.status === STATUS.notFound && isQuietNotFound(request, path)) {
+    await upstream.body?.cancel();
+    return settle(new NextResponse(null, { status: BFF.noContent }), env, live);
   }
   const response = new NextResponse(upstream.body, {
     status: upstream.status,

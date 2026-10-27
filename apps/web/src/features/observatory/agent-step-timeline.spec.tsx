@@ -112,6 +112,14 @@ describe('AgentStepTimeline', () => {
     ).toBeInTheDocument();
   });
 
+  it('treats a 204 from the proxy as no handoffs', async () => {
+    stubApi({ [`GET ${PATH}`]: { status: 204, body: null } });
+    renderWith(<AgentStepTimeline trace={published} moment="m" />);
+    expect(
+      await screen.findByText('No handoffs were recorded for this moment.'),
+    ).toBeInTheDocument();
+  });
+
   it('waits for a moment that is still being written', () => {
     const mock = stubApi({});
     renderWith(

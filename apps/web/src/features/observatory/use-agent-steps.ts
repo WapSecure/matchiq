@@ -4,10 +4,8 @@ import {
   AGENT_STEPS_QUERY_KEY,
   AGENT_STEPS_STALE_MS,
   AGENT_TRACE_PATH,
-  NOT_FOUND_STATUS,
 } from '@/constants/agent-steps';
-import { ApiError } from '@/lib/api/api-error';
-import { requestJson } from '@/lib/api/http-client';
+import { requestJsonOrNull } from '@/lib/api/http-client';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 
 /** Null when the run stored no handoffs, e.g. templates published without the agents. */
@@ -15,15 +13,9 @@ const fetchAgentSteps = async (
   correlationId: string,
   signal?: AbortSignal,
 ): Promise<AgentStepTrace | null> => {
-  try {
-    return await requestJson(AGENT_TRACE_PATH(correlationId), AgentStepTrace, {
-      signal,
-    });
-  } catch (error) {
-    if (error instanceof ApiError && error.status === NOT_FOUND_STATUS)
-      return null;
-    throw error;
-  }
+  return requestJsonOrNull(AGENT_TRACE_PATH(correlationId), AgentStepTrace, {
+    signal,
+  });
 };
 
 export const correlationIdOf = (trace: InsightTrace): string | undefined =>
