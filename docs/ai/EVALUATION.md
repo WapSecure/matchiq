@@ -147,3 +147,17 @@ To measure again:
 2. Start a replay session of the Late comeback fixture at 5x and let it finish.
 3. Poll `insights`, `narratives` and `agent_runs` for the fixture. Count insights by `publication` (AGENT or TEMPLATE) and `agent_runs` by `outcome`; read `fallback_reason` on template insights (`SKIPPED_STALE` counts the moments skipped for age).
 4. Repeat with `AGENT_PROMPT_MODE=compact` and compare the AI share and the timed-out count.
+
+## Recorded model run on the live stack (27 October 2026)
+
+`MODEL_PROVIDER=recorded`, `AI_ENABLED=true`, `DEMO_FAULTS_ENABLED=true`, Late comeback, the owner's laptop. Counts come from `GET /api/v1/fixtures/<id>/agent-runs` and the Fact-checks page. The recorded text is real output of a local `qwen2.5:7b-instruct` run from 23 October, replayed through today's fact check and publish gate; no model ran.
+
+| Run | Speed | Demo failure         | Build                                                           | Result                                                                                                                                           |
+| --- | ----- | -------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| s28 | 30×   | none                 | before [PR #128](https://github.com/WapSecure/matchiq/pull/128) | 1 of 41 key moments auto-written; 13 "writing service slow or unavailable", 5 rejected by the fact check                                         |
+| s29 | 5×    | Wrong number fixed   | before PR #128                                                  | 1 of 33 moments auto-written; pressure, shot and regain moments failed with "invalid PipelineResult"                                             |
+| s30 | 5×    | Wrong number fixed   | after PR #128                                                   | **10 of 19 non-milestone moments auto-written**, 0 invalid responses; the planted number was sent back and fixed (read in detail on two moments) |
+| s31 | 5×    | Timed out            | after PR #128                                                   | The 18' writer timed out and standard wording aired on time; later moments published as AI wording                                               |
+| s32 | 5×    | Wrong number blocked | after PR #128                                                   | The final fact check blocked the planted number on two moments; their other versions kept their wording                                          |
+
+Cause of the before/after gap: the agents service sent `breakdown: null` on translated drafts, which the worker's response contract rejects, so every recorded moment failed before the checks ran. All six goal moments still fall back to standard wording after the fix, because the 23 October goal text does not lead with the goal or name the scorer and today's checks reject it. The recording was not edited. A clean full-share result needs a fresh recording.
