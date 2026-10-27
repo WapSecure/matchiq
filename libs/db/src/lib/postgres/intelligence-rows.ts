@@ -124,6 +124,9 @@ export const toTrace = (
     overlay: row.overlayState,
     overlayReason: row.overlayReason,
   },
+  ...(row.gate?.queueWaitMs === undefined
+    ? {}
+    : { queueWaitMs: row.gate.queueWaitMs }),
 });
 
 /** Pairs an insight with its overlay cue, for traces. */

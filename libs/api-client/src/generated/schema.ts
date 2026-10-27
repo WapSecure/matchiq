@@ -1663,6 +1663,7 @@ export interface components {
                 codes: ("UNSUPPORTED_NUMBER" | "UNKNOWN_ENTITY" | "UNCITED_EVIDENCE" | "FORBIDDEN_CLAIM" | "SCHEMA_VIOLATION" | "LENGTH_EXCEEDED" | "UNREQUESTED_VARIANT" | "INJECTION_ECHO" | "UNSUPPORTED_CAUSALITY" | "REPETITION" | "UNSAFE_TONE")[];
                 details: string[];
             }[];
+            queueWaitMs?: number;
         };
         InsightTrace: {
             insightId: string;
@@ -1682,6 +1683,7 @@ export interface components {
                 overlay: ("RETRACTED" | "HELD" | "SUPPRESSED" | "AWAITING_APPROVAL" | "APPROVED" | "REJECTED" | "APPROVAL_EXPIRED") | null;
                 overlayReason: string | null;
             };
+            queueWaitMs?: number;
         };
         EditorialCommand: {
             reason: string;

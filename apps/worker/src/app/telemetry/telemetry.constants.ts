@@ -11,6 +11,8 @@ export const WORKER_METRICS = {
     retention: 'matchiq_retention_deleted_total',
     sessions: 'matchiq_replay_sessions',
     queueJobs: 'matchiq_queue_jobs',
+    queueWait: 'matchiq_agent_queue_wait_seconds',
+    queueDepth: 'matchiq_agent_queue_depth',
     outboxBacklog: 'matchiq_outbox_backlog',
     outboxAge: 'matchiq_outbox_oldest_age_seconds',
   },
@@ -30,6 +32,9 @@ export const WORKER_METRICS = {
     retention: 'Rows deleted by data retention, by kind',
     sessions: 'Replay sessions loaded in this worker by state',
     queueJobs: 'BullMQ jobs by queue and state',
+    queueWait:
+      'Time an insight-pipeline job waited in the queue before its first attempt began',
+    queueDepth: 'Insight-pipeline jobs waiting for the agents service',
     outboxBacklog: 'Unpublished outbox rows',
     outboxAge: 'Age of the oldest unpublished outbox row (relay lag)',
   },

@@ -1,19 +1,21 @@
 import { ShieldIcon } from '@/components/icons';
 import { Badge } from '@/components/ui';
 import { STEP_DECISION_TONES } from '@/constants/agent-steps';
-import { MOMENT_TRACE_COPY } from '@/constants/moment-trace';
+import { MOMENT_TRACE_COPY, QUEUE_WAIT_COPY } from '@/constants/moment-trace';
 import type { ChainLink, MomentChain } from './moment-chain';
 
 const copy = MOMENT_TRACE_COPY;
 
-function Link({ item }: { item: ChainLink }) {
+function Link({ item, waited }: { item: ChainLink; waited: boolean }) {
   return (
     <li className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-md border border-line bg-surface px-2 py-1.5 text-xs">
       <span className="font-medium text-ink">{item.label}</span>
       <Badge tone={STEP_DECISION_TONES[item.tone]}>{item.outcome}</Badge>
       {item.duration ? (
         <span className="tabular text-micro text-ink-subtle">
-          {copy.tookLabel(item.duration)}
+          {waited
+            ? QUEUE_WAIT_COPY.stepTime(item.duration)
+            : copy.tookLabel(item.duration)}
         </span>
       ) : null}
     </li>
@@ -69,7 +71,7 @@ export function ChainView({
           className="grid gap-1.5 sm:grid-cols-2"
         >
           {chain.links.map((item) => (
-            <Link key={item.key} item={item} />
+            <Link key={item.key} item={item} waited={chain.waited ?? false} />
           ))}
         </ol>
       ) : null}
@@ -83,6 +85,9 @@ export function ChainView({
             </span>
           ))}
         </p>
+      ) : null}
+      {chain.waitLine ? (
+        <p className="text-xs text-ink-subtle">{chain.waitLine}</p>
       ) : null}
       <Caught items={chain.caught} />
       <HeldBack items={chain.heldBack} />

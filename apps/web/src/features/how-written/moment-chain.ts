@@ -16,6 +16,7 @@ import {
   describeRejection,
   plainFallbackReasons,
 } from '@/features/observatory/plain-trace';
+import { hasQueueWait, queueWaitLine } from '@/features/observatory/queue-wait';
 import { splitRejections } from '@/features/observatory/rejection-split';
 import type { InsightTrace } from '@/lib/api/trace-schemas';
 import { formatSeconds } from '@/lib/format';
@@ -37,6 +38,10 @@ export type MomentChain = {
   heldBack: string[];
   finalLine: string | null;
   standardReason: boolean;
+  /** Quiet note when the moment queued before writing started. */
+  waitLine?: string | null;
+  /** True when step times follow a long wait and are not shown as model time. */
+  waited?: boolean;
 };
 
 const link = (role: AgentStepRole, steps: readonly AgentStep[]): ChainLink => {
@@ -104,5 +109,7 @@ export const buildChain = (
     heldBack: split.heldBack.map(describeRejection),
     finalLine: finalLineFor(trace),
     standardReason: trace.publication === 'TEMPLATE',
+    waitLine: queueWaitLine(trace.queueWaitMs),
+    waited: hasQueueWait(trace.queueWaitMs),
   };
 };

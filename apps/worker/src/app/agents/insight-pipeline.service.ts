@@ -26,6 +26,7 @@ import {
   WorkerMetrics,
 } from '../telemetry/worker-metrics';
 import { CircuitBreaker } from './circuit-breaker';
+import { withQueueWait } from './queue-wait';
 import { faultFor, tamperForGate } from './demo-faults';
 
 export interface JobAttempt {
@@ -34,6 +35,8 @@ export interface JobAttempt {
   readonly maxAttempts: number;
   /** Wall-clock time the job was queued; stale moments skip AI writing. */
   readonly enqueuedAtMs?: number;
+  /** Enqueue-to-start wait of the first attempt; absent for retries. */
+  readonly queueWaitMs?: number;
 }
 
 export type JobOutcome = WriteOutcome | 'skipped';
@@ -100,7 +103,11 @@ export class InsightPipelineService {
       attempt,
       fault: await this.faultOf(key, pending.insightId),
     });
-    return this.sessions.publish(key, { insight: pending, ...decided });
+    return this.sessions.publish(key, {
+      insight: pending,
+      ...decided,
+      publication: withQueueWait(decided.publication, attempt.queueWaitMs),
+    });
   }
 
   private isStale(attempt: JobAttempt): boolean {
