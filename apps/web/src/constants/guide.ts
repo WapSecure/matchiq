@@ -73,7 +73,7 @@ export const GUIDE_STEPS: readonly GuideStep[] = [
     doThis:
       'Back in the matches, open your replay and choose Fact-checks at the top.',
     shows:
-      'Who wrote each moment, and which problems the fact check caught before anything went on air.',
+      'Who wrote each moment, and which wrong facts or numbers the fact check stopped before anything went on air.',
     link: lobby,
   },
   {
