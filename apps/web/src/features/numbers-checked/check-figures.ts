@@ -1,7 +1,9 @@
 import type { Insight, Narrative } from '@matchiq/contracts';
 import {
+  CONTEXT_FIGURE_LABELS,
   FIGURE_DECIMAL_COMMA,
   FIGURE_NUMERAL_PATTERN,
+  FIGURE_FALLBACK_LABEL,
   FIGURE_TOLERANCE,
   FIGURE_WORD_PATTERN,
   FIGURE_WORDS,
@@ -43,6 +45,14 @@ const represents = (numeral: Numeral, value: number): boolean => {
   );
 };
 
+/** Never a raw internal name: unknown refs get a neutral label. */
+const statLabel = (ref: string): string => {
+  const context = CONTEXT_FIGURE_LABELS[ref];
+  if (context) return context;
+  const described = describeMetric(ref);
+  return described.plain === null ? FIGURE_FALLBACK_LABEL : described.label;
+};
+
 /** The same stats the publish gate accepts: the moment's metrics and its context. */
 const citable = (insight: Insight): [string, number][] =>
   Object.entries({
@@ -70,7 +80,7 @@ export function checkFigures(
   for (const numeral of found) {
     const hit = stats.find(([, v]) => represents(numeral, v));
     if (!hit) return null;
-    const stat = describeMetric(hit[0]).label;
+    const stat = statLabel(hit[0]);
     if (!matched.some((m) => m.shown === numeral.shown && m.stat === stat))
       matched.push({ shown: numeral.shown, stat });
   }

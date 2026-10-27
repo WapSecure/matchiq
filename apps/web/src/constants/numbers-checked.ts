@@ -43,3 +43,23 @@ export const NUMBERS_CHECKED_COPY = {
   listIntro: 'Each figure in the wording and the stat it matches.',
   matches: 'matches',
 } as const;
+
+export const FIGURE_FALLBACK_LABEL = 'Another figure in the wording';
+
+/** Plain names for the moment-context figures; keyed by their internal ref. */
+export const CONTEXT_FIGURE_LABELS: Readonly<Record<string, string>> = {
+  'context.score.home': 'Score, home',
+  'context.score.away': 'Score, away',
+  'context.score.margin': 'Goal difference',
+  'context.minute': 'Minute of the moment',
+  'context.compare.windowMinutes': 'Comparison window (minutes)',
+  'context.compare.recent.home': 'Recent count, home',
+  'context.compare.recent.away': 'Recent count, away',
+  'context.compare.average.home': 'Match average, home',
+  'context.compare.average.away': 'Match average, away',
+  'context.trend.spell1': 'Count in the earliest spell',
+  'context.trend.spell2': 'Count in the middle spell',
+  'context.trend.spell3': 'Count in the latest spell',
+  'context.linked.regainSeconds': 'Seconds from the ball win to the moment',
+  'context.linked.previousMinute': 'Minute of the related moment',
+};

@@ -1,7 +1,11 @@
 import { CONTEXT_REFS, type Insight } from '@matchiq/contracts';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { COMPARISON_COPY, COMPARISON_WINDOW_KEY } from '@/constants/comparison';
+import {
+  COMPARISON_COPY,
+  COMPARISON_WINDOW_KEY,
+  countNoun,
+} from '@/constants/comparison';
 import { insight } from '@/test/factories';
 import { useComparisonWindow } from '../lib/comparison-window';
 import { ComparedWith } from './compared-with';
@@ -97,5 +101,25 @@ describe('ComparedWith', () => {
       <ComparedWith insight={withContext()} persona={persona} />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('countNoun', () => {
+  it.each([
+    [0, 'shots'],
+    [1, 'shot'],
+    [2, 'shots'],
+  ])('uses the right form for %i', (count, expected) => {
+    expect(countNoun(count, 'shots')).toBe(expected);
+    expect(COMPARISON_COPY.recent(count, 'shots', 10)).toContain(
+      `${count} ${expected} in`,
+    );
+  });
+
+  it('handles ball wins and pressing moments', () => {
+    expect(countNoun(1, 'ball wins')).toBe('ball win');
+    expect(countNoun(1, 'pressing moments')).toBe('pressing moment');
+    expect(countNoun(2, 'pressing moments')).toBe('pressing moments');
+    expect(COMPARISON_COPY.sample(1, 'shots', 5)).toContain('1 shot here');
   });
 });

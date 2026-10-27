@@ -15,6 +15,19 @@ export const METRIC_NOUNS: Record<ContextMetric, string> = {
   finalThirdEntries: 'entries into the attacking third',
 };
 
+const SINGULAR_NOUNS: Record<string, string> = {
+  shots: 'shot',
+  'shots on target': 'shot on target',
+  'pressing moments': 'pressing moment',
+  'ball wins': 'ball win',
+  'ball wins high up the pitch': 'ball win high up the pitch',
+  'entries into the attacking third': 'entry into the attacking third',
+};
+
+/** The noun in the form that agrees with the count: singular for exactly 1. */
+export const countNoun = (count: number, plural: string): string =>
+  count === 1 ? (SINGULAR_NOUNS[plural] ?? plural) : plural;
+
 export const TREND_WORDS: Record<TrendDirection, string> = {
   RISING: 'Building up',
   FALLING: 'Fading',
@@ -39,13 +52,13 @@ export const COMPARISON_COPY = {
   below: 'Below the match average',
   level: 'In line with the match average',
   recent: (count: number, noun: string, minutes: number) =>
-    `${count} ${noun} in the last ${minutes} minutes`,
+    `${count} ${countNoun(count, noun)} in the last ${minutes} minutes`,
   average: (rate: string, minutes: number) =>
     `Match average ${rate} every ${minutes} minutes`,
   wholeMatch: (total: number, noun: string, rate: string) =>
-    `About ${total} ${noun} so far, ${rate} every 10 minutes`,
+    `About ${total} ${countNoun(total, noun)} so far, ${rate} every 10 minutes`,
   sample: (count: number, noun: string, total: number) =>
-    `Based on ${count} ${noun} here and about ${total} so far in the match`,
+    `Based on ${count} ${countNoun(count, noun)} here and about ${total} so far in the match`,
   sampleMatch: (total: number) => `Based on about ${total} plays so far`,
   momentSample: (count: number) => `The moment itself rests on ${count} plays.`,
   trendTitle: 'Last three 5-minute spells',
