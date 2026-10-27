@@ -1,7 +1,10 @@
-import type { StoryParagraphKind } from '@matchiq/contracts';
+import type { Persona, StoryParagraphKind } from '@matchiq/contracts';
 
 const plural = (n: number, one: string, many = `${one}s`) =>
   `${n} ${n === 1 ? one : many}`;
+
+/** The result line at the top stays in plain words for every audience. */
+export const RECAP_LEDE_PERSONA: Persona = 'CASUAL';
 
 export const RECAP_COPY = {
   metaTitle: 'Match recap',
