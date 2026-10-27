@@ -1371,3 +1371,8 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 - Screenshots are 1280 px wide WebP under 55 KB each in `apps/web/public/landing/`, rendered with `next/image` (explicit size, lazy, `unoptimized` because they are already compressed), framed with a border that reads in light and dark.
 - Code: `features/landing/gallery-section`, `capabilities-section`, `constants/landing-gallery.ts`. No new icons were needed.
 - Tests: `gallery.spec.tsx` (four images with alt and captions, recorded-earlier caption, headings, no technical words, capabilities, tour link).
+
+## MQ-111 Evidence drawer wording
+
+- Figures checked now uses plain labels for every figure (context figures such as "Minute of the moment"; unknown refs show "Another figure in the wording", never a dotted name), and the list has the same rhythm as the other drawer sections.
+- Compared with agrees counts with nouns ("1 shot", "1 ball win") through a small `countNoun` helper; specs cover 0, 1 and 2 and the label fallbacks.

@@ -17,7 +17,10 @@ export function FiguresCheckedList({
   );
   if (!figures || figures.length === 0) return null;
   return (
-    <section aria-label={COPY.listTitle} className="flex flex-col gap-1.5">
+    <section
+      aria-label={COPY.listTitle}
+      className="mt-4 flex flex-col gap-1.5 border-t border-line pt-4"
+    >
       <h3 className="eyebrow">{COPY.listTitle}</h3>
       <p className="text-xs text-ink-subtle">{COPY.line(figures.length)}</p>
       <ul className="flex flex-col gap-1 text-sm">

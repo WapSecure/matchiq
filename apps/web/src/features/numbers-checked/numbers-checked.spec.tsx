@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Insight, Persona } from '@matchiq/contracts';
+import { CONTEXT_REFS } from '@matchiq/contracts';
+import { FIGURE_FALLBACK_LABEL } from '@/constants/numbers-checked';
 import { insight, narrative } from '@/test/factories';
 import { checkFigures, narrativeFigures } from './check-figures';
 import { FiguresCheckedList } from './figures-checked-list';
@@ -146,5 +148,43 @@ describe('FiguresCheckedList', () => {
       <FiguresCheckedList insight={FOUR} narrative={undefined} />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('FiguresCheckedList labels', () => {
+  const ctx = (metrics: Record<string, number>) => {
+    const i = base({});
+    return { ...i, evidence: { ...i.evidence, computedMetrics: metrics } };
+  };
+  const words = narrative({
+    headline: 'Minute 20 of 10 and 3',
+    body: 'Average 1.5 here.',
+  });
+
+  it('names context figures plainly and never prints a dotted name', () => {
+    const i = ctx({
+      [CONTEXT_REFS.minute]: 20,
+      [CONTEXT_REFS.windowMinutes]: 10,
+      [CONTEXT_REFS.average('away')]: 1.5,
+      [CONTEXT_REFS.previousMinute]: 3,
+    });
+    render(<FiguresCheckedList insight={i} narrative={words} />);
+    expect(screen.getByText('Minute of the moment')).toBeInTheDocument();
+    expect(screen.getByText('Match average, away')).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/context\.|\w+\.\w+\.\w+/);
+  });
+
+  it('falls back to a neutral label for an unknown ref', () => {
+    const i = ctx({
+      'mystery.thing.value': 20,
+      [CONTEXT_REFS.windowMinutes]: 10,
+      [CONTEXT_REFS.previousMinute]: 3,
+      'other.odd': 1.5,
+    });
+    render(<FiguresCheckedList insight={i} narrative={words} />);
+    expect(screen.getAllByText(FIGURE_FALLBACK_LABEL).length).toBeGreaterThan(
+      0,
+    );
+    expect(document.body.textContent).not.toMatch(/mystery|other\.odd/);
   });
 });
