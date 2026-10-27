@@ -35,7 +35,7 @@ const sentRequests = async (): Promise<unknown> => {
  * apps/agents/tests/test_contract_roundtrip.py loads these fixtures through the generated Pydantic
  * model and the worker's Zod schema. Pinning worker_requests.json to the real builder here keeps
  * that proof about what the worker sends. After an intended engine or contract change run
- * `UPDATE_CONTRACT_FIXTURE=1 pnpm nx test worker -- -t "agents contract"`.
+ * `UPDATE_CONTRACT_FIXTURE=1 pnpm nx test worker -- -t "agents contract"`, then format the file with prettier.
  */
 describe('agents contract fixtures', () => {
   it('worker_requests.json is what buildPipelineRequest produces from engine output', async () => {
