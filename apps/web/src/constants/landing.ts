@@ -13,7 +13,7 @@ export const HERO = {
   eyebrow: 'Football intelligence for live broadcast',
   title: 'One trusted match feed. Every audience, every language.',
   description:
-    'MatchIQ spots the moments that matter as the match plays. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.',
+    'MatchIQ spots the moments that matter as the match plays. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get broadcast graphics they can trust and remove at any time.',
   primaryCta: { label: 'Choose a match', href: '/fixtures' },
   howItWorks: { label: 'See how it works', href: '#pipeline' },
   facts: [
@@ -57,7 +57,7 @@ export const PIPELINE = {
       key: 'render',
       title: 'Show',
       description:
-        'On-air graphics timed to the match, kept inside safe areas, and removable in one click.',
+        'Broadcast graphics timed to the match, kept inside safe areas and removable in one click.',
       Icon: RenderIcon,
     },
     {

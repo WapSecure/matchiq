@@ -1,6 +1,7 @@
 'use client';
 
 import { type PointerEvent, useState } from 'react';
+import { NOT_AVAILABLE } from '@/constants/match';
 import { cn } from '@/lib/cn';
 import { formatMinute } from '@/lib/format';
 import { type MomentumPoint, nearestPoint } from './momentum-geometry';
@@ -34,7 +35,7 @@ function Row({ name, value }: { name: string; value: number | null }) {
     <p className="flex justify-between gap-3">
       <span className="text-ink-muted">{name}</span>
       <span className="tabular font-semibold text-ink">
-        {value === null ? '–' : value.toFixed(DECIMALS)}
+        {value === null ? NOT_AVAILABLE : value.toFixed(DECIMALS)}
       </span>
     </p>
   );

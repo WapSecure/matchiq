@@ -40,9 +40,9 @@ export const GUIDE_STEPS: readonly GuideStep[] = [
     key: 'watch',
     title: 'Watch it build',
     doThis:
-      'Stay in the Live studio and watch the key moments, the match stats and the on-air preview.',
+      'Stay in the Live studio and watch the key moments, the match stats and the graphics preview.',
     shows:
-      'Each key moment is spotted in the match data, written up, fact-checked and timed for broadcast.',
+      'Each key moment is spotted in the match data, written up, checked against the data and timed for broadcast.',
   },
   {
     key: 'evidence',
@@ -120,14 +120,14 @@ export const TOUR_ACTIVE_ATTRIBUTE = 'data-tour-active';
 export const TOUR_STEPS: readonly TourStep[] = [
   {
     key: 'scoreboard',
-    title: 'Score and on-air preview',
-    body: 'The score and clock follow the replay. Below it, the on-air preview shows the graphic viewers would see right now.',
+    title: 'Score and graphics preview',
+    body: 'The score and clock follow the replay. Below them, the preview shows the graphic viewers would see right now.',
     targets: [TOUR_TARGETS.scoreboard, TOUR_TARGETS.preview],
   },
   {
     key: 'moments',
     title: 'Key moments',
-    body: 'Moments appear here as they happen, each written up and fact-checked against the match data.',
+    body: 'Moments appear here as they happen, each written up and checked against the match data.',
     targets: [TOUR_TARGETS.moments],
   },
   {

@@ -21,8 +21,8 @@ describe('GallerySection', () => {
     );
   });
 
-  it('says the fact-checks session was recorded earlier', () => {
-    expect(screen.getByText(/recorded earlier/i)).toBeInTheDocument();
+  it('identifies the fact-checks screen as an earlier replay', () => {
+    expect(screen.getByText(/earlier replay/i)).toBeInTheDocument();
   });
 
   it('has a heading per shot under one section heading', () => {

@@ -47,7 +47,7 @@ export const OVERLAY_COPY = {
   held: 'Kept on screen',
   heldHint: (seconds: number) =>
     `Its moment has passed, but it stays on screen for at least ${seconds} s so viewers can read it.`,
-  source: { AGENT: 'Fact-checked', TEMPLATE: 'Standard wording' },
+  source: { AGENT: 'Checked against data', TEMPLATE: 'Standard wording' },
   sourceHint:
     'Each graphic goes out first with standard wording, then switches to the auto-written version once that passes the fact check.',
   localeFallback: 'English graphic',

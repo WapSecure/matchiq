@@ -22,7 +22,7 @@ export const GALLERY = {
     {
       key: 'studio',
       src: '/landing/studio-live-full-time.webp',
-      alt: 'The live studio at full time, showing the score, the match story so far and the on-air graphics queue.',
+      alt: 'The live studio at full time, showing the score, the match story so far and the broadcast graphics queue.',
       title: 'Live studio',
       caption:
         'Follow the match to the final whistle, with every moment explained as it happens.',
@@ -38,10 +38,10 @@ export const GALLERY = {
     {
       key: 'observatory',
       src: '/landing/fact-checks-recorded-session.webp',
-      alt: 'The fact-checks page for a session recorded earlier, with every moment written and checked.',
+      alt: 'The AI fact-checks page for an earlier replay, with every moment written and checked.',
       title: 'Fact checks',
       caption:
-        'A session recorded earlier, with every moment written by the AI and checked before it could air.',
+        'An earlier replay, with every moment written automatically and checked before it could air.',
     },
     {
       key: 'recap',

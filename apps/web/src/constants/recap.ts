@@ -1,4 +1,5 @@
 import type { Persona, StoryParagraphKind } from '@matchiq/contracts';
+import { NOT_AVAILABLE } from './match';
 
 const plural = (n: number, one: string, many = `${one}s`) =>
   `${n} ${n === 1 ? one : many}`;
@@ -21,9 +22,12 @@ export const RECAP_COPY = {
   storyLabel: 'The story of the match',
   facts: {
     moments: (n: number) => plural(n, 'key moment'),
-    possession: (home: string, away: string) => `Possession ${home}–${away}`,
+    possession: (home: string, away: string) =>
+      home === NOT_AVAILABLE || away === NOT_AVAILABLE
+        ? `Possession: ${NOT_AVAILABLE}`
+        : `Possession ${home}–${away}`,
     shots: (home: number, away: number) => `Shots ${home}–${away}`,
-    missing: '–',
+    missing: NOT_AVAILABLE,
   },
   matchStory: {
     title: 'Match story',
@@ -70,7 +74,7 @@ export const RECAP_COPY = {
     unavailable: 'not available',
     footer: 'Simulated match. Every number comes from the match data.',
     disclosure:
-      'Commentary auto-generated from the match data and fact-checked.',
+      'Commentary written automatically from the match data, with every number checked.',
   },
   notReady: {
     title: 'The recap is ready at full time',

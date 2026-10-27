@@ -3,7 +3,7 @@
     "hero": {
       "eyebrow": "Football intelligence for live broadcast",
       "title": "One trusted match feed. Every audience, every language.",
-      "description": "MatchIQ spots the moments that matter as the match plays. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get on-air graphics they can trust and pull at any time.",
+      "description": "MatchIQ spots the moments that matter as the match plays. The stats come straight from the match data, AI explains why each moment matters, a fact check confirms every number, and producers get broadcast graphics they can trust and remove at any time.",
       "primaryAction": "Choose a match",
       "secondaryAction": "See how it works",
       "guideAction": "Take the three-minute tour",
@@ -33,7 +33,7 @@
         },
         "render": {
           "title": "Show",
-          "description": "On-air graphics timed to the match, kept inside safe areas, and removable in one click."
+          "description": "Broadcast graphics timed to the match, kept inside safe areas and removable in one click."
         },
         "personalize": {
           "title": "Personalise",
@@ -79,8 +79,8 @@
       },
       "watch": {
         "title": "Watch it build",
-        "doThis": "Stay in the Live studio and watch the key moments, the match stats and the on-air preview.",
-        "shows": "Each key moment is spotted in the match data, written up, fact-checked and timed for broadcast."
+        "doThis": "Stay in the Live studio and watch the key moments, the match stats and the graphics preview.",
+        "shows": "Each key moment is spotted in the match data, written up, checked against the data and timed for broadcast."
       },
       "evidence": {
         "title": "Open the evidence",
@@ -149,7 +149,7 @@
   "lobby": {
     "eyebrow": "Matches",
     "title": "Choose a match to replay",
-    "description": "Pick a match and a speed. Key moments, stats and on-air graphics build as it plays.",
+    "description": "Pick a match and a speed. Key moments, stats and broadcast graphics build as it plays.",
     "guide": "A three-minute tour",
     "howItWorks": {
       "label": "How replays work",

@@ -5,7 +5,7 @@ export const LOBBY_COPY = {
   eyebrow: 'Matches',
   title: 'Choose a match to replay',
   description:
-    'Pick a match and a speed. Key moments, stats and on-air graphics build as it plays.',
+    'Pick a match and a speed. Key moments, stats and broadcast graphics build as it plays.',
   howItWorks: {
     label: 'How replays work',
     text: 'Each match plays out the same way every time, so you can rehearse and compare. Anyone with the link to a replay sees the same moment you do.',
