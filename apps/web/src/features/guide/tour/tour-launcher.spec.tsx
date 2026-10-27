@@ -32,7 +32,7 @@ describe('TourLauncher', () => {
     await user.click(screen.getByRole('button', { name: 'Take the tour' }));
     expect(screen.getByRole('dialog', { name: 'Studio tour' })).toHaveFocus();
     expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
-    expect(screen.getByText('Score and on-air preview')).toBeInTheDocument();
+    expect(screen.getByText('Score and graphics preview')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Next' }));
     expect(screen.getByText('Audience and language')).toBeInTheDocument();
