@@ -1383,6 +1383,10 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 - Code: `pipeline/templates/milestone-constants.ts`, `milestone-copy.ts`, `template-facts.ts` (milestone metric becomes a cited fact). Milestones are template-only, so the Python phrases are unchanged.
 - Tests: `template-narratives.spec.ts` (cited count, plural and singular per locale, generic fallback).
 
+## MQ-120: plain label for the planted number (27 October 2026)
+
+- MQ-120: the Fact-checks evidence list no longer shows raw refs. `fault.injected` reads "Planted wrong number (demo)" and any other unregistered ref reads "Another figure in the wording".
+
 ## MQ-119: recorded provider output reaches the worker (27 October 2026)
 
 - Root cause of "agents service returned an invalid PipelineResult": a draft rebuilt from another draft's dump (translated Casual and Broadcast drafts) carries an explicit `breakdown: null`. `to_wire` used `exclude_unset`, so the null went on the wire and the worker's zod contract (`breakdown` is optional, not nullable) refused the whole result. It hit the recorded provider on every moment with a translated non-Analyst draft, and any provider that localises. Reproduced in-process: 19 of 19 recorded moments produced a result the worker rejected (`narratives.N.breakdown: expected object, received null`), 0 published.
