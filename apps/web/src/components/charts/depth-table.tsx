@@ -14,7 +14,12 @@ type DepthTableProps = {
 export function DepthTable({ caption, columns, rows, note }: DepthTableProps) {
   return (
     <Disclosure title={PITCH_COPY.tableToggle} panelClassName="pt-2 text-xs">
-      <div className="max-h-56 overflow-auto rounded-md border border-line">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label={caption}
+        className="max-h-56 overflow-auto rounded-md border border-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
         <table className="w-full text-left">
           <caption className="sr-only">{caption}</caption>
           <thead className="sticky top-0 bg-surface-raised text-ink-muted">
