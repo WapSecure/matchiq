@@ -115,6 +115,15 @@ describe('PitchMap', () => {
     expect(rows[2]).toHaveTextContent('80, 30');
   });
 
+  it('lets keyboard users reach the scrolling table', async () => {
+    const user = userEvent.setup();
+    renderMap();
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    const region = screen.getByRole('region', { name: /Pitch event map/ });
+    expect(region).toHaveAttribute('tabindex', '0');
+    expect(region).toContainElement(screen.getByRole('table'));
+  });
+
   it('filters by team and event type, plot and table together', async () => {
     const user = userEvent.setup();
     const { container } = renderMap();

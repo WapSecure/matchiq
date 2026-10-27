@@ -16,7 +16,12 @@ const eventLabel = (m: PitchMark): string =>
 export function PitchTable({ marks }: { marks: readonly PitchMark[] }) {
   return (
     <Disclosure title={PITCH_COPY.tableToggle} panelClassName="pt-2 text-xs">
-      <div className="max-h-56 overflow-auto rounded-md border border-line">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label={PITCH_COPY.title}
+        className="max-h-56 overflow-auto rounded-md border border-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
         <table className="w-full text-left">
           <caption className="sr-only">{PITCH_COPY.title}</caption>
           <thead className="sticky top-0 bg-surface-raised text-ink-muted">
