@@ -60,7 +60,8 @@ export const COMPARISON_COPY = {
   sample: (count: number, noun: string, total: number) =>
     `Based on ${count} ${countNoun(count, noun)} here and about ${total} so far in the match`,
   sampleMatch: (total: number) => `Based on about ${total} plays so far`,
-  momentSample: (count: number) => `The moment itself rests on ${count} plays.`,
+  momentSample: (count: number) =>
+    `The moment itself rests on ${count} ${count === 1 ? 'play' : 'plays'}.`,
   trendTitle: 'Last three 5-minute spells',
   trendName: (noun: string, side: string, direction: string) =>
     `${side}: ${noun} in the last three 5-minute spells. ${direction}.`,
