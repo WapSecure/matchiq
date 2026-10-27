@@ -33,7 +33,7 @@ const unique = <T>(items: readonly T[]) => [...new Set(items)];
 
 const graphicFact = (trace: InsightTrace): TraceFact => {
   const editorial = trace.editorial?.overlay;
-  if (editorial)
+  if (editorial && editorial !== 'APPROVED')
     return {
       label: facts.graphic,
       value: facts.graphicValue[editorial],
