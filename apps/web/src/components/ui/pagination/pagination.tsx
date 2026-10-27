@@ -1,7 +1,9 @@
 'use client';
 
 import { MoreIcon } from '@/components/icons';
-import { type CountNoun, PAGINATION_COPY as C } from '@/constants/pagination';
+import type { CountNoun } from '@/constants/pagination';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
+import type { InterfaceMessages } from '@/features/interface-language/interface-messages';
 import { cn } from '@/lib/cn';
 import { Select } from '../select';
 import { clampPage, pageItems, rangeOf, totalPagesOf } from './page-range';
@@ -32,10 +34,12 @@ function PageList({
   page,
   pages,
   onPageChange,
+  copy,
 }: {
   page: number;
   pages: number;
   onPageChange: (page: number) => void;
+  copy: InterfaceMessages['pagination'];
 }) {
   return pageItems(page, pages).map((item) => {
     if (typeof item !== 'number') {
@@ -52,7 +56,7 @@ function PageList({
       <li key={item} className="hidden sm:block">
         <button
           type="button"
-          aria-label={C.goToPage(item)}
+          aria-label={copy.goToPage(item)}
           aria-current={current ? 'page' : undefined}
           onClick={() => {
             if (!current) onPageChange(item);
@@ -70,21 +74,23 @@ function PageSizeSelect({
   pageSize,
   options,
   onChange,
+  copy,
 }: {
   pageSize: number;
   options: readonly number[];
   onChange: (size: number) => void;
+  copy: InterfaceMessages['pagination'];
 }) {
   return (
     <Select
-      label={C.perPage}
+      label={copy.perPage}
       hideLabel
       className="w-28 sm:w-34"
       value={String(pageSize)}
       onChange={(id) => onChange(Number(id))}
       options={options.map((size) => ({
         id: String(size),
-        label: C.perPageOption(size),
+        label: copy.perPageOption(size),
       }))}
     />
   );
@@ -92,6 +98,7 @@ function PageSizeSelect({
 
 /** Numbered pages for a list with a known total: `‹ 1 … 4 5 6 … 12 ›`, "Page 2 of 3" on phones. */
 export function Pagination(props: PaginationProps) {
+  const copy = useInterfaceMessages().pagination;
   const { pageSize, total, noun, label, isLoading = false } = props;
   const pages = totalPagesOf(total, pageSize);
   const page = clampPage(props.page, pages);
@@ -102,7 +109,7 @@ export function Pagination(props: PaginationProps) {
   return (
     <div className={cn(NAV_ROW, props.className)}>
       <PageSummary busy={isLoading}>
-        {C.showing(from, to, total, noun)}
+        {copy.showing(from, to, total, noun)}
       </PageSummary>
       <div className="flex min-w-0 flex-wrap items-center gap-2">
         {canResize && props.onPageSizeChange ? (
@@ -110,6 +117,7 @@ export function Pagination(props: PaginationProps) {
             pageSize={pageSize}
             options={sizes}
             onChange={props.onPageSizeChange}
+            copy={copy}
           />
         ) : null}
         {pages > 1 ? (
@@ -126,12 +134,13 @@ export function Pagination(props: PaginationProps) {
                 page={page}
                 pages={pages}
                 onPageChange={props.onPageChange}
+                copy={copy}
               />
               <li
                 data-testid="page-of"
                 className="tabular whitespace-nowrap px-2 text-xs font-medium text-ink sm:hidden"
               >
-                {C.pageOf(page, pages)}
+                {copy.pageOf(page, pages)}
               </li>
               <li>
                 <StepButton

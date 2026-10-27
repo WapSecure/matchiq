@@ -3,8 +3,9 @@
 import { useId } from 'react';
 import { LockIcon } from '@/components/icons';
 import { ButtonLink } from '@/components/ui';
-import { AUTH_COPY, ROLE_LABELS } from '@/constants/auth';
+import { ROLE_LABELS } from '@/constants/auth';
 import { ROUTES } from '@/constants/navigation';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
 import { rolesOf, useSession } from '@/lib/auth/session-store';
 
 /** The 403 state: a labelled region rather than an alert, since nothing failed. */
@@ -12,6 +13,7 @@ export function AccessDenied({ className }: { className?: string }) {
   const headingId = useId();
   const roles = rolesOf(useSession((s) => s.view));
   const role = roles.map((r) => ROLE_LABELS[r]).join(', ');
+  const copy = useInterfaceMessages().feedback.accessDenied;
   return (
     <section
       aria-labelledby={headingId}
@@ -22,13 +24,11 @@ export function AccessDenied({ className }: { className?: string }) {
         <LockIcon size={18} />
       </span>
       <h2 id={headingId} className="text-base font-semibold text-ink">
-        {AUTH_COPY.forbiddenTitle}
+        {copy.title}
       </h2>
-      <p className="max-w-prose text-sm text-ink-muted">
-        {AUTH_COPY.forbiddenBody(role)}
-      </p>
+      <p className="max-w-prose text-sm text-ink-muted">{copy.body(role)}</p>
       <ButtonLink href={ROUTES.fixtures} variant="secondary" size="sm">
-        {AUTH_COPY.forbiddenAction}
+        {copy.action}
       </ButtonLink>
     </section>
   );

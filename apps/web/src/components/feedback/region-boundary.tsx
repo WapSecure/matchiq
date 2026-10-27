@@ -3,7 +3,8 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertIcon, RefreshIcon } from '@/components/icons';
 import { Button } from '@/components/ui';
-import { BOUNDARY_COPY } from '@/constants/errors';
+import { useInterfaceMessages } from '@/features/interface-language/interface-language-store';
+import type { InterfaceMessages } from '@/features/interface-language/interface-messages';
 import { cn } from '@/lib/cn';
 
 type RegionBoundaryProps = {
@@ -14,12 +15,13 @@ type RegionBoundaryProps = {
 };
 
 type RegionBoundaryState = { failed: boolean };
+type BoundaryCopy = InterfaceMessages['feedback']['boundary'];
 
 const LOG_PREFIX = '[matchiq] region failed:';
 
 /** Contains a render failure to one region, so the rest of the page keeps working. */
-export class RegionBoundary extends Component<
-  RegionBoundaryProps,
+class RegionBoundaryCore extends Component<
+  RegionBoundaryProps & { copy: BoundaryCopy },
   RegionBoundaryState
 > {
   override state: RegionBoundaryState = { failed: false };
@@ -48,16 +50,21 @@ export class RegionBoundary extends Component<
         <AlertIcon size={18} className="shrink-0 text-warning" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-ink">
-            {BOUNDARY_COPY.title(this.props.region)}
+            {this.props.copy.title(this.props.region)}
           </p>
           <p className="mt-0.5 text-xs text-ink-muted">
-            {BOUNDARY_COPY.message}
+            {this.props.copy.message}
           </p>
         </div>
         <Button onClick={this.reset} leadingIcon={<RefreshIcon size={14} />}>
-          {BOUNDARY_COPY.retry}
+          {this.props.copy.retry}
         </Button>
       </section>
     );
   }
+}
+
+export function RegionBoundary(props: RegionBoundaryProps) {
+  const copy = useInterfaceMessages().feedback.boundary;
+  return <RegionBoundaryCore {...props} copy={copy} />;
 }

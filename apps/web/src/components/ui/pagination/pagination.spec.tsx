@@ -7,6 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PAGINATION_NOUNS } from '@/constants/pagination';
+import { useInterfaceLanguage } from '@/features/interface-language/interface-language-store';
 import { CursorPagination } from './cursor-pagination';
 import { LoadMore } from './load-more';
 import { Pagination } from './pagination';
@@ -14,7 +15,11 @@ import { useCursorPage, useNumberedPage } from './use-paged-url';
 
 const replays = PAGINATION_NOUNS.replays;
 
-afterEach(() => window.history.replaceState(null, '', '/'));
+afterEach(() => {
+  window.history.replaceState(null, '', '/');
+});
+
+beforeEach(() => useInterfaceLanguage.setState({ locale: 'en-GB' }));
 
 describe('Pagination', () => {
   const renderPages = (page: number, onPageChange = vi.fn()) => {
@@ -83,6 +88,19 @@ describe('Pagination', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       'Showing 1–5 of 5 matches',
     );
+  });
+
+  it('localizes ranges, controls and accessible page names', () => {
+    useInterfaceLanguage.setState({ locale: 'fr-FR' });
+    renderPages(2);
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '9 à 16 sur 23 rediffusions',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Page précédente' }),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Page suivante' })).toBeTruthy();
+    expect(screen.getByTestId('page-of')).toHaveTextContent('Page 2 sur 3');
   });
 });
 
@@ -175,6 +193,24 @@ describe('LoadMore', () => {
     );
     expect(screen.getByText("You've reached the end.")).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Showing 60 entries');
+  });
+
+  it('localizes progress and actions', () => {
+    useInterfaceLanguage.setState({ locale: 'es-ES' });
+    render(
+      <LoadMore
+        shown={12}
+        total={24}
+        hasMore
+        onLoadMore={vi.fn()}
+        noun={PAGINATION_NOUNS.activity}
+        label="Más actividad"
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Mostrando 12 de 24 entradas',
+    );
+    expect(screen.getByRole('button', { name: 'Mostrar más' })).toBeTruthy();
   });
 });
 
