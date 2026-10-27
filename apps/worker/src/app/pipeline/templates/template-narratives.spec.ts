@@ -1,5 +1,6 @@
 import {
   isInternalIndexMetric,
+  type Locale,
   NarrativeDraft,
   OverlayProposal,
 } from '@matchiq/contracts';
@@ -83,5 +84,77 @@ describe('template fallback narratives', () => {
     expect(OverlayProposal.parse(overlay)).toEqual(overlay);
     expect(overlay).toMatchObject({ kind: 'SCORE_UPDATE', priority: 90 });
     expect(templateOverlay(goal, fixture)).toEqual(overlay);
+  });
+
+  describe('player milestones', () => {
+    const milestones = async () => {
+      const { fixture, insights } = await goldenMoments('comeback');
+      return {
+        fixture,
+        list: insights.filter((i) => i.kind === 'PLAYER_MILESTONE'),
+      };
+    };
+
+    it('say what the milestone is, with the cited count', async () => {
+      const { fixture, list } = await milestones();
+      expect(list.length).toBeGreaterThan(0);
+      for (const insight of list) {
+        const [ref, value] =
+          Object.entries(insight.evidence.computedMetrics)[0] ?? [];
+        const [broadcast] = templateDrafts(insight, fixture, {
+          personas: ['BROADCAST'],
+          locales: ['en-GB'],
+        });
+        expect(broadcast?.citedValues).toEqual([{ metricRef: ref, value }]);
+        expect(broadcast?.headline).toMatch(new RegExp(`reach ${value} `));
+        expect(broadcast?.headline.length).toBeLessThanOrEqual(60);
+        expect(broadcast?.body).toMatch(new RegExp(`^${value} .+ so far$`));
+        expect(`${broadcast?.headline} ${broadcast?.body}`).not.toMatch(
+          /milestone/i,
+        );
+      }
+    });
+
+    it('uses singular and plural nouns in every locale', async () => {
+      const { fixture, list } = await milestones();
+      const base = list[0];
+      if (base === undefined) throw new Error('expected a milestone');
+      const make = (metric: string, value: number) => ({
+        ...base,
+        evidence: {
+          ...base.evidence,
+          computedMetrics: { [`${metric}.home`]: value },
+        },
+        teamId: fixture.home.teamId,
+      });
+      const body = (metric: string, value: number, locale: Locale) =>
+        templateDrafts(make(metric, value), fixture, {
+          personas: ['BROADCAST'],
+          locales: [locale],
+        })[0]?.body;
+      expect(body('shotsOnTarget', 1, 'en-GB')).toBe('1 shot on target so far');
+      expect(body('yellowCards', 3, 'en-GB')).toBe('3 yellow cards so far');
+      expect(body('goals', 2, 'fr-FR')).toBe("2 buts jusqu'ici");
+      expect(body('yellowCards', 1, 'es-ES')).toBe(
+        '1 tarjeta amarilla hasta ahora',
+      );
+      expect(body('goals', 1, 'pcm-NG')).toBe('1 goal so far');
+    });
+
+    it('keeps the generic wording for an unknown metric', async () => {
+      const { fixture, list } = await milestones();
+      const base = list[0];
+      if (base === undefined) throw new Error('expected a milestone');
+      const unknown = {
+        ...base,
+        evidence: { ...base.evidence, computedMetrics: { 'touches.home': 5 } },
+      };
+      const [draft] = templateDrafts(unknown, fixture, {
+        personas: ['BROADCAST'],
+        locales: ['en-GB'],
+      });
+      expect(draft?.body).toBe('Milestone reached');
+      expect(draft?.citedValues).toEqual([]);
+    });
   });
 });

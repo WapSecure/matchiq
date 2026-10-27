@@ -1376,3 +1376,9 @@ No product behaviour changed. Each row from the requirements tracker now has a C
 
 - Figures checked now uses plain labels for every figure (context figures such as "Minute of the moment"; unknown refs show "Another figure in the wording", never a dotted name), and the list has the same rhythm as the other drawer sections.
 - Compared with agrees counts with nouns ("1 shot", "1 ball win") through a small `countNoun` helper; specs cover 0, 1 and 2 and the label fallbacks.
+
+## MQ-114: specific player milestone wording (27 October 2026)
+
+- Milestone headline, graphic body and casual line now name the milestone and its count from the cited metric: "Penbrook Town reach 3 yellow cards" with "3 yellow cards so far", "1 shot on target so far". Shots on target, goals and yellow cards are mapped in en-GB, fr-FR, es-ES and pcm-NG with singular and plural nouns. The count is the cited `<metric>.<side>` value, so the number check passes. An unknown metric keeps the previous generic wording.
+- Code: `pipeline/templates/milestone-constants.ts`, `milestone-copy.ts`, `template-facts.ts` (milestone metric becomes a cited fact). Milestones are template-only, so the Python phrases are unchanged.
+- Tests: `template-narratives.spec.ts` (cited count, plural and singular per locale, generic fallback).

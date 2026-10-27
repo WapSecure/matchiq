@@ -7,6 +7,11 @@ import type {
   Locale,
 } from '@matchiq/contracts';
 import { WINDOW_SUFFIX } from '@matchiq/football-engine';
+import {
+  MILESTONE_FACT_KEY,
+  type MilestoneMetric,
+} from './milestone-constants';
+import { milestoneRef } from './milestone-copy';
 
 type Side = 'home' | 'away';
 
@@ -17,6 +22,8 @@ export interface TemplateFacts {
   readonly home: string;
   readonly away: string;
   readonly player?: string;
+  /** Set for player milestones whose metric the engine names. */
+  readonly milestone?: MilestoneMetric;
   readonly confidence: ConfidenceLabel;
   readonly confidenceText: string;
   /** Formatted cited values by fact key; every key here is in `cited`. */
@@ -88,7 +95,15 @@ export const buildFacts = (
   const side = sideOf(fixture, insight.teamId);
   const opp: Side = side === 'home' ? 'away' : 'home';
   const metrics = insight.evidence.computedMetrics;
-  const refs = Object.entries(REFS[insight.kind](side, opp));
+  const milestone =
+    insight.kind === 'PLAYER_MILESTONE'
+      ? milestoneRef(metrics, side)
+      : undefined;
+  const refs = Object.entries(
+    milestone === undefined
+      ? REFS[insight.kind](side, opp)
+      : { [MILESTONE_FACT_KEY]: milestone.metricRef },
+  );
   const cited: CitedValue[] = [];
   const v: Record<string, string> = {};
   for (const [key, metricRef] of refs) {
@@ -107,6 +122,7 @@ export const buildFacts = (
       home: fixture.home.name,
       away: fixture.away.name,
       ...(player === undefined ? {} : { player }),
+      ...(milestone === undefined ? {} : { milestone: milestone.metric }),
       confidence: insight.evidence.confidenceLabel,
       confidenceText: confidenceWords[insight.evidence.confidenceLabel],
       v,

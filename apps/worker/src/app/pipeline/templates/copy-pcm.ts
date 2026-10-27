@@ -1,3 +1,4 @@
+import { milestoneLine } from './milestone-copy';
 import { type LocaleCopy, scoreLine } from './copy-types';
 
 /**
@@ -16,7 +17,8 @@ export const COPY_PCM: LocaleCopy = {
     HIGH_REGAINS: (f) => `${f.team} dey win ball for up`,
     PRESSURE_SWING: (f) => `${f.team} dey press well well`,
     MOMENTUM_SHIFT: (f) => `Momentum don shift go ${f.team} side`,
-    PLAYER_MILESTONE: (f) => `${f.team} don reach milestone`,
+    PLAYER_MILESTONE: (f) =>
+      milestoneLine('pcm-NG', 'headline', f, `${f.team} don reach milestone`),
   },
   casual: {
     GOAL: (f) =>
@@ -34,7 +36,13 @@ export const COPY_PCM: LocaleCopy = {
     PRESSURE_SWING: (f) =>
       `${f.team} dey press well well, ${f.v['pressures']} pressures for di latest spell.`,
     MOMENTUM_SHIFT: (f) => `Di game don dey turn for ${f.team} side.`,
-    PLAYER_MILESTONE: (f) => `${f.team} don reach one milestone.`,
+    PLAYER_MILESTONE: (f) =>
+      milestoneLine(
+        'pcm-NG',
+        'casual',
+        f,
+        `${f.team} don reach one milestone.`,
+      ),
   },
   analyst: {
     GOAL: (f) =>
@@ -59,7 +67,8 @@ export const COPY_PCM: LocaleCopy = {
     PRESSURE_SWING: (f) =>
       `${f.v['pressures']} pressures, e don climb from ${f.v['previous']}`,
     MOMENTUM_SHIFT: (f) => `${f.team} dey on top`,
-    PLAYER_MILESTONE: () => 'Milestone don land',
+    PLAYER_MILESTONE: (f) =>
+      milestoneLine('pcm-NG', 'body', f, 'Milestone don land'),
   },
   generic: {
     headline: (f) => `Big moment for ${f.team}`,

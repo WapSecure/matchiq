@@ -1,3 +1,4 @@
+import { milestoneLine } from './milestone-copy';
 import { type LocaleCopy, scoreLine } from './copy-types';
 
 const conf = (label: string) => `Confiance : ${label}.`;
@@ -11,7 +12,8 @@ export const COPY_FR: LocaleCopy = {
     HIGH_REGAINS: (f) => `${f.team} récupère haut`,
     PRESSURE_SWING: (f) => `${f.team} presse plus fort`,
     MOMENTUM_SHIFT: (f) => `La dynamique passe à ${f.team}`,
-    PLAYER_MILESTONE: (f) => `Cap franchi pour ${f.team}`,
+    PLAYER_MILESTONE: (f) =>
+      milestoneLine('fr-FR', 'headline', f, `Cap franchi pour ${f.team}`),
   },
   casual: {
     GOAL: (f) =>
@@ -29,7 +31,8 @@ export const COPY_FR: LocaleCopy = {
     PRESSURE_SWING: (f) =>
       `${f.team} presse davantage, avec ${f.v['pressures']} pressions sur la dernière période.`,
     MOMENTUM_SHIFT: (f) => `Le match bascule en faveur de ${f.team}.`,
-    PLAYER_MILESTONE: (f) => `${f.team} franchit un cap.`,
+    PLAYER_MILESTONE: (f) =>
+      milestoneLine('fr-FR', 'casual', f, `${f.team} franchit un cap.`),
   },
   analyst: {
     GOAL: (f) =>
@@ -54,7 +57,7 @@ export const COPY_FR: LocaleCopy = {
     PRESSURE_SWING: (f) =>
       `${f.v['pressures']} pressions, contre ${f.v['previous']} avant`,
     MOMENTUM_SHIFT: (f) => `${f.team} domine`,
-    PLAYER_MILESTONE: () => 'Cap franchi',
+    PLAYER_MILESTONE: (f) => milestoneLine('fr-FR', 'body', f, 'Cap franchi'),
   },
   generic: {
     headline: (f) => `Moment clé pour ${f.team}`,
