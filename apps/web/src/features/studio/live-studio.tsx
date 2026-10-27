@@ -7,6 +7,7 @@ import {
   ConnectionBanner,
   LiveConnection,
 } from './components/connection-banner';
+import { SafetyNetMenu } from './components/safety-net-menu';
 import { SessionFrame } from './components/session-frame';
 import { EditorialBanner, EditorialChip } from './editorial/editorial-status';
 import { useMatchStream } from './hooks/use-match-stream';
@@ -32,7 +33,12 @@ function StudioScreen({
     <SessionFrame
       fixtureId={fixtureId}
       view="live"
-      tabsAction={<TourLauncher />}
+      tabsAction={
+        <>
+          <SafetyNetMenu sessionId={fixtureId} />
+          <TourLauncher />
+        </>
+      }
       status={
         <>
           <EditorialChip />
