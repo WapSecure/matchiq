@@ -71,10 +71,17 @@
         "{projectRoot}/**/*.py",
         "{projectRoot}/pyproject.toml",
         "{workspaceRoot}/libs/contracts/samples/**/*",
-        "{workspaceRoot}/libs/narrative-guard/generated/**/*"
+        "{workspaceRoot}/libs/narrative-guard/generated/**/*",
+        "{workspaceRoot}/libs/contracts/src/**/*"
       ],
       "cache": true,
-      "dependsOn": ["codegen"]
+      "dependsOn": [
+        "codegen",
+        {
+          "projects": ["contracts"],
+          "target": "build"
+        }
+      ]
     },
     "serve": {
       "command": "uv run --frozen python -m matchiq_agents",
