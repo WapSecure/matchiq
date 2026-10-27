@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { EmptyState } from '@/components/feedback';
 import { PITCH_COORD_MAX, type PitchTeamFilter } from '@/constants/pitch';
 import { DEPTH_COPY } from '@/constants/pitch-depth';
 import { DepthCanvas } from './depth-canvas';
@@ -41,7 +42,7 @@ export function ShotMap({ marks, team, length, width, analyst }: ShotMapProps) {
     ...(analyst ? [DEPTH_COPY.xgLabel] : []),
   ];
   if (shots.length === 0) {
-    return <p className="py-6 text-center text-sm text-ink-muted">{c.empty}</p>;
+    return <EmptyState compact title={c.empty} description={c.emptyHint} />;
   }
   return (
     <div className="flex flex-col gap-2">

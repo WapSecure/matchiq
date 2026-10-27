@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { EmptyState } from '@/components/feedback';
 import { PITCH_COORD_MAX, type PitchTeamFilter } from '@/constants/pitch';
 import {
   DEPTH_COPY,
@@ -74,7 +75,7 @@ export function PassMap({ arrows, team, length, width }: PassMapProps) {
   const c = DEPTH_COPY.passes;
   const active = shown.find((p) => p.id === activeId) ?? null;
   if (shown.length === 0) {
-    return <p className="py-6 text-center text-sm text-ink-muted">{c.empty}</p>;
+    return <EmptyState compact title={c.empty} description={c.emptyHint} />;
   }
   return (
     <div className="flex flex-col gap-2">

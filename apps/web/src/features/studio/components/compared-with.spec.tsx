@@ -89,6 +89,7 @@ describe('ComparedWith', () => {
   it('says there is not enough match time when nothing was compared', () => {
     render(<ComparedWith insight={insight()} persona="ANALYST" />);
     expect(screen.getByText(COMPARISON_COPY.empty)).toBeVisible();
+    expect(COMPARISON_COPY.empty).toContain('Try again');
   });
 
   it('shows a placeholder while loading', () => {

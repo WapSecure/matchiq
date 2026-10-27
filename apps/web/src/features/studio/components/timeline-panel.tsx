@@ -92,7 +92,11 @@ export function TimelinePanel({ roster, className }: TimelinePanelProps) {
           />
           {older.error ? (
             <div className="px-4 pt-2">
-              <InlineProblem error={older.error} lead={copy.loadFailed} />
+              <InlineProblem
+                error={older.error}
+                lead={copy.loadFailed}
+                onRetry={() => void older.loadOlder()}
+              />
             </div>
           ) : null}
           <LoadMore

@@ -209,9 +209,17 @@ describe('PitchMap views', () => {
     await user.click(screen.getByRole('radio', { name: 'Shots' }));
     await user.click(screen.getByRole('radio', { name: 'AWC' }));
     expect(screen.getByText('No shots for this team yet.')).toBeInTheDocument();
+    expect(
+      screen.getByText('This map updates as soon as a shot is recorded.'),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('radio', { name: 'Passes' }));
     expect(
       screen.getByText('No completed passes for this team yet.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'This map updates as soon as a completed pass is recorded.',
+      ),
     ).toBeInTheDocument();
   });
 });
