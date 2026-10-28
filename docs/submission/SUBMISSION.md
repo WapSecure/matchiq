@@ -2,6 +2,8 @@
 
 Microsoft × Premier League: Inside the Game developer hackathon. Prepared 2026-10-23 and refreshed 2026-10-27 against `dev`; CI green at `02680d6`.
 
+Demo video: <https://vimeo.com/1240060978>. Code: <https://github.com/WapSecure/matchiq>.
+
 Claims in this document carry the evidence labels from spec §58:
 
 - **[VALIDATED]**: measured or tested, with the artefact linked.
