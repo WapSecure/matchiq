@@ -27,11 +27,11 @@ export const RATIONALE = {
   momentumShift: (team: string, m: MomentumPair) =>
     `The momentum index favours ${team} at ${m.now} against ${m.opponentNow}, from ${m.before} against ${m.opponentBefore} in the previous five minutes; this suggests a shift in attacking momentum, not a prediction of the result.`,
   firstShotOnTarget: (team: string) =>
-    `A ${team} player had their first shot on target of the match.`,
+    `A ${team} player had a shot on target, the first by that player in this match.`,
   firstGoal: (team: string) =>
-    `A ${team} player scored their first goal of the match.`,
+    `A ${team} player scored, their first goal in this match.`,
   firstYellowCard: (team: string) =>
-    `A ${team} player received their first yellow card of the match.`,
+    `A ${team} player received a yellow card, the first for that player in this match.`,
 } as const;
 
 export const MILESTONE_LIMITATION =

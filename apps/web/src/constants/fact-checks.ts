@@ -115,7 +115,8 @@ export const FACT_CHECKS_COPY = {
 export const FALLBACK_GROUP_BECAUSE: Record<FallbackGroup, string> = {
   AI_TROUBLE: 'the writing service was slow or unavailable',
   AI_OFF: 'AI writing is switched off here',
-  FACT_CHECK: 'the fact check rejected the draft',
+  FACT_CHECK:
+    'the fact check held the draft back, for a wrong fact or for repeating itself',
   HELD: 'they did not pass our checks',
   OTHER: 'it was the safer choice',
 };
